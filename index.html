@@ -8,33 +8,54 @@
   <!-- CSS -->
   <link rel="stylesheet" href="css/style.css">
 
-  <!-- 외부 폰트 -->
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800&family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-  <!-- 기존 사이트 body 내용 복사 -->
-  <header>
+  <!-- 네비게이션 -->
+  <nav>
+    <button class="navBtn" data-target="home">홈</button>
+    <button class="navBtn" data-target="menu">메뉴</button>
+    <button class="navBtn" data-target="about">소개</button>
+    <button class="navBtn" data-target="contact">연락처</button>
+  </nav>
+
+  <!-- 홈 섹션 -->
+  <section id="home">
+    <img src="images/logo.png" alt="EHWA Logo" style="width:200px;">
     <h1>EHWA Restaurant</h1>
-  </header>
+    <p>맛있는 한식과 함께 편안한 분위기를 제공합니다.</p>
+  </section>
 
-  <main>
-    <section id="menu">
-      <h2>Menu</h2>
-      <p>메뉴 내용</p>
-      <img src="images/menu.jpg" alt="Menu">
-    </section>
+  <!-- 메뉴 섹션 -->
+  <section id="menu">
+    <h2>Menu</h2>
+    <div class="menu-item">
+      <img src="images/menu1.jpg" alt="Menu 1">
+      <p>비빔밥 — 신선한 채소와 고소한 고기</p>
+    </div>
+    <div class="menu-item">
+      <img src="images/menu2.jpg" alt="Menu 2">
+      <p>김치찌개 — 깊은 맛의 전통 찌개</p>
+    </div>
+  </section>
 
-    <section id="about">
-      <h2>About Us</h2>
-      <p>소개 내용</p>
-    </section>
+  <!-- 소개 섹션 -->
+  <section id="about">
+    <h2>About Us</h2>
+    <img src="images/about.jpg" alt="About" style="width:300px;">
+    <p>EHWA Restaurant는 정통 한식을 캐나다에서 즐길 수 있는 최고의 장소입니다.</p>
+  </section>
 
-    <section id="contact">
-      <h2>Contact</h2>
-      <p>연락처 정보</p>
-    </section>
-  </main>
+  <!-- 연락처 섹션 -->
+  <section id="contact">
+    <h2>Contact</h2>
+    <img src="images/contact.jpg" alt="Contact" style="width:300px;">
+    <p>주소: 123 Main Street, Toronto, ON</p>
+    <p>전화: (123) 456-7890</p>
+    <p>이메일: info@ehwa.ca</p>
+  </section>
 
   <!-- JS -->
   <script src="js/main.js"></script>
