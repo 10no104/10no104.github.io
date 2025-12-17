@@ -1,16 +1,40 @@
-:root{
-  --green:#0e4d39;
-  --green-2:#1a6b51;
-  --ink:#0e4d39;
-  --muted:#5b6b63;
-  --line:#cfe2d9;
+/* 전체 스타일 */
+body {
+  margin: 0;
+  font-family: sans-serif;
 }
 
-*{ box-sizing:border-box }
-
-body{
-  margin:0;
-  background:#fff;
-  color:var(--ink);
-  font-family:'Noto Sans KR', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #0e4d39;
+  padding: 10px;
+  display: flex;
+  gap: 10px;
+  z-index: 100;
 }
+
+nav button {
+  background: #fff;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+nav button:hover {
+  background: #1a6b51;
+  color: #fff;
+}
+
+section {
+  height: 100vh;
+  padding: 80px 20px 20px 20px; /* nav 때문에 top padding */
+  border-bottom: 1px solid #ccc;
+}
+
+#home { background: #f7f7f7; }
+#about { background: #e0f7fa; }
+#contact { background: #fff0f0; }
