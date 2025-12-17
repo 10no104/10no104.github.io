@@ -1,7 +1,5 @@
-// 모든 네비게이션 버튼 선택
-const buttons = document.querySelectorAll('.navBtn');
-
-buttons.forEach(btn => {
+// 예: 버튼 클릭 시 스크롤 이동
+document.querySelectorAll('.navBtn').forEach(btn => {
   btn.addEventListener('click', () => {
     const targetId = btn.getAttribute('data-target');
     const targetEl = document.getElementById(targetId);
