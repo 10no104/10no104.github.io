@@ -1,7 +1,6 @@
-/* 전체 스타일 */
 body {
   margin: 0;
-  font-family: sans-serif;
+  font-family: 'Noto Sans KR', sans-serif;
 }
 
 nav {
@@ -31,10 +30,21 @@ nav button:hover {
 
 section {
   height: 100vh;
-  padding: 80px 20px 20px 20px; /* nav 때문에 top padding */
+  padding: 100px 20px 20px 20px; /* nav 때문에 top padding */
   border-bottom: 1px solid #ccc;
 }
 
 #home { background: #f7f7f7; }
-#about { background: #e0f7fa; }
-#contact { background: #fff0f0; }
+#menu { background: #e0f7fa; }
+#about { background: #fff0f0; }
+#contact { background: #f0fff0; }
+
+.menu-item {
+  margin-bottom: 20px;
+}
+
+.menu-item img {
+  width: 200px;
+  display: block;
+  margin-bottom: 10px;
+}
