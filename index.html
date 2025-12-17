@@ -3,34 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Dynamic GitHub Page</title>
+  <title>EHWA Restaurant</title>
+
+  <!-- CSS -->
   <link rel="stylesheet" href="css/style.css">
+
+  <!-- 외부 폰트 -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800&family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-  <!-- 네비게이션 -->
-  <nav>
-    <button class="navBtn" data-target="home">홈</button>
-    <button class="navBtn" data-target="about">소개</button>
-    <button class="navBtn" data-target="contact">연락처</button>
-  </nav>
+  <!-- 기존 사이트 body 내용 복사 -->
+  <header>
+    <h1>EHWA Restaurant</h1>
+  </header>
 
-  <!-- 섹션 -->
-  <section id="home">
-    <h1>홈 섹션</h1>
-    <p>여기가 메인 화면입니다.</p>
-  </section>
+  <main>
+    <section id="menu">
+      <h2>Menu</h2>
+      <p>메뉴 내용</p>
+      <img src="images/menu.jpg" alt="Menu">
+    </section>
 
-  <section id="about">
-    <h1>소개 섹션</h1>
-    <p>여기는 소개 내용입니다.</p>
-  </section>
+    <section id="about">
+      <h2>About Us</h2>
+      <p>소개 내용</p>
+    </section>
 
-  <section id="contact">
-    <h1>연락처 섹션</h1>
-    <p>여기는 연락처 정보입니다.</p>
-  </section>
+    <section id="contact">
+      <h2>Contact</h2>
+      <p>연락처 정보</p>
+    </section>
+  </main>
 
+  <!-- JS -->
   <script src="js/main.js"></script>
 </body>
 </html>
