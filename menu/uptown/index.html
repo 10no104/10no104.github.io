@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EHWA Restaurant — Full Menu (One Page)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800&family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --green:#0e4d39;
+      --green-2:#1a6b51;
+      --ink:#0e4d39;
+      --muted:#5b6b63;
+      --line:#cfe2d9;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; background:#fff; color:var(--ink);
+      font-family:'Noto Sans KR', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    }
+    header{
+      position:sticky; top:0; z-index:10; backdrop-filter:saturate(180%) blur(6px);
+      background:rgb(255 255 255 / .9); border-bottom:1px solid var(--line);
+    }
+    .container{max-width:1100px; margin:0 auto; padding:16px 20px}
+    .brand{display:flex; align-items:flex-end; justify-content:space-between; gap:16px}
+    .brand h1{font-family:'Playfair Display', serif; font-weight:800; letter-spacing:.06em; margin:0; font-size:28px}
+    .brand small{color:var(--muted)}
+    nav{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px}
+    nav a{padding:6px 10px; border:1px solid var(--line); border-radius:999px; text-decoration:none; color:var(--green); font-weight:600; font-size:.9rem}
+    main{padding:20px}
+    section{max-width:1100px; margin:0 auto 36px; padding:0 4px}
+    .section-title{display:flex; align-items:center; gap:12px; margin:18px 0 14px}
+    .section-title h2{margin:0; font-size:22px; font-weight:800; letter-spacing:.02em}
+    .section-title .rule{flex:1; height:2px; background:var(--green); opacity:.2}
+
+    /* grid for menu items */
+    .grid{display:grid; grid-template-columns:1fr auto; gap:6px 14px}
+    .item{display:contents}
+    .name{font-weight:700}
+    .roman{font-weight:600; font-size:.92rem; color:var(--green-2); margin-left:6px}
+    .price{font-weight:700; justify-self:end}
+    .desc{grid-column:1 / -1; color:#4c5a54; font-size:.92rem}
+    .divider{border-top:1px dashed var(--line); margin:8px 0 16px}
+
+    /* 2-col layout for desktop sections that have a lot of lines */
+    .two-col{display:grid; grid-template-columns:1fr 1fr; gap:24px}
+
+    @media (max-width:900px){
+      .two-col{grid-template-columns:1fr}
+    }
+    @media (max-width:560px){
+      nav{gap:6px}
+      nav a{font-size:.85rem; padding:5px 9px}
+      .grid{grid-template-columns:1fr}
+      .price{justify-self:start}
+    }
+    footer{border-top:1px solid var(--line); color:#7a8a83; text-align:center; padding:22px 16px; font-size:.9rem}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="brand">
+        <h1>EHWA RESTAURANT</h1>
+      </div>
+      <nav>
+        <a href="#main">Main</a>
+        <a href="#soup">Soup</a>
+        <a href="#meal">Meal</a>
+        <a href="#chicken">Fried Chicken</a>
+        <a href="#tteok">Tteokbokki</a>
+        <a href="#pasta">Pasta</a>
+        <a href="#pancake">Pancakes</a>
+        <a href="#omurice">Omurice</a>
+        <a href="#salad">Salad</a>
+        <a href="#tonkatsu">Tonkatsu</a>
+        <a href="#light">Light Shares</a>
+        <a href="#yuk">Yukhway</a>
+        <a href="#dessert">Dessert</a>
+        <a href="#soju">Soju</a>
+        <a href="#mak">Makguli</a>
+        <a href="#sake">Sake</a>
+        <a href="#highball">Highball</a>
+        <a href="#shot">Shot</a>
+        <a href="#beer">Beer</a>
+        <a href="#cocktail">Cocktail</a>
+        <a href="#bottle">Bottle</a>
+        <a href="#wine">Wine</a>
+        <a href="#soft">Soft Drink</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Main Dish -->
+    <section id="main">
+      <div class="section-title"><h2>Main Dish</h2><div class="rule"></div></div>
+      <div class="two-col">
+        <div>
+          <div class="grid">
+            <div class="item">
+              <div class="name">삼겹 두루치기 <span class="roman">Samgyup Duruchigi</span></div>
+              <div class="price">$23.99</div>
+              <div class="desc">Stir-fried seasonal vegetables, kimchi, and pork belly.</div>
+            </div>
+            <div class="item">
+              <div class="name">매운 등갈비 떡찜 <span class="roman">Spicy Back Ribs</span></div>
+              <div class="price">$27.99</div>
+              <div class="desc">Spicy braised pork ribs with ricecakes.</div>
+            </div>
+            <div class="item">
+              <div class="name">치즈 불닭 <span class="roman">Cheese BulDak</span></div>
+              <div class="price">$22.99</div>
+              <div class="desc">Grilled spicy chicken with mozzarella cheese on top.</div>
+            </div>
+            <div class="item">
+              <div class="name">지꾸바 치킨 <span class="roman">G-quva Chicken</span></div>
+              <div class="price">$23.99</div>
+              <div class="desc">Grilled spicy chicken with udon and rice cake.</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="grid">
+            <div class="item">
+              <div class="name">불고기 <span class="roman">Bulgogi</span></div>
+              <div class="price">$23.99</div>
+              <div class="desc">Sliced beef marinated in a sweet and savory sauce.</div>
+            </div> <div class="item">
+              <div class="name">오징어 카펠리니 <span class="roman">Bulgogi</span></div>
+              <div class="price">$20.99</div>
+              <div class="desc">Capellini with spicy stir fried</div>
+            </div>
+
+            <div class="item">
+              <div class="name">인절미 탕수육 <span class="roman">Injeolmi Tangsuyuk</span></div>
+              <div class="price">$23.99</div>
+              <div class="desc">Chewy sweet & sour deep fried pork with Injeolmi ricecakes.</div>
+            </div>
+            <div class="item">
+              <div class="name">쫄뱅이 <span class="roman">Jjol Bang E</span></div>
+              <div class="price">$23.99</div>
+              <div class="desc">Spicy baitop shells with mixed vegetables and noodles.</div>
+            </div>
+            <div class="item">
+              <div class="name">삼겹살 한상 <span class="roman">Pork Belly BBQ</span></div>
+              <div class="price">$23.99</div>
+              <div class="desc">Grilled pork belly.</div>
+            </div>
+            <div class="item">
+              <div class="name">불고기 한상 <span class="roman">Bulgogi Hansang</span></div>
+              <div class="price">$23.99</div>
+              <div class="desc">Stir Fried Korean-style Beef.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Soup -->
+    <section id="soup">
+      <div class="section-title"><h2>Soup</h2><div class="rule"></div></div>
+      <div class="two-col">
+        <div>
+          <div class="grid">
+            <div class="item"><div class="name">부대찌개 <span class="roman">Budaejjigae (Army Soup)</span></div><div class="price">$22.99</div><div class="desc">Spam, sausage, kimchi, ramen noodle, and vegetable in signature soup base.</div></div>
+            <div class="item"><div class="name">고기 해물 짬뽕 <span class="roman">Jjamppong</span></div><div class="price">$22.99</div><div class="desc">Spicy seafood based soup with noodles and stir-fried meat.</div></div>
+            <div class="item"><div class="name">홍합탕 <span class="roman">Honghaptang</span></div><div class="price">$22.99</div><div class="desc">Mussel soup.</div></div>
+<div class="name">매운 꼬치 오뎅탕 <span class="roman">Kkochi Odeng Tang</span></div><div class="price">$22.99</div><div class="desc">Spicy skewered fish cakes and odeng soup.</div></div>
+
+        <div>
+          <div class="grid">
+            <div class="item"><div class="name">유부 오뎅탕 <span class="roman">Yubu Odeng Tang</span></div><div class="price">$22.99</div><div class="desc">Odeng soup with fried tofu.</div></div>
+
+<div class="item"><div class="name">떡도리탕 <span class="roman">Dduk Doritang</span></div><div class="price">$25.99</div><div class="desc">Braised chicken with spicy sauce, carrot, potato, onion, garlic and ricecakes</div></div>
+
+            <div class="item"><div class="name">봉골레 국물 술찜 <span class="roman">Vongole Gukmul Suljjim</span></div><div class="price">$25.99</div><div class="desc">Spaghetti with clam, dried chilli, butter and garlic in signature vongole sauce.</div></div>
+            <div class="item"><div class="name">해물 계란탕 <span class="roman">Haemul Gyerantang</span></div><div class="price">$25.99</div><div class="desc">Seafood egg soup.</div></div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Meal -->
+    <section id="meal">
+      <div class="section-title"><h2>Meal</h2><div class="rule"></div></div>
+      <div class="two-col">
+        <div>
+          <div class="grid">
+            <div class="item"><div class="name">스팸 계란밥 <span class="roman">Spam Egg on Rice </span></div><div class="price">$7.99</div></div>
+            <div class="item"><div class="name">반합 라면 <span class="roman">Banhap Ramyun</span></div><div class="price">$13.99</div><div class="desc">Ramyun in military mess tin</div></div>
+            <div class="item"><div class="name">짜계치 <span class="roman">Jjagechi</span></div><div class="price">$15.99</div><div class="desc">Korean jjajang noodles with fried egg and cheese</div></div>
+            <div class="item"><div class="name">육회 김밥 <span class="roman">Yukhway Gimbap</span></div><div class="price">$19.99</div><div class="desc">Mini gimbap with yukhay on top</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="grid">
+            <div class="item"><div class="name">콩나물 육회 비빔밥 <span class="roman">Kongnamul Yukhway Bibimbap</span></div><div class="price">$19.99</div><div class="desc">Korean style beef tartare, bean sprouts, spring mix with rice bowl.</div></div>
+            <div class="item"><div class="name">불고기 덮밥 <span class="roman">Bulgogi Dupbap</span></div><div class="price">$15.99</div><div class="desc">Sliced beef marinated in a sweet and savory sauce, grilled, served on rice.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chicken -->
+    <section id="chicken">
+      <div class="section-title"><h2>Chicken</h2><div class="rule"></div></div>
+      <div class="two-col">
+        <div>
+          <div class="grid">
+            <div class="item"><div class="name">순살 후라이드 치킨 <span class="roman">Crispy Boneless Fried Chicken</span></div><div class="price">$24.99</div><div class="desc">Classic crispy boneless chicken.</div></div>
+            <div class="item"><div class="name">순살 양념 치킨 <span class="roman">Crispy Boneless Sweet & Spicy Chicken</span></div><div class="price">$25.99</div><div class="desc">Sweet & spicy glaze.</div></div>
+            <div class="item"><div class="name">순살 간장 치킨 <span class="roman">Crispy Boneless Soy Sauce Chicken</span></div><div class="price">$25.99</div><div class="desc">Savory soy glaze.</div></div>
+            <div class="item"><div class="name">꿀간장 인절미 치킨 <span class="roman">Soy Sauce Injeolmi Chicken</span></div><div class="price">$27.99</div><div class="desc">Crispy boneless soy sauce chicken with Injeolmi ricecakes.</div></div>
+            <div class="item"><div class="name">치즈 뿌링클 <span class="roman">Crispy Boneless Cheese Powdered Chicken</span></div><div class="price">$27.99</div><div class="desc">Cheese flavored powder.</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="grid">
+            <div class="item"><div class="name">싸가지 닭 <span class="roman">Ssagaji Dak</span></div><div class="price">$29.99</div><div class="desc">Combination of four flavours chicken in one.</div></div>
+            <div class="item"><div class="name">치킨윙 <span class="roman">Flavoured Chicken Wing</span></div><div class="price">$21.99</div><div class="desc">Original, Sweet & Spicy, and Soy Sauce.</div></div>
+            <div class="item"><div class="name">허니 갈릭 치킨윙 <span class="roman">Honey Garlic Chicken Wing</span></div><div class="price">$21.99</div><div class="desc">Honey garlic glaze.</div></div>
+            <div class="item"><div class="name">닭강정 <span class="roman">Dakgangjeong</span></div><div class="price">$24.99</div><div class="desc">Deep-fried chicken with sweet & spicy sauce.</div></div>
+            <div class="item"><div class="name">깐풍기 <span class="roman">Kkanpunggi</span></div><div class="price">$24.99</div><div class="desc">Spicy garlic fried chicken.</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tteokbokki -->
+    <section id="tteok">
+      <div class="section-title"><h2>Tteokbokki</h2><div class="rule"></div></div>
+      <div class="two-col">
+        <div>
+          <div class="grid">
+            <div class="item"><div class="name">오리지날 떡볶이 <span class="roman">Original Tteokbokki</span></div><div class="price">$18.99</div><div class="desc">Korean traditional spicy ricecakes.</div></div>
+            <div class="item"><div class="name">로제 떡볶이 <span class="roman">Rosé Tteokbokki</span></div><div class="price">$20.99</div><div class="desc">Korean-style rosé ricecakes.</div></div>
+            <div class="item"><div class="name">삼겹살 떡볶이 <span class="roman">Samgyeupsal Tteokbokki</span></div><div class="price">$18.99</div><div class="desc">Ricecakes with grilled pork belly.</div></div>
+           
+            <div class="item"><div class="name">불고기 떡볶이 <span class="roman">Bulgogi Tteokbokki</span></div><div class="price">$19.99</div><div class="desc">Savory stir-fried ricecakes with Bulgogi.</div></div>
+            <div class="item"><div class="name">해물 마라 로제 떡볶이 <span class="roman">Haemul Mala Rosé Tteokbokki</span></div><div class="price">$22.99</div><div class="desc">Mala rosé tteokbokki with seafoods.</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="grid">
+            <div class="item"><div class="name">김말이 튀김 <span class="roman">Deep Fried Seaweed Roll</span></div><div class="price">$7.99</div><div class="desc">Topping for tteokbokki.</div></div>
+            <div class="item"><div class="name">만두 튀김 <span class="roman">Deep Fried Beef Dumpling</span></div><div class="price">$7.99</div><div class="desc">Topping for tteokbokki.</div></div>
+            <div class="item"><div class="name">치즈 <span class="roman">Cheese</span></div><div class="price">$2.00</div><div class="desc">Extra cheese topping.</div></div>
+<div class="item"><div class="name">우삼겹 <span class="roman">Beef Brisket</span></div><div class="price">$9.99</div><div class="desc">Extra topping.</div></div>
+<div class="item"><div class="name">순살치킨 <span class="roman">Boneless Chicken</span></div><div class="price">$9.99</div><div class="desc">Extra topping.</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pasta -->
+    <section id="pasta">
+      <div class="section-title"><h2>Pasta</h2><div class="rule"></div></div>
+      <div class="two-col">
+        <div>
+          <div class="grid">
+            <div class="item"><div class="name">토마토 해장 파스타 <span class="roman">Squid Pasta</span></div><div class="price">$23.99</div><div class="desc">Spaghetti with whole squid, assorted seafood, and garlic in spicy tomato sauce.</div></div>
+            <div class="item"><div class="name">이화 봉골레 파스타 <span class="roman">Ehwa Vongole Pasta</span></div><div class="price">$20.99</div><div class="desc">Spaghetti with Clam, Dried Chilli, Butter, and Garlic in Signature Vongole Sauce</div></div>
+            <div class="item"><div class="name">트러플 청양 크림 파스타 <span class="roman">Pork Belly Chilli Cream Pasta</span></div><div class="price">$20.99</div><div class="desc">Spaghetti with pork-belly, truffle oil, and cheese in signature cream sauce.</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="grid">
+            <!-- intentionally left for future pasta items -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pancakes -->
+    <section id="pancake">
+      <div class="section-title"><h2>Pancakes</h2><div class="rule"></div></div>
+      <div class="two-col">
+        <div>
+          <div class="grid">
+            <div class="item"><div class="name">해물파전 <span class="roman">Haemul Pajeon</span></div><div class="price">$22.99</div><div class="desc">Korean style seafood pancake.</div></div>
+            <div class="item"><div class="name">김치전 <span class="roman">Kimchi Jeon</span></div><div class="price">$22.99</div><div class="desc">Korean style kimchi pancake.</div></div>
+            <div class="item"><div class="name">한판 육전 <span class="roman">Hanpan Yukjeon</span></div><div class="price">$23.99</div><div class="desc">Korean style beef pancake</div></div>
+            <div class="item"><div class="name">반반파전 (김치&해물) <span class="roman">Banban Pajeon</span></div><div class="price">$24.99</div><div class="desc">Half & half pancake (kimchi & seafood).</div></div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </section>
+
+
+    <!-- Omurice -->
+    <section id="omurice">
+      <div class="section-title"><h2>Omurice </h2><div class="rule"></div></div>
+      <div class="two-col">
+        <div>
+          <div class="grid">
+            <div class="item"><div class="name">오리지널 오므라이스 <span class="roman">Original Omurice</span></div><div class="price">$17.99</div></div>
+<div class="item"><div class="name">소시지 오므라이스 <span class="roman">Sausage Omurice</span></div><div class="price">$19.99</div></div><div class="item"><div class="name">돈까스 오므라이스 <span class="roman">Pork cutlet Omurice</span></div><div class="price">$20.99</div></div>
+<div class="item"><div class="name">함박 스테이크 오므라이스 <span class="roman">Hamburg Steak Omurice</span></div><div class="price">$22.99</div></div>
+
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </section>
+
+    <!-- Salad-->
+    <section id="salad">
+      <div class="section-title"><h2>Salad</h2><div class="rule"></div></div>
+      <div class="two-col">
+        <div>
+          <div class="grid">
+            <div class="item"><div class="name">미니 시저 샐러드 <span class="roman">Mini Ceasar Salad</span></div><div class="price">$7.99</div></div>
+<div class="item"><div class="name">이화 미니 샐러드 <span class="roman">Ehwa Mini Salad</span></div><div class="price">$7.99</div><div class="desc">Cherry Tomato, Spring Mix with Yuzu Dressing</div></div>
+
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </section>
+
+<!-- Tonkatsu-->
+    <section id="tonkatsu">
+      <div class="section-title"><h2>Tonkatsu</h2><div class="rule"></div></div>
+      <div class="two-col">
+        <div>
+          <div class="grid">
+            <div class="item">
+              <div class="name">이화 돈까스 <span class="roman">Ehwa Tonkatsu</span></div>
+              <div class="price">$18.99</div>
+              <div class="desc">Pork Cutlet with ehwa Signature Tonkatsu Sauce</div>
+            </div>
+
+<div class="item">
+              <div class="name">치즈 돈까스 <span class="roman">Cheese Tonkatsu</span></div>
+              <div class="price">$21.99</div>
+              <div class="desc">Mozzarella Cheese on Pork Cutlet with ehwa Signature Tonkatsu Sauce</div>
+            </div>
+
+<div class="item">
+              <div class="name">청양 크림 돈까스 <span class="roman">Chilli Cream Tonkatsu</span></div>
+              <div class="price">$22.99</div>
+              <div class="desc">Pork Cutlet, Truffle Oil, Chilli Pesto, and Cream Sauce</div>
+            </div>
+
+<div class="item">
+              <div class="name">생선 까스 <span class="roman">Fish Katsu</span></div>
+              <div class="price">$21.99</div>
+              <div class="desc">Fish Katsu with Korean Style Colourful Tartar Sauce</div>
+            </div>
+<div class="item">
+              <div class="name">이화 정식 <span class="roman">Ehwa Jeong-Sik</span></div>
+              <div class="price">$24.99</div>
+              <div class="desc">A set meal consisting of Hamburg Steak, Fish Katsu, Tonkatsu, anm Shrimp Tempura</div>
+            </div>
+
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </section>
+
+<!-- Hamburg-->
+    <section id="tonkatsu">
+      <div class="section-title"><h2>Hamburg Steak</h2><div class="rule"></div></div>
+      <div class="two-col">
+        <div>
+          <div class="grid">
+<div class="item"><div class="name">그 시절 함박 스테이크 <span class="roman">Ehwa Hamburg Steak</span></div><div class="price">$21.99</div><div class="desc">Juicy Beef and pork patty with ehwa signature sauce</div></div>
+<div class="item"><div class="name">청양 함박 스테이크 <span class="roman">Chilli Cream Hamburg Steak</span></div><div class="price">$22.99</div><div class="desc">Juicy Beef and pork patty with Chilly pesto, truffle oil and cream sauce</div></div>
+
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </section>
+
+
+
+    <!-- Light Shares + Yukhway -->
+    <section id="light">
+      <div class="section-title"><h2>Light Shares</h2><div class="rule"></div></div>
+      <div class="two-col">
+        <div>
+          <div class="grid">
+            <div class="item"><div class="name">콘치즈 <span class="roman">Corn Cheese</span></div><div class="price">$6.99</div><div class="desc">Stir-fry sweet corn, savory cheese, creamy mayonnaise, and sugar.</div></div>
+            <div class="item"><div class="name">타코와사비 <span class="roman">Tako Wasabi</span></div><div class="price">$9.99</div><div class="desc">Raw octopus with lots of wasabi.</div></div>
+            <div class="item"><div class="name">감자튀김 <span class="roman">French Fries</span></div><div class="price">$6.99</div><div class="desc">Golden fries.</div></div>
+            <div class="item"><div class="name">트러플 감자튀김 <span class="roman">French Fries with Truffle Oil</span></div><div class="price">$9.99</div><div class="desc">Fries finished with truffle oil.</div></div>
+            <div class="item"><div class="name">마약 옥수수 <span class="roman">Mayak Oksusu</span></div><div class="price">$8.99</div><div class="desc">Grilled corn with special powder.</div></div>
+            <div class="item"><div class="name">과일 황도 <span class="roman">Gwail Hwangdo</span></div><div class="price">$12.99</div><div class="desc">Yellow peaches and fruits.</div></div>
+
+ <div class="item"><div class="name">감바스 <span class="roman">Gambas</span></div><div class="price">$18.99</div><div class="desc">Shrimps, olive oil, garlic, dried chilli and parsley</div></div>
+
+ <div class="item"><div class="name">구절판 과일 <span class="roman">Gujeolpan Gwail</span></div><div class="price">$25.99</div><div class="desc">Assorted fruits served in Gujeolpan plate</div></div>
+
+ <div class="item"><div class="name">먹태<span class="roman">Meoktae</span></div><div class="price">$18.99</div><div class="desc">Roasted Dried Pollack</div></div>
+
+
+          </div>
+        </div>
+        <div id="yuk">
+          <div class="section-title"><h2>Yukhway</h2><div class="rule"></div></div>
+          <div class="grid">
+            <div class="item"><div class="name">육회 <span class="roman">Yukhway</span></div><div class="price">$18.99</div><div class="desc">Beef sashimi with soy sauce.</div></div>
+            <div class="item"><div class="name">한국식 육회 <span class="roman">Korean Yukhway</span></div><div class="price">$18.99</div><div class="desc">Beef sashimi with gochujang.</div></div>
+            <div class="item"><div class="name">타코야끼 <span class="roman">Takoyaki</span></div><div class="price">$10.99</div><div class="desc">Octopus balls.</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dessert -->
+    <section id="dessert">
+      <div class="section-title"><h2>Dessert</h2><div class="rule"></div></div>
+      <div class="grid">
+        <div class="item"><div class="name">크롱지 아이스크림 <span class="roman">C-roonggi</span></div><div class="price">$6.99</div><div class="desc">Nurungji croissant with ice cream.</div></div>
+        <div class="item"><div class="name">주전부리 <span class="roman">Jujeonburi</span></div><div class="price">$9.99</div><div class="desc">Assorted snacks served in plate.</div></div>
+ <div class="item"><div class="name">인절미 꿀피자 <span class="roman">Injeolmi Honey Pizza</span></div><div class="price">$15.99</div><div class="desc">Tortilla pizza with injeolmi and honey topping</div></div>
+
+      </div>
+    </section>
+
+    <!-- Drinks: Soju / Fruit Soju -->
+    <section id="soju">
+      <div class="section-title"><h2>Soju</h2><div class="rule"></div></div>
+      <div class="two-col">
+        <div>
+          <div class="grid">
+            <div class="item"><div class="name">참이슬 <span class="roman">Chamisul Fresh</span></div><div class="price">$23.99</div><div class="desc"></div></div>
+            <div class="item"><div class="name">처음처럼 <span class="roman">Chum-Churum</span></div><div class="price">$23.99</div><div class="desc"></div></div>
+            <div class="item"><div class="name">진로이즈백 <span class="roman">Jinro</span></div><div class="price">$23.99</div><div class="desc"></div></div>
+            <div class="item"><div class="name">한라산 <span class="roman">Hallasan</span></div><div class="price">$23.99</div><div class="desc"></div></div>
+            
+<div class="item"><div class="name">새로 <span class="roman">Sero</span></div><div class="price">$23.99</div><div class="desc">Original, Apricot.</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="section-title"><h2>Fruit Soju</h2><div class="rule"></div></div>
+          <div class="grid">
+            <div class="item"><div class="name">청포도 <span class="roman">Green Grape</span></div><div class="price">$23.99</div><div class="desc"></div></div>
+            <div class="item"><div class="name">자몽 <span class="roman">Grapefruit</span></div><div class="price">$23.99</div><div class="desc"></div></div>
+            <div class="item"><div class="name">사과 <span class="roman">Green Apple</span></div><div class="price">$23.99</div><div class="desc"></div></div>
+            <div class="item"><div class="name">복숭아 <span class="roman">Peach</span></div><div class="price">$23.99</div><div class="desc"></div></div>
+            <div class="item"><div class="name">자두 <span class="roman">Plum</span></div><div class="price">$23.99</div><div class="desc"></div></div>
+            <div class="item"><div class="name">칵테일 소주 <span class="roman">Cocktail Soju</span></div><div class="price">$23.99</div><div class="desc">Peach, Mango, Pineapple, and Yakult.</div></div>
+
+<div class="item"><div class="name">솜사탕주 <span class="roman">Cotton Candy Soju</span></div><div class="price">$14.99</div><div class="desc">Soju with cotton candy on top</div></div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Makguli / Sake / Highball / Shot -->
+    <section id="mak">
+      <div class="section-title"><h2>Makguli</h2><div class="rule"></div></div>
+      <div class="grid">
+        <div class="item"><div class="name">막걸리 <span class="roman">Makguli</span></div><div class="price">$23.99</div><div class="desc">Original, Peach, Green grape.</div></div>
+        <div class="item"><div class="name">벌꿀집 <span class="roman">Honeycomb</span></div><div class="price">$5.99</div><div class="desc"></div></div>
+        <div class="item"><div class="name">생과일 막걸리 <span class="roman">Fruit Makguli</span></div><div class="price">$30.99</div><div class="desc">Peach, Mango, Pineapple.</div></div>
+      </div>
+    </section>
+
+    <section id="sake">
+      <div class="section-title"><h2>Sake</h2><div class="rule"></div></div>
+      <div class="two-col">
+        <div>
+          <div class="grid">
+            <div class="item"><div class="name">Hot Sake</div><div class="price">$18.99</div><div class="desc">—</div></div>
+            <div class="item"><div class="name">Hakutsuru Draft <span class="roman">300ml</span></div><div class="price">$23.99</div><div class="desc">—</div></div>
+            <div class="item"><div class="name">Sayuri Nigori <span class="roman">300ml</span></div><div class="price">$23.99</div><div class="desc">—</div></div>
+            <div class="item"><div class="name">Junmai Ginjo <span class="roman">300ml</span></div><div class="price">$23.99</div><div class="desc">—</div></div>
+            <div class="item"><div class="name">Gekkeikan <span class="roman">750ml</span></div><div class="price">$40.00</div><div class="desc">—</div></div>
+          </div>
+        </div>
+        <div id="highball">
+          <div class="section-title"><h2>Highball</h2><div class="rule"></div></div>
+          <div class="grid">
+            <div class="item"><div class="name">유자 <span class="roman">Yuja</span></div><div class="price">$12.99</div><div class="desc"></div></div>
+            <div class="item"><div class="name">자몽 <span class="roman">Grapefruit</span></div><div class="price">$12.99</div><div class="desc"></div></div>
+            <div class="item"><div class="name">한라봉 <span class="roman">Hanrabong</span></div><div class="price">$12.99</div><div class="desc"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="shot">
+      <div class="section-title"><h2>Shot</h2><div class="rule"></div></div>
+      <div class="grid">
+        <div class="item"><div class="name">Absolute</div><div class="price">$7.00</div><div class="desc"></div></div>
+        <div class="item"><div class="name">Captain Morgen</div><div class="price">$7.00</div><div class="desc"></div></div>
+        <div class="item"><div class="name">Bacardi</div><div class="price">$7.00</div><div class="desc"></div></div>
+        <div class="item"><div class="name">Jagermeister</div><div class="price">$7.00</div><div class="desc"></div></div>
+        <div class="item"><div class="name">Jameson</div><div class="price">$7.00</div><div class="desc"></div></div>
+        <div class="item"><div class="name">1800 Tequila</div><div class="price">$9.00</div><div class="desc"></div></div>
+        <div class="item"><div class="name">Grey Goose</div><div class="price">$9.00</div><div class="desc"></div></div>
+        <div class="item"><div class="name">Johnnie Walker</div><div class="price">$9.00</div><div class="desc"></div></div>
+        <div class="item"><div class="name">Hennessy</div><div class="price">$13.00</div><div class="desc"></div></div>
+      </div>
+    </section>
+
+    <!-- Beer -->
+    <section id="beer">
+      <div class="section-title"><h2>Draft & Premium Beer</h2><div class="rule"></div></div>
+      <div class="two-col">
+        <div>
+          <div class="grid">
+            <div class="item"><div class="name">Pint <span class="roman">Sapporo or Asahi (16oz)</span></div><div class="price">$8.50</div><div class="desc"></div></div>
+            <div class="item"><div class="name">Pitcher <span class="roman">Sapporo or Asahi (60oz)</span></div><div class="price">$28.99</div><div class="desc"></div></div>
+          </div>
+          <div class="divider"></div>
+          <div class="grid">
+            <div class="item"><div class="name">Corona</div><div class="price">$7.99</div></div>
+            <div class="item"><div class="name">Heineken</div><div class="price">$7.99</div></div>
+            <div class="item"><div class="name">Sapporo</div><div class="price">$7.99</div></div>
+            <div class="item"><div class="name">Alexander Keith</div><div class="price">$7.99</div></div>
+            <div class="item"><div class="name">Stella Artois</div><div class="price">$7.99</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="section-title"><h2>Domestic Beer</h2><div class="rule"></div></div>
+          <div class="grid">
+            <div class="item"><div class="name">Coors Light</div><div class="price">$6.99</div></div>
+            <div class="item"><div class="name">Budweiser</div><div class="price">$6.99</div></div>
+            <div class="item"><div class="name">Canadian</div><div class="price">$6.99</div></div>
+            <div class="item"><div class="name">Blue</div><div class="price">$6.99</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cocktail / Bottle / Wine / Soft Drink -->
+    <section id="cocktail">
+      <div class="section-title"><h2>Cocktail</h2><div class="rule"></div></div>
+      <div class="grid">
+        <div class="item"><div class="name">Jack Coke</div><div class="price">$10.99</div></div>
+        <div class="item"><div class="name">Rum Coke</div><div class="price">$10.99</div></div>
+        <div class="item"><div class="name">Jager Bomb</div><div class="price">$10.99</div></div>
+        <div class="item"><div class="name">Gin & Tonic</div><div class="price">$10.99</div></div>
+      </div>
+    </section>
+
+    <section id="bottle">
+      <div class="section-title"><h2>Bottle</h2><div class="rule"></div></div>
+      <div class="two-col">
+        <div>
+          <div class="grid">
+            <div class="item"><div class="name">Jack Daniel <span class="roman">375ml</span></div><div class="price">$60.00</div></div>
+            <div class="item"><div class="name">Jameson Whiskey <span class="roman">750ml</span></div><div class="price">$110.00</div></div>
+            <div class="item"><div class="name">Johnnie Walker <span class="roman">375ml</span></div><div class="price">$110.00</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="grid">
+            <div class="item"><div class="name">Grey Goose <span class="roman">750ml</span></div><div class="price">$170.00</div></div>
+            <div class="item"><div class="name">*Add $6 for fruit platter & 2 pop</div><div class="price"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="wine">
+      <div class="section-title"><h2>Wine</h2><div class="rule"></div></div>
+      <div class="grid">
+        <div class="item"><div class="name">Red</div><div class="price">$7.99</div></div>
+        <div class="item"><div class="name">White</div><div class="price">$7.99</div></div>
+      </div>
+    </section>
+
+    <section id="soft">
+      <div class="section-title"><h2>Soft Drink</h2><div class="rule"></div></div>
+      <div class="two-col">
+        <div>
+          <div class="grid">
+            <div class="item"><div class="name">Coke</div><div class="price">$3.99</div></div>
+            <div class="item"><div class="name">Diet Coke</div><div class="price">$3.99</div></div>
+<div class="item"><div class="name">Zero Coke</div><div class="price">$3.99</div></div>
+            <div class="item"><div class="name">Sprite</div><div class="price">$3.99</div></div>
+            <div class="item"><div class="name">Canada Dry</div><div class="price">$3.99</div></div>
+            <div class="item"><div class="name">Iced Tea</div><div class="price">$3.99</div></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Can’t decide what to eat? Ask our servers for the best recommendation.
+  </footer>
+</body>
+</html>
