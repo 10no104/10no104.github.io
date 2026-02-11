@@ -1,725 +1,408 @@
- (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
-diff --git a/index.html b/index.html
-index e0cea0fc2864c3c03d5400056eab44f73b0fe678..bee2c3f2418d1183641b7e4bd91a1e9ebca5096d 100644
---- a/index.html
-+++ b/index.html
-@@ -1,455 +1,304 @@
- <!DOCTYPE html>
- <html lang="ko">
- <head>
-   <meta charset="UTF-8" />
-   <meta name="viewport" content="width=device-width, initial-scale=1" />
--  <title>EHWA Restaurant — Full Menu (One Page)</title>
--  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800&family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet">
--<link rel="stylesheet" href="/css/style.css">
-+  <title>EHWA Restaurant | Main Home</title>
-+  <link rel="preconnect" href="https://fonts.googleapis.com" />
-+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet" />
-+  <style>
-+    :root{
-+      --bg:#0c1512;
-+      --panel:#13211b;
-+      --line:#244137;
-+      --text:#edf4f0;
-+      --muted:#b6c5bc;
-+      --accent:#8fe3b8;
-+      --accent-strong:#65c596;
-+      --radius:18px;
-+    }
-+    *{box-sizing:border-box}
-+    html,body{margin:0;padding:0}
-+    body{
-+      font-family:'Noto Sans KR',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-+      color:var(--text);
-+      background:var(--bg);
-+      line-height:1.6;
-+    }
-+    img{max-width:100%;display:block}
-+    a{text-decoration:none;color:inherit}
- 
-+    .container{width:min(1120px, calc(100% - 40px));margin-inline:auto}
- 
--</head>
--<body>
--  <header>
--    <div class="container">
--      <div class="brand">
--        <h1>EHWA RESTAURANT</h1>
--      </div>
--      <nav>
--        <a href="#main">Main</a>
--        <a href="#soup">Soup</a>
--        <a href="#meal">Meal</a>
--        <a href="#chicken">Fried Chicken</a>
--        <a href="#tteok">Tteokbokki</a>
--        <a href="#pasta">Pasta</a>
--        <a href="#pancake">Pancakes</a>
--        <a href="#light">Light Shares</a>
--        <a href="#yuk">Yukhway</a>
--        <a href="#soju">Soju</a>
--        <a href="#mak">Makguli</a>
--        <a href="#sake">Sake</a>
--        <a href="#highball">Highball</a>
--        <a href="#shot">Shot</a>
--        <a href="#beer">Beer</a>
--        <a href="#cocktail">Cocktail</a>
--        <a href="#bottle">Bottle</a>
--        <a href="#wine">Wine</a>
--        <a href="#soft">Soft Drink</a>
--      </nav>
--    </div>
--  </header>
-+    .hero{
-+      position:relative;
-+      min-height:90vh;
-+      border-bottom:1px solid var(--line);
-+      overflow:hidden;
-+      display:grid;
-+      align-items:center;
-+    }
-+    .hero::before{
-+      content:"";
-+      position:absolute;
-+      inset:0;
-+      background:
-+        linear-gradient(to right, rgba(8,18,14,.90), rgba(8,18,14,.58)),
-+        url('assets/background.webp') center/cover no-repeat;
-+      transform:scale(1.04);
-+    }
-+    .hero-inner{
-+      position:relative;
-+      z-index:1;
-+      display:grid;
-+      grid-template-columns:1.1fr .9fr;
-+      gap:26px;
-+      align-items:center;
-+      padding:36px 0;
-+    }
-+    .brand-row{display:flex;align-items:center;gap:14px;margin-bottom:14px}
-+    .brand-row img{
-+      width:64px;height:64px;object-fit:contain;
-+      background:rgba(0,0,0,.26);
-+      border:1px solid rgba(255,255,255,.2);
-+      border-radius:14px;
-+      padding:10px;
-+    }
-+    .eyebrow{color:var(--accent);font-weight:700;letter-spacing:.08em;font-size:.82rem;text-transform:uppercase}
-+    h1{margin:0 0 10px;font-size:clamp(2rem, 5vw, 3.5rem);line-height:1.15}
-+    .lead{margin:0 0 18px;color:var(--muted);max-width:640px}
- 
--  <main>
--    <!-- Main Dish -->
--    <section id="main">
--      <div class="section-title"><h2>Main Dish</h2><div class="rule"></div></div>
--      <div class="two-col">
--        <div>
--          <div class="grid">
--            <div class="item">
--              <div class="name">삼겹 두루치기 <span class="roman">Samgyup Duruchigi</span></div>
--              <div class="price">$23.99</div>
--              <div class="desc">Stir-fried seasonal vegetables, kimchi, and pork belly.</div>
--            </div>
--            <div class="item">
--              <div class="name">치즈 불닭 <span class="roman">Cheese BulDak</span></div>
--              <div class="price">$22.99</div>
--              <div class="desc">Grilled spicy chicken with mozzarella cheese on top.</div>
--            </div>
--            <div class="item">
--              <div class="name">매운 등갈비 떡찜 <span class="roman">Spicy Back Ribs</span></div>
--              <div class="price">$27.99</div>
--              <div class="desc">Spicy braised pork ribs with ricecakes.</div>
--            </div>
--            <div class="item">
--              <div class="name">지꾸바 치킨 <span class="roman">G-quva Chicken</span></div>
--              <div class="price">$23.99</div>
--              <div class="desc">Grilled spicy chicken with udon and rice cake.</div>
--            </div>
--          </div>
--        </div>
--        <div>
--          <div class="grid">
--            <div class="item">
--              <div class="name">불고기 <span class="roman">Bulgogi</span></div>
--              <div class="price">$23.99</div>
--              <div class="desc">Sliced beef marinated in a sweet and savory sauce.</div>
--            </div>
--            <div class="item">
--              <div class="name">돈까스 <span class="roman">Tonkatsu</span></div>
--              <div class="price">$18.99</div>
--              <div class="desc">Pork Cutlet.</div>
--            </div>
--            <div class="item">
--              <div class="name">돈까스 플래터 <span class="roman">Tonkatsu Platter</span></div>
--              <div class="price">$23.99</div>
--              <div class="desc">Pork loin clutter with sausage and assorted fries.</div>
--            </div>
--            <div class="item">
--              <div class="name">인절미 탕수육 <span class="roman">Injeolmi Tangsuyuk</span></div>
--              <div class="price">$23.99</div>
--              <div class="desc">Chewy sweet & sour deep fried pork with Injeolmi ricecakes.</div>
--            </div>
--            <div class="item">
--              <div class="name">쫄뱅이 <span class="roman">Jjol Bang E</span></div>
--              <div class="price">$23.99</div>
--              <div class="desc">Spicy baitop shells with mixed vegetables and noodles.</div>
--            </div>
--            <div class="item">
--              <div class="name">삼겹살 한판 <span class="roman">Pork Belly BBQ</span></div>
--              <div class="price">$23.99</div>
--              <div class="desc">Grilled pork belly.</div>
--            </div>
--            <div class="item">
--              <div class="name">치즈 계란말이 <span class="roman">Cheese Egg Roll</span></div>
--              <div class="price">$18.99</div>
--              <div class="desc">Cheese Egg Roll.</div>
--            </div>
--            <div class="item">
--              <div class="name">과일안주 <span class="roman">Fruit Platter</span></div>
--              <div class="price">$23.99</div>
--              <div class="desc">Assorted fresh seasonal fruit.</div>
--            </div>
--            <div class="item">
--              <div class="name">닭갈비 <span class="roman">Dak Galbi (Chicken)</span></div>
--              <div class="price">$21.99</div>
--              <div class="desc">Grilled spicy chicken.</div>
--            </div>
--            <div class="item">
--              <div class="name">닭똥집 <span class="roman">Chicken Gizzard</span></div>
--              <div class="price">$18.99</div>
--              <div class="desc">Stir-fried chicken gizzard.</div>
--            </div>
--          </div>
--        </div>
--      </div>
--    </section>
-+    .cta-row{display:flex;flex-wrap:wrap;gap:10px}
-+    .btn{
-+      display:inline-flex;align-items:center;justify-content:center;
-+      padding:11px 16px;border-radius:999px;font-weight:700;font-size:.95rem;
-+      border:1px solid var(--line);transition:.2s ease;
-+    }
-+    .btn.primary{background:var(--accent);color:#0b2219;border-color:transparent}
-+    .btn.primary:hover{background:var(--accent-strong)}
-+    .btn:hover{transform:translateY(-1px)}
- 
--    <!-- Soup -->
--    <section id="soup">
--      <div class="section-title"><h2>Soup</h2><div class="rule"></div></div>
--      <div class="two-col">
--        <div>
--          <div class="grid">
--            <div class="item"><div class="name">부대찌개 <span class="roman">Budaejjigae (Army Soup)</span></div><div class="price">$22.99</div><div class="desc">Spam, sausage, kimchi, ramen noodle, and vegetable in signature soup base.</div></div>
--            <div class="item"><div class="name">고기 해물 짬뽕 <span class="roman">Jjamppong</span></div><div class="price">$22.99</div><div class="desc">Spicy seafood based soup with noodles and stir-fried meat.</div></div>
--            <div class="item"><div class="name">홍합탕 <span class="roman">Honghaptang</span></div><div class="price">$22.99</div><div class="desc">Mussel soup.</div></div>
--            <div class="item"><div class="name">오뎅탕 <span class="roman">Odeng Tang</span></div><div class="price">$19.99</div><div class="desc">Fishcake soup.</div></div>
--          </div>
--        </div>
--        <div>
--          <div class="grid">
--            <div class="item"><div class="name">유부 오뎅탕 <span class="roman">Yubu Odeng Tang</span></div><div class="price">$22.99</div><div class="desc">Odeng soup with fried tofu.</div></div>
--            <div class="item"><div class="name">봉골레 국물 술찜 <span class="roman">Vongole Gukmul Suljjim</span></div><div class="price">$25.99</div><div class="desc">Spaghetti with clam, dried chilli, butter and garlic in signature vongole sauce.</div></div>
--            <div class="item"><div class="name">해물 계란탕 <span class="roman">Haemul Gyerantang</span></div><div class="price">$25.99</div><div class="desc">Seafood egg soup.</div></div>
--            <div class="item"><div class="name">닭볶음탕 <span class="roman">Dakbokkeumtang</span></div><div class="price">$24.99</div><div class="desc">Spicy chicken soup.</div></div>
--          </div>
--        </div>
--      </div>
--    </section>
-+    .hero-photo{
-+      border-radius:var(--radius);
-+      overflow:hidden;
-+      border:1px solid rgba(255,255,255,.16);
-+      box-shadow:0 20px 30px rgba(0,0,0,.25);
-+    }
-+    .hero-photo img{height:100%;min-height:380px;object-fit:cover}
- 
--    <!-- Meal -->
--    <section id="meal">
--      <div class="section-title"><h2>Meal</h2><div class="rule"></div></div>
--      <div class="two-col">
--        <div>
--          <div class="grid">
--            <div class="item"><div class="name">간장 계란밥 <span class="roman">Egg on Rice with Soy Sauce</span></div><div class="price">$5.99</div><div class="desc">Comfort bowl of rice topped with egg and soy sauce.</div></div>
--            <div class="item"><div class="name">라면 <span class="roman">Korean Style Instant Ramen</span></div><div class="price">$7.99</div><div class="desc">Classic instant noodles.</div></div>
--            <div class="item"><div class="name">도시락 <span class="roman">Korean Style Lunch Box</span></div><div class="price">$11.99</div><div class="desc">Assorted side dishes with rice.</div></div>
--            <div class="item"><div class="name">김치 덮밥 <span class="roman">Kimchi Dupbap</span></div><div class="price">$10.99</div><div class="desc">Stir-fried kimchi, served on rice.</div></div>
--          </div>
--        </div>
--        <div>
--          <div class="grid">
--            <div class="item"><div class="name"> 육회 비빔밥 <span class="roman">Yukhway Bibimbap</span></div><div class="price">$19.99</div><div class="desc">Korean style beef tartare, spring mix with rice bowl.</div></div>
--            <div class="item"><div class="name">불고기 덮밥 <span class="roman">Bulgogi Dupbap</span></div><div class="price">$15.99</div><div class="desc">Sliced beef marinated in a sweet and savory sauce, grilled, served on rice.</div></div>
--            <div class="item"><div class="name">공기밥 <span class="roman">Bowl of White Rice</span></div><div class="price">$3.99</div><div class="desc">Steamed white rice.</div></div>
--          </div>
--        </div>
--      </div>
--    </section>
-+    main{padding:44px 0 72px}
- 
--    <!-- Chicken -->
--    <section id="chicken">
--      <div class="section-title"><h2>Chicken</h2><div class="rule"></div></div>
--      <div class="two-col">
--        <div>
--          <div class="grid">
--            <div class="item"><div class="name">순살 후라이드 치킨 <span class="roman">Crispy Boneless Fried Chicken</span></div><div class="price">$24.99</div><div class="desc">Classic crispy boneless chicken.</div></div>
--            <div class="item"><div class="name">순살 양념 치킨 <span class="roman">Crispy Boneless Sweet & Spicy Chicken</span></div><div class="price">$25.99</div><div class="desc">Sweet & spicy glaze.</div></div>
--            <div class="item"><div class="name">순살 간장 치킨 <span class="roman">Crispy Boneless Soy Sauce Chicken</span></div><div class="price">$25.99</div><div class="desc">Savory soy glaze.</div></div>
--            <div class="item"><div class="name">꿀간장 인절미 치킨 <span class="roman">Soy Sauce Injeolmi Chicken</span></div><div class="price">$27.99</div><div class="desc">Crispy boneless soy sauce chicken with Injeolmi ricecakes.</div></div>
--            <div class="item"><div class="name">치즈 뿌링클 <span class="roman">Crispy Boneless Cheese Powdered Chicken</span></div><div class="price">$27.99</div><div class="desc">Cheese flavored powder.</div></div>
--          </div>
--        </div>
--        <div>
--          <div class="grid">
--            <div class="item"><div class="name">싸가지 닭 <span class="roman">Ssagaji Dak</span></div><div class="price">$29.99</div><div class="desc">Combination of four flavours chicken in one.</div></div>
--            <div class="item"><div class="name">치킨윙 <span class="roman">Flavoured Chicken Wing</span></div><div class="price">$21.99</div><div class="desc">Original, Sweet & Spicy, and Soy Sauce.</div></div>
--            <div class="item"><div class="name">허니 갈릭 치킨윙 <span class="roman">Honey Garlic Chicken Wing</span></div><div class="price">$21.99</div><div class="desc">Honey garlic glaze.</div></div>
--            <div class="item"><div class="name">닭강정 <span class="roman">Dakgangjeong</span></div><div class="price">$24.99</div><div class="desc">Deep-fried chicken with sweet & spicy sauce.</div></div>
--            <div class="item"><div class="name">깐풍기 <span class="roman">Kkanpunggi</span></div><div class="price">$24.99</div><div class="desc">Spicy garlic fried chicken.</div></div>
--          </div>
--        </div>
--      </div>
--    </section>
-+    .intro-grid{
-+      display:grid;
-+      grid-template-columns:1fr 1fr 1fr;
-+      gap:14px;
-+      margin-bottom:30px;
-+    }
-+    .tile{
-+      border-radius:var(--radius);
-+      overflow:hidden;
-+      border:1px solid var(--line);
-+      background:var(--panel);
-+    }
-+    .tile img{height:170px;width:100%;object-fit:cover}
-+    .tile .copy{padding:12px 14px}
-+    .tile h3{margin:0 0 6px;font-size:1rem}
-+    .tile p{margin:0;color:var(--muted);font-size:.92rem}
- 
--    <!-- Tteokbokki -->
--    <section id="tteok">
--      <div class="section-title"><h2>Tteokbokki</h2><div class="rule"></div></div>
--      <div class="two-col">
--        <div>
--          <div class="grid">
--            <div class="item"><div class="name">오리지날 떡볶이 <span class="roman">Original Tteokbokki</span></div><div class="price">$18.99</div><div class="desc">Korean traditional spicy ricecakes.</div></div>
--            <div class="item"><div class="name">로제 떡볶이 <span class="roman">Rosé Tteokbokki</span></div><div class="price">$20.99</div><div class="desc">Korean-style rosé ricecakes.</div></div>
--            <div class="item"><div class="name">삼겹살 떡볶이 <span class="roman">Samgyeupsal Tteokbokki</span></div><div class="price">$18.99</div><div class="desc">Ricecakes with grilled pork belly.</div></div>
--            <div class="item"><div class="name">치킨 떡볶이 <span class="roman">Chicken Tteokbokki</span></div><div class="price">$18.99</div><div class="desc">Ricecakes with grilled chicken.</div></div>
--            <div class="item"><div class="name">불고기 떡볶이 <span class="roman">Bulgogi Tteokbokki</span></div><div class="price">$19.99</div><div class="desc">Savory stir-fried ricecakes with Bulgogi.</div></div>
--            <div class="item"><div class="name">해물 마라 로제 떡볶이 <span class="roman">Haemul Mala Rosé Tteokbokki</span></div><div class="price">$22.99</div><div class="desc">Mala rosé tteokbokki with seafoods.</div></div>
--          </div>
--        </div>
--        <div>
--          <div class="grid">
--            <div class="item"><div class="name">김말이 튀김 <span class="roman">Deep Fried Seaweed Roll</span></div><div class="price">$7.99</div><div class="desc">Topping for tteokbokki.</div></div>
--            <div class="item"><div class="name">만두 튀김 <span class="roman">Deep Fried Beef Dumpling</span></div><div class="price">$7.99</div><div class="desc">Topping for tteokbokki.</div></div>
--            <div class="item"><div class="name">치즈 <span class="roman">Cheese</span></div><div class="price">$2.00</div><div class="desc">Extra cheese topping.</div></div>
--          </div>
--        </div>
--      </div>
--    </section>
-+    .section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin:0 0 14px}
-+    .section-head h2{margin:0;font-size:1.45rem}
-+    .section-head p{margin:0;color:var(--muted);font-size:.95rem}
- 
--    <!-- Pasta -->
--    <section id="pasta">
--      <div class="section-title"><h2>Pasta</h2><div class="rule"></div></div>
--      <div class="two-col">
--        <div>
--          <div class="grid">
--            <div class="item"><div class="name">토마토 해장 파스타 <span class="roman">Squid Pasta</span></div><div class="price">$23.99</div><div class="desc">Spaghetti with shrimp, squid, mussel, crab, and garlic in spicy tomato sauce.</div></div>
--            <div class="item"><div class="name">트러플 청양 크림 파스타 <span class="roman">Pork Belly Chilli Cream Pasta</span></div><div class="price">$20.99</div><div class="desc">Spaghetti with pork-belly, truffle oil, and cheese in signature cream sauce.</div></div>
--          </div>
--        </div>
--        <div>
--          <div class="grid">
--            <!-- intentionally left for future pasta items -->
-+    .locations{
-+      display:grid;
-+      grid-template-columns:1fr 1fr;
-+      gap:16px;
-+    }
-+    .location-card{
-+      border:1px solid var(--line);
-+      border-radius:var(--radius);
-+      background:var(--panel);
-+      overflow:hidden;
-+    }
-+    .location-cover img{height:220px;width:100%;object-fit:cover}
-+    .location-content{padding:18px}
-+    .location-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
-+    .location-title h3{margin:0;font-size:1.18rem}
-+    .badge{font-size:.78rem;padding:4px 9px;border-radius:999px;border:1px solid var(--line);color:var(--accent)}
-+
-+    .meta{display:grid;gap:8px;margin:12px 0 15px}
-+    .meta-item{display:grid;grid-template-columns:88px 1fr;gap:8px;font-size:.93rem}
-+    .meta-item dt{color:var(--muted);font-weight:700}
-+    .meta-item dd{margin:0}
-+
-+    .menu-list{
-+      margin:0 0 16px;
-+      padding-left:18px;
-+      color:var(--muted);
-+      font-size:.92rem;
-+    }
-+    .menu-list li{margin:3px 0}
-+
-+    .footer{
-+      margin-top:30px;
-+      border-top:1px solid var(--line);
-+      padding-top:16px;
-+      color:var(--muted);
-+      font-size:.9rem;
-+      text-align:center;
-+    }
-+
-+    @media (max-width:980px){
-+      .hero-inner{grid-template-columns:1fr}
-+      .hero-photo img{min-height:280px}
-+      .intro-grid{grid-template-columns:1fr 1fr}
-+      .locations{grid-template-columns:1fr}
-+    }
-+    @media (max-width:640px){
-+      .container{width:min(1120px, calc(100% - 24px))}
-+      .hero{min-height:unset}
-+      .intro-grid{grid-template-columns:1fr}
-+      .meta-item{grid-template-columns:76px 1fr}
-+    }
-+  </style>
-+</head>
-+<body>
-+  <header class="hero">
-+    <div class="container hero-inner">
-+      <div>
-+        <div class="brand-row">
-+          <img src="assets/logo-white.webp" alt="EHWA Logo" />
-+          <div>
-+            <div class="eyebrow">Korean Dining & Bar</div>
-+            <strong>EHWA RESTAURANT</strong>
-           </div>
-         </div>
--      </div>
--    </section>
- 
--    <!-- Pancakes -->
--    <section id="pancake">
--      <div class="section-title"><h2>Pancakes</h2><div class="rule"></div></div>
--      <div class="two-col">
--        <div>
--          <div class="grid">
--            <div class="item"><div class="name">해물파전 <span class="roman">Haemul Pajeon</span></div><div class="price">$22.99</div><div class="desc">Korean style seafood pancake.</div></div>
--            <div class="item"><div class="name">김치전 <span class="roman">Kimchi Jeon</span></div><div class="price">$22.99</div><div class="desc">Korean style kimchi pancake.</div></div>
--            <div class="item"><div class="name">김치 치즈 전 <span class="roman">Kimchi Cheese Jeon</span></div><div class="price">$23.99</div><div class="desc">Kimchi pancake with cheese.</div></div>
--            <div class="item"><div class="name">불고기 전 <span class="roman">Bulgogi Jeon</span></div><div class="price">$22.99</div><div class="desc">Bulgogi pancake.</div></div>
-+        <h1>이화 EHWA 메인 페이지 (임시)</h1>
-+        <p class="lead">
-+          업타운/다운타운 지점 정보를 빠르게 확인하고 메뉴 페이지로 이동할 수 있도록 만든
-+          임시 메인 화면입니다. 상세 소개 문구와 운영 정보는 추후 실제 데이터로 교체하면 됩니다.
-+        </p>
- 
--<div class="item"><div class="name">한판 육전 <span class="roman">Hanpan Yukjeon</span></div><div class="price">$23.99</div><div class="desc">Korean style beef pancake</div></div>
--            <div class="item"><div class="name">반반파전 (김치&해물) <span class="roman">Banban Pajeon</span></div><div class="price">$24.99</div><div class="desc">Half & half pancake (kimchi & seafood).</div></div>
--          </div>
-+        <div class="cta-row">
-+          <a class="btn primary" href="#locations">지점 정보 보기</a>
-+          <a class="btn" href="menu/uptown/">업타운 메뉴 바로가기</a>
-+          <a class="btn" href="menu/downtown/">다운타운 메뉴 바로가기</a>
-         </div>
--        <div></div>
-       </div>
--    </section>
- 
--    <!-- Light Shares + Yukhway -->
--    <section id="light">
--      <div class="section-title"><h2>Light Shares</h2><div class="rule"></div></div>
--      <div class="two-col">
--        <div>
--          <div class="grid">
--            <div class="item"><div class="name">콘치즈 <span class="roman">Corn Cheese</span></div><div class="price">$6.99</div><div class="desc">Stir-fry sweet corn, savory cheese, creamy mayonnaise, and sugar.</div></div>
--            <div class="item"><div class="name">타코와사비 <span class="roman">Tako Wasabi</span></div><div class="price">$9.99</div><div class="desc">Raw octopus with lots of wasabi.</div></div>
--            <div class="item"><div class="name">감자튀김 <span class="roman">French Fries</span></div><div class="price">$6.99</div><div class="desc">Golden fries.</div></div>
--            <div class="item"><div class="name">트러플 감자튀김 <span class="roman">French Fries with Truffle Oil</span></div><div class="price">$9.99</div><div class="desc">Fries finished with truffle oil.</div></div>
--            <div class="item"><div class="name">마약 옥수수 <span class="roman">Mayak Oksusu</span></div><div class="price">$8.99</div><div class="desc">Grilled corn with special powder.</div></div>
--            <div class="item"><div class="name">과일 황도 <span class="roman">Gwail Hwangdo</span></div><div class="price">$12.99</div><div class="desc">Yellow peaches and fruits.</div></div>
--            <div class="item"><div class="name">에다마메 <span class="roman">Edamame</span></div><div class="price">$5.99</div><div class="desc">Steamed edamame.</div></div>
--            <div class="item"><div class="name">가라아게 <span class="roman">Karaage</span></div><div class="price">$10.99</div><div class="desc">Japanese fried chicken.</div></div>
--            <div class="item"><div class="name">김말이 튀김 <span class="roman">Deep Fried Seaweed Roll</span></div><div class="price">$7.99</div><div class="desc">Crispy seaweed rolls.</div></div>
--            <div class="item"><div class="name">만두 튀김 <span class="roman">Deep Fried Beef Dumpling</span></div><div class="price">$7.99</div><div class="desc">Fried dumplings.</div></div>
--          </div>
--        </div>
--        <div id="yuk">
--          <div class="section-title"><h2>Yukhway</h2><div class="rule"></div></div>
--          <div class="grid">
--            <div class="item"><div class="name">육회 <span class="roman">Yukhway</span></div><div class="price">$18.99</div><div class="desc">Beef sashimi with soy sauce.</div></div>
--            <div class="item"><div class="name">한국식 육회 <span class="roman">Korean Yukhway</span></div><div class="price">$18.99</div><div class="desc">Beef sashimi with gochujang.</div></div>
--            <div class="item"><div class="name">타코야끼 <span class="roman">Takoyaki</span></div><div class="price">$10.99</div><div class="desc">Octopus balls.</div></div>
-+      <div class="hero-photo">
-+        <img src="assets/woman.webp" alt="EHWA 분위기 이미지" />
-+      </div>
-+    </div>
-+  </header>
- 
--<!-- Dessert -->
--    <section id="dessert">
--      <div class="section-title"><h2>Dessert</h2><div class="rule"></div></div>
--      <div class="grid">
--        <div class="item"><div class="name">크롱지 아이스크림 <span class="roman">C-roonggi</span></div><div class="price">$6.99</div><div class="desc">Nurungji croissant with ice cream.</div></div>
--          </div>
-+  <main class="container">
-+    <section class="intro-grid" aria-label="브랜드 소개 이미지">
-+      <article class="tile">
-+        <img src="assets/ehwa-gung.webp" alt="한국적 무드" />
-+        <div class="copy">
-+          <h3>Traditional Mood</h3>
-+          <p>한국적 감성과 현대적인 다이닝 경험을 함께 담았습니다.</p>
-         </div>
--      </div>
--    </section>
--    <!-- Drinks: Soju / Fruit Soju -->
--    <section id="soju">
--      <div class="section-title"><h2>Soju</h2><div class="rule"></div></div>
--      <div class="two-col">
--        <div>
--          <div class="grid">
--            <div class="item"><div class="name">참이슬 <span class="roman">Chamisul Fresh</span></div><div class="price">$23.99</div><div class="desc"></div></div>
--            <div class="item"><div class="name">처음처럼 <span class="roman">Chum-Churum</span></div><div class="price">$23.99</div><div class="desc"></div></div>
--            <div class="item"><div class="name">진로이즈백 <span class="roman">Jinro</span></div><div class="price">$23.99</div><div class="desc"></div></div>
--            <div class="item"><div class="name">한라산 <span class="roman">Hallasan</span></div><div class="price">$23.99</div><div class="desc"></div></div>
--            <div class="item"><div class="name">새로 <span class="roman">Sero</span></div><div class="price">$23.99</div><div class="desc">Original, Apricot.</div></div>
--          </div>
-+      </article>
-+      <article class="tile">
-+        <img src="assets/flower.webp" alt="꽃 장식" />
-+        <div class="copy">
-+          <h3>Space Detail</h3>
-+          <p>공간 디테일과 테이블 세팅을 통해 편안한 분위기를 연출합니다.</p>
-         </div>
--        <div>
--          <div class="section-title"><h2>Fruit Soju</h2><div class="rule"></div></div>
--          <div class="grid">
--            <div class="item"><div class="name">청포도 <span class="roman">Green Grape</span></div><div class="price">$23.99</div><div class="desc"></div></div>
--            <div class="item"><div class="name">자몽 <span class="roman">Grapefruit</span></div><div class="price">$23.99</div><div class="desc"></div></div>
--            <div class="item"><div class="name">사과 <span class="roman">Green Apple</span></div><div class="price">$23.99</div><div class="desc"></div></div>
--            <div class="item"><div class="name">복숭아 <span class="roman">Peach</span></div><div class="price">$23.99</div><div class="desc"></div></div>
--            <div class="item"><div class="name">자두 <span class="roman">Plum</span></div><div class="price">$23.99</div><div class="desc"></div></div>
--            <div class="item"><div class="name">칵테일 소주 <span class="roman">Cocktail Soju</span></div><div class="price">$23.99</div><div class="desc">Peach, Mango, Pineapple, and Yakult.</div></div>
--          </div>
-+      </article>
-+      <article class="tile">
-+        <img src="assets/background수묵.webp" alt="수묵 배경" />
-+        <div class="copy">
-+          <h3>Brand Texture</h3>
-+          <p>브랜드 톤을 보여주는 비주얼 레퍼런스(임시 텍스트)입니다.</p>
-         </div>
--      </div>
-+      </article>
-     </section>
- 
--    <!-- Makguli / Sake / Highball / Shot -->
--    <section id="mak">
--      <div class="section-title"><h2>Makguli</h2><div class="rule"></div></div>
--      <div class="grid">
--        <div class="item"><div class="name">막걸리 <span class="roman">Makguli</span></div><div class="price">$23.99</div><div class="desc">Original, Peach, Green grape.</div></div>
--        <div class="item"><div class="name">벌꿀집 <span class="roman">Honeycomb</span></div><div class="price">$5.99</div><div class="desc"></div></div>
--        <div class="item"><div class="name">생과일 막걸리 <span class="roman">Fruit Makguli</span></div><div class="price">$30.99</div><div class="desc">Peach, Mango, Pineapple.</div></div>
-+    <section id="locations">
-+      <div class="section-head">
-+        <h2>지점 안내</h2>
-+        <p>주소 / 영업시간 / 대표 메뉴 (임시 정보)</p>
-       </div>
--    </section>
- 
--    <section id="sake">
--      <div class="section-title"><h2>Sake</h2><div class="rule"></div></div>
--      <div class="two-col">
--        <div>
--          <div class="grid">
--            <div class="item"><div class="name">Hot Sake</div><div class="price">$18.99</div><div class="desc">—</div></div>
--            <div class="item"><div class="name">Hakutsuru Draft <span class="roman">300ml</span></div><div class="price">$23.99</div><div class="desc">—</div></div>
--            <div class="item"><div class="name">Sayuri Nigori <span class="roman">300ml</span></div><div class="price">$23.99</div><div class="desc">—</div></div>
--            <div class="item"><div class="name">Junmai Ginjo <span class="roman">300ml</span></div><div class="price">$23.99</div><div class="desc">—</div></div>
--            <div class="item"><div class="name">Gekkeikan <span class="roman">750ml</span></div><div class="price">$40.00</div><div class="desc">—</div></div>
-+      <div class="locations">
-+        <article class="location-card">
-+          <div class="location-cover">
-+            <img src="assets/seats-scaled.webp" alt="Uptown 매장" />
-           </div>
--        </div>
--        <div id="highball">
--          <div class="section-title"><h2>Highball</h2><div class="rule"></div></div>
--          <div class="grid">
--            <div class="item"><div class="name">유자 <span class="roman">Yuja</span></div><div class="price">$12.99</div><div class="desc"></div></div>
--            <div class="item"><div class="name">자몽 <span class="roman">Grapefruit</span></div><div class="price">$12.99</div><div class="desc"></div></div>
--            <div class="item"><div class="name">한라봉 <span class="roman">Hanrabong</span></div><div class="price">$12.99</div><div class="desc"></div></div>
--          </div>
--        </div>
--      </div>
--    </section>
-+          <div class="location-content">
-+            <div class="location-title">
-+              <h3>EHWA Uptown</h3>
-+              <span class="badge">UPTOWN</span>
-+            </div>
- 
--    <section id="shot">
--      <div class="section-title"><h2>Shot</h2><div class="rule"></div></div>
--      <div class="grid">
--        <div class="item"><div class="name">Absolute</div><div class="price">$7.00</div><div class="desc"></div></div>
--        <div class="item"><div class="name">Captain Morgen</div><div class="price">$7.00</div><div class="desc"></div></div>
--        <div class="item"><div class="name">Bacardi</div><div class="price">$7.00</div><div class="desc"></div></div>
--        <div class="item"><div class="name">Jagermeister</div><div class="price">$7.00</div><div class="desc"></div></div>
--        <div class="item"><div class="name">Jameson</div><div class="price">$7.00</div><div class="desc"></div></div>
--        <div class="item"><div class="name">Grey Goose</div><div class="price">$9.00</div><div class="desc"></div></div>
--        <div class="item"><div class="name">Johnnie Walker</div><div class="price">$9.00</div><div class="desc"></div></div>
-+            <dl class="meta">
-+              <div class="meta-item">
-+                <dt>주소</dt>
-+                <dd>1234 Uptown Ave, North York, ON (임시)</dd>
-+              </div>
-+              <div class="meta-item">
-+                <dt>영업시간</dt>
-+                <dd>월-목 11:30-22:00 / 금-토 11:30-23:00 / 일 12:00-21:00 (임시)</dd>
-+              </div>
-+              <div class="meta-item">
-+                <dt>연락처</dt>
-+                <dd>+1 (416) 000-1111 (임시)</dd>
-+              </div>
-+            </dl>
- 
--      </div>
--    </section>
-+            <ul class="menu-list">
-+              <li>대표 메뉴: 불고기, 치즈 불닭, 순살 양념치킨 (임시)</li>
-+              <li>인기 주류: 하이볼, 소주, 막걸리 (임시)</li>
-+            </ul>
- 
--    <!-- Beer -->
--    <section id="beer">
--      <div class="section-title"><h2>Draft & Premium Beer</h2><div class="rule"></div></div>
--      <div class="two-col">
--        <div>
--          <div class="grid">
--            <div class="item"><div class="name">Pint <span class="roman">Sapporo or Asahi (16oz)</span></div><div class="price">$8.50</div><div class="desc"></div></div>
--            <div class="item"><div class="name">Pitcher <span class="roman">Sapporo or Asahi (60oz)</span></div><div class="price">$28.99</div><div class="desc"></div></div>
--          </div>
--          <div class="divider"></div>
--          <div class="grid">
--            <div class="item"><div class="name">Corona</div><div class="price">$7.99</div></div>
--            <div class="item"><div class="name">Heineken</div><div class="price">$7.99</div></div>
--            <div class="item"><div class="name">Sapporo</div><div class="price">$7.99</div></div>
--            <div class="item"><div class="name">Alexander Keith</div><div class="price">$7.99</div></div>
--            <div class="item"><div class="name">Stella Artois</div><div class="price">$7.99</div></div>
-+            <a class="btn primary" href="menu/uptown/">업타운 메뉴 보기</a>
-           </div>
--        </div>
--        <div>
--          <div class="section-title"><h2>Domestic Beer</h2><div class="rule"></div></div>
--          <div class="grid">
--            <div class="item"><div class="name">Coors Light</div><div class="price">$6.99</div></div>
--            <div class="item"><div class="name">Budweiser</div><div class="price">$6.99</div></div>
--            <div class="item"><div class="name">Canadian</div><div class="price">$6.99</div></div>
--            <div class="item"><div class="name">Blue</div><div class="price">$6.99</div></div>
-+        </article>
-+
-+        <article class="location-card">
-+          <div class="location-cover">
-+            <img src="assets/매장-scaled.webp" alt="Downtown 매장" />
-           </div>
--        </div>
--      </div>
--    </section>
-+          <div class="location-content">
-+            <div class="location-title">
-+              <h3>EHWA Downtown</h3>
-+              <span class="badge">DOWNTOWN</span>
-+            </div>
- 
--    <!-- Cocktail / Bottle / Wine / Soft Drink -->
--    <section id="cocktail">
--      <div class="section-title"><h2>Cocktail</h2><div class="rule"></div></div>
--      <div class="grid">
--        <div class="item"><div class="name">Jack Coke</div><div class="price">$10.99</div></div>
--        <div class="item"><div class="name">Rum Coke</div><div class="price">$10.99</div></div>
--        <div class="item"><div class="name">Jager Bomb</div><div class="price">$10.99</div></div>
--        <div class="item"><div class="name">Gin & Tonic</div><div class="price">$10.99</div></div>
--      </div>
--    </section>
-+            <dl class="meta">
-+              <div class="meta-item">
-+                <dt>주소</dt>
-+                <dd>55 Downtown St, Toronto, ON (임시)</dd>
-+              </div>
-+              <div class="meta-item">
-+                <dt>영업시간</dt>
-+                <dd>월-목 11:00-22:30 / 금-토 11:00-23:30 / 일 12:00-21:30 (임시)</dd>
-+              </div>
-+              <div class="meta-item">
-+                <dt>연락처</dt>
-+                <dd>+1 (416) 000-2222 (임시)</dd>
-+              </div>
-+            </dl>
- 
--    <section id="bottle">
--      <div class="section-title"><h2>Bottle</h2><div class="rule"></div></div>
--      <div class="two-col">
--        <div>
--          <div class="grid">
--            <div class="item"><div class="name">Jack Daniel <span class="roman">375ml</span></div><div class="price">$60.00</div></div>
--            <div class="item"><div class="name">Jameson Whiskey <span class="roman">750ml</span></div><div class="price">$110.00</div></div>
--            <div class="item"><div class="name">Johnnie Walker <span class="roman">375ml</span></div><div class="price">$110.00</div></div>
--          </div>
--        </div>
--        <div>
--          <div class="grid">
--            <div class="item"><div class="name">Grey Goose <span class="roman">750ml</span></div><div class="price">$170.00</div></div>
--            <div class="item"><div class="name">*Add $6 for fruit platter & 2 pop</div><div class="price"></div></div>
--          </div>
--        </div>
--      </div>
--    </section>
-+            <ul class="menu-list">
-+              <li>대표 메뉴: 삼겹 두루치기, 떡볶이, 육회비빔밥 (임시)</li>
-+              <li>인기 주류: 칵테일, 맥주, 사케 (임시)</li>
-+            </ul>
- 
--    <section id="wine">
--      <div class="section-title"><h2>Wine</h2><div class="rule"></div></div>
--      <div class="grid">
--        <div class="item"><div class="name">Red</div><div class="price">$7.99</div></div>
--        <div class="item"><div class="name">White</div><div class="price">$7.99</div></div>
-+            <a class="btn primary" href="menu/downtown/">다운타운 메뉴 보기</a>
-+          </div>
-+        </article>
-       </div>
-     </section>
- 
--    <section id="soft">
--      <div class="section-title"><h2>Soft Drink</h2><div class="rule"></div></div>
--      <div class="two-col">
--        <div>
--          <div class="grid">
--            <div class="item"><div class="name">Coke</div><div class="price">$3.99</div></div>
--            <div class="item"><div class="name">Diet Coke</div>
--<div class="price">$3.99</div></div>           <div class="item"><div class="name">Zero Coke</div><div class="price">$3.99</div></div>
--            <div class="item"><div class="name">Sprite</div><div class="price">$3.99</div></div>
--            <div class="item"><div class="name">Canada Dry</div><div class="price">$3.99</div></div>
--            <div class="item"><div class="name">Iced Tea</div><div class="price">$3.99</div></div>
--        </div>
--      </div>
--    </section>
-+    <footer class="footer">
-+      © EHWA Restaurant · Temporary Homepage Draft
-+    </footer>
-   </main>
--
--  <footer>
--    Can’t decide what to eat? Ask our servers for the best recommendation.
--  </footer>
- </body>
- </html>
- 
-EOF
-)
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>이화 EHWA 메인 페이지</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:#041411;
+      --bg-soft:#07201a;
+      --panel:#0a251e;
+      --panel-2:#0e2d25;
+      --line:#1f4a3e;
+      --text:#ecf6f2;
+      --muted:#b0c5bc;
+      --mint:#8ee7b9;
+      --mint-strong:#61d89d;
+    }
+
+    * { box-sizing:border-box; }
+    html, body { margin:0; padding:0; }
+
+    body {
+      font-family:'Noto Sans KR', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color:var(--text);
+      background:var(--bg);
+      line-height:1.55;
+    }
+
+    a { color:inherit; text-decoration:none; }
+    img { max-width:100%; display:block; }
+
+    .container {
+      width:min(1180px, calc(100% - 40px));
+      margin-inline:auto;
+    }
+
+    .hero {
+      position:relative;
+      min-height:85vh;
+      border-bottom:1px solid var(--line);
+      overflow:hidden;
+      isolation:isolate;
+      display:grid;
+      align-items:center;
+    }
+
+    .hero::before {
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at 10% 5%, rgba(94,174,144,.15), transparent 32%),
+        radial-gradient(circle at 85% 85%, rgba(86,122,210,.09), transparent 28%),
+        linear-gradient(to right, rgba(3,16,13,.95), rgba(3,16,13,.62)),
+        url('assets/background수묵.webp') center/cover no-repeat;
+      z-index:-3;
+      transform:scale(1.03);
+    }
+
+    .decor-top,
+    .decor-bottom {
+      position:absolute;
+      pointer-events:none;
+      opacity:.22;
+      filter:drop-shadow(0 0 40px rgba(117,185,160,.15));
+      z-index:-2;
+    }
+
+    .decor-top {
+      top:-8px;
+      left:-10px;
+      width:min(620px, 68vw);
+    }
+
+    .decor-bottom {
+      right:-20px;
+      bottom:-40px;
+      width:min(660px, 72vw);
+      transform:scaleX(-1);
+    }
+
+    .hero-grid {
+      padding:48px 0 54px;
+      display:grid;
+      grid-template-columns:1.05fr .95fr;
+      gap:34px;
+      align-items:center;
+    }
+
+    .logo-row {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:14px;
+    }
+
+    .logo-row img {
+      width:44px;
+      height:44px;
+      object-fit:contain;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.22);
+      padding:6px;
+      background:rgba(0,0,0,.3);
+    }
+
+    .eyebrow {
+      margin:0;
+      color:var(--mint);
+      font-size:.8rem;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      font-weight:800;
+    }
+
+    h1 {
+      margin:0 0 12px;
+      font-size:clamp(2rem, 5vw, 3.55rem);
+      line-height:1.18;
+      letter-spacing:-.02em;
+    }
+
+    .hero-desc {
+      margin:0 0 22px;
+      color:var(--muted);
+      max-width:620px;
+    }
+
+    .hero-actions {
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
+    .btn {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:11px 17px;
+      border-radius:999px;
+      font-weight:800;
+      font-size:.95rem;
+      border:1px solid var(--line);
+      background:rgba(11,33,27,.8);
+      transition:.2s ease;
+    }
+
+    .btn:hover { transform:translateY(-1px); }
+
+    .btn.primary {
+      background:var(--mint);
+      color:#10261d;
+      border-color:transparent;
+      box-shadow:0 8px 20px rgba(93,222,162,.28);
+    }
+
+    .btn.primary:hover { background:var(--mint-strong); }
+
+    .hero-visual {
+      position:relative;
+      border:1px solid rgba(142,231,185,.28);
+      border-radius:26px;
+      background:linear-gradient(180deg, rgba(9,30,24,.62), rgba(7,24,19,.62));
+      min-height:560px;
+      display:flex;
+      align-items:flex-end;
+      justify-content:center;
+      padding:18px 18px 0;
+      box-shadow:0 20px 60px rgba(2,10,8,.6);
+    }
+
+    .hero-visual img {
+      width:min(440px, 92%);
+      object-fit:contain;
+    }
+
+    .section {
+      padding:36px 0 18px;
+    }
+
+    .section h2 {
+      margin:0 0 6px;
+      font-size:clamp(1.5rem, 3vw, 2.1rem);
+    }
+
+    .section p {
+      margin:0 0 18px;
+      color:var(--muted);
+    }
+
+    .branch-grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+    }
+
+    .branch-card {
+      background:linear-gradient(180deg, rgba(10,36,29,.9), rgba(9,30,24,.95));
+      border:1px solid var(--line);
+      border-radius:18px;
+      overflow:hidden;
+    }
+
+    .branch-card > img {
+      width:100%;
+      height:220px;
+      object-fit:cover;
+      border-bottom:1px solid var(--line);
+    }
+
+    .branch-body { padding:16px; }
+
+    .branch-head {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:10px;
+    }
+
+    .branch-head h3 { margin:0; font-size:1.35rem; }
+
+    .tag {
+      border:1px solid var(--line);
+      color:var(--mint);
+      font-size:.76rem;
+      border-radius:999px;
+      padding:4px 9px;
+      font-weight:700;
+    }
+
+    .branch-list {
+      list-style:none;
+      margin:0;
+      padding:0;
+      color:var(--muted);
+    }
+
+    .branch-list li { margin-bottom:6px; }
+
+    .branch-list strong { color:var(--text); }
+
+    .branch-cta { margin-top:14px; }
+
+    .insta-wide {
+      margin-top:18px;
+      border:1px solid var(--line);
+      background:linear-gradient(90deg, rgba(10,34,27,.95), rgba(12,44,34,.95));
+      border-radius:14px;
+      padding:12px 14px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      color:var(--muted);
+    }
+
+    .insta-btn {
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-weight:800;
+      color:#052216;
+      background:linear-gradient(135deg, #a9ffd4, #7cecbc 55%, #58d89a);
+      padding:9px 14px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.6);
+      box-shadow:0 0 0 3px rgba(121,238,177,.2), 0 10px 24px rgba(75,210,149,.3);
+    }
+
+    .insta-btn img { width:16px; height:16px; }
+
+    .floating-insta {
+      position:fixed;
+      right:18px;
+      bottom:18px;
+      z-index:40;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:11px 14px;
+      border-radius:999px;
+      font-weight:800;
+      color:#042216;
+      background:linear-gradient(135deg, #b8ffe0, #80f1bf 55%, #5dd89f);
+      border:1px solid rgba(255,255,255,.72);
+      box-shadow:0 0 0 3px rgba(124,240,186,.24), 0 12px 28px rgba(58,211,138,.4);
+    }
+
+    .floating-insta img { width:18px; height:18px; }
+
+    footer {
+      margin-top:18px;
+      border-top:1px solid var(--line);
+      color:#97b2a7;
+      text-align:center;
+      padding:18px;
+      font-size:.9rem;
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid { grid-template-columns:1fr; }
+      .hero-visual { min-height:460px; }
+      .branch-grid { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <img class="decor-top" src="assets/clouds.webp" alt="" aria-hidden="true" />
+    <img class="decor-bottom" src="assets/clouds-white.webp" alt="" aria-hidden="true" />
+
+    <div class="container hero-grid">
+      <div>
+        <div class="logo-row">
+          <img src="assets/logo-white.png" alt="EHWA 로고" />
+          <div>
+            <p class="eyebrow">Korean Dining & Bar</p>
+            <strong>EHWA Restaurant</strong>
+          </div>
+        </div>
+
+        <h1>이화 EHWA 메인 페이지</h1>
+        <p class="hero-desc">
+          지점 정보를 한 번에 확인하고 메뉴 페이지로 이동할 수 있는 임시 메인 페이지입니다.
+          주소, 연락처, 영업시간, 대표 메뉴 정보는 현재 임시 텍스트로 입력되어 있습니다.
+        </p>
+
+        <div class="hero-actions">
+          <a class="btn primary" href="#uptown">업타운 메뉴 바로가기</a>
+          <a class="btn" href="#downtown">다운타운 메뉴 바로가기</a>
+        </div>
+      </div>
+
+      <div class="hero-visual" aria-label="여자 비주얼">
+        <img src="assets/woman.webp" alt="여성 메인 비주얼 이미지" />
+      </div>
+    </div>
+  </header>
+
+  <main class="container section">
+    <h2>지점 안내</h2>
+    <p>업타운 / 다운타운 지점 정보 + 메뉴 이동</p>
+
+    <section class="branch-grid">
+      <article class="branch-card" id="uptown">
+        <img src="assets/매장-scaled.webp" alt="EHWA Uptown 내부 이미지" />
+        <div class="branch-body">
+          <div class="branch-head">
+            <h3>EHWA Uptown</h3>
+            <span class="tag">UPTOWN</span>
+          </div>
+          <ul class="branch-list">
+            <li><strong>주소</strong> 1234 Uptown Ave, North York, ON (임시)</li>
+            <li><strong>영업시간</strong> 월-목 11:30-22:00 / 금-토 11:30-23:00 / 일 12:00-21:00 (임시)</li>
+            <li><strong>연락처</strong> +1 (416) 000-1111 (임시)</li>
+            <li><strong>대표 메뉴</strong> 불고기, 치즈 불닭, 순살 양념치킨 (임시)</li>
+          </ul>
+          <div class="branch-cta">
+            <a class="btn primary" href="menu/uptown/index.html">업타운 메뉴 보기</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="branch-card" id="downtown">
+        <img src="assets/seats-scaled.webp" alt="EHWA Downtown 내부 이미지" />
+        <div class="branch-body">
+          <div class="branch-head">
+            <h3>EHWA Downtown</h3>
+            <span class="tag">DOWNTOWN</span>
+          </div>
+          <ul class="branch-list">
+            <li><strong>주소</strong> 55 Downtown St, Toronto, ON (임시)</li>
+            <li><strong>영업시간</strong> 월-목 11:00-22:30 / 금-토 11:00-23:30 / 일 12:00-21:30 (임시)</li>
+            <li><strong>연락처</strong> +1 (416) 000-2222 (임시)</li>
+            <li><strong>대표 메뉴</strong> 순살 두부치킨, 떡볶이, 육회비빔밥 (임시)</li>
+          </ul>
+          <div class="branch-cta">
+            <a class="btn primary" href="menu/downtown/index.html">다운타운 메뉴 보기</a>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <div class="insta-wide">
+      <span>최신 소식은 인스타그램에서 확인하세요.</span>
+      <a class="insta-btn" href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="인스타그램 이동">
+        <img src="assets/Group-11863g.svg" alt="인스타그램 로고" />
+        Instagram
+      </a>
+    </div>
+  </main>
+
+  <a class="floating-insta" href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="인스타그램 바로가기">
+    <img src="assets/Group-11863g.svg" alt="인스타그램 로고" />
+    Instagram
+  </a>
+
+  <footer>
+    © EHWA Restaurant · Temporary Homepage Draft
+  </footer>
+</body>
+</html>
