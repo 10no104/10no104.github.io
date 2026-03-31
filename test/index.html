@@ -28,6 +28,23 @@
       margin: 54px auto 100px;
     }
 
+    .home-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #1f4f84;
+      font-weight: 800;
+      font-size: 20px;
+      margin-bottom: 18px;
+    }
+
+    .home-logo img {
+      width: 34px;
+      height: 34px;
+      object-fit: contain;
+    }
+
     .tabs {
       display: flex;
       gap: 14px;
@@ -174,7 +191,11 @@
 </head>
 <body>
   <main class="wrap">
-    <section class="tabs" aria-label="Categories" id="tabs"></section>
+    <a class="home-logo" href="../index.html" aria-label="메인 페이지 이동">
+      <img src="../assets/logo-white.png" alt="" />
+      <span>Main</span>
+    </a>
+    <section class="tabs" aria-label="Tags" id="tabs"></section>
     <section class="menu-list" id="menuList"></section>
   </main>
 
@@ -232,7 +253,8 @@
     ];
 
     let allMenus = [];
-    let selectedCategory = "All";
+    const FILTER_TAGS = ["Vegan", "Spicy", "Popular"];
+    let selectedTag = "Vegan";
 
     function escapeHtml(text = "") {
       return text
@@ -298,28 +320,18 @@
       return `$${v}`;
     }
 
-    function getCategories(menuItems) {
-      const unique = [...new Set(menuItems.map((item) => item.category).filter(Boolean))];
-      const base = ["All", ...unique];
-      if (!base.includes("Vegan")) base.push("Vegan");
-      if (!base.includes("Spicy 🌶️")) base.push("Spicy 🌶️");
-      return base;
-    }
-
     function renderTabs() {
       const tabsEl = document.getElementById("tabs");
-      const categories = getCategories(allMenus);
-
-      tabsEl.innerHTML = categories
-        .map((category) => {
-          const activeClass = category === selectedCategory ? "active" : "";
-          return `<button class="tab ${activeClass}" data-category="${escapeHtml(category)}" type="button">${escapeHtml(category)}</button>`;
+      tabsEl.innerHTML = FILTER_TAGS
+        .map((tag) => {
+          const activeClass = tag === selectedTag ? "active" : "";
+          return `<button class="tab ${activeClass}" data-tag="${escapeHtml(tag)}" type="button">${escapeHtml(tag)}</button>`;
         })
         .join("");
 
       tabsEl.querySelectorAll(".tab").forEach((tabButton) => {
         tabButton.addEventListener("click", () => {
-          selectedCategory = tabButton.dataset.category || "All";
+          selectedTag = tabButton.dataset.tag || "Vegan";
           renderTabs();
           renderMenu();
         });
@@ -327,21 +339,9 @@
     }
 
     function filterMenus(menuItems) {
-      if (selectedCategory === "All") return menuItems;
-
-      if (selectedCategory === "Vegan") {
-        return menuItems.filter((item) =>
-          item.tags.some((tag) => tag.label.toLowerCase().includes("vegan"))
-        );
-      }
-
-      if (selectedCategory === "Spicy 🌶️") {
-        return menuItems.filter((item) =>
-          item.tags.some((tag) => tag.label.toLowerCase().includes("spicy"))
-        );
-      }
-
-      return menuItems.filter((item) => item.category === selectedCategory);
+      return menuItems.filter((item) => {
+        return item.tags.some((tag) => tag.label.toLowerCase().includes(selectedTag.toLowerCase()));
+      });
     }
 
     function renderMenu() {
