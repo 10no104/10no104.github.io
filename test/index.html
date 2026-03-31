@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Menu Test</title>
+  <style>
+    :root {
+      --bg: #ececef;
+      --card: #f8f8fa;
+      --text: #242633;
+      --muted: #4d5160;
+      --shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      --blue: #2f73bb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Pretendard", "Noto Sans KR", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .wrap {
+      width: min(960px, 92vw);
+      margin: 54px auto 100px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 34px;
+    }
+
+    .tab {
+      border-radius: 999px;
+      padding: 14px 34px;
+      border: 1px solid #d3d5db;
+      background: #f2f2f4;
+      color: #454958;
+      font-size: 22px;
+      font-weight: 600;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .tab.active {
+      background: var(--blue);
+      color: #fff;
+      border-color: #2a67a8;
+    }
+
+    .menu-list {
+      display: block;
+    }
+
+    .card {
+      display: grid;
+      grid-template-columns: 230px minmax(0, 1fr) auto;
+      gap: 24px;
+      align-items: center;
+      background: var(--card);
+      border-radius: 34px;
+      box-shadow: var(--shadow);
+      padding: 28px;
+      margin-bottom: 22px;
+      border: 1px solid #dbdde2;
+    }
+
+    .thumb {
+      width: 230px;
+      height: 230px;
+      border-radius: 30px;
+      object-fit: cover;
+      display: block;
+      background: #d8d8df;
+    }
+
+    .name-ko {
+      margin: 0;
+      font-size: 48px;
+      line-height: 1.12;
+      letter-spacing: -0.4px;
+      font-weight: 700;
+    }
+
+    .name-en {
+      margin: 10px 0 16px;
+      font-size: 32px;
+      line-height: 1.15;
+      font-weight: 700;
+    }
+
+    .desc {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 26px;
+      line-height: 1.4;
+      max-width: 700px;
+    }
+
+    .tags {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 7px 16px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .tag.red { background: #e13a31; }
+    .tag.green { background: #6ea42e; }
+    .tag.yellow { background: #d8a32a; }
+    .tag.blue { background: #2f73bb; }
+    .tag.gray { background: #7b8090; }
+
+    .price {
+      font-size: 62px;
+      font-weight: 800;
+      line-height: 1;
+      padding-left: 16px;
+      white-space: nowrap;
+    }
+
+    .empty {
+      padding: 40px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 22px;
+    }
+
+    @media (max-width: 980px) {
+      .card {
+        grid-template-columns: 160px 1fr auto;
+        border-radius: 24px;
+      }
+
+      .thumb { width: 160px; height: 160px; border-radius: 20px; }
+      .name-ko { font-size: 30px; }
+      .name-en { font-size: 28px; }
+      .desc { font-size: 24px; }
+      .price { font-size: 52px; }
+    }
+
+    @media (max-width: 720px) {
+      .tab { font-size: 18px; padding: 10px 20px; }
+      .card {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .thumb { width: 100%; height: 220px; }
+      .price {
+        padding-left: 0;
+        font-size: 40px;
+      }
+      .name-ko { font-size: 26px; }
+      .name-en { font-size: 24px; }
+      .desc { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="tabs" aria-label="Categories" id="tabs"></section>
+    <section class="menu-list" id="menuList"></section>
+  </main>
+
+  <script>
+    /**
+     * [Google Sheet 컬럼 순서]
+     * category | nameKo | nameEn | description | price | imageUrl | tags
+     *
+     * tags 예시:
+     * 🌶️ Spicy|red, 🌱 Vegan|green, ⭐ Popular|yellow
+     */
+    const SHEET_CONFIG = {
+      sheetId: "1xa9OZbctYnlbaAL8lKIgmefM5hvSw0Plk01lxp5G2fc",
+      gid: "0"
+    };
+
+    const SAMPLE_MENU = [
+      {
+        category: "Appetizers",
+        nameKo: "매콤 콜리플라워",
+        nameEn: "Spicy Fried Cauliflower",
+        description: "Crispy fried cauliflower tossed in a spicy sauce.",
+        price: "$12",
+        imageUrl: "https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=500&q=80",
+        tags: [
+          { label: "🌶️ Spicy", color: "red" },
+          { label: "🌱 Vegan", color: "green" },
+          { label: "⭐ Popular", color: "yellow" }
+        ]
+      },
+      {
+        category: "Mains",
+        nameKo: "해물김치 볶음밥",
+        nameEn: "Seafood Kimchi Fried Rice",
+        description: "Fried rice stir-fried with seafood and spicy kimchi.",
+        price: "$15",
+        imageUrl: "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=500&q=80",
+        tags: [
+          { label: "🌶️ Spicy", color: "red" },
+          { label: "🐟 Seafood", color: "blue" }
+        ]
+      },
+      {
+        category: "Mains",
+        nameKo: "달콤매콤 치킨",
+        nameEn: "Sweet & Spicy Korean Chicken",
+        description: "Crispy chicken pieces coated in a sweet and spicy glaze.",
+        price: "$9",
+        imageUrl: "https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=500&q=80",
+        tags: [
+          { label: "🌶️ Spicy", color: "red" },
+          { label: "⭐ Popular", color: "blue" }
+        ]
+      }
+    ];
+
+    let allMenus = [];
+    let selectedCategory = "All";
+
+    function escapeHtml(text = "") {
+      return text
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function parseTags(raw = "") {
+      return String(raw)
+        .split(",")
+        .map((part) => part.trim())
+        .filter(Boolean)
+        .map((chunk) => {
+          const [label, color] = chunk.split("|").map((v) => v && v.trim());
+          return {
+            label: label || "Tag",
+            color: color || "gray"
+          };
+        });
+    }
+
+    function mapSheetRows(rows = []) {
+      return rows
+        .map((row) => row.c || [])
+        .map((c) => c.map((cell) => (cell?.v ?? "").toString().trim()))
+        .filter((cells) => cells.some(Boolean))
+        .map((cells) => ({
+          category: cells[0] || "Uncategorized",
+          nameKo: cells[1] || "",
+          nameEn: cells[2] || "",
+          description: cells[3] || "",
+          price: cells[4] || "",
+          imageUrl: cells[5] || "",
+          tags: parseTags(cells[6] || "")
+        }));
+    }
+
+    async function fetchMenusFromGoogleSheet() {
+      const { sheetId, gid } = SHEET_CONFIG;
+      if (!sheetId) return SAMPLE_MENU;
+
+      const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?gid=${gid}&tqx=out:json`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("구글 시트 호출 실패");
+
+      const text = await res.text();
+      const jsonText = text
+        .replace("/*O_o*/", "")
+        .replace("google.visualization.Query.setResponse(", "")
+        .slice(0, -2);
+
+      const data = JSON.parse(jsonText);
+      return mapSheetRows(data.table?.rows || []);
+    }
+
+    function formatPrice(value = "") {
+      if (!value) return "";
+      const v = String(value).trim();
+      if (v.startsWith("$")) return v;
+      return `$${v}`;
+    }
+
+    function getCategories(menuItems) {
+      const unique = [...new Set(menuItems.map((item) => item.category).filter(Boolean))];
+      const base = ["All", ...unique];
+      if (!base.includes("Vegan")) base.push("Vegan");
+      if (!base.includes("Spicy 🌶️")) base.push("Spicy 🌶️");
+      return base;
+    }
+
+    function renderTabs() {
+      const tabsEl = document.getElementById("tabs");
+      const categories = getCategories(allMenus);
+
+      tabsEl.innerHTML = categories
+        .map((category) => {
+          const activeClass = category === selectedCategory ? "active" : "";
+          return `<button class="tab ${activeClass}" data-category="${escapeHtml(category)}" type="button">${escapeHtml(category)}</button>`;
+        })
+        .join("");
+
+      tabsEl.querySelectorAll(".tab").forEach((tabButton) => {
+        tabButton.addEventListener("click", () => {
+          selectedCategory = tabButton.dataset.category || "All";
+          renderTabs();
+          renderMenu();
+        });
+      });
+    }
+
+    function filterMenus(menuItems) {
+      if (selectedCategory === "All") return menuItems;
+
+      if (selectedCategory === "Vegan") {
+        return menuItems.filter((item) =>
+          item.tags.some((tag) => tag.label.toLowerCase().includes("vegan"))
+        );
+      }
+
+      if (selectedCategory === "Spicy 🌶️") {
+        return menuItems.filter((item) =>
+          item.tags.some((tag) => tag.label.toLowerCase().includes("spicy"))
+        );
+      }
+
+      return menuItems.filter((item) => item.category === selectedCategory);
+    }
+
+    function renderMenu() {
+      const menuListEl = document.getElementById("menuList");
+      const filtered = filterMenus(allMenus);
+
+      if (!filtered.length) {
+        menuListEl.innerHTML = `<div class="empty">해당 카테고리 메뉴가 없습니다.</div>`;
+        return;
+      }
+
+      menuListEl.innerHTML = filtered
+        .map((item) => {
+          const tagsHtml = item.tags
+            .map((tag) => `<span class="tag ${escapeHtml(tag.color)}">${escapeHtml(tag.label)}</span>`)
+            .join("");
+
+          return `
+            <article class="card">
+              <img class="thumb" src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.nameEn || item.nameKo)}" />
+              <div>
+                <p class="name-ko">${escapeHtml(item.nameKo)}</p>
+                <p class="name-en">${escapeHtml(item.nameEn)}</p>
+                <p class="desc">${escapeHtml(item.description)}</p>
+                <div class="tags">${tagsHtml}</div>
+              </div>
+              <div class="price">${escapeHtml(formatPrice(item.price))}</div>
+            </article>
+          `;
+        })
+        .join("");
+    }
+
+    async function bootstrap() {
+      try {
+        allMenus = await fetchMenusFromGoogleSheet();
+      } catch (error) {
+        console.error(error);
+        allMenus = SAMPLE_MENU;
+      }
+
+      renderTabs();
+      renderMenu();
+    }
+
+    bootstrap();
+  </script>
+</body>
+</html>
