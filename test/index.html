@@ -28,11 +28,29 @@
       margin: 54px auto 100px;
     }
 
+    .filters {
+      display: grid;
+      gap: 18px;
+      margin-bottom: 34px;
+    }
+
+    .filter-group {
+      display: grid;
+      gap: 10px;
+    }
+
+    .filter-title {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: #495061;
+      letter-spacing: 0.02em;
+    }
+
     .tabs {
       display: flex;
       gap: 14px;
       flex-wrap: wrap;
-      margin-bottom: 34px;
     }
 
     .tab {
@@ -52,6 +70,18 @@
       background: var(--blue);
       color: #fff;
       border-color: #2a67a8;
+    }
+
+    .tab.tag-tab {
+      background: #f5f8ef;
+      border-color: #d5dcc5;
+      color: #4f5e30;
+    }
+
+    .tab.tag-tab.active {
+      background: #6f8e34;
+      border-color: #647f2f;
+      color: #fff;
     }
 
     .menu-list {
@@ -174,7 +204,16 @@
 </head>
 <body>
   <main class="wrap">
-    <section class="tabs" aria-label="Categories" id="tabs"></section>
+    <section class="filters" aria-label="Filters">
+      <div class="filter-group">
+        <p class="filter-title">Category</p>
+        <section class="tabs" aria-label="Categories" id="categoryTabs"></section>
+      </div>
+      <div class="filter-group">
+        <p class="filter-title">Tag</p>
+        <section class="tabs" aria-label="Tags" id="tagTabs"></section>
+      </div>
+    </section>
     <section class="menu-list" id="menuList"></section>
   </main>
 
@@ -232,7 +271,9 @@
     ];
 
     let allMenus = [];
+    const FILTER_TAGS = ["Vegan", "Spicy", "Popular"];
     let selectedCategory = "All";
+    let selectedTag = "All Tags";
 
     function escapeHtml(text = "") {
       return text
@@ -300,26 +341,40 @@
 
     function getCategories(menuItems) {
       const unique = [...new Set(menuItems.map((item) => item.category).filter(Boolean))];
-      const base = ["All", ...unique];
-      if (!base.includes("Vegan")) base.push("Vegan");
-      if (!base.includes("Spicy 🌶️")) base.push("Spicy 🌶️");
-      return base;
+      return ["All", ...unique];
     }
 
     function renderTabs() {
-      const tabsEl = document.getElementById("tabs");
+      const categoryTabsEl = document.getElementById("categoryTabs");
+      const tagTabsEl = document.getElementById("tagTabs");
       const categories = getCategories(allMenus);
+      const tags = ["All Tags", ...FILTER_TAGS];
 
-      tabsEl.innerHTML = categories
+      categoryTabsEl.innerHTML = categories
         .map((category) => {
           const activeClass = category === selectedCategory ? "active" : "";
           return `<button class="tab ${activeClass}" data-category="${escapeHtml(category)}" type="button">${escapeHtml(category)}</button>`;
         })
         .join("");
 
-      tabsEl.querySelectorAll(".tab").forEach((tabButton) => {
+      tagTabsEl.innerHTML = tags
+        .map((tag) => {
+          const activeClass = tag === selectedTag ? "active" : "";
+          return `<button class="tab tag-tab ${activeClass}" data-tag="${escapeHtml(tag)}" type="button">${escapeHtml(tag)}</button>`;
+        })
+        .join("");
+
+      categoryTabsEl.querySelectorAll(".tab").forEach((tabButton) => {
         tabButton.addEventListener("click", () => {
           selectedCategory = tabButton.dataset.category || "All";
+          renderTabs();
+          renderMenu();
+        });
+      });
+
+      tagTabsEl.querySelectorAll(".tag-tab").forEach((tabButton) => {
+        tabButton.addEventListener("click", () => {
+          selectedTag = tabButton.dataset.tag || "All Tags";
           renderTabs();
           renderMenu();
         });
@@ -327,21 +382,13 @@
     }
 
     function filterMenus(menuItems) {
-      if (selectedCategory === "All") return menuItems;
-
-      if (selectedCategory === "Vegan") {
-        return menuItems.filter((item) =>
-          item.tags.some((tag) => tag.label.toLowerCase().includes("vegan"))
-        );
-      }
-
-      if (selectedCategory === "Spicy 🌶️") {
-        return menuItems.filter((item) =>
-          item.tags.some((tag) => tag.label.toLowerCase().includes("spicy"))
-        );
-      }
-
-      return menuItems.filter((item) => item.category === selectedCategory);
+      return menuItems.filter((item) => {
+        const categoryMatch = selectedCategory === "All" || item.category === selectedCategory;
+        const tagMatch =
+          selectedTag === "All Tags" ||
+          item.tags.some((tag) => tag.label.toLowerCase().includes(selectedTag.toLowerCase()));
+        return categoryMatch && tagMatch;
+      });
     }
 
     function renderMenu() {
