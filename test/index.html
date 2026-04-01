@@ -353,7 +353,7 @@
     function filterMenus(menuItems) {
       if (selectedCategory === "All") return menuItems;
 
-      if (selectedCategory === "Vegan") {
+      if (selectedCategory === "Vegan 🌱") {
         return menuItems.filter((item) =>
           item.tags.some((tag) => tag.label.toLowerCase().includes("vegan"))
         );
