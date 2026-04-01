@@ -324,7 +324,7 @@
     function getCategories(menuItems) {
       const unique = [...new Set(menuItems.map((item) => item.category).filter(Boolean))];
       const base = ["All", ...unique];
-      if (!base.includes("Vegan")) base.push("Vegan");
+      if (!base.includes("Vegan 🌱")) base.push("Vegan 🌱");
       if (!base.includes("Spicy 🌶️")) base.push("Spicy 🌶️");
       if (!base.includes("Popular ⭐")) base.push("Popular ⭐");
       return base;
