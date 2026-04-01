@@ -184,7 +184,7 @@
      * category | nameKo | nameEn | description | price | imageUrl | tags
      *
      * tags 예시:
-     * 🌶️ Spicy|red, 🌱 Vegan|green, ⭐ Popular|yellow
+     * 🌶️ Spicy|red, 🌱 Vegan|green, ⭐ Popular|yellow, 🐟 Seafood|blue
      */
     const SHEET_CONFIG = {
       sheetId: "1xa9OZbctYnlbaAL8lKIgmefM5hvSw0Plk01lxp5G2fc",
@@ -214,7 +214,8 @@
         imageUrl: "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=500&q=80",
         tags: [
           { label: "🌶️ Spicy", color: "red" },
-          { label: "🐟 Seafood", color: "blue" }
+          { label: "🐟 Seafood", color: "blue" },
+          { label: "⭐ Popular", color: "yellow" }
         ]
       },
       {
@@ -251,10 +252,32 @@
         .map((chunk) => {
           const [label, color] = chunk.split("|").map((v) => v && v.trim());
           return {
-            label: label || "Tag",
+            label: withTagEmoji(label || "Tag"),
             color: color || "gray"
           };
         });
+    }
+
+    function withTagEmoji(label = "") {
+      const raw = String(label).trim();
+      if (!raw) return "🏷️ Tag";
+      if (/[\u{1F300}-\u{1FAFF}\u2600-\u27BF]/u.test(raw)) return raw;
+
+      const normalized = raw.toLowerCase();
+      const emojiMap = [
+        { keyword: "spicy", emoji: "🌶️" },
+        { keyword: "vegan", emoji: "🌱" },
+        { keyword: "popular", emoji: "⭐" },
+        { keyword: "seafood", emoji: "🐟" },
+        { keyword: "sweet", emoji: "🍯" },
+        { keyword: "chicken", emoji: "🍗" },
+        { keyword: "beef", emoji: "🥩" },
+        { keyword: "pork", emoji: "🐷" }
+      ];
+
+      const matched = emojiMap.find((item) => normalized.includes(item.keyword));
+      if (matched) return `${matched.emoji} ${raw}`;
+      return `🏷️ ${raw}`;
     }
 
     function mapSheetRows(rows = []) {
@@ -301,8 +324,9 @@
     function getCategories(menuItems) {
       const unique = [...new Set(menuItems.map((item) => item.category).filter(Boolean))];
       const base = ["All", ...unique];
-      if (!base.includes("Vegan")) base.push("Vegan");
+      if (!base.includes("Vegan 🌱")) base.push("Vegan 🌱");
       if (!base.includes("Spicy 🌶️")) base.push("Spicy 🌶️");
+      if (!base.includes("Popular ⭐")) base.push("Popular ⭐");
       return base;
     }
 
@@ -329,7 +353,7 @@
     function filterMenus(menuItems) {
       if (selectedCategory === "All") return menuItems;
 
-      if (selectedCategory === "Vegan") {
+      if (selectedCategory === "Vegan 🌱") {
         return menuItems.filter((item) =>
           item.tags.some((tag) => tag.label.toLowerCase().includes("vegan"))
         );
@@ -338,6 +362,12 @@
       if (selectedCategory === "Spicy 🌶️") {
         return menuItems.filter((item) =>
           item.tags.some((tag) => tag.label.toLowerCase().includes("spicy"))
+        );
+      }
+
+      if (selectedCategory === "Popular ⭐") {
+        return menuItems.filter((item) =>
+          item.tags.some((tag) => tag.label.toLowerCase().includes("popular"))
         );
       }
 
