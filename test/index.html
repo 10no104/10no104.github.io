@@ -28,23 +28,11 @@
       margin: 54px auto 100px;
     }
 
-    .tabs-wrap {
-      position: sticky;
-      top: 8px;
-      z-index: 30;
-      background: color-mix(in srgb, var(--bg) 86%, white 14%);
-      border: 1px solid #d9dbe1;
-      border-radius: 22px;
-      padding: 12px;
-      margin-bottom: 24px;
-      backdrop-filter: blur(4px);
-    }
-
     .tabs {
       display: flex;
       gap: 14px;
       flex-wrap: wrap;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     .tab {
@@ -92,12 +80,6 @@
       background: #2f73bb;
       color: #fff;
       border-color: #2a67a8;
-    }
-
-    .subtabs-help {
-      color: #686d7d;
-      font-size: 14px;
-      padding: 10px 4px;
     }
 
     .to-top {
@@ -224,14 +206,6 @@
     }
 
     @media (max-width: 720px) {
-      .wrap {
-        margin-top: 18px;
-      }
-      .tabs-wrap {
-        top: 0;
-        border-radius: 14px;
-        padding: 10px;
-      }
       .tabs {
         flex-wrap: nowrap;
         overflow-x: auto;
@@ -263,10 +237,8 @@
 </head>
 <body>
   <main class="wrap">
-    <section class="tabs-wrap">
-      <section class="tabs" aria-label="Categories" id="tabs"></section>
-      <section class="subtabs" aria-label="Subcategories" id="subtabs"></section>
-    </section>
+    <section class="tabs" aria-label="Categories" id="tabs"></section>
+    <section class="subtabs" aria-label="Subcategories" id="subtabs"></section>
     <section class="menu-list" id="menuList"></section>
   </main>
   <button class="to-top" id="toTopBtn" type="button" aria-label="맨 위로 이동">↑ Top</button>
@@ -274,7 +246,7 @@
   <script>
     /**
      * [Google Sheet 컬럼 순서]
-     * category | nameKo | nameEn | description | price | imageUrl | tags
+     * category | label | nameKo | nameEn | description | price | imageUrl | tags
      *
      * tags 예시:
      * 🌶️ Spicy|red, 🌱 Vegan|green, ⭐ Popular|yellow, 🐟 Seafood|blue
@@ -287,6 +259,7 @@
     const SAMPLE_MENU = [
       {
         category: "Appetizers",
+        label: "Fried",
         nameKo: "매콤 콜리플라워",
         nameEn: "Spicy Fried Cauliflower",
         description: "Crispy fried cauliflower tossed in a spicy sauce.",
@@ -300,6 +273,7 @@
       },
       {
         category: "Mains",
+        label: "Stir-fried",
         nameKo: "해물김치 볶음밥",
         nameEn: "Seafood Kimchi Fried Rice",
         description: "Fried rice stir-fried with seafood and spicy kimchi.",
@@ -313,6 +287,7 @@
       },
       {
         category: "Mains",
+        label: "Fried",
         nameKo: "달콤매콤 치킨",
         nameEn: "Sweet & Spicy Korean Chicken",
         description: "Crispy chicken pieces coated in a sweet and spicy glaze.",
@@ -381,30 +356,23 @@
         .filter((cells) => cells.some(Boolean))
         .map((cells) => ({
           category: cells[0] || "Uncategorized",
-          nameKo: cells[1] || "",
-          nameEn: cells[2] || "",
-          description: cells[3] || "",
-          price: cells[4] || "",
-          imageUrl: cells[5] || "",
-          tags: parseTags(cells[6] || "")
+          label: cells[1] || "",
+          nameKo: cells[2] || "",
+          nameEn: cells[3] || "",
+          description: cells[4] || "",
+          price: cells[5] || "",
+          imageUrl: cells[6] || "",
+          tags: parseTags(cells[7] || "")
         }));
-    }
-
-    function normalizeSubLabel(text = "") {
-      return String(text).replace(/^[\p{Emoji}\s]+/u, "").trim();
     }
 
     function getSubcategoriesByCategory(menuItems, category) {
       if (category === "All" || category === "Vegan 🌱" || category === "Spicy 🌶️" || category === "Popular ⭐") return [];
 
       const categoryMenus = menuItems.filter((item) => item.category === category);
-      const blocked = ["spicy", "vegan", "popular", "seafood"];
-
       const options = categoryMenus
-        .flatMap((item) => item.tags || [])
-        .map((tag) => normalizeSubLabel(tag.label))
-        .filter(Boolean)
-        .filter((label) => !blocked.includes(label.toLowerCase()));
+        .map((item) => String(item.label || "").trim())
+        .filter(Boolean);
 
       return [...new Set(options)];
     }
@@ -470,7 +438,7 @@
       const subcategories = getSubcategoriesByCategory(allMenus, selectedCategory);
 
       if (!subcategories.length) {
-        subtabsEl.innerHTML = `<div class="subtabs-help">카테고리를 선택하면 세부 태그(예: Fried, Stir-fried)를 고를 수 있어요.</div>`;
+        subtabsEl.innerHTML = "";
         return;
       }
 
@@ -512,7 +480,7 @@
 
       if (selectedSubcategory !== "All") {
         filtered = filtered.filter((item) =>
-          item.tags.some((tag) => normalizeSubLabel(tag.label).toLowerCase() === selectedSubcategory.toLowerCase())
+          String(item.label || "").toLowerCase() === selectedSubcategory.toLowerCase()
         );
       }
 
