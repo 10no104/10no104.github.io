@@ -65,6 +65,34 @@
       min-height: 44px;
     }
 
+    .subtabs-wrap {
+      position: sticky;
+      top: 10px;
+      z-index: 25;
+      background: rgba(236, 236, 239, 0.95);
+      border: 1px solid #d6d8df;
+      border-radius: 16px;
+      padding: 10px 12px;
+      margin-bottom: 16px;
+      backdrop-filter: blur(3px);
+    }
+
+    .subtabs-wrap.hidden {
+      display: none;
+    }
+
+    .subtabs-context {
+      font-size: 14px;
+      font-weight: 700;
+      color: #3f4557;
+      margin: 0 0 8px;
+      letter-spacing: 0.1px;
+    }
+
+    .subtabs-context .parent {
+      color: #2f73bb;
+    }
+
     .subtab {
       border-radius: 999px;
       border: 1px solid #d3d5db;
@@ -225,7 +253,10 @@
 <body>
   <main class="wrap">
     <section class="tabs" aria-label="Categories" id="tabs"></section>
-    <section class="subtabs" aria-label="Subcategories" id="subtabs"></section>
+    <section class="subtabs-wrap hidden" id="subtabsWrap">
+      <p class="subtabs-context" id="subtabsContext"></p>
+      <section class="subtabs" aria-label="Subcategories" id="subtabs"></section>
+    </section>
     <section class="menu-list" id="menuList"></section>
   </main>
   <button class="to-top" id="toTopBtn" type="button" aria-label="맨 위로 이동">↑ Top</button>
@@ -422,18 +453,28 @@
 
     function renderSubtabs() {
       const subtabsEl = document.getElementById("subtabs");
+      const subtabsWrapEl = document.getElementById("subtabsWrap");
+      const subtabsContextEl = document.getElementById("subtabsContext");
       const subcategories = getSubcategoriesByCategory(allMenus, selectedCategory);
 
       if (!subcategories.length) {
         subtabsEl.innerHTML = "";
+        subtabsWrapEl.classList.add("hidden");
+        subtabsContextEl.textContent = "";
         return;
       }
+
+      subtabsWrapEl.classList.remove("hidden");
+      subtabsContextEl.innerHTML = `<span class="parent">${escapeHtml(selectedCategory)}</span> 안의 라벨 선택`;
 
       const allOptions = ["All", ...subcategories];
       subtabsEl.innerHTML = allOptions
         .map((sub) => {
           const activeClass = sub === selectedSubcategory ? "active" : "";
-          return `<button class="subtab ${activeClass}" data-subcategory="${escapeHtml(sub)}" type="button">${escapeHtml(sub)}</button>`;
+          const text = sub === "All"
+            ? `${escapeHtml(selectedCategory)} 전체`
+            : `${escapeHtml(selectedCategory)} · ${escapeHtml(sub)}`;
+          return `<button class="subtab ${activeClass}" data-subcategory="${escapeHtml(sub)}" type="button">${text}</button>`;
         })
         .join("");
 
