@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -32,7 +32,7 @@
       display: flex;
       gap: 14px;
       flex-wrap: wrap;
-      margin-bottom: 34px;
+      margin-bottom: 12px;
     }
 
     .tab {
@@ -56,6 +56,80 @@
 
     .menu-list {
       display: block;
+    }
+
+    .subtabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      min-height: 44px;
+    }
+
+    .subtabs-wrap {
+      position: sticky;
+      top: 10px;
+      z-index: 25;
+      background: rgba(236, 236, 239, 0.95);
+      border: 1px solid #d6d8df;
+      border-radius: 16px;
+      padding: 10px 12px;
+      margin-bottom: 16px;
+      backdrop-filter: blur(3px);
+    }
+
+    .subtabs-wrap.hidden {
+      display: none;
+    }
+
+    .subtabs-context {
+      font-size: 15px;
+      font-weight: 800;
+      color: #2f73bb;
+      margin: 0 0 8px;
+      letter-spacing: 0.2px;
+    }
+
+    .subtab {
+      border-radius: 999px;
+      border: 1px solid #d3d5db;
+      background: #fff;
+      color: #454958;
+      padding: 8px 16px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .subtab.active {
+      background: #2f73bb;
+      color: #fff;
+      border-color: #2a67a8;
+    }
+
+    .to-top {
+      position: fixed;
+      right: 16px;
+      bottom: 18px;
+      z-index: 40;
+      border: none;
+      border-radius: 999px;
+      background: #2f73bb;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 12px 14px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .to-top.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
     }
 
     .card {
@@ -175,25 +249,31 @@
 <body>
   <main class="wrap">
     <section class="tabs" aria-label="Categories" id="tabs"></section>
+    <section class="subtabs-wrap hidden" id="subtabsWrap">
+      <p class="subtabs-context" id="subtabsContext"></p>
+      <section class="subtabs" aria-label="Subcategories" id="subtabs"></section>
+    </section>
     <section class="menu-list" id="menuList"></section>
   </main>
+  <button class="to-top" id="toTopBtn" type="button" aria-label="Back to top">↑ Top</button>
 
   <script>
     /**
      * [Google Sheet 컬럼 순서]
-     * category | nameKo | nameEn | description | price | imageUrl | tags
+     * category | label | nameKo | nameEn | description | price | imageUrl | tags
      *
      * tags 예시:
      * 🌶️ Spicy|red, 🌱 Vegan|green, ⭐ Popular|yellow, 🐟 Seafood|blue
      */
     const SHEET_CONFIG = {
       sheetId: "1xa9OZbctYnlbaAL8lKIgmefM5hvSw0Plk01lxp5G2fc",
-      gid: "0"
+      gid: "1100419696"
     };
 
     const SAMPLE_MENU = [
       {
         category: "Appetizers",
+        label: "Fried",
         nameKo: "매콤 콜리플라워",
         nameEn: "Spicy Fried Cauliflower",
         description: "Crispy fried cauliflower tossed in a spicy sauce.",
@@ -207,6 +287,7 @@
       },
       {
         category: "Mains",
+        label: "Stir-fried",
         nameKo: "해물김치 볶음밥",
         nameEn: "Seafood Kimchi Fried Rice",
         description: "Fried rice stir-fried with seafood and spicy kimchi.",
@@ -220,6 +301,7 @@
       },
       {
         category: "Mains",
+        label: "Fried",
         nameKo: "달콤매콤 치킨",
         nameEn: "Sweet & Spicy Korean Chicken",
         description: "Crispy chicken pieces coated in a sweet and spicy glaze.",
@@ -234,6 +316,7 @@
 
     let allMenus = [];
     let selectedCategory = "All";
+    let selectedSubcategory = "All";
 
     function escapeHtml(text = "") {
       return text
@@ -287,13 +370,25 @@
         .filter((cells) => cells.some(Boolean))
         .map((cells) => ({
           category: cells[0] || "Uncategorized",
-          nameKo: cells[1] || "",
-          nameEn: cells[2] || "",
-          description: cells[3] || "",
-          price: cells[4] || "",
-          imageUrl: cells[5] || "",
-          tags: parseTags(cells[6] || "")
+          label: cells[1] || "",
+          nameKo: cells[2] || "",
+          nameEn: cells[3] || "",
+          description: cells[4] || "",
+          price: cells[5] || "",
+          imageUrl: cells[6] || "",
+          tags: parseTags(cells[7] || "")
         }));
+    }
+
+    function getSubcategoriesByCategory(menuItems, category) {
+      if (category === "All" || category === "Vegan 🌱" || category === "Spicy 🌶️" || category === "Popular ⭐") return [];
+
+      const categoryMenus = menuItems.filter((item) => item.category === category);
+      const options = categoryMenus
+        .map((item) => String(item.label || "").trim())
+        .filter(Boolean);
+
+      return [...new Set(options)];
     }
 
     async function fetchMenusFromGoogleSheet() {
@@ -302,7 +397,7 @@
 
       const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?gid=${gid}&tqx=out:json`;
       const res = await fetch(url);
-      if (!res.ok) throw new Error("구글 시트 호출 실패");
+      if (!res.ok) throw new Error("Failed to fetch Google Sheet");
 
       const text = await res.text();
       const jsonText = text
@@ -344,34 +439,86 @@
       tabsEl.querySelectorAll(".tab").forEach((tabButton) => {
         tabButton.addEventListener("click", () => {
           selectedCategory = tabButton.dataset.category || "All";
+          selectedSubcategory = "All";
           renderTabs();
+          renderSubtabs();
+          renderMenu();
+        });
+      });
+    }
+
+    function renderSubtabs() {
+      const subtabsEl = document.getElementById("subtabs");
+      const subtabsWrapEl = document.getElementById("subtabsWrap");
+      const subtabsContextEl = document.getElementById("subtabsContext");
+      const subcategories = getSubcategoriesByCategory(allMenus, selectedCategory);
+
+      if (!subcategories.length) {
+        subtabsEl.innerHTML = "";
+        subtabsWrapEl.classList.add("hidden");
+        subtabsContextEl.textContent = "";
+        return;
+      }
+
+      subtabsWrapEl.classList.remove("hidden");
+      subtabsContextEl.textContent = selectedCategory;
+
+      const allOptions = ["All", ...subcategories];
+      subtabsEl.innerHTML = allOptions
+        .map((sub) => {
+          const activeClass = sub === selectedSubcategory ? "active" : "";
+          return `<button class="subtab ${activeClass}" data-subcategory="${escapeHtml(sub)}" type="button">${escapeHtml(sub)}</button>`;
+        })
+        .join("");
+
+      subtabsEl.querySelectorAll(".subtab").forEach((button) => {
+        button.addEventListener("click", () => {
+          selectedSubcategory = button.dataset.subcategory || "All";
+          renderSubtabs();
           renderMenu();
         });
       });
     }
 
     function filterMenus(menuItems) {
-      if (selectedCategory === "All") return menuItems;
+      let filtered = menuItems;
 
       if (selectedCategory === "Vegan 🌱") {
-        return menuItems.filter((item) =>
+        filtered = menuItems.filter((item) =>
           item.tags.some((tag) => tag.label.toLowerCase().includes("vegan"))
         );
-      }
-
-      if (selectedCategory === "Spicy 🌶️") {
-        return menuItems.filter((item) =>
+      } else if (selectedCategory === "Spicy 🌶️") {
+        filtered = menuItems.filter((item) =>
           item.tags.some((tag) => tag.label.toLowerCase().includes("spicy"))
         );
+      } else if (selectedCategory === "Popular ⭐") {
+        filtered = menuItems.filter((item) =>
+          item.tags.some((tag) => tag.label.toLowerCase().includes("popular"))
+        );
+      } else if (selectedCategory !== "All") {
+        filtered = menuItems.filter((item) => item.category === selectedCategory);
       }
 
-      if (selectedCategory === "Popular ⭐") {
-        return menuItems.filter((item) =>
-          item.tags.some((tag) => tag.label.toLowerCase().includes("popular"))
+      if (selectedSubcategory !== "All") {
+        filtered = filtered.filter((item) =>
+          String(item.label || "").toLowerCase() === selectedSubcategory.toLowerCase()
         );
       }
 
-      return menuItems.filter((item) => item.category === selectedCategory);
+      return filtered;
+    }
+
+    function setupToTopButton() {
+      const toTopBtn = document.getElementById("toTopBtn");
+      if (!toTopBtn) return;
+
+      window.addEventListener("scroll", () => {
+        toTopBtn.classList.toggle("show", window.scrollY > 380);
+      }, { passive: true });
+
+      toTopBtn.addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
     }
 
     function renderMenu() {
@@ -379,7 +526,7 @@
       const filtered = filterMenus(allMenus);
 
       if (!filtered.length) {
-        menuListEl.innerHTML = `<div class="empty">해당 카테고리 메뉴가 없습니다.</div>`;
+        menuListEl.innerHTML = `<div class="empty">No menu items found in this category.</div>`;
         return;
       }
 
@@ -414,7 +561,9 @@
       }
 
       renderTabs();
+      renderSubtabs();
       renderMenu();
+      setupToTopButton();
     }
 
     bootstrap();
