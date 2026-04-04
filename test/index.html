@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -82,15 +82,11 @@
     }
 
     .subtabs-context {
-      font-size: 14px;
-      font-weight: 700;
-      color: #3f4557;
-      margin: 0 0 8px;
-      letter-spacing: 0.1px;
-    }
-
-    .subtabs-context .parent {
+      font-size: 15px;
+      font-weight: 800;
       color: #2f73bb;
+      margin: 0 0 8px;
+      letter-spacing: 0.2px;
     }
 
     .subtab {
@@ -259,7 +255,7 @@
     </section>
     <section class="menu-list" id="menuList"></section>
   </main>
-  <button class="to-top" id="toTopBtn" type="button" aria-label="맨 위로 이동">↑ Top</button>
+  <button class="to-top" id="toTopBtn" type="button" aria-label="Back to top">↑ Top</button>
 
   <script>
     /**
@@ -401,7 +397,7 @@
 
       const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?gid=${gid}&tqx=out:json`;
       const res = await fetch(url);
-      if (!res.ok) throw new Error("구글 시트 호출 실패");
+      if (!res.ok) throw new Error("Failed to fetch Google Sheet");
 
       const text = await res.text();
       const jsonText = text
@@ -465,16 +461,13 @@
       }
 
       subtabsWrapEl.classList.remove("hidden");
-      subtabsContextEl.innerHTML = `<span class="parent">${escapeHtml(selectedCategory)}</span> 안의 라벨 선택`;
+      subtabsContextEl.textContent = selectedCategory;
 
       const allOptions = ["All", ...subcategories];
       subtabsEl.innerHTML = allOptions
         .map((sub) => {
           const activeClass = sub === selectedSubcategory ? "active" : "";
-          const text = sub === "All"
-            ? `${escapeHtml(selectedCategory)} 전체`
-            : `${escapeHtml(selectedCategory)} · ${escapeHtml(sub)}`;
-          return `<button class="subtab ${activeClass}" data-subcategory="${escapeHtml(sub)}" type="button">${text}</button>`;
+          return `<button class="subtab ${activeClass}" data-subcategory="${escapeHtml(sub)}" type="button">${escapeHtml(sub)}</button>`;
         })
         .join("");
 
@@ -533,7 +526,7 @@
       const filtered = filterMenus(allMenus);
 
       if (!filtered.length) {
-        menuListEl.innerHTML = `<div class="empty">해당 카테고리 메뉴가 없습니다.</div>`;
+        menuListEl.innerHTML = `<div class="empty">No menu items found in this category.</div>`;
         return;
       }
 
