@@ -28,11 +28,23 @@
       margin: 54px auto 100px;
     }
 
+    .tabs-wrap {
+      position: sticky;
+      top: 8px;
+      z-index: 30;
+      background: color-mix(in srgb, var(--bg) 86%, white 14%);
+      border: 1px solid #d9dbe1;
+      border-radius: 22px;
+      padding: 12px;
+      margin-bottom: 24px;
+      backdrop-filter: blur(4px);
+    }
+
     .tabs {
       display: flex;
       gap: 14px;
       flex-wrap: wrap;
-      margin-bottom: 34px;
+      margin-bottom: 10px;
     }
 
     .tab {
@@ -56,6 +68,62 @@
 
     .menu-list {
       display: block;
+    }
+
+    .subtabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      min-height: 44px;
+    }
+
+    .subtab {
+      border-radius: 999px;
+      border: 1px solid #d3d5db;
+      background: #fff;
+      color: #454958;
+      padding: 8px 16px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .subtab.active {
+      background: #2f73bb;
+      color: #fff;
+      border-color: #2a67a8;
+    }
+
+    .subtabs-help {
+      color: #686d7d;
+      font-size: 14px;
+      padding: 10px 4px;
+    }
+
+    .to-top {
+      position: fixed;
+      right: 16px;
+      bottom: 18px;
+      z-index: 40;
+      border: none;
+      border-radius: 999px;
+      background: #2f73bb;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 12px 14px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .to-top.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
     }
 
     .card {
@@ -156,7 +224,28 @@
     }
 
     @media (max-width: 720px) {
+      .wrap {
+        margin-top: 18px;
+      }
+      .tabs-wrap {
+        top: 0;
+        border-radius: 14px;
+        padding: 10px;
+      }
+      .tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+      }
       .tab { font-size: 18px; padding: 10px 20px; }
+      .subtabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+      }
+      .subtab { white-space: nowrap; }
       .card {
         grid-template-columns: 1fr;
         gap: 16px;
@@ -174,9 +263,13 @@
 </head>
 <body>
   <main class="wrap">
-    <section class="tabs" aria-label="Categories" id="tabs"></section>
+    <section class="tabs-wrap">
+      <section class="tabs" aria-label="Categories" id="tabs"></section>
+      <section class="subtabs" aria-label="Subcategories" id="subtabs"></section>
+    </section>
     <section class="menu-list" id="menuList"></section>
   </main>
+  <button class="to-top" id="toTopBtn" type="button" aria-label="맨 위로 이동">↑ Top</button>
 
   <script>
     /**
@@ -234,6 +327,7 @@
 
     let allMenus = [];
     let selectedCategory = "All";
+    let selectedSubcategory = "All";
 
     function escapeHtml(text = "") {
       return text
@@ -296,6 +390,25 @@
         }));
     }
 
+    function normalizeSubLabel(text = "") {
+      return String(text).replace(/^[\p{Emoji}\s]+/u, "").trim();
+    }
+
+    function getSubcategoriesByCategory(menuItems, category) {
+      if (category === "All" || category === "Vegan 🌱" || category === "Spicy 🌶️" || category === "Popular ⭐") return [];
+
+      const categoryMenus = menuItems.filter((item) => item.category === category);
+      const blocked = ["spicy", "vegan", "popular", "seafood"];
+
+      const options = categoryMenus
+        .flatMap((item) => item.tags || [])
+        .map((tag) => normalizeSubLabel(tag.label))
+        .filter(Boolean)
+        .filter((label) => !blocked.includes(label.toLowerCase()));
+
+      return [...new Set(options)];
+    }
+
     async function fetchMenusFromGoogleSheet() {
       const { sheetId, gid } = SHEET_CONFIG;
       if (!sheetId) return SAMPLE_MENU;
@@ -344,34 +457,79 @@
       tabsEl.querySelectorAll(".tab").forEach((tabButton) => {
         tabButton.addEventListener("click", () => {
           selectedCategory = tabButton.dataset.category || "All";
+          selectedSubcategory = "All";
           renderTabs();
+          renderSubtabs();
+          renderMenu();
+        });
+      });
+    }
+
+    function renderSubtabs() {
+      const subtabsEl = document.getElementById("subtabs");
+      const subcategories = getSubcategoriesByCategory(allMenus, selectedCategory);
+
+      if (!subcategories.length) {
+        subtabsEl.innerHTML = `<div class="subtabs-help">카테고리를 선택하면 세부 태그(예: Fried, Stir-fried)를 고를 수 있어요.</div>`;
+        return;
+      }
+
+      const allOptions = ["All", ...subcategories];
+      subtabsEl.innerHTML = allOptions
+        .map((sub) => {
+          const activeClass = sub === selectedSubcategory ? "active" : "";
+          return `<button class="subtab ${activeClass}" data-subcategory="${escapeHtml(sub)}" type="button">${escapeHtml(sub)}</button>`;
+        })
+        .join("");
+
+      subtabsEl.querySelectorAll(".subtab").forEach((button) => {
+        button.addEventListener("click", () => {
+          selectedSubcategory = button.dataset.subcategory || "All";
+          renderSubtabs();
           renderMenu();
         });
       });
     }
 
     function filterMenus(menuItems) {
-      if (selectedCategory === "All") return menuItems;
+      let filtered = menuItems;
 
       if (selectedCategory === "Vegan 🌱") {
-        return menuItems.filter((item) =>
+        filtered = menuItems.filter((item) =>
           item.tags.some((tag) => tag.label.toLowerCase().includes("vegan"))
         );
-      }
-
-      if (selectedCategory === "Spicy 🌶️") {
-        return menuItems.filter((item) =>
+      } else if (selectedCategory === "Spicy 🌶️") {
+        filtered = menuItems.filter((item) =>
           item.tags.some((tag) => tag.label.toLowerCase().includes("spicy"))
         );
+      } else if (selectedCategory === "Popular ⭐") {
+        filtered = menuItems.filter((item) =>
+          item.tags.some((tag) => tag.label.toLowerCase().includes("popular"))
+        );
+      } else if (selectedCategory !== "All") {
+        filtered = menuItems.filter((item) => item.category === selectedCategory);
       }
 
-      if (selectedCategory === "Popular ⭐") {
-        return menuItems.filter((item) =>
-          item.tags.some((tag) => tag.label.toLowerCase().includes("popular"))
+      if (selectedSubcategory !== "All") {
+        filtered = filtered.filter((item) =>
+          item.tags.some((tag) => normalizeSubLabel(tag.label).toLowerCase() === selectedSubcategory.toLowerCase())
         );
       }
 
-      return menuItems.filter((item) => item.category === selectedCategory);
+      return filtered;
+    }
+
+    function setupToTopButton() {
+      const toTopBtn = document.getElementById("toTopBtn");
+      if (!toTopBtn) return;
+
+      window.addEventListener("scroll", () => {
+        toTopBtn.classList.toggle("show", window.scrollY > 380);
+      }, { passive: true });
+
+      toTopBtn.addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
     }
 
     function renderMenu() {
@@ -414,7 +572,9 @@
       }
 
       renderTabs();
+      renderSubtabs();
       renderMenu();
+      setupToTopButton();
     }
 
     bootstrap();
