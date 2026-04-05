@@ -260,10 +260,13 @@
   <script>
     /**
      * [Google Sheet 컬럼 순서]
-     * category | label | nameKo | nameEn | description | price | imageUrl | tags
+     * category | label | nameKo | nameEn | description | price | imageUrl | tags | tagSubLabels
      *
      * tags 예시:
      * 🌶️ Spicy|red, 🌱 Vegan|green, ⭐ Popular|yellow, 🐟 Seafood|blue
+     *
+     * tagSubLabels 예시:
+     * Vegan:Dairy-free|Seafood-free; Spicy:Mild|Extra Hot; Popular:Best Seller
      */
     const SHEET_CONFIG = {
       sheetId: "1xa9OZbctYnlbaAL8lKIgmefM5hvSw0Plk01lxp5G2fc",
@@ -283,7 +286,12 @@
           { label: "🌶️ Spicy", color: "red" },
           { label: "🌱 Vegan", color: "green" },
           { label: "⭐ Popular", color: "yellow" }
-        ]
+        ],
+        tagSubLabels: {
+          vegan: ["Dairy-free", "Seafood-free"],
+          spicy: ["Medium"],
+          popular: ["Best Seller"]
+        }
       },
       {
         category: "Mains",
@@ -297,7 +305,11 @@
           { label: "🌶️ Spicy", color: "red" },
           { label: "🐟 Seafood", color: "blue" },
           { label: "⭐ Popular", color: "yellow" }
-        ]
+        ],
+        tagSubLabels: {
+          spicy: ["Hot"],
+          popular: ["Chef Pick"]
+        }
       },
       {
         category: "Mains",
@@ -310,13 +322,22 @@
         tags: [
           { label: "🌶️ Spicy", color: "red" },
           { label: "⭐ Popular", color: "blue" }
-        ]
+        ],
+        tagSubLabels: {
+          spicy: ["Extra Hot"],
+          popular: ["New Menu"]
+        }
       }
     ];
 
     let allMenus = [];
     let selectedCategory = "All";
     let selectedSubcategory = "All";
+    const SPECIAL_TAG_CATEGORIES = {
+      "Vegan 🌱": "vegan",
+      "Spicy 🌶️": "spicy",
+      "Popular ⭐": "popular"
+    };
 
     function escapeHtml(text = "") {
       return text
@@ -339,6 +360,26 @@
             color: color || "gray"
           };
         });
+    }
+
+    function parseTagSubLabels(raw = "") {
+      return String(raw)
+        .split(";")
+        .map((part) => part.trim())
+        .filter(Boolean)
+        .reduce((acc, chunk) => {
+          const [tagName, labelsRaw = ""] = chunk.split(":");
+          const key = String(tagName || "").trim().toLowerCase();
+          if (!key) return acc;
+
+          const labels = labelsRaw
+            .split("|")
+            .map((label) => label.trim())
+            .filter(Boolean);
+
+          if (labels.length) acc[key] = [...new Set(labels)];
+          return acc;
+        }, {});
     }
 
     function withTagEmoji(label = "") {
@@ -376,12 +417,30 @@
           description: cells[4] || "",
           price: cells[5] || "",
           imageUrl: cells[6] || "",
-          tags: parseTags(cells[7] || "")
+          tags: parseTags(cells[7] || ""),
+          tagSubLabels: parseTagSubLabels(cells[8] || "")
         }));
     }
 
+    function getSpecialCategoryKey(category) {
+      return SPECIAL_TAG_CATEGORIES[category] || "";
+    }
+
     function getSubcategoriesByCategory(menuItems, category) {
-      if (category === "All" || category === "Vegan 🌱" || category === "Spicy 🌶️" || category === "Popular ⭐") return [];
+      if (category === "All") return [];
+
+      const specialCategoryKey = getSpecialCategoryKey(category);
+      if (specialCategoryKey) {
+        const options = menuItems
+          .filter((item) =>
+            item.tags.some((tag) => tag.label.toLowerCase().includes(specialCategoryKey))
+          )
+          .flatMap((item) => item.tagSubLabels?.[specialCategoryKey] || [])
+          .map((value) => String(value).trim())
+          .filter(Boolean);
+
+        return [...new Set(options)];
+      }
 
       const categoryMenus = menuItems.filter((item) => item.category === category);
       const options = categoryMenus
@@ -482,27 +541,27 @@
 
     function filterMenus(menuItems) {
       let filtered = menuItems;
+      const specialCategoryKey = getSpecialCategoryKey(selectedCategory);
 
-      if (selectedCategory === "Vegan 🌱") {
+      if (specialCategoryKey) {
         filtered = menuItems.filter((item) =>
-          item.tags.some((tag) => tag.label.toLowerCase().includes("vegan"))
-        );
-      } else if (selectedCategory === "Spicy 🌶️") {
-        filtered = menuItems.filter((item) =>
-          item.tags.some((tag) => tag.label.toLowerCase().includes("spicy"))
-        );
-      } else if (selectedCategory === "Popular ⭐") {
-        filtered = menuItems.filter((item) =>
-          item.tags.some((tag) => tag.label.toLowerCase().includes("popular"))
+          item.tags.some((tag) => tag.label.toLowerCase().includes(specialCategoryKey))
         );
       } else if (selectedCategory !== "All") {
         filtered = menuItems.filter((item) => item.category === selectedCategory);
       }
 
       if (selectedSubcategory !== "All") {
-        filtered = filtered.filter((item) =>
-          String(item.label || "").toLowerCase() === selectedSubcategory.toLowerCase()
-        );
+        if (specialCategoryKey) {
+          filtered = filtered.filter((item) =>
+            (item.tagSubLabels?.[specialCategoryKey] || [])
+              .some((sub) => sub.toLowerCase() === selectedSubcategory.toLowerCase())
+          );
+        } else {
+          filtered = filtered.filter((item) =>
+            String(item.label || "").toLowerCase() === selectedSubcategory.toLowerCase()
+          );
+        }
       }
 
       return filtered;
