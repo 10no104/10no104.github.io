@@ -4,9 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Menu Downtown</title>
-  <link rel="stylesheet" href="../../css/global.css" />
-  <link rel="stylesheet" href="../../css/layout.css" />
-  <link rel="stylesheet" href="../../css/components.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/components.css" />
 </head>
 <body class="menu-page">
   <main class="wrap">
@@ -295,10 +294,10 @@
       menuListEl.innerHTML = filtered
         .map((item) => {
           const tagsHtml = item.tags
-            .map((tag) => `<span class="menu-tag ${escapeHtml(tag.color)}">${escapeHtml(tag.label)}</span>`)
+            .map((tag) => `<span class="menu-tag tag ${escapeHtml(tag.color)}">${escapeHtml(tag.label)}</span>`)
             .join("");
 
-          const tagsSection = tagsHtml ? `<div class="menu-meta">${tagsHtml}</div>` : "";
+          const tagsSection = tagsHtml ? `<div class="tags menu-meta">${tagsHtml}</div>` : "";
 
           return `
             <article class="menu-card">
