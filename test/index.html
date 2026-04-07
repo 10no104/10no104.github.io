@@ -371,7 +371,7 @@
             ? `<span class="spicy-level" data-spicy="${escapeHtml(spicyLevel)}"></span>`
             : "";
           const tagsHtml = item.tags
-            .map((tag) => `<span class="menu-tag ${escapeHtml(tag.color)}">${escapeHtml(tag.label)}</span>`)
+            .map((tag) => `<span class="menu-tag ${escapeHtml(tag.color)}">${escapeHtml(formatTagLabel(tag.label))}</span>`)
             .join("");
 
           const tagsSection = tagsHtml ? `<div class="menu-meta">${tagsHtml}</div>` : "";
