@@ -144,6 +144,16 @@
         }, {});
     }
 
+    function formatTagLabel(tag = {}) {
+      const originalLabel = String(tag.label || "").trim();
+      const normalizedLabel = originalLabel.replace(/^[^A-Za-z0-9]+/, "").trim();
+      const spicyMatch = normalizedLabel.match(/^Spicy([1-5])?$/i);
+      if (!spicyMatch) return originalLabel;
+
+      const spicyLevel = Number(spicyMatch[1] || "1");
+      return "🌶️".repeat(spicyLevel);
+    }
+
     function withTagEmoji(label = "") {
       const raw = String(label).trim();
       if (!raw) return "🏷️ Tag";
@@ -354,7 +364,7 @@
       menuListEl.innerHTML = filtered
         .map((item) => {
           const tagsHtml = item.tags
-            .map((tag) => `<span class="menu-tag ${escapeHtml(tag.color)}">${escapeHtml(tag.label)}</span>`)
+            .map((tag) => `<span class="menu-tag ${escapeHtml(tag.color)}">${escapeHtml(formatTagLabel(tag))}</span>`)
             .join("");
 
           const tagsSection = tagsHtml ? `<div class="menu-meta">${tagsHtml}</div>` : "";
