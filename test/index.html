@@ -144,6 +144,18 @@
         }, {});
     }
 
+    function getSpicyLevelFromLabel(label = "") {
+      const matchedLevel = String(label).match(/spicy\s*([1-5])?/i);
+      if (!matchedLevel) return null;
+      return Number(matchedLevel[1] || "1");
+    }
+
+    function formatTagLabel(tagLabel = "") {
+      const spicyLevel = getSpicyLevelFromLabel(tagLabel);
+      if (!spicyLevel) return tagLabel;
+      return "🌶️".repeat(spicyLevel);
+    }
+
     function withTagEmoji(label = "") {
       const raw = String(label).trim();
       if (!raw) return "🏷️ Tag";
@@ -354,7 +366,7 @@
       menuListEl.innerHTML = filtered
         .map((item) => {
           const tagsHtml = item.tags
-            .map((tag) => `<span class="menu-tag ${escapeHtml(tag.color)}">${escapeHtml(tag.label)}</span>`)
+            .map((tag) => `<span class="menu-tag ${escapeHtml(tag.color)}">${escapeHtml(formatTagLabel(tag.label))}</span>`)
             .join("");
 
           const tagsSection = tagsHtml ? `<div class="menu-meta">${tagsHtml}</div>` : "";
