@@ -1,109 +1,237 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>이화 EHWA 메인 페이지</title>
+  <title>EHWA | Main Landing</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/global.css" />
   <link rel="stylesheet" href="css/layout.css" />
   <link rel="stylesheet" href="css/components.css" />
+  <style>
+    .home-hub {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 20px 56px;
+    }
+
+    .hub-hero {
+      position: relative;
+      margin-top: 24px;
+      border-radius: 20px;
+      overflow: hidden;
+      min-height: 420px;
+      background: #111;
+      color: #fff;
+      display: grid;
+      align-items: end;
+    }
+
+    .hub-hero-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.55;
+    }
+
+    .hub-hero-content {
+      position: relative;
+      z-index: 1;
+      padding: 32px;
+      display: grid;
+      gap: 16px;
+      max-width: 640px;
+    }
+
+    .hub-logo {
+      width: 148px;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .hub-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .hub-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 18px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: opacity 0.2s ease;
+    }
+
+    .hub-btn:hover {
+      opacity: 0.9;
+    }
+
+    .hub-btn-primary {
+      background: #d4af37;
+      color: #101010;
+    }
+
+    .hub-btn-secondary {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.45);
+    }
+
+    .hub-section {
+      margin-top: 44px;
+    }
+
+    .hub-section h2 {
+      margin-bottom: 14px;
+    }
+
+    .location-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .location-card {
+      border: 1px solid #e5e5e5;
+      border-radius: 16px;
+      padding: 22px;
+      background: #fff;
+      display: grid;
+      gap: 12px;
+    }
+
+    .location-card h3 {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+
+    .location-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 8px;
+      color: #333;
+    }
+
+    .location-list strong {
+      margin-right: 6px;
+      color: #111;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .gallery-grid img {
+      width: 100%;
+      height: 220px;
+      display: block;
+      border-radius: 12px;
+      object-fit: cover;
+    }
+
+    .hub-footer {
+      margin-top: 40px;
+      text-align: center;
+      color: #666;
+      font-size: 0.95rem;
+      padding-bottom: 16px;
+    }
+
+    @media (max-width: 900px) {
+      .gallery-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 760px) {
+      .hub-hero {
+        min-height: 360px;
+      }
+
+      .hub-hero-content {
+        padding: 24px;
+      }
+
+      .location-grid,
+      .gallery-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body class="home-page">
-  <header class="hero">
-    <img class="decor-top" src="assets/clouds.webp" alt="" aria-hidden="true" />
-    <img class="decor-bottom" src="assets/clouds-white.webp" alt="" aria-hidden="true" />
+  <main class="home-hub">
+    <section class="hub-hero" aria-label="Main hero section">
+      <!-- TODO: Replace with hero image path -->
+      <img class="hub-hero-image" src="assets/woman.webp" alt="EHWA hero visual" />
 
-    <div class="container hero-grid">
-      <div>
-        <div class="logo-row">
-          <img src="assets/logo-white.png" alt="EHWA 로고" />
-          <div>
-            <p class="eyebrow">Korean Dining & Bar</p>
-            <strong>EHWA Restaurant</strong>
-          </div>
-        </div>
-
-        <h1>이화 EHWA 메인 페이지</h1>
-        <p class="hero-desc">
-          지점 정보를 한 번에 확인하고 메뉴 페이지로 이동할 수 있는 임시 메인 페이지입니다.
-          주소, 연락처, 영업시간, 대표 메뉴 정보는 현재 임시 텍스트로 입력되어 있습니다.
-        </p>
-
-        <div class="hero-actions">
-          <a class="btn primary" href="#uptown">업타운 메뉴 바로가기</a>
-          <a class="btn" href="#downtown">다운타운 메뉴 바로가기</a>
+      <div class="hub-hero-content">
+        <!-- TODO: Replace with logo image path -->
+        <img class="hub-logo" src="assets/logo-white.png" alt="EHWA logo" />
+        <h1>EHWA Dining & Lounge</h1>
+        <p>Your one-stop page for reservation, location details, and latest updates.</p>
+        <div class="hub-actions">
+          <!-- TODO: Replace with reservation page URL -->
+          <a class="hub-btn hub-btn-primary" href="https://example.com/reservation">Online Reservation</a>
+          <!-- TODO: Replace with Instagram URL -->
+          <a class="hub-btn hub-btn-secondary" href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer">Instagram</a>
         </div>
       </div>
-
-      <div class="hero-visual" aria-label="여자 비주얼">
-        <img src="assets/woman.webp" alt="여성 메인 비주얼 이미지" />
-      </div>
-    </div>
-  </header>
-
-  <main class="container section">
-    <h2>지점 안내</h2>
-    <p>업타운 / 다운타운 지점 정보 + 메뉴 이동</p>
-
-    <section class="branch-grid">
-      <article class="branch-card" id="uptown">
-        <img src="assets/매장-scaled.webp" alt="EHWA Uptown 내부 이미지" />
-        <div class="branch-body">
-          <div class="branch-head">
-            <h3>EHWA Uptown</h3>
-            <span class="branch-tag">UPTOWN</span>
-          </div>
-          <ul class="branch-list">
-            <li><strong>주소</strong> 1234 Uptown Ave, North York, ON (임시)</li>
-            <li><strong>영업시간</strong> 월-목 11:30-22:00 / 금-토 11:30-23:00 / 일 12:00-21:00 (임시)</li>
-            <li><strong>연락처</strong> +1 (416) 000-1111 (임시)</li>
-            <li><strong>대표 메뉴</strong> 불고기, 치즈 불닭, 순살 양념치킨 (임시)</li>
-          </ul>
-          <div class="branch-cta">
-            <a class="btn primary" href="menu/uptown/index.html">업타운 메뉴 보기</a>
-          </div>
-        </div>
-      </article>
-
-      <article class="branch-card" id="downtown">
-        <img src="assets/seats-scaled.webp" alt="EHWA Downtown 내부 이미지" />
-        <div class="branch-body">
-          <div class="branch-head">
-            <h3>EHWA Downtown</h3>
-            <span class="branch-tag">DOWNTOWN</span>
-          </div>
-          <ul class="branch-list">
-            <li><strong>주소</strong> 55 Downtown St, Toronto, ON (임시)</li>
-            <li><strong>영업시간</strong> 월-목 11:00-22:30 / 금-토 11:00-23:30 / 일 12:00-21:30 (임시)</li>
-            <li><strong>연락처</strong> +1 (416) 000-2222 (임시)</li>
-            <li><strong>대표 메뉴</strong> 순살 두부치킨, 떡볶이, 육회비빔밥 (임시)</li>
-          </ul>
-          <div class="branch-cta">
-            <a class="btn primary" href="menu/downtown/index.html">다운타운 메뉴 보기</a>
-          </div>
-        </div>
-      </article>
     </section>
 
-    <div class="insta-wide">
-      <span>최신 소식은 인스타그램에서 확인하세요.</span>
-      <a class="insta-btn" href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="인스타그램 이동">
-        <img src="assets/Group-11863g.svg" alt="인스타그램 로고" />
-        Instagram
-      </a>
-    </div>
+    <section class="hub-section" aria-labelledby="locations-heading">
+      <h2 id="locations-heading">Locations</h2>
+      <div class="location-grid">
+        <article class="location-card" aria-label="Uptown location">
+          <h3>Uptown</h3>
+          <!-- TODO: Replace with Uptown menu URL -->
+          <a class="hub-btn hub-btn-primary" href="menu/uptown/index.html">View Uptown Menu</a>
+          <ul class="location-list">
+            <li><strong>Hours:</strong> <!-- TODO: Replace with Uptown business hours text -->Mon-Sun 11:30 AM - 10:30 PM</li>
+            <li><strong>Address:</strong> <!-- TODO: Replace with Uptown address text -->1234 Uptown Ave, City, ST 00000</li>
+            <li><strong>Phone:</strong> <!-- TODO: Replace with Uptown phone number --> <a href="tel:+10000000001">+1 (000) 000-0001</a></li>
+          </ul>
+        </article>
+
+        <article class="location-card" aria-label="Downtown location">
+          <h3>Downtown</h3>
+          <!-- TODO: Replace with Downtown menu URL -->
+          <a class="hub-btn hub-btn-primary" href="menu/downtown/index.html">View Downtown Menu</a>
+          <ul class="location-list">
+            <li><strong>Hours:</strong> <!-- TODO: Replace with Downtown business hours text -->Mon-Sun 11:30 AM - 10:30 PM</li>
+            <li><strong>Address:</strong> <!-- TODO: Replace with Downtown address text -->55 Downtown Street, City, ST 00000</li>
+            <li><strong>Phone:</strong> <!-- TODO: Replace with Downtown phone number --> <a href="tel:+10000000002">+1 (000) 000-0002</a></li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="hub-section" aria-labelledby="gallery-heading">
+      <h2 id="gallery-heading">Gallery</h2>
+      <div class="gallery-grid">
+        <!-- TODO: Replace with gallery image paths -->
+        <img src="assets/매장-scaled.webp" alt="Restaurant interior 1" />
+        <img src="assets/seats-scaled.webp" alt="Restaurant interior 2" />
+        <img src="assets/woman.webp" alt="Restaurant visual 3" />
+      </div>
+    </section>
+
+    <footer class="hub-footer">
+      © EHWA Restaurant. All rights reserved.
+    </footer>
   </main>
-
-  <a class="floating-insta" href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="인스타그램 바로가기">
-    <img src="assets/Group-11863g.svg" alt="인스타그램 로고" />
-    Instagram
-  </a>
-
-  <footer>
-    © EHWA Restaurant · Temporary Homepage Draft
-  </footer>
 </body>
 </html>
