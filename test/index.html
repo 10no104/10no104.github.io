@@ -144,6 +144,15 @@
         }, {});
     }
 
+    function getSpicyLevelFromTags(tags = []) {
+      const spicyTag = tags.find((tag) => /spicy\s*[1-5]?/i.test(String(tag.label || "")));
+      if (!spicyTag) return null;
+
+      const matchedLevel = String(spicyTag.label || "").match(/spicy\s*([1-5])?/i);
+      if (!matchedLevel) return null;
+      return matchedLevel[1] || "1";
+    }
+
     function withTagEmoji(label = "") {
       const raw = String(label).trim();
       if (!raw) return "🏷️ Tag";
@@ -171,17 +180,21 @@
         .map((row) => row.c || [])
         .map((c) => c.map((cell) => (cell?.v ?? "").toString().trim()))
         .filter((cells) => cells.some(Boolean))
-        .map((cells) => ({
-          category: cells[0] || "Uncategorized",
-          label: cells[1] || "",
-          nameKo: cells[2] || "",
-          nameEn: cells[3] || "",
-          description: cells[4] || "",
-          price: cells[5] || "",
-          imageUrl: cells[6] || "",
-          tags: parseTags(cells[7] || ""),
-          tagSubLabels: parseTagSubLabels(cells[8] || "")
-        }));
+        .map((cells) => {
+          const tags = parseTags(cells[7] || "");
+          return {
+            category: cells[0] || "Uncategorized",
+            label: cells[1] || "",
+            nameKo: cells[2] || "",
+            nameEn: cells[3] || "",
+            description: cells[4] || "",
+            price: cells[5] || "",
+            imageUrl: cells[6] || "",
+            tags,
+            spicyLevel: getSpicyLevelFromTags(tags),
+            tagSubLabels: parseTagSubLabels(cells[8] || "")
+          };
+        });
     }
 
     function getSpecialCategoryKey(category) {
@@ -353,15 +366,22 @@
 
       menuListEl.innerHTML = filtered
         .map((item) => {
+          const spicyLevel = item.spicyLevel || getSpicyLevelFromTags(item.tags);
+          const spicyBadge = spicyLevel
+            ? `<span class="spicy-level" data-spicy="${escapeHtml(spicyLevel)}"></span>`
+            : "";
           const tagsHtml = item.tags
-            .map((tag) => `<span class="menu-tag ${escapeHtml(tag.color)}">${escapeHtml(tag.label)}</span>`)
+            .map((tag) => `<span class="menu-tag ${escapeHtml(tag.color)}">${escapeHtml(formatTagLabel(tag.label))}</span>`)
             .join("");
 
           const tagsSection = tagsHtml ? `<div class="menu-meta">${tagsHtml}</div>` : "";
 
           return `
             <article class="menu-card">
-              <img class="menu-image" src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.nameEn || item.nameKo)}" />
+              <div class="menu-image-wrap">
+                <img class="menu-image" src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.nameEn || item.nameKo)}" />
+                ${spicyBadge}
+              </div>
               <div class="menu-content">
                 <p class="menu-title name-ko">${escapeHtml(item.nameKo)}</p>
                 <p class="menu-title menu-title-alt name-en">${escapeHtml(item.nameEn)}</p>
