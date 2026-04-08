@@ -1,12 +1,13 @@
+
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Menu Test</title>
-    <link rel="stylesheet" href="../css/global.css" />
-  <link rel="stylesheet" href="../css/layout.css" />
-  <link rel="stylesheet" href="../css/components.css" />
+  <title>Menu Downtown</title>
+    <link rel="stylesheet" href="../../css/global.css" />
+  <link rel="stylesheet" href="../../css/layout.css" />
+  <link rel="stylesheet" href="../../css/components.css" />
 </head>
 <body class="menu-page">
   <main class="wrap">
@@ -22,13 +23,10 @@
   <script>
     /**
      * [Google Sheet 컬럼 순서]
-     * category | label | nameKo | nameEn | description | price | imageUrl | tags | tagSubLabels
+     * category | label | nameKo | nameEn | description | price | imageUrl | tags
      *
      * tags 예시:
      * 🌶️ Spicy|red, 🌱 Vegan|green, ⭐ Popular|yellow, 🐟 Seafood|blue
-     *
-     * tagSubLabels 예시:
-     * Vegan:Dairy-free|Seafood-free; Spicy:Mild|Extra Hot; Popular:Best Seller
      */
     const SHEET_CONFIG = {
       sheetId: "1xa9OZbctYnlbaAL8lKIgmefM5hvSw0Plk01lxp5G2fc",
@@ -48,12 +46,7 @@
           { label: "🌶️ Spicy", color: "red" },
           { label: "🌱 Vegan", color: "green" },
           { label: "⭐ Popular", color: "yellow" }
-        ],
-        tagSubLabels: {
-          vegan: ["Dairy-free", "Seafood-free"],
-          spicy: ["Medium"],
-          popular: ["Best Seller"]
-        }
+        ]
       },
       {
         category: "Mains",
@@ -67,11 +60,7 @@
           { label: "🌶️ Spicy", color: "red" },
           { label: "🐟 Seafood", color: "blue" },
           { label: "⭐ Popular", color: "yellow" }
-        ],
-        tagSubLabels: {
-          spicy: ["Hot"],
-          popular: ["Chef Pick"]
-        }
+        ]
       },
       {
         category: "Mains",
@@ -84,22 +73,13 @@
         tags: [
           { label: "🌶️ Spicy", color: "red" },
           { label: "⭐ Popular", color: "blue" }
-        ],
-        tagSubLabels: {
-          spicy: ["Extra Hot"],
-          popular: ["New Menu"]
-        }
+        ]
       }
     ];
 
     let allMenus = [];
     let selectedCategory = "All";
     let selectedSubcategory = "All";
-    const SPECIAL_TAG_CATEGORIES = {
-      "Vegan 🌱": "vegan",
-      "Spicy 🌶️": "spicy",
-      "Popular ⭐": "popular"
-    };
 
     function escapeHtml(text = "") {
       return text
@@ -122,35 +102,6 @@
             color: color || "gray"
           };
         });
-    }
-
-    function parseTagSubLabels(raw = "") {
-      return String(raw)
-        .split(";")
-        .map((part) => part.trim())
-        .filter(Boolean)
-        .reduce((acc, chunk) => {
-          const [tagName, labelsRaw = ""] = chunk.split(":");
-          const key = String(tagName || "").trim().toLowerCase();
-          if (!key) return acc;
-
-          const labels = labelsRaw
-            .split("|")
-            .map((label) => label.trim())
-            .filter(Boolean);
-
-          if (labels.length) acc[key] = [...new Set(labels)];
-          return acc;
-        }, {});
-    }
-
-    function getSpicyLevelFromTags(tags = []) {
-      const spicyTag = tags.find((tag) => /spicy\s*[1-5]?/i.test(String(tag.label || "")));
-      if (!spicyTag) return null;
-
-      const matchedLevel = String(spicyTag.label || "").match(/spicy\s*([1-5])?/i);
-      if (!matchedLevel) return null;
-      return matchedLevel[1] || "1";
     }
 
     function withTagEmoji(label = "") {
@@ -180,42 +131,20 @@
         .map((row) => row.c || [])
         .map((c) => c.map((cell) => (cell?.v ?? "").toString().trim()))
         .filter((cells) => cells.some(Boolean))
-        .map((cells) => {
-          const tags = parseTags(cells[7] || "");
-          return {
-            category: cells[0] || "Uncategorized",
-            label: cells[1] || "",
-            nameKo: cells[2] || "",
-            nameEn: cells[3] || "",
-            description: cells[4] || "",
-            price: cells[5] || "",
-            imageUrl: cells[6] || "",
-            tags,
-            spicyLevel: getSpicyLevelFromTags(tags),
-            tagSubLabels: parseTagSubLabels(cells[8] || "")
-          };
-        });
-    }
-
-    function getSpecialCategoryKey(category) {
-      return SPECIAL_TAG_CATEGORIES[category] || "";
+        .map((cells) => ({
+          category: cells[0] || "Uncategorized",
+          label: cells[1] || "",
+          nameKo: cells[2] || "",
+          nameEn: cells[3] || "",
+          description: cells[4] || "",
+          price: cells[5] || "",
+          imageUrl: cells[6] || "",
+          tags: parseTags(cells[7] || "")
+        }));
     }
 
     function getSubcategoriesByCategory(menuItems, category) {
-      if (category === "All") return [];
-
-      const specialCategoryKey = getSpecialCategoryKey(category);
-      if (specialCategoryKey) {
-        const options = menuItems
-          .filter((item) =>
-            item.tags.some((tag) => tag.label.toLowerCase().includes(specialCategoryKey))
-          )
-          .flatMap((item) => item.tagSubLabels?.[specialCategoryKey] || [])
-          .map((value) => String(value).trim())
-          .filter(Boolean);
-
-        return [...new Set(options)];
-      }
+      if (category === "All" || category === "Vegan 🌱" || category === "Spicy 🌶️" || category === "Popular ⭐") return [];
 
       const categoryMenus = menuItems.filter((item) => item.category === category);
       const options = categoryMenus
@@ -316,27 +245,27 @@
 
     function filterMenus(menuItems) {
       let filtered = menuItems;
-      const specialCategoryKey = getSpecialCategoryKey(selectedCategory);
 
-      if (specialCategoryKey) {
+      if (selectedCategory === "Vegan 🌱") {
         filtered = menuItems.filter((item) =>
-          item.tags.some((tag) => tag.label.toLowerCase().includes(specialCategoryKey))
+          item.tags.some((tag) => tag.label.toLowerCase().includes("vegan"))
+        );
+      } else if (selectedCategory === "Spicy 🌶️") {
+        filtered = menuItems.filter((item) =>
+          item.tags.some((tag) => tag.label.toLowerCase().includes("spicy"))
+        );
+      } else if (selectedCategory === "Popular ⭐") {
+        filtered = menuItems.filter((item) =>
+          item.tags.some((tag) => tag.label.toLowerCase().includes("popular"))
         );
       } else if (selectedCategory !== "All") {
         filtered = menuItems.filter((item) => item.category === selectedCategory);
       }
 
       if (selectedSubcategory !== "All") {
-        if (specialCategoryKey) {
-          filtered = filtered.filter((item) =>
-            (item.tagSubLabels?.[specialCategoryKey] || [])
-              .some((sub) => sub.toLowerCase() === selectedSubcategory.toLowerCase())
-          );
-        } else {
-          filtered = filtered.filter((item) =>
-            String(item.label || "").toLowerCase() === selectedSubcategory.toLowerCase()
-          );
-        }
+        filtered = filtered.filter((item) =>
+          String(item.label || "").toLowerCase() === selectedSubcategory.toLowerCase()
+        );
       }
 
       return filtered;
@@ -366,22 +295,15 @@
 
       menuListEl.innerHTML = filtered
         .map((item) => {
-          const spicyLevel = item.spicyLevel || getSpicyLevelFromTags(item.tags);
-          const spicyBadge = spicyLevel
-            ? `<span class="spicy-level" data-spicy="${escapeHtml(spicyLevel)}"></span>`
-            : "";
           const tagsHtml = item.tags
-            .map((tag) => `<span class="menu-tag ${escapeHtml(tag.color)}">${escapeHtml(formatTagLabel(tag.label))}</span>`)
+            .map((tag) => `<span class="menu-tag ${escapeHtml(tag.color)}">${escapeHtml(tag.label)}</span>`)
             .join("");
 
           const tagsSection = tagsHtml ? `<div class="menu-meta">${tagsHtml}</div>` : "";
 
           return `
             <article class="menu-card">
-              <div class="menu-image-wrap">
-                <img class="menu-image" src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.nameEn || item.nameKo)}" />
-                ${spicyBadge}
-              </div>
+              <img class="menu-image" src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.nameEn || item.nameKo)}" />
               <div class="menu-content">
                 <p class="menu-title name-ko">${escapeHtml(item.nameKo)}</p>
                 <p class="menu-title menu-title-alt name-en">${escapeHtml(item.nameEn)}</p>
