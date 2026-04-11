@@ -81,6 +81,7 @@
     let selectedCategory = "All";
     let selectedSubcategory = "All";
     let selectedDietaryTags = new Set();
+    let veganSelectionMode = "blank";
 
     function escapeHtml(text = "") {
       return text
@@ -251,6 +252,7 @@
           selectedCategory = tabButton.dataset.category || "All";
           selectedSubcategory = "All";
           selectedDietaryTags = new Set();
+          veganSelectionMode = "blank";
           renderTabs();
           renderSubtabs();
           renderMenu();
@@ -640,7 +642,9 @@
       let filtered = filterBySelectedCategory(menuItems, selectedCategory);
 
       if (isDietaryCategory(selectedCategory)) {
-        if (selectedDietaryTags.size) {
+        if (veganSelectionMode === "blank") {
+          filtered = filtered.filter((item) => !getDietaryTagsForItem(item).length);
+        } else if (selectedDietaryTags.size) {
           filtered = filtered.filter((item) => {
             const dietaryTags = getDietaryTagsForItem(item);
             return [...selectedDietaryTags].every((tag) => dietaryTags.includes(tag));
@@ -680,7 +684,7 @@
           const value = isDietaryCategory(selectedCategory) ? normalizeDietaryTag(sub) : sub;
           const isAll = value === "all";
           const isActive = isDietaryCategory(selectedCategory)
-            ? (isAll ? selectedDietaryTags.size === 0 : selectedDietaryTags.has(value))
+            ? (isAll ? veganSelectionMode === "blank" : veganSelectionMode === "tags" && selectedDietaryTags.has(value))
             : sub === selectedSubcategory;
           const activeClass = isActive ? "active" : "";
           const label = isDietaryCategory(selectedCategory) && !isAll ? formatDietaryTag(sub) : sub;
@@ -695,9 +699,12 @@
           if (isDietaryCategory(selectedCategory)) {
             if (value === "all") {
               selectedDietaryTags = new Set();
+              veganSelectionMode = "blank";
             } else if (selectedDietaryTags.has(value)) {
               selectedDietaryTags.delete(value);
+              veganSelectionMode = selectedDietaryTags.size ? "tags" : "blank";
             } else {
+              veganSelectionMode = "tags";
               selectedDietaryTags.add(value);
             }
           } else {
