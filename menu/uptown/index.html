@@ -89,6 +89,51 @@
         .replaceAll("'", "&#39;");
     }
 
+    function getTagKey(label = "") {
+      const normalized = String(label).trim().toLowerCase();
+      if (!normalized) return "tag";
+      if (/^spicy\d*$/.test(normalized)) return "spicy";
+      if (normalized.includes("vegan")) return "vegan";
+      if (normalized.includes("popular")) return "popular";
+      if (normalized.includes("seafood")) return "seafood";
+      if (normalized.includes("sweet")) return "sweet";
+      if (normalized.includes("chicken")) return "chicken";
+      if (normalized.includes("beef")) return "beef";
+      if (normalized.includes("pork")) return "pork";
+      return normalized;
+    }
+
+    function getSpicyLevel(label = "") {
+      const normalized = String(label).trim().toLowerCase();
+      const match = normalized.match(/^spicy(\d*)$/);
+      if (!match) return null;
+      return Math.max(1, Number(match[1] || "1"));
+    }
+
+    function renderTagLabel(label = "") {
+      const raw = String(label).trim();
+      if (!raw) return "Tag";
+
+      const spicyLevel = getSpicyLevel(raw);
+      if (spicyLevel) return "🌶️".repeat(spicyLevel);
+      if (/[\u{1F300}-\u{1FAFF}\u2600-\u27BF]/u.test(raw)) return raw;
+
+      const tagKey = getTagKey(raw);
+      const emojiMap = {
+        spicy: "🌶️",
+        vegan: "🌱",
+        popular: "⭐",
+        seafood: "🐟",
+        sweet: "🍯",
+        chicken: "🍗",
+        beef: "🥩",
+        pork: "🐷"
+      };
+
+      const emoji = emojiMap[tagKey];
+      return emoji ? `${emoji} ${raw}` : raw;
+    }
+
     function parseTags(raw = "") {
       return String(raw)
         .split(",")
@@ -97,7 +142,8 @@
         .map((chunk) => {
           const [label, color] = chunk.split("|").map((v) => v && v.trim());
           return {
-            label: withTagEmoji(label || "Tag"),
+            key: getTagKey(label || "Tag"),
+            label: renderTagLabel(label || "Tag"),
             color: color || "gray"
           };
         });
@@ -247,15 +293,15 @@
 
       if (selectedCategory === "Vegan 🌱") {
         filtered = menuItems.filter((item) =>
-          item.tags.some((tag) => tag.label.toLowerCase().includes("vegan"))
+          item.tags.some((tag) => tag.key === "vegan")
         );
       } else if (selectedCategory === "Spicy 🌶️") {
         filtered = menuItems.filter((item) =>
-          item.tags.some((tag) => tag.label.toLowerCase().includes("spicy"))
+          item.tags.some((tag) => tag.key === "spicy")
         );
       } else if (selectedCategory === "Popular ⭐") {
         filtered = menuItems.filter((item) =>
-          item.tags.some((tag) => tag.label.toLowerCase().includes("popular"))
+          item.tags.some((tag) => tag.key === "popular")
         );
       } else if (selectedCategory !== "All") {
         filtered = menuItems.filter((item) => item.category === selectedCategory);
