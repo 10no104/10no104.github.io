@@ -551,7 +551,7 @@
     }
 
     function getDietaryTagsForItem(item) {
-      const values = Array.isArray(item.dietaryTags) ? item.dietaryTags : parseDietaryTagList(item.ingredient || "");
+      const values = Array.isArray(item.dietaryTags) ? item.dietaryTags : [];
       return values
         .map((tag) => normalizeDietaryTag(tag))
         .filter((tag, index, arr) => tag && arr.indexOf(tag) === index);
@@ -586,7 +586,7 @@
     }
 
     function getSubcategoryValue(item) {
-      return String(item.ingredient || item.label || "").trim();
+      return String(item.label || "").trim();
     }
 
     function filterBySelectedCategory(menuItems, category) {
@@ -622,7 +622,7 @@
 
       if (isDietaryCategory(category)) {
         const options = scopedMenus
-          .flatMap((item) => Array.isArray(item.dietaryTags) ? item.dietaryTags : parseDietaryTagList(item.ingredient || ""))
+          .flatMap((item) => Array.isArray(item.dietaryTags) ? item.dietaryTags : [])
           .map((tag) => String(tag).trim())
           .filter(Boolean);
 
