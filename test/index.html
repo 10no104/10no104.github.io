@@ -528,16 +528,21 @@
       return filtered;
     }
 
-    const DIETARY_FILTERS = ["vegan", "vegetarian", "seafood", "egg", "dairy", "meat"];
-
     function normalizeDietaryTag(value = "") {
       return String(value).trim().toLowerCase();
     }
 
+    function parseDietaryTagList(raw = "") {
+      return String(raw)
+        .split(",")
+        .map((part) => String(part).trim())
+        .filter(Boolean);
+    }
+
     function formatDietaryTag(tag = "") {
-      const normalized = normalizeDietaryTag(tag);
-      if (!normalized) return "";
-      return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+      const raw = String(tag).trim();
+      if (!raw) return "";
+      return raw.charAt(0).toUpperCase() + raw.slice(1);
     }
 
     function isDietaryCategory(category = "") {
@@ -546,9 +551,10 @@
     }
 
     function getDietaryTagsForItem(item) {
-      return (Array.isArray(item.tags) ? item.tags : [])
-        .map((tag) => normalizeDietaryTag(tag?.key || tag?.label || ""))
-        .filter((tag, index, arr) => DIETARY_FILTERS.includes(tag) && arr.indexOf(tag) === index);
+      const values = Array.isArray(item.dietaryTags) ? item.dietaryTags : parseDietaryTagList(item.ingredient || "");
+      return values
+        .map((tag) => normalizeDietaryTag(tag))
+        .filter((tag, index, arr) => tag && arr.indexOf(tag) === index);
     }
 
     function mapSheetRows(rows = []) {
@@ -565,7 +571,8 @@
           price: cells[5] || "",
           imageUrl: cells[6] || "",
           tags: parseTags(cells[7] || ""),
-          ingredient: cells[8] || ""
+          ingredient: cells[8] || "",
+          dietaryTags: parseDietaryTagList(cells[8] || "")
         }));
     }
 
@@ -614,7 +621,12 @@
       const scopedMenus = filterBySelectedCategory(menuItems, category);
 
       if (isDietaryCategory(category)) {
-        return ["All", ...DIETARY_FILTERS];
+        const options = scopedMenus
+          .flatMap((item) => Array.isArray(item.dietaryTags) ? item.dietaryTags : parseDietaryTagList(item.ingredient || ""))
+          .map((tag) => String(tag).trim())
+          .filter(Boolean);
+
+        return ["All", ...new Set(options)];
       }
 
       const options = scopedMenus
