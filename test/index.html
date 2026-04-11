@@ -317,6 +317,98 @@
       return filtered;
     }
 
+    function filterBySelectedCategory(menuItems, category) {
+      if (category === "Vegan ðŸŒ±") {
+        return menuItems.filter((item) =>
+          item.tags.some((tag) => tag.key === "vegan")
+        );
+      }
+
+      if (category === "Spicy ðŸŒ¶ï¸") {
+        return menuItems.filter((item) =>
+          item.tags.some((tag) => tag.key === "spicy")
+        );
+      }
+
+      if (category === "Popular â­") {
+        return menuItems.filter((item) =>
+          item.tags.some((tag) => tag.key === "popular")
+        );
+      }
+
+      if (category === "All") return menuItems;
+
+      return menuItems.filter((item) => item.category === category);
+    }
+
+    function getSubcategoriesByCategory(menuItems, category) {
+      const scopedMenus = filterBySelectedCategory(menuItems, category);
+      const options = scopedMenus
+        .map((item) => String(item.label || "").trim())
+        .filter(Boolean);
+
+      return [...new Set(options)];
+    }
+
+    function filterMenus(menuItems) {
+      let filtered = filterBySelectedCategory(menuItems, selectedCategory);
+
+      if (selectedSubcategory !== "All") {
+        filtered = filtered.filter((item) =>
+          String(item.label || "").toLowerCase() === selectedSubcategory.toLowerCase()
+        );
+      }
+
+      return filtered;
+    }
+
+    function filterBySelectedCategory(menuItems, category) {
+      const normalizedCategory = String(category || "").toLowerCase();
+
+      if (normalizedCategory.includes("vegan")) {
+        return menuItems.filter((item) =>
+          item.tags.some((tag) => tag.key === "vegan")
+        );
+      }
+
+      if (normalizedCategory.includes("spicy")) {
+        return menuItems.filter((item) =>
+          item.tags.some((tag) => tag.key === "spicy")
+        );
+      }
+
+      if (normalizedCategory.includes("popular")) {
+        return menuItems.filter((item) =>
+          item.tags.some((tag) => tag.key === "popular")
+        );
+      }
+
+      if (category === "All") return menuItems;
+
+      return menuItems.filter((item) => item.category === category);
+    }
+
+    function getSubcategoriesByCategory(menuItems, category) {
+      const scopedMenus = filterBySelectedCategory(menuItems, category);
+      const options = scopedMenus
+        .map((item) => String(item.label || "").trim())
+        .filter(Boolean);
+
+      return [...new Set(options)];
+    }
+
+    function filterMenus(menuItems) {
+      let filtered = filterBySelectedCategory(menuItems, selectedCategory);
+
+      if (selectedSubcategory !== "All") {
+        filtered = filtered.filter((item) =>
+          String(item.label || "").toLowerCase() === selectedSubcategory.toLowerCase()
+        );
+      }
+
+      return filtered;
+    }
+
     function setupToTopButton() {
       const toTopBtn = document.getElementById("toTopBtn");
       if (!toTopBtn) return;
