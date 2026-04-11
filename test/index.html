@@ -504,6 +504,8 @@
     }
 
     function getSubcategoriesByCategory(menuItems, category) {
+      if (category === "All") return [];
+
       const scopedMenus = filterBySelectedCategory(menuItems, category);
       const options = scopedMenus
         .map((item) => getSubcategoryValue(item))
