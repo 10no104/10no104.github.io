@@ -12,10 +12,6 @@
 <body class="menu-page">
   <main class="wrap">
     <section class="tabs" aria-label="Categories" id="tabs"></section>
-    <section class="subtabs-wrap" aria-label="Dietary filters">
-      <p class="subtabs-context">Dietary Filters</p>
-      <section class="subtabs" aria-label="Dietary tags" id="dietaryFilters"></section>
-    </section>
     <section class="subtabs-wrap hidden" id="subtabsWrap">
       <p class="subtabs-context" id="subtabsContext"></p>
       <section class="subtabs" aria-label="Subcategories" id="subtabs"></section>
@@ -254,6 +250,7 @@
         tabButton.addEventListener("click", () => {
           selectedCategory = tabButton.dataset.category || "All";
           selectedSubcategory = "All";
+          selectedDietaryTags = new Set();
           renderTabs();
           renderSubtabs();
           renderMenu();
@@ -537,33 +534,21 @@
       return String(value).trim().toLowerCase();
     }
 
-    function parseDietaryTags(raw = "") {
-      return String(raw)
-        .split(",")
-        .map((part) => normalizeDietaryTag(part))
-        .filter(Boolean);
-    }
-
     function formatDietaryTag(tag = "") {
       const normalized = normalizeDietaryTag(tag);
       if (!normalized) return "";
       return normalized.charAt(0).toUpperCase() + normalized.slice(1);
     }
 
-    function normalizeMenuItem(item = {}) {
-      const fallbackDietaryTags = Array.isArray(item.tags)
-        ? item.tags
-            .map((tag) => normalizeDietaryTag(tag?.key || tag?.label || ""))
-            .filter((tag) => DIETARY_FILTERS.includes(tag))
-        : [];
+    function isDietaryCategory(category = "") {
+      const normalized = String(category).toLowerCase();
+      return normalized.includes("vegan");
+    }
 
-      return {
-        ...item,
-        ingredient: String(item.ingredient || "").trim(),
-        dietaryTags: Array.isArray(item.dietaryTags)
-          ? item.dietaryTags.map((tag) => normalizeDietaryTag(tag)).filter(Boolean)
-          : fallbackDietaryTags
-      };
+    function getDietaryTagsForItem(item) {
+      return (Array.isArray(item.tags) ? item.tags : [])
+        .map((tag) => normalizeDietaryTag(tag?.key || tag?.label || ""))
+        .filter((tag, index, arr) => DIETARY_FILTERS.includes(tag) && arr.indexOf(tag) === index);
     }
 
     function mapSheetRows(rows = []) {
@@ -571,24 +556,26 @@
         .map((row) => row.c || [])
         .map((c) => c.map((cell) => (cell?.v ?? "").toString().trim()))
         .filter((cells) => cells.some(Boolean))
-        .map((cells) =>
-          normalizeMenuItem({
-            category: cells[0] || "Uncategorized",
-            label: cells[1] || "",
-            nameKo: cells[2] || "",
-            nameEn: cells[3] || "",
-            description: cells[4] || "",
-            price: cells[5] || "",
-            imageUrl: cells[6] || "",
-            dietaryTags: parseDietaryTags(cells[7] || ""),
-            ingredient: cells[8] || ""
-          })
-        );
+        .map((cells) => ({
+          category: cells[0] || "Uncategorized",
+          label: cells[1] || "",
+          nameKo: cells[2] || "",
+          nameEn: cells[3] || "",
+          description: cells[4] || "",
+          price: cells[5] || "",
+          imageUrl: cells[6] || "",
+          tags: parseTags(cells[7] || ""),
+          ingredient: cells[8] || ""
+        }));
     }
 
     function getCategories(menuItems) {
       const unique = [...new Set(menuItems.map((item) => item.category).filter(Boolean))];
-      return ["All", ...unique];
+      const base = ["All", ...unique];
+      if (!base.includes("Vegan 🌱")) base.push("Vegan 🌱");
+      if (!base.includes("Spicy 🌶️")) base.push("Spicy 🌶️");
+      if (!base.includes("Popular ⭐")) base.push("Popular ⭐");
+      return base;
     }
 
     function getSubcategoryValue(item) {
@@ -596,21 +583,39 @@
     }
 
     function filterBySelectedCategory(menuItems, category) {
-      if (category === "All") return menuItems;
-      return menuItems.filter((item) => item.category === category);
-    }
+      const normalizedCategory = String(category || "").toLowerCase();
 
-    function itemMatchesDietaryFilters(item) {
-      if (!selectedDietaryTags.size) return true;
-      const dietaryTags = Array.isArray(item.dietaryTags) ? item.dietaryTags : [];
-      return [...selectedDietaryTags].every((tag) => dietaryTags.includes(tag));
+      if (normalizedCategory.includes("vegan")) {
+        return menuItems.filter((item) =>
+          item.tags.some((tag) => tag.key === "vegan")
+        );
+      }
+
+      if (normalizedCategory.includes("spicy")) {
+        return menuItems.filter((item) =>
+          item.tags.some((tag) => tag.key === "spicy")
+        );
+      }
+
+      if (normalizedCategory.includes("popular")) {
+        return menuItems.filter((item) =>
+          item.tags.some((tag) => tag.key === "popular")
+        );
+      }
+
+      if (category === "All") return menuItems;
+
+      return menuItems.filter((item) => item.category === category);
     }
 
     function getSubcategoriesByCategory(menuItems, category) {
       if (category === "All") return [];
 
-      const scopedMenus = filterBySelectedCategory(menuItems, category)
-        .filter((item) => itemMatchesDietaryFilters(item));
+      const scopedMenus = filterBySelectedCategory(menuItems, category);
+
+      if (isDietaryCategory(category)) {
+        return ["All", ...DIETARY_FILTERS];
+      }
 
       const options = scopedMenus
         .map((item) => getSubcategoryValue(item))
@@ -620,8 +625,18 @@
     }
 
     function filterMenus(menuItems) {
-      let filtered = filterBySelectedCategory(menuItems, selectedCategory)
-        .filter((item) => itemMatchesDietaryFilters(item));
+      let filtered = filterBySelectedCategory(menuItems, selectedCategory);
+
+      if (isDietaryCategory(selectedCategory)) {
+        if (selectedDietaryTags.size) {
+          filtered = filtered.filter((item) => {
+            const dietaryTags = getDietaryTagsForItem(item);
+            return [...selectedDietaryTags].every((tag) => dietaryTags.includes(tag));
+          });
+        }
+
+        return filtered;
+      }
 
       if (selectedSubcategory !== "All") {
         filtered = filtered.filter((item) =>
@@ -632,37 +647,51 @@
       return filtered;
     }
 
-    function renderDietaryFilters() {
-      const dietaryFiltersEl = document.getElementById("dietaryFilters");
-      if (!dietaryFiltersEl) return;
+    function renderSubtabs() {
+      const subtabsEl = document.getElementById("subtabs");
+      const subtabsWrapEl = document.getElementById("subtabsWrap");
+      const subtabsContextEl = document.getElementById("subtabsContext");
+      const subcategories = getSubcategoriesByCategory(allMenus, selectedCategory);
 
-      const buttons = ["All", ...DIETARY_FILTERS];
-      dietaryFiltersEl.innerHTML = buttons
-        .map((tag) => {
-          const normalized = normalizeDietaryTag(tag);
-          const isAll = tag === "All";
-          const isActive = isAll ? selectedDietaryTags.size === 0 : selectedDietaryTags.has(normalized);
+      if (!subcategories.length) {
+        subtabsEl.innerHTML = "";
+        subtabsWrapEl.classList.add("hidden");
+        subtabsContextEl.textContent = "";
+        return;
+      }
+
+      subtabsWrapEl.classList.remove("hidden");
+      subtabsContextEl.textContent = selectedCategory;
+
+      subtabsEl.innerHTML = subcategories
+        .map((sub) => {
+          const value = isDietaryCategory(selectedCategory) ? normalizeDietaryTag(sub) : sub;
+          const isAll = value === "all";
+          const isActive = isDietaryCategory(selectedCategory)
+            ? (isAll ? selectedDietaryTags.size === 0 : selectedDietaryTags.has(value))
+            : sub === selectedSubcategory;
           const activeClass = isActive ? "active" : "";
-          const label = isAll ? "All" : formatDietaryTag(tag);
-          const value = isAll ? "all" : normalized;
-          return `<button class="subtab ${activeClass}" data-dietary="${escapeHtml(value)}" type="button">${escapeHtml(label)}</button>`;
+          const label = isDietaryCategory(selectedCategory) && !isAll ? formatDietaryTag(sub) : sub;
+          return `<button class="subtab ${activeClass}" data-subcategory="${escapeHtml(value)}" type="button">${escapeHtml(label)}</button>`;
         })
         .join("");
 
-      dietaryFiltersEl.querySelectorAll("[data-dietary]").forEach((button) => {
+      subtabsEl.querySelectorAll(".subtab").forEach((button) => {
         button.addEventListener("click", () => {
-          const dietary = button.dataset.dietary || "all";
+          const value = button.dataset.subcategory || "All";
 
-          if (dietary === "all") {
-            selectedDietaryTags = new Set();
-          } else if (selectedDietaryTags.has(dietary)) {
-            selectedDietaryTags.delete(dietary);
+          if (isDietaryCategory(selectedCategory)) {
+            if (value === "all") {
+              selectedDietaryTags = new Set();
+            } else if (selectedDietaryTags.has(value)) {
+              selectedDietaryTags.delete(value);
+            } else {
+              selectedDietaryTags.add(value);
+            }
           } else {
-            selectedDietaryTags.add(dietary);
+            selectedSubcategory = value || "All";
           }
 
-          selectedSubcategory = "All";
-          renderDietaryFilters();
           renderSubtabs();
           renderMenu();
         });
@@ -680,8 +709,8 @@
 
       menuListEl.innerHTML = filtered
         .map((item) => {
-          const tagsHtml = (item.dietaryTags || [])
-            .map((tag) => `<span class="menu-tag gray">${escapeHtml(formatDietaryTag(tag))}</span>`)
+          const tagsHtml = item.tags
+            .map((tag) => `<span class="menu-tag ${escapeHtml(tag.color)}">${escapeHtml(tag.label)}</span>`)
             .join("");
 
           const tagsSection = tagsHtml ? `<div class="menu-meta">${tagsHtml}</div>` : "";
@@ -704,14 +733,13 @@
 
     async function bootstrap() {
       try {
-        allMenus = (await fetchMenusFromGoogleSheet()).map((item) => normalizeMenuItem(item));
+        allMenus = await fetchMenusFromGoogleSheet();
       } catch (error) {
         console.error(error);
-        allMenus = SAMPLE_MENU.map((item) => normalizeMenuItem(item));
+        allMenus = SAMPLE_MENU;
       }
 
       renderTabs();
-      renderDietaryFilters();
       renderSubtabs();
       renderMenu();
       setupToTopButton();
