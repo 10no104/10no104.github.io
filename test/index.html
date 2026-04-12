@@ -96,6 +96,8 @@
       if (!normalized) return "tag";
       if (/^spicy\d*$/.test(normalized)) return "spicy";
       if (normalized.includes("vegan")) return "vegan";
+      if (normalized.includes("ask server")) return "ask-server";
+      if (normalized.includes("vegetarian")) return "vegetarian";
       if (normalized.includes("popular")) return "popular";
       if (normalized.includes("seafood")) return "seafood";
       if (normalized.includes("sweet")) return "sweet";
@@ -124,6 +126,8 @@
       const emojiMap = {
         spicy: "🌶️",
         vegan: "🌱",
+        "ask-server": "🌱",
+        vegetarian: "🌱",
         popular: "⭐",
         seafood: "🐟",
         sweet: "🍯",
@@ -160,6 +164,8 @@
       const emojiMap = [
         { keyword: "spicy", emoji: "🌶️" },
         { keyword: "vegan", emoji: "🌱" },
+        { keyword: "ask server", emoji: "🌱" },
+        { keyword: "vegetarian", emoji: "🌱" },
         { keyword: "popular", emoji: "⭐" },
         { keyword: "seafood", emoji: "🐟" },
         { keyword: "sweet", emoji: "🍯" },
@@ -250,6 +256,7 @@
         tabButton.addEventListener("click", () => {
           selectedCategory = tabButton.dataset.category || "All";
           selectedSubcategory = "All";
+          selectedDietaryTags = new Set();
           renderTabs();
           renderDietaryFilters();
           renderSubtabs();
