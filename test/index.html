@@ -794,10 +794,12 @@
         return hasMenuTag(item, "ask-server");
       }
 
-      // Fully vegan-ready dishes require a strict match on the selected specific tags.
+      // Selected options mean "ingredients this user can accept".
+      // So a standard vegan dish is visible when all of its required attributes
+      // fit within the user's allowed set.
       if (hasMenuTag(item, "vegan")) {
         if (!selectedSpecific.length) return false;
-        return selectedSpecific.every((tag) => dietaryTags.includes(tag));
+        return dietaryTags.every((tag) => selectedSpecific.includes(tag));
       }
 
       // Ask-server dishes are looser: they should appear anywhere their current
