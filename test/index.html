@@ -783,24 +783,28 @@
         dietaryTags.includes("vegetarian") &&
         !dietaryTags.some((tag) => ["seafood", "egg", "dairy"].includes(tag));
 
-      // Vegetarian dishes are allowed for anyone selecting a stricter or broader vegan-safe option.
+      // Vegetarian-only dishes are safe for anyone browsing vegan-friendly options.
       if (isVegetarianOnly) {
-        return selected.includes("vegetarian") || selected.some((tag) => ["seafood", "egg", "dairy"].includes(tag));
+        return true;
       }
 
-      // Vegetarian-only users should not see dishes that require egg/seafood/dairy.
+      // A vegetarian-only selection should not show dishes with egg/seafood/dairy
+      // unless the kitchen can remove them on request.
       if (selected.length === 1 && selected[0] === "vegetarian") {
         return hasMenuTag(item, "ask-server");
       }
 
+      // Fully vegan-ready dishes require a strict match on the selected specific tags.
       if (hasMenuTag(item, "vegan")) {
         if (!selectedSpecific.length) return false;
         return selectedSpecific.every((tag) => dietaryTags.includes(tag));
       }
 
+      // Ask-server dishes are looser: they should appear anywhere their current
+      // ingredients intersect with the user's selected removable set.
       if (hasMenuTag(item, "ask-server")) {
         if (!selectedSpecific.length) return true;
-        return selectedSpecific.every((tag) => dietaryTags.includes(tag));
+        return selectedSpecific.some((tag) => dietaryTags.includes(tag));
       }
 
       return false;
