@@ -256,7 +256,9 @@
         tabButton.addEventListener("click", () => {
           selectedCategory = tabButton.dataset.category || "All";
           selectedSubcategory = "All";
-          selectedDietaryTags = new Set();
+          selectedDietaryTags = String(selectedCategory || "").toLowerCase().includes("vegan")
+            ? new Set(["vegetarian"])
+            : new Set();
           renderTabs();
           renderDietaryFilters();
           renderSubtabs();
@@ -806,22 +808,7 @@
       }
 
       if (normalizedCategory.includes("vegan")) {
-        const options = scopedMenus
-          .flatMap((item) => getDietaryTagsForItem(item))
-          .map((tag) => String(tag).trim())
-          .filter(Boolean);
-
-        const unique = [...new Set(options)];
-        const priority = ["Vegetarian"];
-        const prioritySet = new Set(priority.map((item) => item.toLowerCase()));
-        const orderedPriority = priority.filter((item) =>
-          unique.some((value) => value.toLowerCase() === item.toLowerCase())
-        );
-        const rest = unique
-          .filter((value) => !prioritySet.has(value.toLowerCase()))
-          .sort((a, b) => a.localeCompare(b));
-
-        return [...orderedPriority, ...rest];
+        return ["Vegetarian", "Seafood", "Egg", "Dairy"];
       }
 
       const options = scopedMenus
