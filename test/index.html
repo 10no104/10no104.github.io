@@ -539,6 +539,11 @@
       return String(value).trim().toLowerCase();
     }
 
+    function isFilterableDietaryTag(value = "") {
+      const normalized = normalizeDietaryTag(value);
+      return Boolean(normalized) && normalized !== "ask server";
+    }
+
     function parseDietaryTagList(raw = "") {
       return String(raw)
         .split(",")
@@ -759,7 +764,7 @@
       const values = Array.isArray(item.dietaryTags) ? item.dietaryTags : parseDietaryTagList(item.ingredient || "");
       return values
         .map((tag) => normalizeDietaryTag(tag))
-        .filter((tag, index, arr) => tag && arr.indexOf(tag) === index);
+        .filter((tag, index, arr) => isFilterableDietaryTag(tag) && arr.indexOf(tag) === index);
     }
 
     function renderDietaryFilters() {
@@ -807,7 +812,7 @@
           .filter(Boolean);
 
         const unique = [...new Set(options)];
-        const priority = ["Ask Server", "Vegetarian"];
+        const priority = ["Vegetarian"];
         const prioritySet = new Set(priority.map((item) => item.toLowerCase()));
         const orderedPriority = priority.filter((item) =>
           unique.some((value) => value.toLowerCase() === item.toLowerCase())
