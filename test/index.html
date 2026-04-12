@@ -733,7 +733,7 @@
 
       menuListEl.innerHTML = filtered
         .map((item) => {
-          const tagsHtml = [...item.tags, ...getVeganStatusBadges(item)]
+          const tagsHtml = item.tags
             .map((tag) => `<span class="menu-tag ${escapeHtml(tag.color)}">${escapeHtml(tag.label)}</span>`)
             .join("");
 
@@ -755,7 +755,7 @@
         .join("");
     }
 
-    function getVeganStatusTags(item) {
+    function getVeganOptionTags(item) {
       const values = Array.isArray(item.dietaryTags) ? item.dietaryTags : parseDietaryTagList(item.ingredient || "");
       return values
         .map((tag) => normalizeDietaryTag(tag))
@@ -763,22 +763,11 @@
     }
 
     function getDietaryTagsForItem(item) {
-      return getVeganStatusTags(item);
+      return getVeganOptionTags(item);
     }
 
-    function getVeganStatusBadges(item) {
-      const tags = getVeganStatusTags(item);
-      const badges = [];
-
-      if (tags.includes("vegan")) {
-        badges.push({ label: "🌱 Vegan", color: "green" });
-      }
-
-      if (tags.includes("ask server")) {
-        badges.push({ label: "🌱 Ask Server", color: "green" });
-      }
-
-      return badges;
+    function hasMenuTag(item, key) {
+      return Array.isArray(item.tags) && item.tags.some((tag) => tag.key === key);
     }
 
     function renderDietaryFilters() {
@@ -790,8 +779,8 @@
 
       if (normalizedCategory.includes("vegan")) {
         return menuItems.filter((item) => {
-          const tags = getVeganStatusTags(item);
-          return tags.includes("vegan") || tags.includes("ask server");
+          const optionTags = getVeganOptionTags(item);
+          return optionTags.some((tag) => ["vegetarian", "seafood", "egg", "dairy"].includes(tag));
         });
       }
 
@@ -823,7 +812,7 @@
       }
 
       if (normalizedCategory.includes("vegan")) {
-        return ["Vegan", "Ask Server"];
+        return ["Vegetarian", "Seafood", "Egg", "Dairy"];
       }
 
       const options = scopedMenus
@@ -839,9 +828,18 @@
       if (String(selectedCategory || "").toLowerCase().includes("vegan")) {
         if (selectedDietaryTags.size) {
           filtered = filtered.filter((item) => {
-            const dietaryTags = getVeganStatusTags(item);
+            const dietaryTags = getVeganOptionTags(item);
             if (!dietaryTags.length) return false;
-            return [...selectedDietaryTags].every((tag) => dietaryTags.includes(tag));
+
+            if (hasMenuTag(item, "vegan")) {
+              return [...selectedDietaryTags].every((tag) => dietaryTags.includes(tag));
+            }
+
+            if (hasMenuTag(item, "ask-server")) {
+              return [...selectedDietaryTags].some((tag) => dietaryTags.includes(tag));
+            }
+
+            return false;
           });
         }
 
