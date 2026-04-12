@@ -777,6 +777,8 @@
       const selected = [...selectedTags];
       if (!selected.length) return true;
 
+      const selectedSpecific = selected.filter((tag) => tag !== "vegetarian");
+
       const isVegetarianOnly =
         dietaryTags.includes("vegetarian") &&
         !dietaryTags.some((tag) => ["seafood", "egg", "dairy"].includes(tag));
@@ -788,15 +790,17 @@
 
       // Vegetarian-only users should not see dishes that require egg/seafood/dairy.
       if (selected.length === 1 && selected[0] === "vegetarian") {
-        return false;
+        return hasMenuTag(item, "ask-server");
       }
 
       if (hasMenuTag(item, "vegan")) {
-        return selected.every((tag) => dietaryTags.includes(tag) || tag === "vegetarian");
+        if (!selectedSpecific.length) return false;
+        return selectedSpecific.every((tag) => dietaryTags.includes(tag));
       }
 
       if (hasMenuTag(item, "ask-server")) {
-        return selected.some((tag) => dietaryTags.includes(tag) || tag === "vegetarian");
+        if (!selectedSpecific.length) return true;
+        return selectedSpecific.every((tag) => dietaryTags.includes(tag));
       }
 
       return false;
