@@ -748,36 +748,76 @@
         .join("");
     }
 
-    const CONTAINS_FILTERS = ["vegetarian", "seafood", "egg", "dairy", "ask server"];
-
-    function formatDietaryTag(tag = "") {
-      const raw = String(tag).trim();
-      if (!raw) return "";
-      return raw
-        .split(/\s+/)
-        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-        .join(" ");
-    }
-
     function getDietaryTagsForItem(item) {
-      const values = Array.isArray(item.dietaryTags) ? item.dietaryTags : [];
+      const values = Array.isArray(item.dietaryTags) ? item.dietaryTags : parseDietaryTagList(item.ingredient || "");
       return values
         .map((tag) => normalizeDietaryTag(tag))
         .filter((tag, index, arr) => tag && arr.indexOf(tag) === index);
     }
 
-    function itemMatchesDietaryFilters(item) {
-      if (!selectedDietaryTags.size) return true;
+    function renderDietaryFilters() {
+      // Intentionally unused in the current vegan-options flow.
+    }
 
-      const dietaryTags = getDietaryTagsForItem(item);
-      if (!dietaryTags.length) return selectedDietaryTags.has("vegetarian");
+    function filterBySelectedCategory(menuItems, category) {
+      const normalizedCategory = String(category || "").toLowerCase();
 
-      return dietaryTags.every((tag) => selectedDietaryTags.has(tag));
+      if (normalizedCategory.includes("vegan")) {
+        return menuItems.filter((item) => getDietaryTagsForItem(item).length > 0);
+      }
+
+      if (normalizedCategory.includes("spicy")) {
+        return menuItems.filter((item) =>
+          item.tags.some((tag) => tag.key === "spicy")
+        );
+      }
+
+      if (normalizedCategory.includes("popular")) {
+        return menuItems.filter((item) =>
+          item.tags.some((tag) => tag.key === "popular")
+        );
+      }
+
+      if (category === "All") return menuItems;
+
+      return menuItems.filter((item) => item.category === category);
+    }
+
+    function getSubcategoriesByCategory(menuItems, category) {
+      if (category === "All") return [];
+
+      const scopedMenus = filterBySelectedCategory(menuItems, category);
+
+      if (String(category || "").toLowerCase().includes("vegan")) {
+        const options = scopedMenus
+          .flatMap((item) => getDietaryTagsForItem(item))
+          .map((tag) => String(tag).trim())
+          .filter(Boolean);
+
+        return [...new Set(options)];
+      }
+
+      const options = scopedMenus
+        .map((item) => getSubcategoryValue(item))
+        .filter(Boolean);
+
+      return [...new Set(options)];
     }
 
     function filterMenus(menuItems) {
       let filtered = filterBySelectedCategory(menuItems, selectedCategory);
-      filtered = filtered.filter((item) => itemMatchesDietaryFilters(item));
+
+      if (String(selectedCategory || "").toLowerCase().includes("vegan")) {
+        if (selectedDietaryTags.size) {
+          filtered = filtered.filter((item) => {
+            const dietaryTags = getDietaryTagsForItem(item);
+            if (!dietaryTags.length) return false;
+            return dietaryTags.every((tag) => selectedDietaryTags.has(tag));
+          });
+        }
+
+        return filtered;
+      }
 
       if (selectedSubcategory !== "All") {
         filtered = filtered.filter((item) =>
@@ -788,54 +828,12 @@
       return filtered;
     }
 
-    function renderDietaryFilters() {
-      const dietaryFiltersEl = document.getElementById("dietaryFilters");
-      if (!dietaryFiltersEl) return;
-
-      dietaryFiltersEl.innerHTML = CONTAINS_FILTERS
-        .map((option) => {
-          const normalized = normalizeDietaryTag(option);
-          const activeClass = selectedDietaryTags.has(normalized) ? "active" : "";
-          return `<button class="subtab ${activeClass}" data-dietary="${escapeHtml(normalized)}" type="button">${escapeHtml(formatDietaryTag(option))}</button>`;
-        })
-        .join("");
-
-      dietaryFiltersEl.querySelectorAll("[data-dietary]").forEach((button) => {
-        button.addEventListener("click", () => {
-          const value = button.dataset.dietary || "";
-          if (!value) return;
-
-          if (selectedDietaryTags.has(value)) {
-            selectedDietaryTags.delete(value);
-          } else {
-            selectedDietaryTags.add(value);
-          }
-
-          renderDietaryFilters();
-          renderSubtabs();
-          renderMenu();
-        });
-      });
-    }
-
-    function getSubcategoriesByCategory(menuItems, category) {
-      if (category === "All") return [];
-
-      const scopedMenus = filterBySelectedCategory(menuItems, category)
-        .filter((item) => itemMatchesDietaryFilters(item));
-
-      const options = scopedMenus
-        .map((item) => getSubcategoryValue(item))
-        .filter(Boolean);
-
-      return [...new Set(options)];
-    }
-
     function renderSubtabs() {
       const subtabsEl = document.getElementById("subtabs");
       const subtabsWrapEl = document.getElementById("subtabsWrap");
       const subtabsContextEl = document.getElementById("subtabsContext");
       const subcategories = getSubcategoriesByCategory(allMenus, selectedCategory);
+      const isVeganCategory = String(selectedCategory || "").toLowerCase().includes("vegan");
 
       if (!subcategories.length) {
         subtabsEl.innerHTML = "";
@@ -845,19 +843,34 @@
       }
 
       subtabsWrapEl.classList.remove("hidden");
-      subtabsContextEl.textContent = selectedCategory;
+      subtabsContextEl.textContent = isVeganCategory ? "Vegan Options" : selectedCategory;
 
-      const allOptions = ["All", ...subcategories];
-      subtabsEl.innerHTML = allOptions
+      const options = isVeganCategory ? subcategories : ["All", ...subcategories];
+      subtabsEl.innerHTML = options
         .map((sub) => {
-          const activeClass = sub === selectedSubcategory ? "active" : "";
-          return `<button class="subtab ${activeClass}" data-subcategory="${escapeHtml(sub)}" type="button">${escapeHtml(sub)}</button>`;
+          const value = isVeganCategory ? normalizeDietaryTag(sub) : sub;
+          const activeClass = isVeganCategory
+            ? (selectedDietaryTags.has(value) ? "active" : "")
+            : (sub === selectedSubcategory ? "active" : "");
+          return `<button class="subtab ${activeClass}" data-subcategory="${escapeHtml(value)}" type="button">${escapeHtml(sub)}</button>`;
         })
         .join("");
 
       subtabsEl.querySelectorAll(".subtab").forEach((button) => {
         button.addEventListener("click", () => {
-          selectedSubcategory = button.dataset.subcategory || "All";
+          const value = button.dataset.subcategory || "";
+
+          if (isVeganCategory) {
+            if (!value) return;
+            if (selectedDietaryTags.has(value)) {
+              selectedDietaryTags.delete(value);
+            } else {
+              selectedDietaryTags.add(value);
+            }
+          } else {
+            selectedSubcategory = value || "All";
+          }
+
           renderSubtabs();
           renderMenu();
         });
@@ -873,7 +886,6 @@
       }
 
       renderTabs();
-      renderDietaryFilters();
       renderSubtabs();
       renderMenu();
       setupToTopButton();
