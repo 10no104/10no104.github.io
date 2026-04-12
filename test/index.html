@@ -770,6 +770,38 @@
       return Array.isArray(item.tags) && item.tags.some((tag) => tag.key === key);
     }
 
+    function matchesVeganSelections(item, selectedTags) {
+      const dietaryTags = getVeganOptionTags(item);
+      if (!dietaryTags.length) return false;
+
+      const selected = [...selectedTags];
+      if (!selected.length) return true;
+
+      const isVegetarianOnly =
+        dietaryTags.includes("vegetarian") &&
+        !dietaryTags.some((tag) => ["seafood", "egg", "dairy"].includes(tag));
+
+      // Vegetarian dishes are allowed for anyone selecting a stricter or broader vegan-safe option.
+      if (isVegetarianOnly) {
+        return selected.includes("vegetarian") || selected.some((tag) => ["seafood", "egg", "dairy"].includes(tag));
+      }
+
+      // Vegetarian-only users should not see dishes that require egg/seafood/dairy.
+      if (selected.length === 1 && selected[0] === "vegetarian") {
+        return false;
+      }
+
+      if (hasMenuTag(item, "vegan")) {
+        return selected.every((tag) => dietaryTags.includes(tag) || tag === "vegetarian");
+      }
+
+      if (hasMenuTag(item, "ask-server")) {
+        return selected.some((tag) => dietaryTags.includes(tag) || tag === "vegetarian");
+      }
+
+      return false;
+    }
+
     function renderDietaryFilters() {
       // Intentionally unused in the current vegan-options flow.
     }
@@ -827,20 +859,7 @@
 
       if (String(selectedCategory || "").toLowerCase().includes("vegan")) {
         if (selectedDietaryTags.size) {
-          filtered = filtered.filter((item) => {
-            const dietaryTags = getVeganOptionTags(item);
-            if (!dietaryTags.length) return false;
-
-            if (hasMenuTag(item, "vegan")) {
-              return [...selectedDietaryTags].every((tag) => dietaryTags.includes(tag));
-            }
-
-            if (hasMenuTag(item, "ask-server")) {
-              return [...selectedDietaryTags].some((tag) => dietaryTags.includes(tag));
-            }
-
-            return false;
-          });
+          filtered = filtered.filter((item) => matchesVeganSelections(item, selectedDietaryTags));
         }
 
         return filtered;
