@@ -787,14 +787,29 @@
       if (category === "All") return [];
 
       const scopedMenus = filterBySelectedCategory(menuItems, category);
+      const normalizedCategory = String(category || "").toLowerCase();
 
-      if (String(category || "").toLowerCase().includes("vegan")) {
+      if (normalizedCategory.includes("spicy") || normalizedCategory.includes("popular")) {
+        return [];
+      }
+
+      if (normalizedCategory.includes("vegan")) {
         const options = scopedMenus
           .flatMap((item) => getDietaryTagsForItem(item))
           .map((tag) => String(tag).trim())
           .filter(Boolean);
 
-        return [...new Set(options)];
+        const unique = [...new Set(options)];
+        const priority = ["Ask Server", "Vegetarian"];
+        const prioritySet = new Set(priority.map((item) => item.toLowerCase()));
+        const orderedPriority = priority.filter((item) =>
+          unique.some((value) => value.toLowerCase() === item.toLowerCase())
+        );
+        const rest = unique
+          .filter((value) => !prioritySet.has(value.toLowerCase()))
+          .sort((a, b) => a.localeCompare(b));
+
+        return [...orderedPriority, ...rest];
       }
 
       const options = scopedMenus
