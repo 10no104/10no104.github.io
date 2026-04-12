@@ -81,7 +81,6 @@
     let selectedCategory = "All";
     let selectedSubcategory = "All";
     let selectedDietaryTags = new Set();
-    let veganSelectionMode = "blank";
 
     function escapeHtml(text = "") {
       return text
@@ -251,9 +250,8 @@
         tabButton.addEventListener("click", () => {
           selectedCategory = tabButton.dataset.category || "All";
           selectedSubcategory = "All";
-          selectedDietaryTags = new Set();
-          veganSelectionMode = "blank";
           renderTabs();
+          renderDietaryFilters();
           renderSubtabs();
           renderMenu();
         });
@@ -750,6 +748,76 @@
         .join("");
     }
 
+    const CONTAINS_FILTERS = ["vegetarian", "seafood", "egg", "dairy", "ask server"];
+
+    function formatDietaryTag(tag = "") {
+      const raw = String(tag).trim();
+      if (!raw) return "";
+      return raw
+        .split(/\s+/)
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(" ");
+    }
+
+    function getDietaryTagsForItem(item) {
+      const values = Array.isArray(item.dietaryTags) ? item.dietaryTags : [];
+      return values
+        .map((tag) => normalizeDietaryTag(tag))
+        .filter((tag, index, arr) => tag && arr.indexOf(tag) === index);
+    }
+
+    function itemMatchesDietaryFilters(item) {
+      if (!selectedDietaryTags.size) return true;
+
+      const dietaryTags = getDietaryTagsForItem(item);
+      if (!dietaryTags.length) return selectedDietaryTags.has("vegetarian");
+
+      return dietaryTags.every((tag) => selectedDietaryTags.has(tag));
+    }
+
+    function filterMenus(menuItems) {
+      let filtered = filterBySelectedCategory(menuItems, selectedCategory);
+      filtered = filtered.filter((item) => itemMatchesDietaryFilters(item));
+
+      if (selectedSubcategory !== "All") {
+        filtered = filtered.filter((item) =>
+          getSubcategoryValue(item).toLowerCase() === selectedSubcategory.toLowerCase()
+        );
+      }
+
+      return filtered;
+    }
+
+    function renderDietaryFilters() {
+      const dietaryFiltersEl = document.getElementById("dietaryFilters");
+      if (!dietaryFiltersEl) return;
+
+      dietaryFiltersEl.innerHTML = CONTAINS_FILTERS
+        .map((option) => {
+          const normalized = normalizeDietaryTag(option);
+          const activeClass = selectedDietaryTags.has(normalized) ? "active" : "";
+          return `<button class="subtab ${activeClass}" data-dietary="${escapeHtml(normalized)}" type="button">${escapeHtml(formatDietaryTag(option))}</button>`;
+        })
+        .join("");
+
+      dietaryFiltersEl.querySelectorAll("[data-dietary]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const value = button.dataset.dietary || "";
+          if (!value) return;
+
+          if (selectedDietaryTags.has(value)) {
+            selectedDietaryTags.delete(value);
+          } else {
+            selectedDietaryTags.add(value);
+          }
+
+          renderDietaryFilters();
+          renderSubtabs();
+          renderMenu();
+        });
+      });
+    }
+
     async function bootstrap() {
       try {
         allMenus = await fetchMenusFromGoogleSheet();
@@ -759,6 +827,7 @@
       }
 
       renderTabs();
+      renderDietaryFilters();
       renderSubtabs();
       renderMenu();
       setupToTopButton();
