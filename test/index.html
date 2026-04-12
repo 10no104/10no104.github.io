@@ -818,6 +818,52 @@
       });
     }
 
+    function getSubcategoriesByCategory(menuItems, category) {
+      if (category === "All") return [];
+
+      const scopedMenus = filterBySelectedCategory(menuItems, category)
+        .filter((item) => itemMatchesDietaryFilters(item));
+
+      const options = scopedMenus
+        .map((item) => getSubcategoryValue(item))
+        .filter(Boolean);
+
+      return [...new Set(options)];
+    }
+
+    function renderSubtabs() {
+      const subtabsEl = document.getElementById("subtabs");
+      const subtabsWrapEl = document.getElementById("subtabsWrap");
+      const subtabsContextEl = document.getElementById("subtabsContext");
+      const subcategories = getSubcategoriesByCategory(allMenus, selectedCategory);
+
+      if (!subcategories.length) {
+        subtabsEl.innerHTML = "";
+        subtabsWrapEl.classList.add("hidden");
+        subtabsContextEl.textContent = "";
+        return;
+      }
+
+      subtabsWrapEl.classList.remove("hidden");
+      subtabsContextEl.textContent = selectedCategory;
+
+      const allOptions = ["All", ...subcategories];
+      subtabsEl.innerHTML = allOptions
+        .map((sub) => {
+          const activeClass = sub === selectedSubcategory ? "active" : "";
+          return `<button class="subtab ${activeClass}" data-subcategory="${escapeHtml(sub)}" type="button">${escapeHtml(sub)}</button>`;
+        })
+        .join("");
+
+      subtabsEl.querySelectorAll(".subtab").forEach((button) => {
+        button.addEventListener("click", () => {
+          selectedSubcategory = button.dataset.subcategory || "All";
+          renderSubtabs();
+          renderMenu();
+        });
+      });
+    }
+
     async function bootstrap() {
       try {
         allMenus = await fetchMenusFromGoogleSheet();
