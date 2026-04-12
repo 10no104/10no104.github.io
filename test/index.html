@@ -256,9 +256,7 @@
         tabButton.addEventListener("click", () => {
           selectedCategory = tabButton.dataset.category || "All";
           selectedSubcategory = "All";
-          selectedDietaryTags = String(selectedCategory || "").toLowerCase().includes("vegan")
-            ? new Set(["vegetarian"])
-            : new Set();
+          selectedDietaryTags = new Set();
           renderTabs();
           renderDietaryFilters();
           renderSubtabs();
@@ -541,11 +539,6 @@
       return String(value).trim().toLowerCase();
     }
 
-    function isFilterableDietaryTag(value = "") {
-      const normalized = normalizeDietaryTag(value);
-      return Boolean(normalized) && normalized !== "ask server";
-    }
-
     function parseDietaryTagList(raw = "") {
       return String(raw)
         .split(",")
@@ -740,7 +733,7 @@
 
       menuListEl.innerHTML = filtered
         .map((item) => {
-          const tagsHtml = item.tags
+          const tagsHtml = [...item.tags, ...getVeganStatusBadges(item)]
             .map((tag) => `<span class="menu-tag ${escapeHtml(tag.color)}">${escapeHtml(tag.label)}</span>`)
             .join("");
 
@@ -762,11 +755,30 @@
         .join("");
     }
 
-    function getDietaryTagsForItem(item) {
+    function getVeganStatusTags(item) {
       const values = Array.isArray(item.dietaryTags) ? item.dietaryTags : parseDietaryTagList(item.ingredient || "");
       return values
         .map((tag) => normalizeDietaryTag(tag))
-        .filter((tag, index, arr) => isFilterableDietaryTag(tag) && arr.indexOf(tag) === index);
+        .filter((tag, index, arr) => tag && arr.indexOf(tag) === index);
+    }
+
+    function getDietaryTagsForItem(item) {
+      return getVeganStatusTags(item);
+    }
+
+    function getVeganStatusBadges(item) {
+      const tags = getVeganStatusTags(item);
+      const badges = [];
+
+      if (tags.includes("vegan")) {
+        badges.push({ label: "🌱 Vegan", color: "green" });
+      }
+
+      if (tags.includes("ask server")) {
+        badges.push({ label: "🌱 Ask Server", color: "green" });
+      }
+
+      return badges;
     }
 
     function renderDietaryFilters() {
@@ -777,7 +789,10 @@
       const normalizedCategory = String(category || "").toLowerCase();
 
       if (normalizedCategory.includes("vegan")) {
-        return menuItems.filter((item) => getDietaryTagsForItem(item).length > 0);
+        return menuItems.filter((item) => {
+          const tags = getVeganStatusTags(item);
+          return tags.includes("vegan") || tags.includes("ask server");
+        });
       }
 
       if (normalizedCategory.includes("spicy")) {
@@ -808,7 +823,7 @@
       }
 
       if (normalizedCategory.includes("vegan")) {
-        return ["Vegetarian", "Seafood", "Egg", "Dairy"];
+        return ["Vegan", "Ask Server"];
       }
 
       const options = scopedMenus
@@ -824,9 +839,9 @@
       if (String(selectedCategory || "").toLowerCase().includes("vegan")) {
         if (selectedDietaryTags.size) {
           filtered = filtered.filter((item) => {
-            const dietaryTags = getDietaryTagsForItem(item);
+            const dietaryTags = getVeganStatusTags(item);
             if (!dietaryTags.length) return false;
-            return dietaryTags.every((tag) => selectedDietaryTags.has(tag));
+            return [...selectedDietaryTags].every((tag) => dietaryTags.includes(tag));
           });
         }
 
