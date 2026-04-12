@@ -96,6 +96,8 @@
       if (!normalized) return "tag";
       if (/^spicy\d*$/.test(normalized)) return "spicy";
       if (normalized.includes("vegan")) return "vegan";
+      if (normalized.includes("ask server")) return "ask-server";
+      if (normalized.includes("vegetarian")) return "vegetarian";
       if (normalized.includes("popular")) return "popular";
       if (normalized.includes("seafood")) return "seafood";
       if (normalized.includes("sweet")) return "sweet";
@@ -124,6 +126,8 @@
       const emojiMap = {
         spicy: "🌶️",
         vegan: "🌱",
+        "ask-server": "🌱",
+        vegetarian: "🌱",
         popular: "⭐",
         seafood: "🐟",
         sweet: "🍯",
@@ -160,6 +164,8 @@
       const emojiMap = [
         { keyword: "spicy", emoji: "🌶️" },
         { keyword: "vegan", emoji: "🌱" },
+        { keyword: "ask server", emoji: "🌱" },
+        { keyword: "vegetarian", emoji: "🌱" },
         { keyword: "popular", emoji: "⭐" },
         { keyword: "seafood", emoji: "🐟" },
         { keyword: "sweet", emoji: "🍯" },
@@ -370,6 +376,11 @@
       return String(value).trim().toLowerCase();
     }
 
+    function isFilterableDietaryTag(value = "") {
+      const normalized = normalizeDietaryTag(value);
+      return Boolean(normalized) && normalized !== "ask server";
+    }
+
     function parseDietaryTagList(raw = "") {
       return String(raw)
         .split(",")
@@ -392,7 +403,7 @@
       const values = Array.isArray(item.dietaryTags) ? item.dietaryTags : parseDietaryTagList(item.ingredient || "");
       return values
         .map((tag) => normalizeDietaryTag(tag))
-        .filter((tag, index, arr) => tag && arr.indexOf(tag) === index);
+        .filter((tag, index, arr) => isFilterableDietaryTag(tag) && arr.indexOf(tag) === index);
     }
 
     function mapSheetRows(rows = []) {
@@ -468,7 +479,7 @@
           .filter(Boolean);
 
         const unique = [...new Set(options)];
-        const priority = ["Ask Server", "Vegetarian"];
+        const priority = ["Vegetarian"];
         const prioritySet = new Set(priority.map((item) => item.toLowerCase()));
         const orderedPriority = priority.filter((item) =>
           unique.some((value) => value.toLowerCase() === item.toLowerCase())
