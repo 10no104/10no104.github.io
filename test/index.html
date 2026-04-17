@@ -792,9 +792,11 @@
       const allTags = getVeganOptionTags(item);
       const compareTags = allTags.filter((tag) => tag !== "vegetarian" && tag !== "ask server");
       const selected = [...selectedTags].map((tag) => normalizeDietaryTag(tag));
+      const hasVegetarianFallback = allTags.includes("vegetarian") && allTags.includes("ask server");
 
       if (!selected.length) return true;
       if (!compareTags.length) return true;
+      if (hasVegetarianFallback && selected.includes("vegetarian")) return true;
 
       return compareTags.every((tag) => selected.includes(tag));
     }
