@@ -879,11 +879,13 @@
       if (!subcategories.length) {
         subtabsEl.innerHTML = "";
         subtabsWrapEl.classList.add("hidden");
+        subtabsWrapEl.classList.remove("vegan-subtabs");
         subtabsContextEl.textContent = "";
         return;
       }
 
       subtabsWrapEl.classList.remove("hidden");
+      subtabsWrapEl.classList.toggle("vegan-subtabs", isVeganCategory);
       subtabsContextEl.textContent = isVeganCategory ? "Allowed Ingredients" : selectedCategory;
 
       const options = isVeganCategory ? subcategories : ["All", ...subcategories];

@@ -53,6 +53,14 @@
   backdrop-filter: blur(3px);
 }
 
+.subtabs-wrap.vegan-subtabs {
+  margin-top: 18px;
+  padding: 14px 14px 12px;
+  background: rgba(247, 249, 242, 0.97);
+  border-color: #cfd9bf;
+  box-shadow: 0 8px 18px rgba(63, 92, 37, 0.08);
+}
+
 .subtabs-wrap.hidden { display: none; }
 
 .subtabs-context {
