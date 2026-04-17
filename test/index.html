@@ -899,7 +899,7 @@
       }
 
       subtabsWrapEl.classList.remove("hidden");
-      subtabsContextEl.textContent = isVeganCategory ? "Vegan Options" : selectedCategory;
+      subtabsContextEl.textContent = isVeganCategory ? "Allowed Ingredients" : selectedCategory;
 
       const options = isVeganCategory ? subcategories : ["All", ...subcategories];
       subtabsEl.innerHTML = options
