@@ -74,7 +74,10 @@
 .menu-tag.green { background: #6ea42e; }
 .menu-tag.yellow { background: #d8a32a; }
 .menu-tag.blue { background: #2f73bb; }
+.menu-tag.orange { background: #d97a21; }
 .menu-tag.gray { background: #7b8090; }
+.menu-tag.teal { background: #1f8f86; }
+.menu-tag.purple { background: #7a56c5; }
 
 .menu-price {
   font-size: 62px;

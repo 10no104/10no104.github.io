@@ -765,19 +765,19 @@
 
     function getIngredientBadges(item) {
       const labelMap = {
-        vegetarian: "Vegetarian",
-        seafood: "Seafood",
-        dairy: "Dairy",
-        egg: "Egg",
-        "ask server": "Ask Server"
+        vegetarian: "🥗 Vegetarian",
+        seafood: "🐟 Seafood",
+        dairy: "🥛 Dairy",
+        egg: "🐣 Egg",
+        "ask server": "🗣️ Ask Server"
       };
 
       const colorMap = {
         vegetarian: "green",
         seafood: "blue",
-        dairy: "yellow",
-        egg: "orange",
-        "ask server": "gray"
+        dairy: "teal",
+        egg: "red",
+        "ask server": "purple"
       };
 
       return getVeganOptionTags(item)
