@@ -42,8 +42,8 @@
 }
 
 .subtabs-wrap {
-  position: sticky !important;
-  top: 10px !important;
+  position: static;
+  top: auto;
   z-index: 25;
   background: rgba(236, 236, 239, 0.95);
   border: 1px solid #d6d8df;
@@ -54,6 +54,8 @@
 }
 
 .subtabs-wrap.vegan-subtabs {
+  position: sticky !important;
+  top: 10px !important;
   margin-top: 18px;
   padding: 14px 14px 12px;
   background: rgba(247, 249, 242, 0.97);
