@@ -639,6 +639,7 @@
     }
 
     function getIngredientBadges(item) {
+      const orderedTags = ["ask server", "vegetarian", "seafood", "egg", "dairy"];
       const labelMap = {
         vegetarian: "🌱 Vegetarian",
         seafood: "🐟 Seafood",
@@ -655,8 +656,8 @@
         "ask server": "purple"
       };
 
-      return getVeganOptionTags(item)
-        .filter((tag) => ["vegetarian", "seafood", "dairy", "egg", "ask server"].includes(tag))
+      return orderedTags
+        .filter((tag) => getVeganOptionTags(item).includes(tag))
         .map((tag) => ({
           label: labelMap[tag] || formatDietaryTag(tag),
           color: colorMap[tag] || "gray"
