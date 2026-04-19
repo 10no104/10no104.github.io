@@ -13,16 +13,18 @@
       position: sticky;
       top: 0;
       z-index: 60;
-      padding: 10px 0 12px;
-      background: linear-gradient(to bottom, rgba(247, 247, 249, 0.96), rgba(247, 247, 249, 0.9));
-      backdrop-filter: blur(10px);
+      padding: 18px 0 8px;
+      background: transparent;
+      backdrop-filter: none;
+      transition: padding 0.24s ease, background 0.24s ease, backdrop-filter 0.24s ease, box-shadow 0.24s ease;
     }
 
     .menu-sticky-inner {
       width: min(960px, 92vw);
       margin: 0 auto;
       display: grid;
-      gap: 12px;
+      gap: 16px;
+      transition: gap 0.24s ease;
     }
 
     .menu-homebar {
@@ -50,6 +52,17 @@
       display: none;
     }
 
+    .menu-page.is-scrolled .menu-sticky-shell {
+      padding: 10px 0 12px;
+      background: linear-gradient(to bottom, rgba(247, 247, 249, 0.96), rgba(247, 247, 249, 0.9));
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 24px rgba(28, 35, 48, 0.08);
+    }
+
+    .menu-page.is-scrolled .menu-sticky-inner {
+      gap: 12px;
+    }
+
     .menu-homebar {
       width: 100%;
     }
@@ -67,6 +80,12 @@
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
+    .menu-page.is-scrolled .menu-home-link {
+      width: 68px;
+      height: 68px;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
+    }
+
     .menu-home-link:hover {
       transform: translateY(-2px);
       box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
@@ -82,16 +101,22 @@
       height: 56px;
       object-fit: contain;
       display: block;
+      transition: width 0.24s ease, height 0.24s ease;
+    }
+
+    .menu-page.is-scrolled .menu-home-logo {
+      width: 44px;
+      height: 44px;
     }
 
     @media (max-width: 640px) {
       .menu-sticky-shell {
-        padding: 8px 0 10px;
+        padding: 14px 0 8px;
       }
 
       .menu-sticky-inner {
         width: min(calc(100% - 20px), 420px);
-        gap: 10px;
+        gap: 12px;
       }
 
       .menu-homebar {
@@ -110,6 +135,24 @@
 
       .wrap {
         margin-top: 18px;
+      }
+
+      .menu-page.is-scrolled .menu-sticky-shell {
+        padding: 8px 0 10px;
+      }
+
+      .menu-page.is-scrolled .menu-sticky-inner {
+        gap: 10px;
+      }
+
+      .menu-page.is-scrolled .menu-home-link {
+        width: 56px;
+        height: 56px;
+      }
+
+      .menu-page.is-scrolled .menu-home-logo {
+        width: 36px;
+        height: 36px;
       }
 
       .menu-sticky-shell .tabs,
@@ -554,6 +597,18 @@
       toTopBtn.addEventListener("click", () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
       });
+    }
+
+    function setupStickyHeaderState() {
+      const page = document.body;
+      if (!page) return;
+
+      const syncStickyState = () => {
+        page.classList.toggle("is-scrolled", window.scrollY > 12);
+      };
+
+      syncStickyState();
+      window.addEventListener("scroll", syncStickyState, { passive: true });
     }
 
     function renderMenu() {
@@ -1065,6 +1120,7 @@
       renderTabs();
       renderSubtabs();
       renderMenu();
+      setupStickyHeaderState();
       setupToTopButton();
     }
 
