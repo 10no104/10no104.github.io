@@ -5,11 +5,70 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Menu Test</title>
-    <link rel="stylesheet" href="../../css/global.css" />
-  <link rel="stylesheet" href="../../css/layout.css" />
-  <link rel="stylesheet" href="../../css/components.css" />
+  <link rel="stylesheet" href="../css/global.css" />
+  <link rel="stylesheet" href="../css/layout.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <style>
+    .menu-homebar {
+      width: min(960px, 92vw);
+      margin: 24px auto 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .menu-home-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 84px;
+      height: 84px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .menu-home-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .menu-home-link:focus-visible {
+      outline: 3px solid rgba(47, 115, 187, 0.24);
+      outline-offset: 4px;
+    }
+
+    .menu-home-logo {
+      width: 56px;
+      height: 56px;
+      object-fit: contain;
+      display: block;
+    }
+
+    @media (max-width: 640px) {
+      .menu-homebar {
+        margin-top: 18px;
+      }
+
+      .menu-home-link {
+        width: 72px;
+        height: 72px;
+      }
+
+      .menu-home-logo {
+        width: 48px;
+        height: 48px;
+      }
+    }
+  </style>
 </head>
 <body class="menu-page">
+  <div class="menu-homebar">
+    <a class="menu-home-link" href="../index.html" aria-label="Go to main page">
+      <img class="menu-home-logo" src="../assets/logo-dark.webp" alt="EHWA home" />
+    </a>
+  </div>
   <main class="wrap">
     <section class="tabs" aria-label="Categories" id="tabs"></section>
     <section class="subtabs-wrap hidden" id="subtabsWrap">
