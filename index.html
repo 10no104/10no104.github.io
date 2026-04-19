@@ -107,21 +107,23 @@
     .hub-eyebrow {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       margin: 0;
       color: var(--hub-accent);
-      font-size: 0.84rem;
+      font-size: 0.76rem;
       font-weight: 800;
-      letter-spacing: 0.24em;
+      line-height: 1;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
     }
 
     .hub-eyebrow img {
-      width: 28px;
-      height: 28px;
+      width: 24px;
+      height: 24px;
       object-fit: contain;
       flex: none;
       filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.18));
+      transform: translateY(-1px);
     }
 
     .hub-hero {
@@ -391,13 +393,14 @@
       }
 
       .hub-eyebrow {
-        gap: 8px;
-        letter-spacing: 0.18em;
+        gap: 6px;
+        font-size: 0.7rem;
+        letter-spacing: 0.12em;
       }
 
       .hub-eyebrow img {
-        width: 24px;
-        height: 24px;
+        width: 20px;
+        height: 20px;
       }
 
       .hub-hero {
@@ -433,8 +436,8 @@
     <section class="hub-hero" aria-label="Main hero section">
       <div class="hub-hero-content">
         <p class="hub-eyebrow">
-          <img src="assets/logo-white.webp" alt="EHWA logo" />
           <span>EHWA</span>
+          <img src="assets/logo-white.webp" alt="EHWA logo" />
         </p>
         <h1>Korean Kitchen & Soju Bar</h1>
         <div class="hub-actions">
