@@ -389,6 +389,11 @@
       touch-action: pan-y pinch-zoom;
     }
 
+    body.home-page.is-touch-scrolling a,
+    body.home-page.is-touch-scrolling button {
+      pointer-events: none !important;
+    }
+
     .location-card h3 {
       margin: 0;
       font-size: 1.3rem;
@@ -595,5 +600,48 @@
       &copy; EHWA Restaurant. All rights reserved.
     </footer>
   </main>
+  <script>
+    (function () {
+      var body = document.body;
+      var startY = 0;
+      var startX = 0;
+      var dragging = false;
+      var clearTimer = null;
+
+      function clearScrollingState() {
+        dragging = false;
+        body.classList.remove("is-touch-scrolling");
+      }
+
+      document.addEventListener("touchstart", function (event) {
+        if (!event.touches || event.touches.length !== 1) return;
+        startY = event.touches[0].clientY;
+        startX = event.touches[0].clientX;
+        dragging = false;
+        body.classList.remove("is-touch-scrolling");
+        if (clearTimer) {
+          clearTimeout(clearTimer);
+          clearTimer = null;
+        }
+      }, { passive: true });
+
+      document.addEventListener("touchmove", function (event) {
+        if (!event.touches || event.touches.length !== 1) return;
+        var dy = Math.abs(event.touches[0].clientY - startY);
+        var dx = Math.abs(event.touches[0].clientX - startX);
+
+        if (!dragging && dy > 8 && dy > dx) {
+          dragging = true;
+          body.classList.add("is-touch-scrolling");
+        }
+      }, { passive: true });
+
+      document.addEventListener("touchend", function () {
+        clearTimer = setTimeout(clearScrollingState, 80);
+      }, { passive: true });
+
+      document.addEventListener("touchcancel", clearScrollingState, { passive: true });
+    }());
+  </script>
 </body>
 </html>
