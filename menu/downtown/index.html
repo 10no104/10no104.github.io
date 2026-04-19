@@ -726,6 +726,10 @@
       return filtered;
     }
 
+    function scrollToCategoryStart() {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
     function renderTabs() {
       const tabsEl = document.getElementById("tabs");
       const categories = getCategories(allMenus);
@@ -743,6 +747,7 @@
           selectedCategory = tabButton.dataset.category || "All";
           selectedSubcategory = "All";
           selectedDietaryTags = new Set();
+          scrollToCategoryStart();
           renderTabs();
           renderSubtabs();
           renderMenu();
