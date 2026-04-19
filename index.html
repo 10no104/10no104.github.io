@@ -264,6 +264,16 @@
       opacity: 0.9;
     }
 
+    .hub-hero-visual::after {
+      content: "";
+      position: absolute;
+      inset: 8% 6% 6% 6%;
+      background: url("assets/flower.webp") center / cover no-repeat;
+      opacity: 0.32;
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
     .hub-hero-image {
       position: relative;
       z-index: 1;
@@ -419,6 +429,13 @@
         min-height: 280px;
         padding: 0 18px 18px;
         background-size: auto, 150% auto;
+      }
+
+      .hub-hero-visual::after {
+        inset: 10% 4% 6% 4%;
+        background-position: center;
+        background-size: contain;
+        opacity: 0.28;
       }
 
       .hub-hero-image {
