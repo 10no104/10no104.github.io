@@ -7,14 +7,222 @@
     <link rel="stylesheet" href="../../css/global.css" />
   <link rel="stylesheet" href="../../css/layout.css" />
   <link rel="stylesheet" href="../../css/components.css" />
+  <style>
+    .menu-sticky-shell {
+      position: relative;
+      padding: 18px 0 8px;
+      background: linear-gradient(to bottom, rgba(249, 247, 243, 0.92), rgba(249, 247, 243, 0.72));
+      backdrop-filter: none;
+      transition: padding 0.24s ease, background 0.24s ease, backdrop-filter 0.24s ease, box-shadow 0.24s ease;
+    }
+
+    .menu-sticky-spacer {
+      height: 0;
+    }
+
+    .menu-sticky-inner {
+      width: min(960px, 92vw);
+      margin: 0 auto;
+      display: grid;
+      gap: 16px;
+      padding: 14px 16px;
+      border-radius: 22px;
+      background: rgba(255, 252, 247, 0.9);
+      border: 1px solid rgba(120, 103, 77, 0.12);
+      box-shadow: 0 10px 28px rgba(34, 30, 24, 0.08);
+      transition: gap 0.24s ease;
+    }
+
+    .menu-homebar {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100%;
+    }
+
+    .menu-sticky-shell .tabs,
+    .menu-sticky-shell .subtabs-wrap {
+      margin-bottom: 0;
+    }
+
+    .menu-sticky-shell .subtabs-wrap {
+      position: static !important;
+      top: auto !important;
+      margin-bottom: 0;
+    }
+
+    .menu-page .wrap {
+      margin-top: 16px;
+    }
+
+    .menu-page.is-scrolled .menu-sticky-shell {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 60;
+      padding: 10px 0 12px;
+      background: linear-gradient(to bottom, rgba(244, 241, 236, 0.96), rgba(244, 241, 236, 0.88));
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 24px rgba(28, 35, 48, 0.08);
+    }
+
+    .menu-page.is-scrolled .menu-sticky-spacer {
+      height: var(--menu-sticky-height, 0px);
+    }
+
+    .menu-page.is-scrolled .menu-sticky-inner {
+      gap: 12px;
+      background: rgba(255, 252, 247, 0.96);
+      border-color: rgba(120, 103, 77, 0.16);
+      box-shadow: 0 12px 32px rgba(28, 35, 48, 0.12);
+    }
+
+    .menu-home-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 84px;
+      height: 84px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .menu-page.is-scrolled .menu-home-link {
+      width: 68px;
+      height: 68px;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
+    }
+
+    .menu-home-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .menu-home-link:focus-visible {
+      outline: 3px solid rgba(47, 115, 187, 0.24);
+      outline-offset: 4px;
+    }
+
+    .menu-home-logo {
+      width: 56px;
+      height: 56px;
+      object-fit: contain;
+      display: block;
+      transition: width 0.24s ease, height 0.24s ease;
+    }
+
+    .menu-page.is-scrolled .menu-home-logo {
+      width: 44px;
+      height: 44px;
+    }
+
+    @media (max-width: 640px) {
+      .menu-sticky-shell {
+        padding: 14px 0 8px;
+      }
+
+      .menu-sticky-inner {
+        width: min(calc(100% - 20px), 420px);
+        gap: 12px;
+        padding: 12px 12px 10px;
+        border-radius: 18px;
+      }
+
+      .menu-homebar {
+        justify-content: center;
+      }
+
+      .menu-home-link {
+        width: 64px;
+        height: 64px;
+      }
+
+      .menu-home-logo {
+        width: 42px;
+        height: 42px;
+      }
+
+      .wrap {
+        margin-top: 18px;
+      }
+
+      .menu-page.is-scrolled .menu-sticky-shell {
+        padding: 7px 0 8px;
+      }
+
+      .menu-page.is-scrolled .menu-sticky-inner {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px 8px;
+      }
+
+      .menu-page.is-scrolled .menu-homebar {
+        justify-content: flex-start;
+        width: auto;
+        flex: 0 0 auto;
+        margin-bottom: 0;
+      }
+
+      .menu-page.is-scrolled .menu-home-link {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        margin: 0 0 0 2px;
+      }
+
+      .menu-page.is-scrolled .menu-sticky-shell .tabs {
+        flex: 1 1 0;
+        min-width: 0;
+        margin-top: 0;
+        align-items: center;
+      }
+
+      .menu-page.is-scrolled .menu-home-logo {
+        width: 26px;
+        height: 26px;
+      }
+
+      .menu-page.is-scrolled .menu-sticky-shell .subtabs-wrap {
+        width: 100%;
+      }
+
+      .menu-page.is-scrolled .menu-sticky-shell .tabs,
+      .menu-page.is-scrolled .menu-sticky-shell .subtabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+      }
+
+      .menu-page.is-scrolled .menu-sticky-shell .tabs::-webkit-scrollbar,
+      .menu-page.is-scrolled .menu-sticky-shell .subtabs::-webkit-scrollbar {
+        display: none;
+      }
+    }
+  </style>
 </head>
 <body class="menu-page">
+  <div class="menu-sticky-spacer" id="menuStickySpacer" aria-hidden="true"></div>
+  <div class="menu-sticky-shell">
+    <div class="menu-sticky-inner">
+      <div class="menu-homebar">
+        <a class="menu-home-link" href="../../index.html" aria-label="Go to main page">
+          <img class="menu-home-logo" src="../../assets/logo-dark.webp" alt="EHWA home" />
+        </a>
+      </div>
+      <section class="tabs" aria-label="Categories" id="tabs"></section>
+      <section class="subtabs-wrap hidden" id="subtabsWrap">
+        <p class="subtabs-context" id="subtabsContext"></p>
+        <section class="subtabs" aria-label="Subcategories" id="subtabs"></section>
+      </section>
+    </div>
+  </div>
   <main class="wrap">
-    <section class="tabs" aria-label="Categories" id="tabs"></section>
-    <section class="subtabs-wrap hidden" id="subtabsWrap">
-      <p class="subtabs-context" id="subtabsContext"></p>
-      <section class="subtabs" aria-label="Subcategories" id="subtabs"></section>
-    </section>
     <section class="menu-list menu-grid" id="menuList"></section>
   </main>
   <button class="to-top" id="toTopBtn" type="button" aria-label="Back to top">↑ Top</button>
@@ -81,6 +289,7 @@
     let selectedSubcategory = "All";
     let selectedDietaryTags = new Set();
     let veganSelectionMode = "blank";
+    let syncStickyHeaderMetrics = () => {};
 
     function escapeHtml(text = "") {
       return text
@@ -335,6 +544,35 @@
       toTopBtn.addEventListener("click", () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
       });
+    }
+
+    function setupStickyHeaderState() {
+      const page = document.body;
+      const stickyShell = document.querySelector(".menu-sticky-shell");
+      if (!page || !stickyShell) return;
+      const mobileQuery = window.matchMedia("(max-width: 640px)");
+
+      const syncHeaderHeight = () => {
+        document.documentElement.style.setProperty("--menu-sticky-height", `${stickyShell.offsetHeight}px`);
+      };
+
+      const syncStickyState = () => {
+        const threshold = mobileQuery.matches
+          ? Math.max(88, stickyShell.offsetHeight - 24)
+          : 16;
+
+        page.classList.toggle("is-scrolled", window.scrollY > threshold);
+        syncHeaderHeight();
+      };
+
+      syncStickyHeaderMetrics = syncHeaderHeight;
+      syncHeaderHeight();
+      syncStickyState();
+      window.addEventListener("scroll", syncStickyState, { passive: true });
+      window.addEventListener("resize", syncStickyState);
+      if (typeof mobileQuery.addEventListener === "function") {
+        mobileQuery.addEventListener("change", syncStickyState);
+      }
     }
 
     function renderMenu() {
@@ -763,6 +1001,7 @@
         subtabsEl.innerHTML = "";
         subtabsWrapEl.classList.add("hidden");
         subtabsContextEl.textContent = "";
+        syncStickyHeaderMetrics();
         return;
       }
 
@@ -799,6 +1038,8 @@
           renderMenu();
         });
       });
+
+      syncStickyHeaderMetrics();
     }
 
     async function bootstrap() {
@@ -812,6 +1053,7 @@
       renderTabs();
       renderSubtabs();
       renderMenu();
+      setupStickyHeaderState();
       setupToTopButton();
     }
 
