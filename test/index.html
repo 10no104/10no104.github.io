@@ -488,7 +488,9 @@
           const key = getTagKey(label || "Tag");
           const resolvedColor = key === "spicy"
             ? "chili"
-            : (color || (key === "ask-server" ? "green" : "gray"));
+            : key === "popular"
+              ? "yellow"
+              : (color || (key === "ask-server" ? "green" : "gray"));
           return {
             key,
             label: renderTagLabel(label || "Tag"),
