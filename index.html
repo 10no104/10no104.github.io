@@ -267,11 +267,12 @@
     .hub-hero-visual::after {
       content: "";
       position: absolute;
-      inset: 8% 6% 6% 6%;
-      background: url("assets/flower.webp") center / cover no-repeat;
-      opacity: 0.32;
+      inset: 14% 14% 8% 18%;
+      background: url("assets/flower.webp") center / contain no-repeat;
+      opacity: 0.72;
       pointer-events: none;
       mix-blend-mode: screen;
+      z-index: 0;
     }
 
     .hub-hero-image {
@@ -432,10 +433,10 @@
       }
 
       .hub-hero-visual::after {
-        inset: 10% 4% 6% 4%;
+        inset: 12% 8% 10% 12%;
         background-position: center;
         background-size: contain;
-        opacity: 0.28;
+        opacity: 0.64;
       }
 
       .hub-hero-image {
