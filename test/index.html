@@ -9,12 +9,49 @@
   <link rel="stylesheet" href="../css/layout.css" />
   <link rel="stylesheet" href="../css/components.css" />
   <style>
-    .menu-homebar {
+    .menu-sticky-shell {
+      position: sticky;
+      top: 0;
+      z-index: 60;
+      padding: 10px 0 12px;
+      background: linear-gradient(to bottom, rgba(247, 247, 249, 0.96), rgba(247, 247, 249, 0.9));
+      backdrop-filter: blur(10px);
+    }
+
+    .menu-sticky-inner {
       width: min(960px, 92vw);
-      margin: 18px auto 0;
+      margin: 0 auto;
+      display: grid;
+      gap: 12px;
+    }
+
+    .menu-homebar {
       display: flex;
       align-items: center;
       justify-content: flex-start;
+    }
+
+    .menu-sticky-shell .tabs,
+    .menu-sticky-shell .subtabs-wrap {
+      margin-bottom: 0;
+    }
+
+    .menu-sticky-shell .subtabs-wrap {
+      position: static !important;
+      top: auto !important;
+      margin-bottom: 0;
+    }
+
+    .menu-page .wrap {
+      margin-top: 16px;
+    }
+
+    .menu-page .to-top {
+      display: none;
+    }
+
+    .menu-homebar {
+      width: 100%;
     }
 
     .menu-home-link {
@@ -48,9 +85,16 @@
     }
 
     @media (max-width: 640px) {
+      .menu-sticky-shell {
+        padding: 8px 0 10px;
+      }
+
+      .menu-sticky-inner {
+        width: min(calc(100% - 20px), 420px);
+        gap: 10px;
+      }
+
       .menu-homebar {
-        width: min(calc(100% - 28px), 420px);
-        margin: 14px auto 0;
         justify-content: center;
       }
 
@@ -67,21 +111,38 @@
       .wrap {
         margin-top: 18px;
       }
+
+      .menu-sticky-shell .tabs,
+      .menu-sticky-shell .subtabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+      }
+
+      .menu-sticky-shell .tabs::-webkit-scrollbar,
+      .menu-sticky-shell .subtabs::-webkit-scrollbar {
+        display: none;
+      }
     }
   </style>
 </head>
 <body class="menu-page">
-  <div class="menu-homebar">
-    <a class="menu-home-link" href="../index.html" aria-label="Go to main page">
-      <img class="menu-home-logo" src="../assets/logo-dark.webp" alt="EHWA home" />
-    </a>
+  <div class="menu-sticky-shell">
+    <div class="menu-sticky-inner">
+      <div class="menu-homebar">
+        <a class="menu-home-link" href="../index.html" aria-label="Go to main page">
+          <img class="menu-home-logo" src="../assets/logo-dark.webp" alt="EHWA home" />
+        </a>
+      </div>
+      <section class="tabs" aria-label="Categories" id="tabs"></section>
+      <section class="subtabs-wrap hidden" id="subtabsWrap">
+        <p class="subtabs-context" id="subtabsContext"></p>
+        <section class="subtabs" aria-label="Subcategories" id="subtabs"></section>
+      </section>
+    </div>
   </div>
   <main class="wrap">
-    <section class="tabs" aria-label="Categories" id="tabs"></section>
-    <section class="subtabs-wrap hidden" id="subtabsWrap">
-      <p class="subtabs-context" id="subtabsContext"></p>
-      <section class="subtabs" aria-label="Subcategories" id="subtabs"></section>
-    </section>
     <section class="menu-list menu-grid" id="menuList"></section>
   </main>
   <button class="to-top" id="toTopBtn" type="button" aria-label="Back to top">↑ Top</button>
