@@ -342,10 +342,9 @@
       inset: 0 0 auto 0;
       height: 100%;
       background:
-        url("assets/Asset-1.webp") left 10% top 14% / 30% auto no-repeat,
-        url("assets/Asset-2.webp") center 6% / 76% auto no-repeat,
-        url("assets/Asset-3.webp") right 8% top 26% / 24% auto no-repeat;
-      opacity: 0.92;
+        url("assets/Asset-2.webp") center 4% / 62% auto no-repeat,
+        url("assets/Asset-3.webp") right 14% top 18% / 18% auto no-repeat;
+      opacity: 0.6;
       pointer-events: none;
     }
 
@@ -524,6 +523,13 @@
         min-height: 280px;
         padding: 0 18px 18px;
         background-size: auto, 150% auto;
+      }
+
+      .hub-hero-visual::after {
+        background:
+          url("assets/Asset-2.webp") center 6% / 82% auto no-repeat,
+          url("assets/Asset-3.webp") right 6% top 16% / 20% auto no-repeat;
+        opacity: 0.52;
       }
 
       .hub-hero-image {
