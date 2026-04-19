@@ -68,6 +68,9 @@
   font-weight: 700;
   color: #fff;
   line-height: 1;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  box-shadow: 0 8px 18px rgba(34, 24, 17, 0.16);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.18);
 }
 
 .menu-tag.red { background: #e13a31; }
@@ -75,6 +78,7 @@
 .menu-tag.yellow { background: #d8a32a; }
 .menu-tag.blue { background: #2f73bb; }
 .menu-tag.orange { background: #d97a21; }
+.menu-tag.pink { background: #c4577a; }
 .menu-tag.gray { background: #7b8090; }
 .menu-tag.teal { background: #1f8f86; }
 .menu-tag.purple { background: #7a56c5; }
