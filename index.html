@@ -44,7 +44,7 @@
 
     body.home-page::before {
       content: "";
-      position: fixed;
+      position: absolute;
       inset: 0;
       background:
         linear-gradient(180deg, rgba(255, 251, 244, 0.42), rgba(255, 249, 240, 0.18)),
@@ -407,6 +407,10 @@
       }
 
       .hub-hero {
+        grid-template-columns: 1fr;
+      }
+
+      .hub-hero {
         min-height: auto;
       }
 
@@ -473,7 +477,7 @@
       }
 
       .hub-hero-content {
-        padding: 30px 24px 18px;
+        padding: 30px 24px 12px;
       }
 
       .hub-actions a {
@@ -481,13 +485,13 @@
       }
 
       .hub-hero-visual {
-        min-height: 340px;
-        padding: 0 18px;
+        min-height: 280px;
+        padding: 0 18px 18px;
         background-size: auto, 150% auto;
       }
 
       .hub-hero-image {
-        width: min(100%, 300px);
+        width: min(100%, 240px);
       }
 
       .location-grid {
