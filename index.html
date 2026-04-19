@@ -12,26 +12,73 @@
   <link rel="stylesheet" href="css/components.css" />
   <style>
     :root {
-      --hub-bg: #f7f2ea;
-      --hub-panel: #fffdfa;
-      --hub-ink: #1b130f;
-      --hub-soft-ink: #67564a;
+      --hub-bg-cream: #f5efe4;
+      --hub-bg-ink: #211813;
+      --hub-panel: rgba(255, 252, 247, 0.92);
+      --hub-panel-soft: rgba(251, 246, 238, 0.88);
       --hub-accent: #d4af37;
-      --hub-border: rgba(51, 29, 17, 0.1);
-      --hub-shadow: 0 24px 50px rgba(14, 10, 8, 0.12);
+      --hub-burgundy: #5a1122;
+      --hub-border: rgba(120, 103, 77, 0.14);
+      --hub-shell-shadow: 0 18px 40px rgba(30, 21, 16, 0.12);
+      --hub-card-shadow: 0 20px 36px rgba(45, 30, 17, 0.08);
     }
 
     body.home-page {
+      position: relative;
+      min-height: 100vh;
       background:
-        radial-gradient(circle at top, rgba(212, 175, 55, 0.08), transparent 32%),
-        linear-gradient(180deg, #fbf7f1 0%, var(--hub-bg) 100%);
-      color: var(--hub-ink);
+        radial-gradient(circle at top left, rgba(212, 175, 55, 0.18), transparent 28%),
+        radial-gradient(circle at 85% 12%, rgba(90, 17, 34, 0.12), transparent 22%),
+        linear-gradient(180deg, rgba(251, 247, 241, 0.96) 0%, rgba(245, 239, 228, 0.98) 100%);
+      color: var(--hub-bg-ink);
+      overflow-x: hidden;
+      font-family: "Noto Sans KR", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    }
+
+    body.home-page::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(17, 12, 10, 0.48), rgba(17, 12, 10, 0.12)),
+        url("assets/background.webp") center top / cover no-repeat;
+      opacity: 0.1;
+      pointer-events: none;
+      z-index: -2;
+    }
+
+    body.home-page::after {
+      content: "";
+      position: fixed;
+      inset: auto -8vw -10vh auto;
+      width: min(42vw, 460px);
+      height: min(42vw, 460px);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.18) 0%, rgba(212, 175, 55, 0.04) 48%, transparent 72%);
+      filter: blur(10px);
+      pointer-events: none;
+      z-index: -1;
     }
 
     .home-hub {
+      position: relative;
       max-width: 1160px;
-      margin: 0 auto;
-      padding: 20px 20px 64px;
+      margin: 22px auto 0;
+      padding: 18px 20px 64px;
+    }
+
+    .home-hub::before {
+      content: "";
+      position: absolute;
+      inset: 6px 2px 0;
+      border-radius: 36px;
+      background:
+        linear-gradient(180deg, rgba(255, 251, 244, 0.76), rgba(255, 249, 240, 0.58)),
+        url("assets/pattern.webp") center / 520px auto;
+      opacity: 0.28;
+      box-shadow: 0 24px 60px rgba(34, 24, 17, 0.08);
+      pointer-events: none;
+      z-index: -1;
     }
 
     .hub-topbar {
@@ -39,24 +86,41 @@
       align-items: center;
       justify-content: space-between;
       gap: 16px;
-      margin-bottom: 16px;
+      margin-bottom: 18px;
+      padding: 14px 16px;
+      border-radius: 22px;
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.94), rgba(251, 246, 238, 0.88)),
+        url("assets/pattern.webp") center / 440px auto;
+      border: 1px solid var(--hub-border);
+      box-shadow: var(--hub-shell-shadow);
     }
 
     .hub-brand-link {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 12px;
-      padding: 10px 18px;
+      min-width: 84px;
+      min-height: 84px;
+      padding: 14px 22px;
       border-radius: 999px;
       text-decoration: none;
-      color: #fff;
-      background: linear-gradient(135deg, #1d130d 0%, #3d1c12 100%);
-      box-shadow: 0 16px 30px rgba(39, 20, 12, 0.18);
+      color: var(--hub-bg-ink);
+      background: linear-gradient(180deg, #fffdf9 0%, #f3eadc 100%);
+      border: 1px solid rgba(71, 48, 31, 0.12);
+      box-shadow: 0 12px 28px rgba(42, 28, 18, 0.12);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .hub-brand-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 36px rgba(42, 28, 18, 0.16);
     }
 
     .hub-brand-link img {
-      width: 34px;
-      height: 34px;
+      width: 48px;
+      height: 48px;
       object-fit: contain;
       flex: none;
     }
@@ -72,7 +136,7 @@
     }
 
     .hub-brand-text span {
-      color: rgba(255, 255, 255, 0.72);
+      color: rgba(33, 24, 19, 0.66);
       font-size: 0.76rem;
     }
 
@@ -85,21 +149,20 @@
     .hub-quick-links a {
       display: inline-flex;
       align-items: center;
-      min-height: 40px;
+      min-height: 42px;
       padding: 0 16px;
       border-radius: 999px;
       text-decoration: none;
-      color: var(--hub-ink);
-      background: rgba(255, 255, 255, 0.72);
+      color: var(--hub-bg-ink);
+      background: rgba(255, 255, 255, 0.56);
       border: 1px solid rgba(51, 29, 17, 0.08);
-      backdrop-filter: blur(10px);
     }
 
     .hub-hero {
       position: relative;
-      border-radius: 30px;
       overflow: hidden;
       min-height: 560px;
+      border-radius: 30px;
       background:
         radial-gradient(circle at top left, rgba(212, 175, 55, 0.24), transparent 34%),
         linear-gradient(135deg, #120f0b 0%, #22160e 45%, #0d0a08 100%);
@@ -111,6 +174,17 @@
     }
 
     .hub-hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(17, 12, 10, 0.08), rgba(17, 12, 10, 0.24)),
+        url("assets/pattern.webp") center / 520px auto;
+      opacity: 0.1;
+      pointer-events: none;
+    }
+
+    .hub-hero::after {
       content: "";
       position: absolute;
       inset: auto auto -120px -120px;
@@ -167,28 +241,46 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      gap: 10px;
       min-height: 46px;
       padding: 0 18px;
       border-radius: 999px;
       text-decoration: none;
       font-weight: 700;
-      transition: transform 0.2s ease, opacity 0.2s ease;
+      transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
     }
 
     .hub-btn:hover {
-      opacity: 0.95;
+      opacity: 0.96;
       transform: translateY(-1px);
     }
 
     .hub-btn-primary {
       background: var(--hub-accent);
       color: #101010;
+      box-shadow: 0 12px 24px rgba(212, 175, 55, 0.24);
     }
 
     .hub-btn-secondary {
-      background: rgba(255, 255, 255, 0.15);
       color: #fff;
-      border: 1px solid rgba(255, 255, 255, 0.45);
+      background: linear-gradient(135deg, rgba(90, 17, 34, 0.92), rgba(212, 175, 55, 0.72));
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow: 0 16px 30px rgba(90, 17, 34, 0.22);
+    }
+
+    .hub-btn-icon {
+      width: 18px;
+      height: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: none;
+    }
+
+    .hub-btn-icon svg {
+      width: 100%;
+      height: 100%;
+      display: block;
     }
 
     .hub-hero-visual {
@@ -199,8 +291,8 @@
       min-height: 100%;
       padding: 38px 28px 0;
       background:
-        url("assets/ehwa-gung.webp") center bottom / 120% auto no-repeat,
-        linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(212, 175, 55, 0.08));
+        linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(212, 175, 55, 0.08)),
+        url("assets/ehwa-gung.webp") center bottom / 120% auto no-repeat;
     }
 
     .hub-hero-visual::before {
@@ -208,8 +300,11 @@
       position: absolute;
       inset: 11% 10% 10% 10%;
       border-radius: 34px 34px 0 0;
-      background: linear-gradient(180deg, rgba(255, 248, 235, 0.14), rgba(255, 248, 235, 0.03));
+      background:
+        linear-gradient(180deg, rgba(255, 248, 235, 0.14), rgba(255, 248, 235, 0.03)),
+        url("assets/pattern.webp") center / 320px auto;
       border: 1px solid rgba(255, 255, 255, 0.08);
+      opacity: 0.9;
     }
 
     .hub-hero-image {
@@ -248,9 +343,24 @@
     .location-card {
       overflow: hidden;
       border-radius: 24px;
-      background: var(--hub-panel);
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.94), rgba(249, 243, 233, 0.94)),
+        url("assets/pattern.webp") center / 460px auto;
       border: 1px solid var(--hub-border);
-      box-shadow: var(--hub-shadow);
+      box-shadow: var(--hub-card-shadow);
+    }
+
+    .hub-photo-card {
+      position: relative;
+    }
+
+    .hub-photo-card::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0;
+      height: 96px;
+      background: linear-gradient(180deg, transparent, rgba(17, 12, 10, 0.3));
+      pointer-events: none;
     }
 
     .hub-photo-card img {
@@ -327,13 +437,37 @@
     }
 
     @media (max-width: 760px) {
+      body.home-page::after {
+        width: 62vw;
+        height: 62vw;
+        right: -16vw;
+        bottom: -4vh;
+      }
+
       .home-hub {
         padding: 16px 16px 56px;
       }
 
+      .home-hub::before {
+        inset: 4px 6px 0;
+        border-radius: 24px;
+      }
+
+      .hub-topbar {
+        padding: 12px;
+        border-radius: 18px;
+      }
+
       .hub-brand-link {
         width: 100%;
+        min-height: 64px;
         justify-content: center;
+        padding: 10px 16px;
+      }
+
+      .hub-brand-link img {
+        width: 42px;
+        height: 42px;
       }
 
       .hub-quick-links {
@@ -356,7 +490,7 @@
       .hub-hero-visual {
         min-height: 340px;
         padding: 0 18px;
-        background-size: 150% auto, auto;
+        background-size: auto, 150% auto;
       }
 
       .hub-hero-image {
@@ -373,7 +507,7 @@
   <main class="home-hub">
     <div class="hub-topbar">
       <a class="hub-brand-link" href="/" aria-label="EHWA Home">
-        <img src="assets/logo-white.png" alt="EHWA logo" />
+        <img src="assets/logo-dark.webp" alt="EHWA logo" />
         <span class="hub-brand-text">
           <strong>EHWA</strong>
           <span>Home</span>
@@ -393,7 +527,16 @@
         <h1>Dining & Lounge</h1>
         <div class="hub-actions">
           <a class="hub-btn hub-btn-primary" href="https://example.com/reservation">Online Reservation</a>
-          <a class="hub-btn hub-btn-secondary" href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer">Instagram</a>
+          <a class="hub-btn hub-btn-secondary" href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+            <span class="hub-btn-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3.25" y="3.25" width="17.5" height="17.5" rx="5.25" stroke="currentColor" stroke-width="2"/>
+                <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/>
+                <circle cx="17.25" cy="6.75" r="1.25" fill="currentColor"/>
+              </svg>
+            </span>
+            <span>Instagram</span>
+          </a>
         </div>
       </div>
 
