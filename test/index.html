@@ -10,13 +10,15 @@
   <link rel="stylesheet" href="../css/components.css" />
   <style>
     .menu-sticky-shell {
-      position: sticky;
-      top: 0;
-      z-index: 60;
+      position: relative;
       padding: 18px 0 8px;
       background: transparent;
       backdrop-filter: none;
       transition: padding 0.24s ease, background 0.24s ease, backdrop-filter 0.24s ease, box-shadow 0.24s ease;
+    }
+
+    .menu-sticky-spacer {
+      height: 0;
     }
 
     .menu-sticky-inner {
@@ -53,10 +55,19 @@
     }
 
     .menu-page.is-scrolled .menu-sticky-shell {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 60;
       padding: 10px 0 12px;
       background: linear-gradient(to bottom, rgba(247, 247, 249, 0.96), rgba(247, 247, 249, 0.9));
       backdrop-filter: blur(10px);
       box-shadow: 0 8px 24px rgba(28, 35, 48, 0.08);
+    }
+
+    .menu-page.is-scrolled .menu-sticky-spacer {
+      height: var(--menu-sticky-height, 0px);
     }
 
     .menu-page.is-scrolled .menu-sticky-inner {
@@ -171,6 +182,7 @@
   </style>
 </head>
 <body class="menu-page">
+  <div class="menu-sticky-spacer" id="menuStickySpacer" aria-hidden="true"></div>
   <div class="menu-sticky-shell">
     <div class="menu-sticky-inner">
       <div class="menu-homebar">
@@ -251,6 +263,7 @@
     let selectedCategory = "All";
     let selectedSubcategory = "All";
     let selectedDietaryTags = new Set();
+    let syncStickyHeaderMetrics = () => {};
 
     function escapeHtml(text = "") {
       return text
@@ -601,14 +614,23 @@
 
     function setupStickyHeaderState() {
       const page = document.body;
-      if (!page) return;
+      const stickyShell = document.querySelector(".menu-sticky-shell");
+      if (!page || !stickyShell) return;
+
+      const syncHeaderHeight = () => {
+        document.documentElement.style.setProperty("--menu-sticky-height", `${stickyShell.offsetHeight}px`);
+      };
 
       const syncStickyState = () => {
         page.classList.toggle("is-scrolled", window.scrollY > 12);
+        syncHeaderHeight();
       };
 
+      syncStickyHeaderMetrics = syncHeaderHeight;
+      syncHeaderHeight();
       syncStickyState();
       window.addEventListener("scroll", syncStickyState, { passive: true });
+      window.addEventListener("resize", syncHeaderHeight);
     }
 
     function renderMenu() {
@@ -1070,6 +1092,7 @@
         subtabsWrapEl.classList.add("hidden");
         subtabsWrapEl.classList.remove("vegan-subtabs");
         subtabsContextEl.textContent = "";
+        syncStickyHeaderMetrics();
         return;
       }
 
@@ -1107,6 +1130,8 @@
           renderMenu();
         });
       });
+
+      syncStickyHeaderMetrics();
     }
 
     async function bootstrap() {
