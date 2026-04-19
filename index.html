@@ -326,6 +326,26 @@
       gap: 14px;
     }
 
+    .location-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .location-actions .hub-btn {
+      min-height: 42px;
+      padding-inline: 14px;
+      font-size: 0.95rem;
+    }
+
+    .location-actions .hub-btn-primary {
+      box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
+    }
+
+    .location-actions .hub-btn-secondary {
+      box-shadow: 0 12px 22px rgba(90, 17, 34, 0.14);
+    }
+
     .location-card a,
     .location-list a {
       touch-action: pan-y pinch-zoom;
@@ -465,6 +485,7 @@
         <h1>Korean Kitchen & Soju Bar</h1>
         <div class="hub-actions">
           <a class="hub-btn hub-btn-primary" href="https://example.com/reservation">Online Reservation</a>
+          <a class="hub-btn hub-btn-secondary" href="#locations">Online Order</a>
           <a class="hub-btn hub-btn-secondary" href="https://www.instagram.com/ehwa_restaurant" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
             <span class="hub-btn-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -491,22 +512,29 @@
       <div class="location-grid">
         <article class="location-card" aria-label="Uptown location">
           <h3>Uptown</h3>
-          <a class="hub-btn hub-btn-primary" href="menu/uptown/index.html">View Uptown Menu</a>
+          <div class="location-actions">
+            <a class="hub-btn hub-btn-primary" href="menu/uptown/index.html">View Uptown Menu</a>
+            <a class="hub-btn hub-btn-secondary" href="https://www.ubereats.com/ca/store/ehwa-uptown/44ZHz__IVJaTPeUckFF6Yg" target="_blank" rel="noopener noreferrer">Uber Eats</a>
+          </div>
           <ul class="location-list">
             <li><strong>Hours:</strong> Mon-Sun 5:30 PM - 3:00 AM</li>
             <li><strong>Kitchen:</strong> Last call at 1:30 AM</li>
-            <li><strong>Address:</strong> <a href="https://maps.google.com/?q=4866+Yonge+St+North+York+ON+M2N+5N2" target="_blank" rel="noopener noreferrer">4866 Yonge St, North York, ON M2N 5N2</a></li>
+            <li><strong>Address:</strong> <a href="https://www.google.com/maps/search/?api=1&query=Ehwa+Restaurant+4866+Yonge+St+North+York+ON+M2N+5N2" target="_blank" rel="noopener noreferrer">4866 Yonge St, North York, ON M2N 5N2</a></li>
             <li><strong>Phone:</strong> <a href="tel:+14376659995">(437) 665-9995</a></li>
           </ul>
         </article>
 
         <article class="location-card" aria-label="Downtown location">
           <h3>Downtown</h3>
-          <a class="hub-btn hub-btn-primary" href="menu/downtown/index.html">View Downtown Menu</a>
+          <div class="location-actions">
+            <a class="hub-btn hub-btn-primary" href="menu/downtown/index.html">View Downtown Menu</a>
+            <a class="hub-btn hub-btn-secondary" href="https://www.doordash.com/store/ehwa-restaurant-1217453/" target="_blank" rel="noopener noreferrer">DoorDash</a>
+            <a class="hub-btn hub-btn-secondary" href="https://www.ubereats.com/ca/store/ehwa-downtown/2_rjxtHlQXWsv1OBu5rufQ" target="_blank" rel="noopener noreferrer">Uber Eats</a>
+          </div>
           <ul class="location-list">
             <li><strong>Hours:</strong> Mon-Sun 5:30 PM - 3:00 AM</li>
             <li><strong>Kitchen:</strong> Last call at 1:30 AM</li>
-            <li><strong>Address:</strong> <a href="https://maps.google.com/?q=16+Isabella+St+Toronto+ON+M4Y+2A1" target="_blank" rel="noopener noreferrer">16 Isabella St, Toronto, ON M4Y 2A1</a></li>
+            <li><strong>Address:</strong> <a href="https://www.google.com/maps/search/?api=1&query=Ehwa+Restaurant+16+Isabella+St+Toronto+ON+M4Y+2A1" target="_blank" rel="noopener noreferrer">16 Isabella St, Toronto, ON M4Y 2A1</a></li>
             <li><strong>Phone:</strong> <a href="tel:+14372672266">(437) 267-2266</a></li>
           </ul>
         </article>
