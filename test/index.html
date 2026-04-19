@@ -695,12 +695,21 @@
       return compareTags.every((tag) => selected.includes(tag));
     }
 
+    function isDefaultVeganVisible(item) {
+      const allTags = getVeganOptionTags(item);
+      const compareTags = allTags.filter((tag) => tag !== "vegetarian");
+      const hasVegetarianFallback = allTags.includes("vegetarian") && hasMenuTag(item, "ask-server");
+      return !compareTags.length || hasVegetarianFallback;
+    }
+
     function filterMenus(menuItems) {
       let filtered = filterBySelectedCategory(menuItems, selectedCategory);
       const isVeganCategory = String(selectedCategory || "").toLowerCase().includes("vegan");
 
       if (isVeganCategory) {
-        if (selectedDietaryTags.size) {
+        if (!selectedDietaryTags.size) {
+          filtered = filtered.filter((item) => isDefaultVeganVisible(item));
+        } else {
           filtered = filtered.filter((item) => matchesAllowedIngredients(item, selectedDietaryTags));
         }
         return filtered;
