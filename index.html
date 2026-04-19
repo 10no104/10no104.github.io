@@ -27,6 +27,12 @@
       overflow-x: hidden;
     }
 
+    html,
+    body {
+      scroll-behavior: auto !important;
+      scroll-snap-type: none !important;
+    }
+
     body.home-page {
       position: relative;
       min-height: 100vh;
@@ -36,7 +42,20 @@
         linear-gradient(180deg, rgba(251, 247, 241, 0.96) 0%, rgba(245, 239, 228, 0.98) 100%);
       color: var(--hub-bg-ink);
       overflow-x: hidden;
+      overflow-anchor: none;
       font-family: "Noto Sans KR", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    }
+
+    .home-hub,
+    .hub-topbar,
+    .hub-hero,
+    .hub-section,
+    .location-grid,
+    .location-card {
+      scroll-snap-align: none !important;
+      scroll-snap-stop: normal !important;
+      scroll-margin-top: 0 !important;
+      overflow-anchor: none;
     }
 
     body.home-page::before {
