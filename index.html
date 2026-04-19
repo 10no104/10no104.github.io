@@ -17,7 +17,6 @@
       --hub-ink: #1b130f;
       --hub-soft-ink: #67564a;
       --hub-accent: #d4af37;
-      --hub-burgundy: #5a1122;
       --hub-border: rgba(51, 29, 17, 0.1);
       --hub-shadow: 0 24px 50px rgba(14, 10, 8, 0.12);
     }
@@ -141,37 +140,15 @@
       text-transform: uppercase;
     }
 
-    .hub-hero h1 {
+    .hub-hero h1,
+    .hub-section h2 {
       margin: 0;
-      font-size: clamp(2.5rem, 5vw, 4.8rem);
-      line-height: 0.95;
       letter-spacing: -0.05em;
     }
 
-    .hub-hero-content p {
-      margin: 0;
-      max-width: 36ch;
-      color: rgba(255, 255, 255, 0.82);
-      font-size: 1.05rem;
-      line-height: 1.7;
-    }
-
-    .hub-action-note {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      width: fit-content;
-      padding: 10px 14px;
-      border-radius: 999px;
-      color: rgba(255, 255, 255, 0.85);
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-    }
-
-    .hub-action-note img {
-      width: 22px;
-      height: 22px;
-      object-fit: contain;
+    .hub-hero h1 {
+      font-size: clamp(2.5rem, 5vw, 4.8rem);
+      line-height: 0.95;
     }
 
     .hub-logo {
@@ -257,166 +234,31 @@
       margin-bottom: 18px;
     }
 
-    .hub-section-header h2,
     .hub-section h2 {
-      margin: 0;
       font-size: clamp(1.65rem, 3vw, 2.35rem);
-      letter-spacing: -0.04em;
     }
 
-    .hub-section-header p {
-      margin: 0;
-      max-width: 48ch;
-      color: var(--hub-soft-ink);
-      line-height: 1.7;
-    }
-
-    .hub-story {
-      display: grid;
-      grid-template-columns: minmax(0, 1.05fr) minmax(260px, 0.95fr);
-      gap: 18px;
-    }
-
-    .hub-story-card,
-    .hub-highlight-card,
-    .location-card,
-    .hub-photo-card {
-      background: var(--hub-panel);
-      border: 1px solid var(--hub-border);
-      box-shadow: var(--hub-shadow);
-    }
-
-    .hub-story-card {
-      position: relative;
-      overflow: hidden;
-      border-radius: 24px;
-      padding: 30px;
-      display: grid;
-      gap: 16px;
-    }
-
-    .hub-story-card::before {
-      content: "";
-      position: absolute;
-      inset: auto -60px -80px auto;
-      width: 220px;
-      height: 220px;
-      background: url("assets/flower.webp") center/contain no-repeat;
-      opacity: 0.08;
-      pointer-events: none;
-    }
-
-    .hub-story-card p,
-    .hub-highlight-card p {
-      margin: 0;
-      color: var(--hub-soft-ink);
-      line-height: 1.8;
-    }
-
-    .hub-story-points {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .hub-story-points span {
-      display: block;
-      padding: 14px 16px;
-      border-radius: 18px;
-      background: #f4ede1;
-      color: var(--hub-ink);
-      font-weight: 700;
-      text-align: center;
-    }
-
-    .hub-highlight-card {
-      border-radius: 24px;
-      padding: 24px;
-      display: grid;
-      align-content: space-between;
-      gap: 18px;
-      background:
-        linear-gradient(160deg, rgba(255, 255, 255, 0.96), rgba(249, 239, 226, 0.94)),
-        var(--hub-panel);
-    }
-
-    .hub-highlight-card strong {
-      font-size: 0.86rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--hub-burgundy);
-    }
-
-    .hub-highlight-stat {
-      font-size: clamp(2rem, 5vw, 3.1rem);
-      font-weight: 800;
-      letter-spacing: -0.05em;
-      color: var(--hub-ink);
-    }
-
-    .hub-showcase {
+    .hub-photo-grid {
       display: grid;
       grid-template-columns: 1.15fr 0.85fr;
       gap: 18px;
     }
 
-    .hub-photo-card {
-      position: relative;
+    .hub-photo-card,
+    .location-card {
       overflow: hidden;
-      min-height: 280px;
-      border-radius: 26px;
+      border-radius: 24px;
+      background: var(--hub-panel);
+      border: 1px solid var(--hub-border);
+      box-shadow: var(--hub-shadow);
     }
 
     .hub-photo-card img {
       width: 100%;
       height: 100%;
+      min-height: 280px;
       display: block;
       object-fit: cover;
-    }
-
-    .hub-photo-copy {
-      position: absolute;
-      inset: auto 0 0 0;
-      padding: 22px;
-      color: #fff;
-      background: linear-gradient(180deg, transparent, rgba(8, 5, 4, 0.76));
-      display: grid;
-      gap: 6px;
-    }
-
-    .hub-photo-copy strong {
-      font-size: 1.2rem;
-    }
-
-    .hub-photo-copy span {
-      color: rgba(255, 255, 255, 0.78);
-      line-height: 1.6;
-    }
-
-    .hub-banner {
-      position: relative;
-      overflow: hidden;
-      border-radius: 26px;
-      min-height: 220px;
-      padding: 26px 30px;
-      background:
-        linear-gradient(90deg, rgba(17, 10, 7, 0.8), rgba(17, 10, 7, 0.12)),
-        url("assets/glasses-scaled.webp") center / cover no-repeat;
-      color: #fff;
-      display: grid;
-      align-content: end;
-      box-shadow: var(--hub-shadow);
-    }
-
-    .hub-banner p,
-    .hub-banner h3 {
-      margin: 0;
-    }
-
-    .hub-banner p {
-      max-width: 40ch;
-      color: rgba(255, 255, 255, 0.8);
-      line-height: 1.7;
     }
 
     .location-grid {
@@ -426,7 +268,6 @@
     }
 
     .location-card {
-      border-radius: 20px;
       padding: 24px;
       display: grid;
       gap: 14px;
@@ -467,8 +308,7 @@
       }
 
       .hub-hero,
-      .hub-story,
-      .hub-showcase {
+      .hub-photo-grid {
         grid-template-columns: 1fr;
       }
 
@@ -513,10 +353,6 @@
         padding: 30px 24px 18px;
       }
 
-      .hub-hero-content p {
-        max-width: none;
-      }
-
       .hub-hero-visual {
         min-height: 340px;
         padding: 0 18px;
@@ -527,15 +363,6 @@
         width: min(100%, 300px);
       }
 
-      .hub-story-card,
-      .hub-highlight-card,
-      .hub-banner,
-      .location-card {
-        padding-left: 20px;
-        padding-right: 20px;
-      }
-
-      .hub-story-points,
       .location-grid {
         grid-template-columns: 1fr;
       }
@@ -549,12 +376,12 @@
         <img src="assets/logo-white.png" alt="EHWA logo" />
         <span class="hub-brand-text">
           <strong>EHWA</strong>
-          <span>Official Home</span>
+          <span>Home</span>
         </span>
       </a>
 
       <div class="hub-quick-links">
-        <a href="#ambience">Ambience</a>
+        <a href="#photos">Photos</a>
         <a href="#locations">Locations</a>
       </div>
     </div>
@@ -562,16 +389,11 @@
     <section class="hub-hero" aria-label="Main hero section">
       <div class="hub-hero-content">
         <img class="hub-logo" src="assets/logo-white.png" alt="EHWA logo" />
-        <p class="hub-eyebrow">Korean Dining & Lounge</p>
-        <h1>EHWA Dining & Lounge</h1>
-        <p>Your one-stop page for reservation, location details, and latest updates.</p>
+        <p class="hub-eyebrow">EHWA</p>
+        <h1>Dining & Lounge</h1>
         <div class="hub-actions">
           <a class="hub-btn hub-btn-primary" href="https://example.com/reservation">Online Reservation</a>
           <a class="hub-btn hub-btn-secondary" href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer">Instagram</a>
-        </div>
-        <div class="hub-action-note">
-          <img src="assets/logo-white.png" alt="" aria-hidden="true" />
-          <span>Signature atmosphere, lounge mood, and Korean dining in one place.</span>
         </div>
       </div>
 
@@ -580,72 +402,25 @@
       </div>
     </section>
 
-    <section class="hub-section hub-story" aria-labelledby="story-heading">
-      <article class="hub-story-card">
-        <div class="hub-section-header">
-          <div>
-            <p class="hub-eyebrow">Space</p>
-            <h2 id="story-heading">A warmer first impression</h2>
-          </div>
-        </div>
-        <p>
-          EHWA blends a lounge-like glow with Korean-inspired visual details, so the homepage feels more like stepping into the room than reading a plain list of links.
-        </p>
-        <div class="hub-story-points">
-          <span>Warm Light</span>
-          <span>Bold Seating</span>
-          <span>Signature Mood</span>
-        </div>
-      </article>
-
-      <aside class="hub-highlight-card">
-        <strong>Brand Cue</strong>
-        <div class="hub-highlight-stat">2</div>
-        <p>Locations presented up front, with the visual tone now supported by real space photography instead of filler gallery blocks.</p>
-      </aside>
-    </section>
-
-    <section class="hub-section" id="ambience" aria-labelledby="ambience-heading">
+    <section class="hub-section" id="photos" aria-labelledby="photos-heading">
       <div class="hub-section-header">
-        <div>
-          <p class="hub-eyebrow">Ambience</p>
-          <h2 id="ambience-heading">Use the real space to sell the feeling</h2>
-        </div>
-        <p>The photos already in the assets folder have strong color and mood, so they work better as guided highlights than as a generic gallery.</p>
+        <h2 id="photos-heading">Photos</h2>
       </div>
 
-      <div class="hub-showcase">
+      <div class="hub-photo-grid">
         <article class="hub-photo-card">
-          <img src="assets/seats-scaled.webp" alt="EHWA seating area" />
-          <div class="hub-photo-copy">
-            <strong>Velvet seating and marble tables</strong>
-            <span>Deep burgundy seating gives the room a richer, more lounge-forward personality.</span>
-          </div>
+          <img src="assets/seats-scaled.webp" alt="EHWA interior photo" />
         </article>
 
         <article class="hub-photo-card">
-          <img src="assets/glasses-scaled.webp" alt="EHWA glassware with warm lighting" />
-          <div class="hub-photo-copy">
-            <strong>Warm bar lighting</strong>
-            <span>Golden reflections add contrast to the darker hero section and make the page feel more alive.</span>
-          </div>
+          <img src="assets/glasses-scaled.webp" alt="EHWA bar photo" />
         </article>
       </div>
-    </section>
-
-    <section class="hub-section">
-      <article class="hub-banner" aria-label="EHWA atmosphere banner">
-        <h3>Not just menus, but a mood.</h3>
-        <p>Photos, branding, and calls to action now sit in the same visual direction so the homepage feels more intentional from top to bottom.</p>
-      </article>
     </section>
 
     <section class="hub-section" id="locations" aria-labelledby="locations-heading">
       <div class="hub-section-header">
-        <div>
-          <p class="hub-eyebrow">Locations</p>
-          <h2 id="locations-heading">Find your nearest EHWA</h2>
-        </div>
+        <h2 id="locations-heading">Locations</h2>
       </div>
 
       <div class="location-grid">

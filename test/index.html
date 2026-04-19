@@ -210,6 +210,48 @@
       box-shadow: 0 18px 32px rgba(90, 17, 34, 0.22);
     }
 
+    .menu-page .tabs .tab-drink {
+      position: relative;
+      padding-inline: 42px;
+      background:
+        linear-gradient(135deg, rgba(90, 17, 34, 0.12), rgba(212, 175, 55, 0.24)),
+        #fff9f1;
+      border-color: rgba(126, 79, 35, 0.34);
+      color: #5a1122;
+      font-weight: 800;
+      box-shadow:
+        0 10px 24px rgba(90, 17, 34, 0.14),
+        inset 0 1px 0 rgba(255, 255, 255, 0.72);
+      transform: translateY(-1px) scale(1.03);
+    }
+
+    .menu-page .tabs .tab-drink::before {
+      content: "Main";
+      position: absolute;
+      top: -9px;
+      right: 14px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #5a1122 0%, #8b1e3f 100%);
+      color: #fff6ec;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      box-shadow: 0 8px 18px rgba(90, 17, 34, 0.24);
+    }
+
+    .menu-page .tabs .tab-drink.active {
+      background: linear-gradient(135deg, #5a1122 0%, #a32147 45%, #d4af37 100%);
+      border-color: rgba(90, 17, 34, 0.9);
+      color: #fffaf3;
+      box-shadow: 0 14px 28px rgba(90, 17, 34, 0.28);
+    }
+
+    .menu-page .tabs .tab-drink:hover {
+      transform: translateY(-2px) scale(1.05);
+    }
+
     @media (max-width: 640px) {
       body.menu-page::after {
         width: 62vw;
@@ -304,6 +346,14 @@
       .menu-page.is-scrolled .menu-sticky-shell .tabs::-webkit-scrollbar,
       .menu-page.is-scrolled .menu-sticky-shell .subtabs::-webkit-scrollbar {
         display: none;
+      }
+
+      .menu-page .tabs .tab-drink {
+        padding-inline: 28px;
+      }
+
+      .menu-page .tabs .tab-drink::before {
+        right: 10px;
       }
     }
   </style>
@@ -540,6 +590,16 @@
       return `$${v}`;
     }
 
+    function isDrinkCategory(category = "") {
+      return String(category).trim().toLowerCase().includes("drink");
+    }
+
+    function prioritizeDrinkCategory(categories = []) {
+      const drinkCategories = categories.filter((category) => isDrinkCategory(category));
+      const otherCategories = categories.filter((category) => !isDrinkCategory(category));
+      return [...drinkCategories, ...otherCategories];
+    }
+
     function getCategories(menuItems) {
       const unique = [...new Set(menuItems.map((item) => item.category).filter(Boolean))];
       const base = ["All", ...unique];
@@ -551,12 +611,13 @@
 
     function renderTabs() {
       const tabsEl = document.getElementById("tabs");
-      const categories = getCategories(allMenus);
+      const categories = prioritizeDrinkCategory(getCategories(allMenus));
 
       tabsEl.innerHTML = categories
         .map((category) => {
           const activeClass = category === selectedCategory ? "active" : "";
-          return `<button class="tab ${activeClass}" data-category="${escapeHtml(category)}" type="button">${escapeHtml(category)}</button>`;
+          const drinkClass = isDrinkCategory(category) ? "tab-drink" : "";
+          return `<button class="tab ${drinkClass} ${activeClass}" data-category="${escapeHtml(category)}" type="button">${escapeHtml(category)}</button>`;
         })
         .join("");
 
