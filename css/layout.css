@@ -29,9 +29,10 @@
 }
 
 .tab.active {
-  background: var(--blue);
-  color: #fff;
-  border-color: #2a67a8;
+  background: linear-gradient(135deg, #5a1122 0%, #d4af37 100%);
+  color: #fffaf3;
+  border-color: rgba(90, 17, 34, 0.9);
+  box-shadow: 0 14px 28px rgba(90, 17, 34, 0.2);
 }
 
 .subtabs {
@@ -83,9 +84,10 @@
 }
 
 .subtab.active {
-  background: #2f73bb;
-  color: #fff;
-  border-color: #2a67a8;
+  background: linear-gradient(135deg, #5a1122 0%, #d4af37 100%);
+  color: #fffaf3;
+  border-color: rgba(90, 17, 34, 0.82);
+  box-shadow: 0 10px 20px rgba(90, 17, 34, 0.16);
 }
 
 .to-top {
