@@ -96,6 +96,7 @@
       if (!normalized) return "tag";
       if (/^spicy\d*$/.test(normalized)) return "spicy";
       if (normalized.includes("vegan")) return "vegan";
+      if (normalized.includes("ask server")) return "ask-server";
       if (normalized.includes("popular")) return "popular";
       if (normalized.includes("seafood")) return "seafood";
       if (normalized.includes("sweet")) return "sweet";
@@ -124,6 +125,7 @@
       const emojiMap = {
         spicy: "🌶️",
         vegan: "🌱",
+        "ask-server": "🌱",
         popular: "⭐",
         seafood: "🐟",
         sweet: "🍯",
@@ -143,10 +145,11 @@
         .filter(Boolean)
         .map((chunk) => {
           const [label, color] = chunk.split("|").map((v) => v && v.trim());
+          const key = getTagKey(label || "Tag");
           return {
-            key: getTagKey(label || "Tag"),
+            key,
             label: renderTagLabel(label || "Tag"),
-            color: color || "gray"
+            color: color || (key === "ask-server" ? "green" : "gray")
           };
         });
     }
@@ -160,6 +163,7 @@
       const emojiMap = [
         { keyword: "spicy", emoji: "🌶️" },
         { keyword: "vegan", emoji: "🌱" },
+        { keyword: "ask server", emoji: "🌱" },
         { keyword: "popular", emoji: "⭐" },
         { keyword: "seafood", emoji: "🐟" },
         { keyword: "sweet", emoji: "🍯" },
@@ -727,9 +731,7 @@
 
       menuListEl.innerHTML = filtered
         .map((item) => {
-          const displayTags = String(selectedCategory || "").toLowerCase().includes("vegan")
-            ? [...item.tags, ...getIngredientBadges(item)]
-            : item.tags;
+          const displayTags = [...item.tags, ...getIngredientBadges(item)];
           const tagsHtml = displayTags
             .map((tag) => `<span class="menu-tag ${escapeHtml(tag.color)}">${escapeHtml(tag.label)}</span>`)
             .join("");
@@ -763,22 +765,24 @@
       return getVeganOptionTags(item);
     }
 
+    function hasMenuTag(item, key) {
+      return Array.isArray(item.tags) && item.tags.some((tag) => tag.key === key);
+    }
+
     function getIngredientBadges(item) {
-      const orderedTags = ["ask server", "vegetarian", "seafood", "egg", "dairy"];
+      const orderedTags = ["vegetarian", "seafood", "egg", "dairy"];
       const labelMap = {
         vegetarian: "🌱 Vegetarian",
         seafood: "🐟 Seafood",
         dairy: "🥛 Dairy",
-        egg: "🥚 Egg",
-        "ask server": "Ask Server"
+        egg: "🥚 Egg"
       };
 
       const colorMap = {
         vegetarian: "green",
         seafood: "blue",
         dairy: "blue",
-        egg: "red",
-        "ask server": "purple"
+        egg: "red"
       };
 
       return orderedTags
@@ -791,9 +795,9 @@
 
     function matchesAllowedIngredients(item, selectedTags) {
       const allTags = getVeganOptionTags(item);
-      const compareTags = allTags.filter((tag) => tag !== "vegetarian" && tag !== "ask server");
+      const compareTags = allTags.filter((tag) => tag !== "vegetarian");
       const selected = [...selectedTags].map((tag) => normalizeDietaryTag(tag));
-      const hasVegetarianFallback = allTags.includes("vegetarian") && allTags.includes("ask server");
+      const hasVegetarianFallback = allTags.includes("vegetarian") && hasMenuTag(item, "ask-server");
 
       if (!selected.length) return true;
       if (!compareTags.length) return true;
@@ -811,7 +815,7 @@
 
       if (normalizedCategory.includes("vegan")) {
         return menuItems.filter((item) =>
-          item.tags.some((tag) => tag.key === "vegan")
+          item.tags.some((tag) => tag.key === "vegan" || tag.key === "ask-server")
         );
       }
 
