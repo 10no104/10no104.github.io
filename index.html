@@ -25,6 +25,8 @@
 
     html {
       overflow-x: hidden;
+      scroll-behavior: auto;
+      scroll-padding-top: 0;
     }
 
     body.home-page {
@@ -36,6 +38,7 @@
         linear-gradient(180deg, rgba(251, 247, 241, 0.96) 0%, rgba(245, 239, 228, 0.98) 100%);
       color: var(--hub-bg-ink);
       overflow-x: hidden;
+      overscroll-behavior-y: auto;
       font-family: "Noto Sans KR", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
     }
 
@@ -341,13 +344,6 @@
       font-size: clamp(1.65rem, 3vw, 2.35rem);
     }
 
-    .hub-photo-grid {
-      display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      gap: 18px;
-    }
-
-    .hub-photo-card,
     .location-card {
       overflow: hidden;
       border-radius: 24px;
@@ -356,27 +352,6 @@
         url("assets/pattern.webp") center / 460px auto;
       border: 1px solid var(--hub-border);
       box-shadow: var(--hub-card-shadow);
-    }
-
-    .hub-photo-card {
-      position: relative;
-    }
-
-    .hub-photo-card::after {
-      content: "";
-      position: absolute;
-      inset: auto 0 0;
-      height: 96px;
-      background: linear-gradient(180deg, transparent, rgba(17, 12, 10, 0.3));
-      pointer-events: none;
-    }
-
-    .hub-photo-card img {
-      width: 100%;
-      height: 100%;
-      min-height: 280px;
-      display: block;
-      object-fit: cover;
     }
 
     .location-grid {
@@ -429,11 +404,6 @@
       .hub-section-header {
         align-items: start;
         flex-direction: column;
-      }
-
-      .hub-hero,
-      .hub-photo-grid {
-        grid-template-columns: 1fr;
       }
 
       .hub-hero {
@@ -538,7 +508,6 @@
       </a>
 
       <div class="hub-quick-links">
-        <a href="#photos">Photos</a>
         <a href="#locations">Locations</a>
       </div>
     </div>
@@ -546,7 +515,7 @@
     <section class="hub-hero" aria-label="Main hero section">
       <div class="hub-hero-content">
         <p class="hub-eyebrow">EHWA</p>
-        <h1>Dining & Lounge</h1>
+        <h1>Korean Kitchen & Soju Bar</h1>
         <div class="hub-actions">
           <a class="hub-btn hub-btn-primary" href="https://example.com/reservation">Online Reservation</a>
           <a class="hub-btn hub-btn-secondary" href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
@@ -564,22 +533,6 @@
 
       <div class="hub-hero-visual">
         <img class="hub-hero-image" src="assets/woman.webp" alt="EHWA hero visual" />
-      </div>
-    </section>
-
-    <section class="hub-section" id="photos" aria-labelledby="photos-heading">
-      <div class="hub-section-header">
-        <h2 id="photos-heading">Photos</h2>
-      </div>
-
-      <div class="hub-photo-grid">
-        <article class="hub-photo-card">
-          <img src="assets/seats-scaled.webp" alt="EHWA interior photo" />
-        </article>
-
-        <article class="hub-photo-card">
-          <img src="assets/glasses-scaled.webp" alt="EHWA bar photo" />
-        </article>
       </div>
     </section>
 
