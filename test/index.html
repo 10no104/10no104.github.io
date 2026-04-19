@@ -12,7 +12,7 @@
     .menu-sticky-shell {
       position: relative;
       padding: 18px 0 8px;
-      background: transparent;
+      background: linear-gradient(to bottom, rgba(249, 247, 243, 0.92), rgba(249, 247, 243, 0.72));
       backdrop-filter: none;
       transition: padding 0.24s ease, background 0.24s ease, backdrop-filter 0.24s ease, box-shadow 0.24s ease;
     }
@@ -26,6 +26,11 @@
       margin: 0 auto;
       display: grid;
       gap: 16px;
+      padding: 14px 16px;
+      border-radius: 22px;
+      background: rgba(255, 252, 247, 0.9);
+      border: 1px solid rgba(120, 103, 77, 0.12);
+      box-shadow: 0 10px 28px rgba(34, 30, 24, 0.08);
       transition: gap 0.24s ease;
     }
 
@@ -57,7 +62,7 @@
       right: 0;
       z-index: 60;
       padding: 10px 0 12px;
-      background: linear-gradient(to bottom, rgba(247, 247, 249, 0.96), rgba(247, 247, 249, 0.9));
+      background: linear-gradient(to bottom, rgba(244, 241, 236, 0.96), rgba(244, 241, 236, 0.88));
       backdrop-filter: blur(10px);
       box-shadow: 0 8px 24px rgba(28, 35, 48, 0.08);
     }
@@ -68,6 +73,9 @@
 
     .menu-page.is-scrolled .menu-sticky-inner {
       gap: 12px;
+      background: rgba(255, 252, 247, 0.96);
+      border-color: rgba(120, 103, 77, 0.16);
+      box-shadow: 0 12px 32px rgba(28, 35, 48, 0.12);
     }
 
     .menu-homebar {
@@ -124,6 +132,8 @@
       .menu-sticky-inner {
         width: min(calc(100% - 20px), 420px);
         gap: 12px;
+        padding: 12px 12px 10px;
+        border-radius: 18px;
       }
 
       .menu-homebar {
