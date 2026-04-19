@@ -41,6 +41,7 @@
       color: var(--hub-bg-ink);
       overflow-x: hidden;
       overflow-anchor: none;
+      touch-action: pan-y pinch-zoom;
       font-family: "Noto Sans KR", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
     }
 
@@ -136,6 +137,7 @@
       border: 1px solid rgba(71, 48, 31, 0.12);
       box-shadow: 0 12px 28px rgba(42, 28, 18, 0.12);
       transition: transform 0.2s ease, box-shadow 0.2s ease;
+      touch-action: pan-y pinch-zoom;
     }
 
     .hub-brand-link:hover {
@@ -184,6 +186,7 @@
       color: var(--hub-bg-ink);
       background: rgba(255, 255, 255, 0.56);
       border: 1px solid rgba(51, 29, 17, 0.08);
+      touch-action: pan-y pinch-zoom;
     }
 
     .hub-hero {
@@ -273,6 +276,7 @@
       font-weight: 700;
       text-align: center;
       transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+      touch-action: pan-y pinch-zoom;
     }
 
     .hub-btn:hover {
@@ -378,6 +382,11 @@
       padding: 24px;
       display: grid;
       gap: 14px;
+    }
+
+    .location-card a,
+    .location-list a {
+      touch-action: pan-y pinch-zoom;
     }
 
     .location-card h3 {
