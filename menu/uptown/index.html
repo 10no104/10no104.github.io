@@ -606,7 +606,7 @@
 
       menuListEl.innerHTML = filtered
         .map((item) => {
-          const displayTags = [...item.tags, ...getIngredientBadges(item)];
+          const displayTags = [...item.tags.filter((tag) => tag.key !== "vegan"), ...getIngredientBadges(item)];
           const tagsHtml = displayTags
             .map((tag) => `<span class="menu-tag ${escapeHtml(tag.color)}">${escapeHtml(tag.label)}</span>`)
             .join("");
