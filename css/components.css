@@ -74,11 +74,13 @@
 }
 
 .menu-tag.red { background: #e13a31; }
+.menu-tag.chili { background: #b64a24; }
 .menu-tag.green { background: #6ea42e; }
 .menu-tag.yellow { background: #d8a32a; }
 .menu-tag.blue { background: #2f73bb; }
 .menu-tag.orange { background: #d97a21; }
 .menu-tag.pink { background: #c4577a; }
+.menu-tag.brown { background: #8a5a3b; }
 .menu-tag.gray { background: #7b8090; }
 .menu-tag.teal { background: #1f8f86; }
 .menu-tag.purple { background: #7a56c5; }

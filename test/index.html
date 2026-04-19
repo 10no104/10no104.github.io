@@ -486,10 +486,13 @@
         .map((chunk) => {
           const [label, color] = chunk.split("|").map((v) => v && v.trim());
           const key = getTagKey(label || "Tag");
+          const resolvedColor = key === "spicy"
+            ? "chili"
+            : (color || (key === "ask-server" ? "green" : "gray"));
           return {
             key,
             label: renderTagLabel(label || "Tag"),
-            color: color || (key === "ask-server" ? "green" : "gray")
+            color: resolvedColor
           };
         });
     }
@@ -1172,8 +1175,8 @@
         dairy: "blue",
         egg: "red",
         chicken: "orange",
-        beef: "red",
-        pork: "pink"
+        beef: "brown",
+        pork: "purple"
       };
 
       return orderedTags
