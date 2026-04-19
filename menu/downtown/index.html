@@ -4,9 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Menu Downtown</title>
-    <link rel="stylesheet" href="../../css/global.css" />
-  <link rel="stylesheet" href="../../css/layout.css" />
-  <link rel="stylesheet" href="../../css/components.css" />
+    <link rel="stylesheet" href="../../css/global.css?v=20260419-1" />
+  <link rel="stylesheet" href="../../css/layout.css?v=20260419-1" />
+  <link rel="stylesheet" href="../../css/components.css?v=20260419-1" />
   <style>
     :root {
       --menu-bg-cream: #f5efe4;
@@ -446,10 +446,15 @@
         .map((chunk) => {
           const [label, color] = chunk.split("|").map((v) => v && v.trim());
           const key = getTagKey(label || "Tag");
+          const resolvedColor = key === "spicy"
+            ? "chili"
+            : key === "popular"
+              ? "yellow"
+              : (color || (key === "ask-server" ? "green" : "gray"));
           return {
             key,
             label: renderTagLabel(label || "Tag"),
-            color: color || (key === "ask-server" ? "green" : "gray")
+            color: resolvedColor
           };
         });
     }
@@ -958,11 +963,16 @@
         .join("");
     }
 
-    function getVeganOptionTags(item) {
+    function getIngredientTagsForItem(item) {
       const values = Array.isArray(item.dietaryTags) ? item.dietaryTags : parseDietaryTagList(item.ingredient || "");
       return values
         .map((tag) => normalizeDietaryTag(tag))
         .filter((tag, index, arr) => tag && arr.indexOf(tag) === index);
+    }
+
+    function getVeganOptionTags(item) {
+      const allowedTags = new Set(["vegetarian", "seafood", "egg", "dairy"]);
+      return getIngredientTagsForItem(item).filter((tag) => allowedTags.has(tag));
     }
 
     function getDietaryTagsForItem(item) {
@@ -974,23 +984,29 @@
     }
 
     function getIngredientBadges(item) {
-      const orderedTags = ["vegetarian", "seafood", "egg", "dairy"];
+      const orderedTags = ["vegetarian", "seafood", "egg", "dairy", "chicken", "beef", "pork"];
       const labelMap = {
-        vegetarian: "🌱 Vegetarian",
-        seafood: "🐟 Seafood",
-        dairy: "🥛 Dairy",
-        egg: "🥚 Egg"
+        vegetarian: "Vegetarian",
+        seafood: "Seafood",
+        dairy: "Dairy",
+        egg: "Egg",
+        chicken: "?? Chicken",
+        beef: "?? Beef",
+        pork: "?? Pork"
       };
 
       const colorMap = {
         vegetarian: "green",
         seafood: "blue",
         dairy: "blue",
-        egg: "red"
+        egg: "red",
+        chicken: "orange",
+        beef: "brown",
+        pork: "purple"
       };
 
       return orderedTags
-        .filter((tag) => getVeganOptionTags(item).includes(tag))
+        .filter((tag) => getIngredientTagsForItem(item).includes(tag))
         .map((tag) => ({
           label: labelMap[tag] || formatDietaryTag(tag),
           color: colorMap[tag] || "gray"
@@ -1152,3 +1168,4 @@
   </script>
 </body>
 </html>
+
