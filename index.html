@@ -104,89 +104,24 @@
       z-index: -1;
     }
 
-    .hub-topbar {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 18px;
-      padding: 14px 16px;
-      border-radius: 22px;
-      background:
-        linear-gradient(180deg, rgba(255, 252, 247, 0.94), rgba(251, 246, 238, 0.88)),
-        url("assets/pattern.webp") center / 440px auto;
-      border: 1px solid var(--hub-border);
-      box-shadow: var(--hub-shell-shadow);
-    }
-
-    .hub-brand-link {
+    .hub-eyebrow {
       display: inline-flex;
-      flex: 0 1 auto;
       align-items: center;
-      justify-content: center;
-      gap: 12px;
-      min-width: 84px;
-      max-width: 100%;
-      min-height: 84px;
-      padding: 14px 22px;
-      border-radius: 999px;
-      text-decoration: none;
-      color: var(--hub-bg-ink);
-      background: linear-gradient(180deg, #fffdf9 0%, #f3eadc 100%);
-      border: 1px solid rgba(71, 48, 31, 0.12);
-      box-shadow: 0 12px 28px rgba(42, 28, 18, 0.12);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      touch-action: pan-y pinch-zoom;
+      gap: 10px;
+      margin: 0;
+      color: var(--hub-accent);
+      font-size: 0.84rem;
+      font-weight: 800;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
     }
 
-    .hub-brand-link:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 16px 36px rgba(42, 28, 18, 0.16);
-    }
-
-    .hub-brand-link img {
-      width: 48px;
-      height: 48px;
+    .hub-eyebrow img {
+      width: 28px;
+      height: 28px;
       object-fit: contain;
       flex: none;
-    }
-
-    .hub-brand-text {
-      display: grid;
-      gap: 2px;
-    }
-
-    .hub-brand-text strong {
-      font-size: 0.92rem;
-      letter-spacing: 0.08em;
-    }
-
-    .hub-brand-text span {
-      color: rgba(33, 24, 19, 0.66);
-      font-size: 0.76rem;
-    }
-
-    .hub-quick-links {
-      display: flex;
-      flex: 1 1 auto;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      gap: 10px;
-      min-width: 0;
-    }
-
-    .hub-quick-links a {
-      display: inline-flex;
-      align-items: center;
-      min-height: 42px;
-      padding: 0 16px;
-      border-radius: 999px;
-      text-decoration: none;
-      color: var(--hub-bg-ink);
-      background: rgba(255, 255, 255, 0.56);
-      border: 1px solid rgba(51, 29, 17, 0.08);
-      touch-action: pan-y pinch-zoom;
+      filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.18));
     }
 
     .hub-hero {
@@ -235,15 +170,6 @@
       gap: 18px;
       min-width: 0;
       max-width: 620px;
-    }
-
-    .hub-eyebrow {
-      margin: 0;
-      color: var(--hub-accent);
-      font-size: 0.84rem;
-      font-weight: 800;
-      letter-spacing: 0.24em;
-      text-transform: uppercase;
     }
 
     .hub-hero h1,
@@ -423,7 +349,6 @@
     }
 
     @media (max-width: 980px) {
-      .hub-topbar,
       .hub-section-header {
         align-items: start;
         flex-direction: column;
@@ -446,10 +371,6 @@
         padding-top: 0;
       }
 
-      .hub-quick-links {
-        width: 100%;
-        display: none;
-      }
     }
 
     @media (max-width: 760px) {
@@ -469,30 +390,14 @@
         border-radius: 24px;
       }
 
-      .hub-topbar {
-        padding: 12px;
-        border-radius: 18px;
+      .hub-eyebrow {
+        gap: 8px;
+        letter-spacing: 0.18em;
       }
 
-      .hub-brand-link {
-        width: 100%;
-        min-height: 64px;
-        justify-content: center;
-        padding: 10px 16px;
-      }
-
-      .hub-brand-link img {
-        width: 42px;
-        height: 42px;
-      }
-
-      .hub-quick-links {
-        width: 100%;
-      }
-
-      .hub-quick-links a {
-        flex: 1 1 140px;
-        justify-content: center;
+      .hub-eyebrow img {
+        width: 24px;
+        height: 24px;
       }
 
       .hub-hero {
@@ -523,22 +428,14 @@
     }
   </style>
 </head>
-<body class="home-page">
+  <body class="home-page">
   <main class="home-hub">
-    <div class="hub-topbar">
-      <a class="hub-brand-link" href="/" aria-label="EHWA Home">
-        <img src="assets/logo-dark.webp" alt="EHWA logo" />
-        <span class="hub-brand-text">
-          <strong>EHWA</strong>
-          <span>Home</span>
-        </span>
-      </a>
-
-    </div>
-
     <section class="hub-hero" aria-label="Main hero section">
       <div class="hub-hero-content">
-        <p class="hub-eyebrow">EHWA</p>
+        <p class="hub-eyebrow">
+          <img src="assets/logo-white.webp" alt="EHWA logo" />
+          <span>EHWA</span>
+        </p>
         <h1>Korean Kitchen & Soju Bar</h1>
         <div class="hub-actions">
           <a class="hub-btn hub-btn-primary" href="https://example.com/reservation">Online Reservation</a>
