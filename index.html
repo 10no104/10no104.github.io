@@ -267,12 +267,15 @@
     .hub-hero-visual::after {
       content: "";
       position: absolute;
-      inset: 14% 14% 8% 18%;
-      background: url("assets/flower.webp") center / contain no-repeat;
-      opacity: 0.72;
+      inset: 0;
+      background:
+        url("assets/flower.webp") left 24% top 18% / 30% auto no-repeat,
+        url("assets/flower.webp") right 16% top 28% / 24% auto no-repeat,
+        url("assets/flower.webp") center 78% / 34% auto no-repeat;
+      opacity: 0.9;
       pointer-events: none;
-      mix-blend-mode: screen;
       z-index: 0;
+      filter: saturate(1.08) drop-shadow(0 4px 10px rgba(156, 33, 70, 0.12));
     }
 
     .hub-hero-image {
@@ -433,10 +436,12 @@
       }
 
       .hub-hero-visual::after {
-        inset: 12% 8% 10% 12%;
-        background-position: center;
-        background-size: contain;
-        opacity: 0.64;
+        inset: 0;
+        background:
+          url("assets/flower.webp") left 18% top 24% / 42% auto no-repeat,
+          url("assets/flower.webp") right 8% top 34% / 34% auto no-repeat,
+          url("assets/flower.webp") center 82% / 44% auto no-repeat;
+        opacity: 0.88;
       }
 
       .hub-hero-image {
