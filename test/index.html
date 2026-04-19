@@ -697,8 +697,10 @@
 
     function isDefaultVeganVisible(item) {
       const allTags = getVeganOptionTags(item);
+      const hasVegetarian = allTags.includes("vegetarian");
       const compareTags = allTags.filter((tag) => tag !== "vegetarian");
       const hasVegetarianFallback = allTags.includes("vegetarian") && hasMenuTag(item, "ask-server");
+      if (!hasVegetarian) return false;
       return !compareTags.length || hasVegetarianFallback;
     }
 
