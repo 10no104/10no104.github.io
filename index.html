@@ -8,23 +8,23 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/global.css" />
-  <link rel="stylesheet" href="css/layout.css" />
-  <link rel="stylesheet" href="css/components.css" />
   <style>
     :root {
       --hub-bg-cream: #f5efe4;
       --hub-bg-ink: #211813;
-      --hub-panel: rgba(255, 252, 247, 0.92);
-      --hub-panel-soft: rgba(251, 246, 238, 0.88);
       --hub-accent: #d4af37;
-      --hub-burgundy: #5a1122;
       --hub-border: rgba(120, 103, 77, 0.14);
-      --hub-shell-shadow: 0 18px 40px rgba(30, 21, 16, 0.12);
       --hub-card-shadow: 0 20px 36px rgba(45, 30, 17, 0.08);
     }
 
     html {
       overflow-x: hidden;
+    }
+
+    html,
+    body {
+      scroll-behavior: auto !important;
+      scroll-snap-type: none !important;
     }
 
     body.home-page {
@@ -36,12 +36,25 @@
         linear-gradient(180deg, rgba(251, 247, 241, 0.96) 0%, rgba(245, 239, 228, 0.98) 100%);
       color: var(--hub-bg-ink);
       overflow-x: hidden;
+      overflow-anchor: none;
+      touch-action: pan-y pinch-zoom;
       font-family: "Noto Sans KR", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    }
+
+    .home-hub,
+    .hub-hero,
+    .hub-section,
+    .location-grid,
+    .location-card {
+      scroll-snap-align: none !important;
+      scroll-snap-stop: normal !important;
+      scroll-margin-top: 0 !important;
+      overflow-anchor: none;
     }
 
     body.home-page::before {
       content: "";
-      position: fixed;
+      position: absolute;
       inset: 0;
       background:
         linear-gradient(180deg, rgba(255, 251, 244, 0.42), rgba(255, 249, 240, 0.18)),
@@ -86,87 +99,26 @@
       z-index: -1;
     }
 
-    .hub-topbar {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 18px;
-      padding: 14px 16px;
-      border-radius: 22px;
-      background:
-        linear-gradient(180deg, rgba(255, 252, 247, 0.94), rgba(251, 246, 238, 0.88)),
-        url("assets/pattern.webp") center / 440px auto;
-      border: 1px solid var(--hub-border);
-      box-shadow: var(--hub-shell-shadow);
-    }
-
-    .hub-brand-link {
+    .hub-eyebrow {
       display: inline-flex;
-      flex: 0 1 auto;
       align-items: center;
-      justify-content: center;
-      gap: 12px;
-      min-width: 84px;
-      max-width: 100%;
-      min-height: 84px;
-      padding: 14px 22px;
-      border-radius: 999px;
-      text-decoration: none;
-      color: var(--hub-bg-ink);
-      background: linear-gradient(180deg, #fffdf9 0%, #f3eadc 100%);
-      border: 1px solid rgba(71, 48, 31, 0.12);
-      box-shadow: 0 12px 28px rgba(42, 28, 18, 0.12);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      gap: 10px;
+      margin: 0;
+      color: var(--hub-accent);
+      font-size: 0.96rem;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
     }
 
-    .hub-brand-link:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 16px 36px rgba(42, 28, 18, 0.16);
-    }
-
-    .hub-brand-link img {
-      width: 48px;
-      height: 48px;
+    .hub-eyebrow img {
+      width: 27px;
+      height: 27px;
       object-fit: contain;
       flex: none;
-    }
-
-    .hub-brand-text {
-      display: grid;
-      gap: 2px;
-    }
-
-    .hub-brand-text strong {
-      font-size: 0.92rem;
-      letter-spacing: 0.08em;
-    }
-
-    .hub-brand-text span {
-      color: rgba(33, 24, 19, 0.66);
-      font-size: 0.76rem;
-    }
-
-    .hub-quick-links {
-      display: flex;
-      flex: 1 1 auto;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      gap: 10px;
-      min-width: 0;
-    }
-
-    .hub-quick-links a {
-      display: inline-flex;
-      align-items: center;
-      min-height: 42px;
-      padding: 0 16px;
-      border-radius: 999px;
-      text-decoration: none;
-      color: var(--hub-bg-ink);
-      background: rgba(255, 255, 255, 0.56);
-      border: 1px solid rgba(51, 29, 17, 0.08);
+      filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.18));
+      transform: translateY(-1px);
     }
 
     .hub-hero {
@@ -217,15 +169,6 @@
       max-width: 620px;
     }
 
-    .hub-eyebrow {
-      margin: 0;
-      color: var(--hub-accent);
-      font-size: 0.84rem;
-      font-weight: 800;
-      letter-spacing: 0.24em;
-      text-transform: uppercase;
-    }
-
     .hub-hero h1,
     .hub-section h2 {
       margin: 0;
@@ -256,6 +199,7 @@
       font-weight: 700;
       text-align: center;
       transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+      touch-action: pan-y pinch-zoom;
     }
 
     .hub-btn:hover {
@@ -274,6 +218,18 @@
       background: linear-gradient(135deg, rgba(90, 17, 34, 0.92), rgba(212, 175, 55, 0.72));
       border: 1px solid rgba(255, 255, 255, 0.22);
       box-shadow: 0 16px 30px rgba(90, 17, 34, 0.22);
+    }
+
+    .hub-btn-instagram {
+      color: #fff;
+      background:
+        linear-gradient(135deg, #515bd4 0%, #8134af 24%, #dd2a7b 52%, #f58529 78%, #feda77 100%);
+      border: 1px solid rgba(255, 255, 255, 0.26);
+      box-shadow: 0 16px 30px rgba(221, 42, 123, 0.28);
+    }
+
+    .hub-btn-instagram:hover {
+      box-shadow: 0 18px 34px rgba(221, 42, 123, 0.34);
     }
 
     .hub-btn-icon {
@@ -315,6 +271,20 @@
       opacity: 0.9;
     }
 
+    .hub-hero-visual::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        url("assets/flower.webp") left 18% top 8% / 40% auto no-repeat,
+        url("assets/flower.webp") right 10% top 18% / 32% auto no-repeat,
+        url("assets/flower.webp") center 62% / 44% auto no-repeat;
+      opacity: 0.9;
+      pointer-events: none;
+      z-index: 0;
+      filter: saturate(1.08) drop-shadow(0 4px 10px rgba(156, 33, 70, 0.12));
+    }
+
     .hub-hero-image {
       position: relative;
       z-index: 1;
@@ -341,13 +311,6 @@
       font-size: clamp(1.65rem, 3vw, 2.35rem);
     }
 
-    .hub-photo-grid {
-      display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      gap: 18px;
-    }
-
-    .hub-photo-card,
     .location-card {
       overflow: hidden;
       border-radius: 24px;
@@ -356,27 +319,6 @@
         url("assets/pattern.webp") center / 460px auto;
       border: 1px solid var(--hub-border);
       box-shadow: var(--hub-card-shadow);
-    }
-
-    .hub-photo-card {
-      position: relative;
-    }
-
-    .hub-photo-card::after {
-      content: "";
-      position: absolute;
-      inset: auto 0 0;
-      height: 96px;
-      background: linear-gradient(180deg, transparent, rgba(17, 12, 10, 0.3));
-      pointer-events: none;
-    }
-
-    .hub-photo-card img {
-      width: 100%;
-      height: 100%;
-      min-height: 280px;
-      display: block;
-      object-fit: cover;
     }
 
     .location-grid {
@@ -389,6 +331,31 @@
       padding: 24px;
       display: grid;
       gap: 14px;
+    }
+
+    .location-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .location-actions.order-links {
+      margin-top: -2px;
+    }
+
+    .location-actions .hub-btn {
+      min-height: 42px;
+      padding-inline: 14px;
+      font-size: 0.95rem;
+    }
+
+    .location-actions .hub-btn-secondary {
+      box-shadow: 0 12px 22px rgba(90, 17, 34, 0.14);
+    }
+
+    .location-card a,
+    .location-list a {
+      touch-action: pan-y pinch-zoom;
     }
 
     .location-card h3 {
@@ -425,14 +392,12 @@
     }
 
     @media (max-width: 980px) {
-      .hub-topbar,
       .hub-section-header {
         align-items: start;
         flex-direction: column;
       }
 
-      .hub-hero,
-      .hub-photo-grid {
+      .hub-hero {
         grid-template-columns: 1fr;
       }
 
@@ -449,10 +414,6 @@
         padding-top: 0;
       }
 
-      .hub-quick-links {
-        width: 100%;
-        justify-content: flex-start;
-      }
     }
 
     @media (max-width: 760px) {
@@ -472,30 +433,15 @@
         border-radius: 24px;
       }
 
-      .hub-topbar {
-        padding: 12px;
-        border-radius: 18px;
+      .hub-eyebrow {
+        gap: 8px;
+        font-size: 0.88rem;
+        letter-spacing: 0.14em;
       }
 
-      .hub-brand-link {
-        width: 100%;
-        min-height: 64px;
-        justify-content: center;
-        padding: 10px 16px;
-      }
-
-      .hub-brand-link img {
-        width: 42px;
-        height: 42px;
-      }
-
-      .hub-quick-links {
-        width: 100%;
-      }
-
-      .hub-quick-links a {
-        flex: 1 1 140px;
-        justify-content: center;
+      .hub-eyebrow img {
+        width: 23px;
+        height: 23px;
       }
 
       .hub-hero {
@@ -503,7 +449,7 @@
       }
 
       .hub-hero-content {
-        padding: 30px 24px 18px;
+        padding: 30px 24px 12px;
       }
 
       .hub-actions a {
@@ -511,13 +457,22 @@
       }
 
       .hub-hero-visual {
-        min-height: 340px;
-        padding: 0 18px;
+        min-height: 280px;
+        padding: 0 18px 18px;
         background-size: auto, 150% auto;
       }
 
+      .hub-hero-visual::after {
+        inset: 0;
+        background:
+          url("assets/flower.webp") left 10% top 14% / 54% auto no-repeat,
+          url("assets/flower.webp") right 2% top 24% / 44% auto no-repeat,
+          url("assets/flower.webp") center 68% / 58% auto no-repeat;
+        opacity: 0.88;
+      }
+
       .hub-hero-image {
-        width: min(100%, 300px);
+        width: min(100%, 240px);
       }
 
       .location-grid {
@@ -526,30 +481,19 @@
     }
   </style>
 </head>
-<body class="home-page">
+  <body class="home-page">
   <main class="home-hub">
-    <div class="hub-topbar">
-      <a class="hub-brand-link" href="/" aria-label="EHWA Home">
-        <img src="assets/logo-dark.webp" alt="EHWA logo" />
-        <span class="hub-brand-text">
-          <strong>EHWA</strong>
-          <span>Home</span>
-        </span>
-      </a>
-
-      <div class="hub-quick-links">
-        <a href="#photos">Photos</a>
-        <a href="#locations">Locations</a>
-      </div>
-    </div>
-
     <section class="hub-hero" aria-label="Main hero section">
       <div class="hub-hero-content">
-        <p class="hub-eyebrow">EHWA</p>
-        <h1>Dining & Lounge</h1>
+        <p class="hub-eyebrow">
+          <img src="assets/logo-white.webp" alt="EHWA logo" />
+          <span>EHWA</span>
+        </p>
+        <h1>Korean Kitchen & Soju Bar</h1>
         <div class="hub-actions">
           <a class="hub-btn hub-btn-primary" href="https://example.com/reservation">Online Reservation</a>
-          <a class="hub-btn hub-btn-secondary" href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+          <a class="hub-btn hub-btn-secondary" href="#locations">Online Order</a>
+          <a class="hub-btn hub-btn-instagram" href="https://www.instagram.com/ehwa_restaurant" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
             <span class="hub-btn-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="3.25" y="3.25" width="17.5" height="17.5" rx="5.25" stroke="currentColor" stroke-width="2"/>
@@ -567,22 +511,6 @@
       </div>
     </section>
 
-    <section class="hub-section" id="photos" aria-labelledby="photos-heading">
-      <div class="hub-section-header">
-        <h2 id="photos-heading">Photos</h2>
-      </div>
-
-      <div class="hub-photo-grid">
-        <article class="hub-photo-card">
-          <img src="assets/seats-scaled.webp" alt="EHWA interior photo" />
-        </article>
-
-        <article class="hub-photo-card">
-          <img src="assets/glasses-scaled.webp" alt="EHWA bar photo" />
-        </article>
-      </div>
-    </section>
-
     <section class="hub-section" id="locations" aria-labelledby="locations-heading">
       <div class="hub-section-header">
         <h2 id="locations-heading">Locations</h2>
@@ -592,20 +520,30 @@
         <article class="location-card" aria-label="Uptown location">
           <h3>Uptown</h3>
           <a class="hub-btn hub-btn-primary" href="menu/uptown/index.html">View Uptown Menu</a>
+          <div class="location-actions order-links">
+            <a class="hub-btn hub-btn-secondary" href="https://www.doordash.com/store/ehwa-north-york-40211481/93983346/" target="_blank" rel="noopener noreferrer">DoorDash</a>
+            <a class="hub-btn hub-btn-secondary" href="https://www.ubereats.com/ca/store/ehwa-uptown/44ZHz__IVJaTPeUckFF6Yg" target="_blank" rel="noopener noreferrer">Uber Eats</a>
+          </div>
           <ul class="location-list">
-            <li><strong>Hours:</strong> Mon-Sun 11:30 AM - 10:30 PM</li>
-            <li><strong>Address:</strong> 1234 Uptown Ave, City, ST 00000</li>
-            <li><strong>Phone:</strong> <a href="tel:+10000000001">+1 (000) 000-0001</a></li>
+            <li><strong>Hours:</strong> Mon-Sun 5:30 PM - 3:00 AM</li>
+            <li><strong>Kitchen:</strong> Last call at 1:30 AM</li>
+            <li><strong>Address:</strong> <a href="https://www.google.com/maps/search/?api=1&query=Ehwa+Restaurant+4866+Yonge+St+North+York+ON+M2N+5N2" target="_blank" rel="noopener noreferrer">4866 Yonge St, North York, ON M2N 5N2</a></li>
+            <li><strong>Phone:</strong> <a href="tel:+14376659995">(437) 665-9995</a></li>
           </ul>
         </article>
 
         <article class="location-card" aria-label="Downtown location">
           <h3>Downtown</h3>
           <a class="hub-btn hub-btn-primary" href="menu/downtown/index.html">View Downtown Menu</a>
+          <div class="location-actions order-links">
+            <a class="hub-btn hub-btn-secondary" href="https://www.doordash.com/store/ehwa-toronto-40211483/93877348/" target="_blank" rel="noopener noreferrer">DoorDash</a>
+            <a class="hub-btn hub-btn-secondary" href="https://www.ubereats.com/ca/store/ehwa-downtown/2_rjxtHlQXWsv1OBu5rufQ" target="_blank" rel="noopener noreferrer">Uber Eats</a>
+          </div>
           <ul class="location-list">
-            <li><strong>Hours:</strong> Mon-Sun 11:30 AM - 10:30 PM</li>
-            <li><strong>Address:</strong> 55 Downtown Street, City, ST 00000</li>
-            <li><strong>Phone:</strong> <a href="tel:+10000000002">+1 (000) 000-0002</a></li>
+            <li><strong>Hours:</strong> Mon-Sun 5:30 PM - 3:00 AM</li>
+            <li><strong>Kitchen:</strong> Last call at 1:30 AM</li>
+            <li><strong>Address:</strong> <a href="https://www.google.com/maps/search/?api=1&query=Ehwa+Restaurant+16+Isabella+St+Toronto+ON+M4Y+2A1" target="_blank" rel="noopener noreferrer">16 Isabella St, Toronto, ON M4Y 2A1</a></li>
+            <li><strong>Phone:</strong> <a href="tel:+14372672266">(437) 267-2266</a></li>
           </ul>
         </article>
       </div>
