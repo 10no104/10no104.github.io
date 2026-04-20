@@ -271,6 +271,9 @@
 
       .menu-sticky-inner {
         width: min(calc(100% - 20px), 420px);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
         gap: 12px;
         padding: 12px 12px 10px;
         border-radius: 18px;
@@ -278,6 +281,7 @@
 
       .menu-homebar {
         justify-content: center;
+        width: 100%;
       }
 
       .menu-home-link {
@@ -299,9 +303,6 @@
       }
 
       .menu-page.is-scrolled .menu-sticky-inner {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
         gap: 6px 8px;
       }
 
@@ -317,6 +318,11 @@
         height: 42px;
         border-radius: 14px;
         margin: 0 0 0 2px;
+      }
+
+      .menu-sticky-shell .tabs {
+        width: 100%;
+        transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease, gap 0.32s ease;
       }
 
       .menu-page.is-scrolled .menu-sticky-shell .tabs {
@@ -335,16 +341,16 @@
         width: 100%;
       }
 
-      .menu-page.is-scrolled .menu-sticky-shell .tabs,
-      .menu-page.is-scrolled .menu-sticky-shell .subtabs {
+      .menu-sticky-shell .tabs,
+      .menu-sticky-shell .subtabs {
         flex-wrap: nowrap;
         overflow-x: auto;
         padding-bottom: 2px;
         scrollbar-width: none;
       }
 
-      .menu-page.is-scrolled .menu-sticky-shell .tabs::-webkit-scrollbar,
-      .menu-page.is-scrolled .menu-sticky-shell .subtabs::-webkit-scrollbar {
+      .menu-sticky-shell .tabs::-webkit-scrollbar,
+      .menu-sticky-shell .subtabs::-webkit-scrollbar {
         display: none;
       }
 
