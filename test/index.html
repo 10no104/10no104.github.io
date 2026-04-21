@@ -738,14 +738,33 @@
     .server-modal {
       width: min(100%, 460px);
       display: grid;
-      gap: 16px;
-      padding: 24px 22px;
-      border-radius: 24px;
+      gap: 18px;
+      padding: 26px 24px;
+      border-radius: 28px;
       background:
         linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(249, 243, 233, 0.98)),
         url("../assets/pattern.webp") center / 420px auto;
       border: 1px solid rgba(125, 98, 63, 0.16);
       box-shadow: 0 24px 46px rgba(23, 15, 11, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .server-modal::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 6px;
+      background: linear-gradient(90deg, #5a1122 0%, #a32147 45%, #d4af37 100%);
+      opacity: 0.96;
+    }
+
+    .server-modal-eyebrow {
+      color: #8a6b1f;
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
     }
 
     .server-modal h3,
@@ -759,7 +778,7 @@
     }
 
     .server-modal-copy h3 {
-      font-size: 1.45rem;
+      font-size: 1.6rem;
       line-height: 1.05;
       letter-spacing: -0.04em;
       color: #211813;
@@ -773,15 +792,17 @@
     .server-modal-summary {
       display: grid;
       gap: 10px;
-      padding: 14px 16px;
-      border-radius: 18px;
-      background: rgba(255, 251, 245, 0.9);
-      border: 1px solid rgba(125, 98, 63, 0.14);
+      padding: 16px 18px;
+      border-radius: 20px;
+      background:
+        linear-gradient(180deg, rgba(255, 251, 245, 0.96), rgba(250, 243, 232, 0.94));
+      border: 1px solid rgba(125, 98, 63, 0.16);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
     }
 
     .server-modal-summary strong {
       color: #211813;
-      font-size: 1rem;
+      font-size: 1.02rem;
     }
 
     .server-modal-summary span {
@@ -800,22 +821,29 @@
       appearance: none;
       border: 0;
       cursor: pointer;
-      min-height: 46px;
-      padding: 0 16px;
+      min-height: 48px;
+      padding: 0 18px;
       border-radius: 999px;
       font: inherit;
       font-weight: 800;
+      transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .server-modal-btn:hover {
+      transform: translateY(-1px);
+      opacity: 0.98;
     }
 
     .server-modal-btn-secondary {
       background: rgba(33, 24, 19, 0.08);
-      color: #211813;
+      color: #4b372b;
+      border: 1px solid rgba(125, 98, 63, 0.12);
     }
 
     .server-modal-btn-primary {
-      background: linear-gradient(135deg, #1f2a44 0%, #2f73bb 100%);
-      color: #fff;
-      box-shadow: 0 14px 28px rgba(31, 42, 68, 0.22);
+      background: linear-gradient(135deg, #5a1122 0%, #a32147 45%, #d4af37 100%);
+      color: #fffaf3;
+      box-shadow: 0 14px 28px rgba(90, 17, 34, 0.22);
     }
 
     .menu-page .tabs .tab-drink {
@@ -1094,16 +1122,17 @@
   <div class="server-modal-backdrop" id="serverModalBackdrop" hidden>
     <div class="server-modal" role="dialog" aria-modal="true" aria-labelledby="serverModalHeading">
       <div class="server-modal-copy">
-        <h3 id="serverModalHeading">Send test server call?</h3>
-        <p id="serverModalMessage">Review the current draft before sending the test flow.</p>
+        <p class="server-modal-eyebrow">Server Check</p>
+        <h3 id="serverModalHeading">Ready to send this draft?</h3>
+        <p id="serverModalMessage">Take one last look before we hand this order draft to the server flow.</p>
       </div>
       <div class="server-modal-summary">
         <strong id="serverModalSummaryTitle">No items in order</strong>
         <span id="serverModalSummaryMeta">Add menu items first if you want a realistic payload preview.</span>
       </div>
       <div class="server-modal-actions">
-        <button class="server-modal-btn server-modal-btn-secondary" id="serverModalCancelBtn" type="button">Cancel</button>
-        <button class="server-modal-btn server-modal-btn-primary" id="serverModalConfirmBtn" type="button">Send test call</button>
+        <button class="server-modal-btn server-modal-btn-secondary" id="serverModalCancelBtn" type="button">Not yet</button>
+        <button class="server-modal-btn server-modal-btn-primary" id="serverModalConfirmBtn" type="button">Send draft</button>
       </div>
     </div>
   </div>
@@ -2026,13 +2055,13 @@
 
       serverCallBtn.addEventListener("click", () => {
         if (cartItems.length) {
-          modalMessage.textContent = "This will use the current table session and order payload for the test server flow.";
+          modalMessage.textContent = "This will use the current table session and hand the draft over to the server test flow.";
           modalSummaryTitle.textContent = `${getCartItemCount()} item${getCartItemCount() === 1 ? "" : "s"} ready`;
-          modalSummaryMeta.textContent = `${formatCurrency(getCartSubtotal())} subtotal in the current draft.`;
+          modalSummaryMeta.textContent = `${formatCurrency(getCartSubtotal())} in the current order draft.`;
         } else {
-          modalMessage.textContent = "There is no menu item in the order yet. You can still continue to test the empty server flow if you want.";
-          modalSummaryTitle.textContent = "No items in order";
-          modalSummaryMeta.textContent = "The payload will still include store, table code, guests, and note values from the current form.";
+          modalMessage.textContent = "There is no menu item in the order yet, but you can still test how an empty draft would reach the server.";
+          modalSummaryTitle.textContent = "No items in this draft";
+          modalSummaryMeta.textContent = "We will still include the current store, table code, guest count, and request note.";
         }
 
         openServerModal();
