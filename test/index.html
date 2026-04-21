@@ -249,7 +249,7 @@
     }
 
     .order-layout {
-      width: min(1200px, 94vw);
+      width: min(1320px, calc(100% - 40px));
       margin: 8px auto 56px;
       display: grid;
       gap: 22px;
@@ -262,8 +262,14 @@
     }
 
     .menu-stage .wrap {
-      margin-top: 0;
-      padding-top: 0;
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 0 0 28px;
+    }
+
+    .menu-stage .wrap::before {
+      inset: -10px 0 -18px;
     }
 
     .order-inline-bar {
@@ -672,6 +678,18 @@
       align-items: center;
       gap: 12px;
       margin-bottom: 18px;
+    }
+
+    @media (max-width: 1240px) {
+      .order-layout {
+        width: min(calc(100% - 28px), 1040px);
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .order-shell {
+        position: static;
+      }
     }
 
     .menu-page .to-top {
