@@ -414,11 +414,18 @@
 
     .order-item {
       display: grid;
-      gap: 10px;
+      grid-template-columns: minmax(0, 1fr) 64px;
+      gap: 12px;
       padding: 16px;
       border-radius: 20px;
       background: rgba(255, 251, 245, 0.86);
       border: 1px solid rgba(125, 98, 63, 0.14);
+    }
+
+    .order-item-main {
+      display: grid;
+      gap: 10px;
+      min-width: 0;
     }
 
     .order-item-top,
@@ -442,6 +449,18 @@
     .order-item-name span {
       font-size: 0.92rem;
       color: rgba(33, 24, 19, 0.64);
+    }
+
+    .order-item-thumb {
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
+      object-fit: cover;
+      align-self: center;
+      justify-self: end;
+      border: 1px solid rgba(125, 98, 63, 0.14);
+      background: rgba(248, 240, 228, 0.9);
+      box-shadow: 0 10px 18px rgba(45, 30, 17, 0.08);
     }
 
     .order-qty {
@@ -941,6 +960,17 @@
       .order-item-bottom {
         align-items: flex-start;
         flex-direction: column;
+      }
+
+      .order-item {
+        grid-template-columns: minmax(0, 1fr) 58px;
+      }
+
+      .order-item-thumb {
+        width: 58px;
+        height: 58px;
+        border-radius: 16px;
+        align-self: start;
       }
 
       .menu-page .menu-card-actions {
@@ -1731,21 +1761,24 @@
       const itemsMarkup = cartItems
         .map((item) => `
           <article class="order-item">
-            <div class="order-item-top">
-              <div class="order-item-name">
-                <strong>${escapeHtml(item.nameKo || item.nameEn)}</strong>
-                <span>${escapeHtml(item.nameEn || item.category)}</span>
+            <div class="order-item-main">
+              <div class="order-item-top">
+                <div class="order-item-name">
+                  <strong>${escapeHtml(item.nameKo || item.nameEn)}</strong>
+                  <span>${escapeHtml(item.nameEn || item.category)}</span>
+                </div>
+                <strong class="order-item-price">${escapeHtml(formatCurrency(item.unitPrice * item.quantity))}</strong>
               </div>
-              <strong class="order-item-price">${escapeHtml(formatCurrency(item.unitPrice * item.quantity))}</strong>
-            </div>
-            <div class="order-item-bottom">
-              <div class="order-qty" role="group" aria-label="Quantity controls for ${escapeHtml(item.nameEn || item.nameKo)}">
-                <button type="button" data-qty-action="decrease" data-menu-id="${escapeHtml(item.menuId)}">-</button>
-                <span>${item.quantity}</span>
-                <button type="button" data-qty-action="increase" data-menu-id="${escapeHtml(item.menuId)}">+</button>
+              <div class="order-item-bottom">
+                <div class="order-qty" role="group" aria-label="Quantity controls for ${escapeHtml(item.nameEn || item.nameKo)}">
+                  <button type="button" data-qty-action="decrease" data-menu-id="${escapeHtml(item.menuId)}">-</button>
+                  <span>${item.quantity}</span>
+                  <button type="button" data-qty-action="increase" data-menu-id="${escapeHtml(item.menuId)}">+</button>
+                </div>
+                <button class="order-remove-btn" type="button" data-remove-id="${escapeHtml(item.menuId)}">Remove</button>
               </div>
-              <button class="order-remove-btn" type="button" data-remove-id="${escapeHtml(item.menuId)}">Remove</button>
             </div>
+            <img class="order-item-thumb" src="${escapeHtml(item.imageUrl || "")}" alt="${escapeHtml(item.nameEn || item.nameKo)}" />
           </article>
         `)
         .join("");
