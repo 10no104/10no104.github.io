@@ -1773,7 +1773,6 @@
         mobileOrderSummaryEl.innerHTML = mobileSummaryMarkup(0);
         previewEl.textContent = "No order yet.";
         inlineTitleEl.textContent = "Your order is empty";
-        inlineMetaEl.textContent = "Add items to start.";
         if (isCartDrawerOpen) closeCartDrawer();
         return;
       }
@@ -1810,7 +1809,6 @@
       bindOrderListInteractions(mobileOrderListEl);
 
       inlineTitleEl.textContent = `${itemCount} item${itemCount === 1 ? "" : "s"} selected`;
-      inlineMetaEl.textContent = "Review order";
 
       const form = document.getElementById("orderForm");
       if (form) {
