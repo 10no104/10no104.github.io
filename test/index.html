@@ -660,6 +660,32 @@
       box-shadow: 0 18px 32px rgba(90, 17, 34, 0.22);
     }
 
+    .server-call-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 72px;
+      z-index: 39;
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #1f2a44 0%, #2f73bb 100%);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      padding: 12px 14px;
+      box-shadow: 0 14px 28px rgba(31, 42, 68, 0.24);
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .server-call-btn.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
     .menu-page .tabs .tab-drink {
       position: relative;
       padding-inline: 42px;
@@ -923,6 +949,7 @@
     </div>
   </div>
   <button class="to-top" id="toTopBtn" type="button" aria-label="Back to top">↑ Top</button>
+  <button class="server-call-btn" id="serverCallBtn" type="button" aria-label="Test server call">Server</button>
 
   <script>
     /**
@@ -1780,14 +1807,37 @@
 
     function setupToTopButton() {
       const toTopBtn = document.getElementById("toTopBtn");
-      if (!toTopBtn) return;
+      const serverCallBtn = document.getElementById("serverCallBtn");
+      if (!toTopBtn || !serverCallBtn) return;
 
       window.addEventListener("scroll", () => {
-        toTopBtn.classList.toggle("show", window.scrollY > 380);
+        const shouldShow = window.scrollY > 380;
+        toTopBtn.classList.toggle("show", shouldShow);
+        serverCallBtn.classList.toggle("show", shouldShow);
       }, { passive: true });
 
       toTopBtn.addEventListener("click", () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
+      serverCallBtn.addEventListener("click", () => {
+        const form = document.getElementById("orderForm");
+        const statusEl = document.getElementById("orderStatus");
+        const previewEl = document.getElementById("orderPayloadPreview");
+        if (!form || !statusEl || !previewEl) return;
+
+        if (!cartItems.length) {
+          statusEl.textContent = "Add at least one menu item before testing a server call.";
+          statusEl.className = "order-status is-error";
+          return;
+        }
+
+        const formData = new FormData(form);
+        const formValues = Object.fromEntries(formData.entries());
+        const payload = buildOrderPayload(formValues);
+        previewEl.textContent = JSON.stringify(payload, null, 2);
+        statusEl.textContent = "Server call test ready. This button is where the real API request will go.";
+        statusEl.className = "order-status is-success";
       });
     }
 
