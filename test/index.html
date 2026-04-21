@@ -213,10 +213,18 @@
 
     .menu-page .menu-card-actions {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-start;
       align-items: center;
       gap: 12px;
       margin-top: 4px;
+    }
+
+    .menu-page .menu-side {
+      display: grid;
+      justify-items: end;
+      align-content: center;
+      gap: 16px;
+      min-width: 164px;
     }
 
     .menu-page .menu-add-btn,
@@ -232,8 +240,9 @@
       align-items: center;
       justify-content: center;
       min-height: 42px;
-      padding: 0 16px;
-      border-radius: 999px;
+      min-width: 148px;
+      padding: 0 18px;
+      border-radius: 16px;
       background: linear-gradient(135deg, #5a1122 0%, #d4af37 100%);
       color: #fffaf3;
       font-weight: 800;
@@ -742,6 +751,16 @@
       .menu-page .menu-card-actions {
         align-items: flex-start;
         flex-direction: column;
+      }
+
+      .menu-page .menu-side {
+        justify-items: start;
+        min-width: 0;
+      }
+
+      .menu-page .menu-add-btn {
+        width: 100%;
+        min-width: 0;
       }
 
       .cart-drawer .order-item-price,
@@ -1787,11 +1806,13 @@
                 <p class="menu-title menu-title-alt name-en">${escapeHtml(item.nameEn)}</p>
                 <p class="menu-desc desc">${escapeHtml(item.description)}</p>
                 ${tagsSection}
+              </div>
+              <div class="menu-side">
+                <div class="menu-price price">${escapeHtml(formatPrice(item.price))}</div>
                 <div class="menu-card-actions">
                   <button class="menu-add-btn" data-menu-id="${escapeHtml(getMenuId(item))}" type="button">Add to order</button>
                 </div>
               </div>
-              <div class="menu-price price">${escapeHtml(formatPrice(item.price))}</div>
             </article>
           `;
         })
