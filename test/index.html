@@ -430,9 +430,17 @@
     .order-item-top,
     .order-item-bottom {
       display: flex;
-      justify-content: space-between;
       align-items: center;
       gap: 14px;
+    }
+
+    .order-item-top {
+      justify-content: space-between;
+    }
+
+    .order-item-bottom {
+      justify-content: flex-start;
+      gap: 10px;
     }
 
     .order-item-name {
@@ -499,6 +507,7 @@
       font-weight: 700;
       cursor: pointer;
       padding: 0;
+      white-space: nowrap;
     }
 
     .order-summary {
