@@ -79,19 +79,7 @@
       padding: 18px 0 8px;
       background: linear-gradient(to bottom, rgba(249, 245, 238, 0.82), rgba(249, 245, 238, 0.4));
       backdrop-filter: none;
-      transition: padding 0.24s ease, background 0.24s ease, backdrop-filter 0.24s ease, box-shadow 0.24s ease, opacity 0.24s ease, transform 0.24s ease;
-    }
-
-    @keyframes menuStickyReveal {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      transition: padding 0.24s ease, background 0.24s ease, backdrop-filter 0.24s ease, box-shadow 0.24s ease;
     }
 
     .menu-sticky-spacer {
@@ -144,7 +132,6 @@
       background: linear-gradient(to bottom, rgba(244, 240, 233, 0.88), rgba(244, 240, 233, 0.54));
       backdrop-filter: blur(10px);
       box-shadow: 0 8px 24px rgba(28, 35, 48, 0.08);
-      animation: menuStickyReveal 0.24s ease-out;
     }
 
     .menu-page.is-scrolled .menu-sticky-spacer {
