@@ -273,11 +273,11 @@
     }
 
     .order-layout {
-      width: min(1320px, calc(100% - 40px));
+      width: min(1040px, calc(100% - 40px));
       margin: 8px auto 56px;
       display: grid;
       gap: 22px;
-      grid-template-columns: minmax(0, 1fr) minmax(320px, 360px);
+      grid-template-columns: minmax(0, 1fr);
       align-items: start;
     }
 
@@ -352,11 +352,7 @@
     }
 
     .order-shell {
-      position: sticky;
-      top: calc(var(--menu-sticky-height, 0px) + 24px);
-      display: grid;
-      gap: 18px;
-      align-items: start;
+      display: none;
     }
 
     .order-card {
@@ -623,21 +619,23 @@
       inset: 0;
       z-index: 130;
       display: none;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 18px 0 0;
       background: rgba(15, 10, 8, 0.48);
       backdrop-filter: blur(4px);
     }
 
     .cart-drawer-backdrop.is-open {
-      display: block;
+      display: flex;
     }
 
     .cart-drawer {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      position: relative;
+      width: min(100%, 560px);
       max-height: min(82vh, 760px);
       overflow-y: auto;
+      margin-top: auto;
       border-radius: 28px 28px 0 0;
       padding: 18px 16px 30px;
       background:
@@ -684,6 +682,19 @@
       margin-bottom: 18px;
     }
 
+    .cart-drawer-body {
+      display: grid;
+      gap: 16px;
+    }
+
+    .cart-drawer-body .order-card {
+      padding: 24px 22px;
+    }
+
+    .cart-drawer-body .order-card-header {
+      margin-bottom: 16px;
+    }
+
     @media (max-width: 1240px) {
       .order-layout {
         width: min(calc(100% - 28px), 1040px);
@@ -691,8 +702,26 @@
         gap: 16px;
       }
 
-      .order-shell {
-        position: static;
+    }
+
+    @media (min-width: 641px) {
+      .cart-drawer-backdrop {
+        align-items: center;
+        padding: 24px;
+      }
+
+      .cart-drawer {
+        width: min(720px, calc(100vw - 48px));
+        max-height: min(84vh, 900px);
+        margin-top: 0;
+        border-radius: 30px;
+        padding: 24px 24px 28px;
+        box-shadow: 0 24px 48px rgba(19, 12, 9, 0.24);
+        transform: translateY(24px) scale(0.985);
+      }
+
+      .cart-drawer-grab {
+        display: none;
       }
     }
 
@@ -944,6 +973,10 @@
         padding: 20px 16px;
       }
 
+      .cart-drawer-body .order-card {
+        padding: 20px 16px;
+      }
+
       .order-form-grid {
         grid-template-columns: 1fr;
       }
@@ -1100,48 +1133,6 @@
         <section class="menu-list menu-grid" id="menuList"></section>
       </main>
     </div>
-    <aside class="order-shell">
-      <section class="order-card" aria-labelledby="orderSummaryHeading">
-        <div class="order-card-header">
-          <p class="order-eyebrow">Your Order</p>
-          <h2 id="orderSummaryHeading">Order</h2>
-        </div>
-        <div class="order-list" id="orderList"></div>
-        <div class="order-summary" id="orderSummary"></div>
-      </section>
-      <section class="order-card" aria-labelledby="orderFormHeading">
-        <div class="order-card-header">
-          <p class="order-eyebrow">Table Session</p>
-          <h3 id="orderFormHeading">Table</h3>
-        </div>
-        <form class="order-form" id="orderForm">
-          <div class="order-form-grid">
-            <div class="order-field">
-              <label for="storeSelect">Store</label>
-              <select id="storeSelect" name="store" required>
-                <option value="downtown">Downtown</option>
-                <option value="uptown">Uptown</option>
-              </select>
-            </div>
-            <div class="order-field">
-              <label for="tableCode">Table / QR code</label>
-              <input id="tableCode" name="tableCode" type="text" placeholder="A12" required />
-            </div>
-            <div class="order-field">
-              <label for="guestCount">Guests</label>
-              <input id="guestCount" name="guestCount" type="number" min="1" max="20" value="2" required />
-            </div>
-            <div class="order-field order-field-full">
-              <label for="orderNote">Request note</label>
-              <textarea id="orderNote" name="orderNote" placeholder="Note"></textarea>
-            </div>
-          </div>
-          <button class="order-submit-btn" type="submit">Send order</button>
-          <p class="order-status" id="orderStatus" aria-live="polite"></p>
-          <pre class="order-payload" id="orderPayloadPreview">No order yet.</pre>
-        </form>
-      </section>
-    </aside>
   </div>
   <div class="cart-drawer-backdrop" id="cartDrawerBackdrop" hidden>
     <div class="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cartDrawerHeading">
@@ -1153,11 +1144,44 @@
         </div>
         <button class="cart-drawer-close" id="cartDrawerCloseBtn" type="button" aria-label="Close order drawer">×</button>
       </div>
-      <section class="order-card" aria-label="Mobile order summary">
-        <div class="order-list" id="orderListMobile"></div>
-        <div class="order-summary" id="orderSummaryMobile"></div>
-        <button class="drawer-submit-btn" id="drawerSubmitBtn" type="button">Send order</button>
-      </section>
+      <div class="cart-drawer-body">
+        <section class="order-card" aria-label="Order summary">
+          <div class="order-list" id="orderListMobile"></div>
+          <div class="order-summary" id="orderSummaryMobile"></div>
+        </section>
+        <section class="order-card" aria-labelledby="orderFormHeading">
+          <div class="order-card-header">
+            <p class="order-eyebrow">Table Session</p>
+            <h3 id="orderFormHeading">Table</h3>
+          </div>
+          <form class="order-form" id="orderForm">
+            <div class="order-form-grid">
+              <div class="order-field">
+                <label for="storeSelect">Store</label>
+                <select id="storeSelect" name="store" required>
+                  <option value="downtown">Downtown</option>
+                  <option value="uptown">Uptown</option>
+                </select>
+              </div>
+              <div class="order-field">
+                <label for="tableCode">Table / QR code</label>
+                <input id="tableCode" name="tableCode" type="text" placeholder="A12" required />
+              </div>
+              <div class="order-field">
+                <label for="guestCount">Guests</label>
+                <input id="guestCount" name="guestCount" type="number" min="1" max="20" value="2" required />
+              </div>
+              <div class="order-field order-field-full">
+                <label for="orderNote">Request note</label>
+                <textarea id="orderNote" name="orderNote" placeholder="Note"></textarea>
+              </div>
+            </div>
+            <button class="drawer-submit-btn" id="drawerSubmitBtn" type="button">Send order</button>
+            <p class="order-status" id="orderStatus" aria-live="polite"></p>
+            <pre class="order-payload" id="orderPayloadPreview">No order yet.</pre>
+          </form>
+        </section>
+      </div>
     </div>
   </div>
   <button class="to-top" id="toTopBtn" type="button" aria-label="Back to top">↑ Top</button>
@@ -1743,15 +1767,13 @@
     }
 
     function renderOrderSummary() {
-      const orderListEl = document.getElementById("orderList");
-      const orderSummaryEl = document.getElementById("orderSummary");
       const mobileOrderListEl = document.getElementById("orderListMobile");
       const mobileOrderSummaryEl = document.getElementById("orderSummaryMobile");
       const previewEl = document.getElementById("orderPayloadPreview");
       const inlineTitleEl = document.getElementById("orderInlineTitle");
       const inlineMetaEl = document.getElementById("orderInlineMeta");
 
-      if (!orderListEl || !orderSummaryEl || !mobileOrderListEl || !mobileOrderSummaryEl || !previewEl || !inlineTitleEl || !inlineMetaEl) return;
+      if (!mobileOrderListEl || !mobileOrderSummaryEl || !previewEl || !inlineTitleEl || !inlineMetaEl) return;
 
       const emptyMarkup = `
         <div class="order-empty">
@@ -1762,15 +1784,9 @@
         <div class="order-summary-row"><span>Items</span><strong>${itemCount}</strong></div>
         <div class="order-summary-row order-summary-total"><span>Subtotal</span><strong>${formatCurrency(subtotal)}</strong></div>
       `;
-      const mobileSummaryMarkup = (itemCount) => `
-        <div class="order-summary-row"><span>Items</span><strong>${itemCount}</strong></div>
-      `;
-
       if (!cartItems.length) {
-        orderListEl.innerHTML = emptyMarkup;
         mobileOrderListEl.innerHTML = emptyMarkup;
-        orderSummaryEl.innerHTML = summaryMarkup(0, 0);
-        mobileOrderSummaryEl.innerHTML = mobileSummaryMarkup(0);
+        mobileOrderSummaryEl.innerHTML = summaryMarkup(0, 0);
         previewEl.textContent = "No order yet.";
         inlineTitleEl.textContent = "Your order is empty";
         if (isCartDrawerOpen) closeCartDrawer();
@@ -1801,11 +1817,8 @@
       const itemCount = getCartItemCount();
       const subtotal = getCartSubtotal();
 
-      orderListEl.innerHTML = itemsMarkup;
       mobileOrderListEl.innerHTML = itemsMarkup;
-      orderSummaryEl.innerHTML = summaryMarkup(itemCount, subtotal);
-      mobileOrderSummaryEl.innerHTML = mobileSummaryMarkup(itemCount);
-      bindOrderListInteractions(orderListEl);
+      mobileOrderSummaryEl.innerHTML = summaryMarkup(itemCount, subtotal);
       bindOrderListInteractions(mobileOrderListEl);
 
       inlineTitleEl.textContent = `${itemCount} item${itemCount === 1 ? "" : "s"} selected`;
@@ -1863,7 +1876,6 @@
       const closeBtn = document.getElementById("cartDrawerCloseBtn");
       const backdrop = document.getElementById("cartDrawerBackdrop");
       const drawer = backdrop?.querySelector(".cart-drawer");
-      const desktopSummary = document.getElementById("orderSummaryHeading");
       if (!closeBtn || !backdrop || !inlineBtn || !drawer) return;
 
       let touchStartY = 0;
@@ -1878,15 +1890,8 @@
       };
 
       inlineBtn.addEventListener("click", () => {
-        if (window.matchMedia("(max-width: 640px)").matches) {
-          if (!cartItems.length) return;
-          openCartDrawer();
-          return;
-        }
-
-        if (desktopSummary) {
-          desktopSummary.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
+        if (!cartItems.length) return;
+        openCartDrawer();
       });
 
       closeBtn.addEventListener("click", closeCartDrawer);
