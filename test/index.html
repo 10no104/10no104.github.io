@@ -572,52 +572,6 @@
       word-break: break-word;
     }
 
-    .cart-mobile-bar {
-      position: fixed;
-      left: 16px;
-      right: 16px;
-      bottom: 16px;
-      z-index: 120;
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      padding: 14px 16px;
-      border-radius: 20px;
-      background: linear-gradient(135deg, rgba(33, 24, 19, 0.96), rgba(90, 17, 34, 0.94));
-      color: #fffaf3;
-      box-shadow: 0 22px 34px rgba(19, 12, 9, 0.28);
-    }
-
-    .cart-mobile-copy {
-      display: grid;
-      gap: 3px;
-    }
-
-    .cart-mobile-copy strong {
-      font-size: 0.98rem;
-      line-height: 1.1;
-    }
-
-    .cart-mobile-copy span {
-      color: rgba(255, 250, 243, 0.76);
-      font-size: 0.86rem;
-    }
-
-    .cart-mobile-btn {
-      appearance: none;
-      border: 0;
-      cursor: pointer;
-      min-height: 44px;
-      padding: 0 16px;
-      border-radius: 999px;
-      background: #fffaf3;
-      color: #211813;
-      font: inherit;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-
     .cart-drawer-backdrop {
       position: fixed;
       inset: 0;
@@ -728,7 +682,7 @@
         width: min(calc(100% - 20px), 420px);
         grid-template-columns: 1fr;
         gap: 14px;
-        margin-bottom: 98px;
+        margin-bottom: 40px;
       }
 
       .order-inline-bar {
@@ -757,8 +711,14 @@
         flex-direction: column;
       }
 
-      .cart-mobile-bar.has-items {
-        display: flex;
+      .cart-drawer .order-item-price,
+      #orderSummaryMobile .order-summary-total {
+        display: none;
+      }
+
+      #orderSummaryMobile {
+        margin-top: 12px;
+        padding-top: 12px;
       }
 
       body.menu-page::after {
@@ -935,13 +895,6 @@
         </form>
       </section>
     </aside>
-  </div>
-  <div class="cart-mobile-bar" id="cartMobileBar" aria-hidden="true">
-    <div class="cart-mobile-copy">
-      <strong id="cartMobileTitle">Your order</strong>
-      <span id="cartMobileMeta">No items yet</span>
-    </div>
-    <button class="cart-mobile-btn" id="cartMobileOpenBtn" type="button">View order</button>
   </div>
   <div class="cart-drawer-backdrop" id="cartDrawerBackdrop" hidden>
     <div class="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cartDrawerHeading">
@@ -1486,13 +1439,10 @@
       const mobileOrderListEl = document.getElementById("orderListMobile");
       const mobileOrderSummaryEl = document.getElementById("orderSummaryMobile");
       const previewEl = document.getElementById("orderPayloadPreview");
-      const mobileBarEl = document.getElementById("cartMobileBar");
-      const mobileTitleEl = document.getElementById("cartMobileTitle");
-      const mobileMetaEl = document.getElementById("cartMobileMeta");
       const inlineTitleEl = document.getElementById("orderInlineTitle");
       const inlineMetaEl = document.getElementById("orderInlineMeta");
 
-      if (!orderListEl || !orderSummaryEl || !mobileOrderListEl || !mobileOrderSummaryEl || !previewEl || !mobileBarEl || !mobileTitleEl || !mobileMetaEl || !inlineTitleEl || !inlineMetaEl) return;
+      if (!orderListEl || !orderSummaryEl || !mobileOrderListEl || !mobileOrderSummaryEl || !previewEl || !inlineTitleEl || !inlineMetaEl) return;
 
       const emptyMarkup = `
         <div class="order-empty">
@@ -1503,17 +1453,16 @@
         <div class="order-summary-row"><span>Items</span><strong>${itemCount}</strong></div>
         <div class="order-summary-row order-summary-total"><span>Subtotal</span><strong>${formatCurrency(subtotal)}</strong></div>
       `;
+      const mobileSummaryMarkup = (itemCount) => `
+        <div class="order-summary-row"><span>Items</span><strong>${itemCount}</strong></div>
+      `;
 
       if (!cartItems.length) {
         orderListEl.innerHTML = emptyMarkup;
         mobileOrderListEl.innerHTML = emptyMarkup;
         orderSummaryEl.innerHTML = summaryMarkup(0, 0);
-        mobileOrderSummaryEl.innerHTML = summaryMarkup(0, 0);
+        mobileOrderSummaryEl.innerHTML = mobileSummaryMarkup(0);
         previewEl.textContent = "Add menu items to see the payload preview.";
-        mobileBarEl.classList.remove("has-items");
-        mobileBarEl.setAttribute("aria-hidden", "true");
-        mobileTitleEl.textContent = "Your order";
-        mobileMetaEl.textContent = "No items yet";
         inlineTitleEl.textContent = "Your order is empty";
         inlineMetaEl.textContent = "Add items and review them while browsing the menu.";
         if (isCartDrawerOpen) closeCartDrawer();
@@ -1528,7 +1477,7 @@
                 <strong>${escapeHtml(item.nameKo || item.nameEn)}</strong>
                 <span>${escapeHtml(item.nameEn || item.category)}</span>
               </div>
-              <strong>${escapeHtml(formatCurrency(item.unitPrice * item.quantity))}</strong>
+              <strong class="order-item-price">${escapeHtml(formatCurrency(item.unitPrice * item.quantity))}</strong>
             </div>
             <div class="order-item-bottom">
               <div class="order-qty" role="group" aria-label="Quantity controls for ${escapeHtml(item.nameEn || item.nameKo)}">
@@ -1547,16 +1496,12 @@
       orderListEl.innerHTML = itemsMarkup;
       mobileOrderListEl.innerHTML = itemsMarkup;
       orderSummaryEl.innerHTML = summaryMarkup(itemCount, subtotal);
-      mobileOrderSummaryEl.innerHTML = summaryMarkup(itemCount, subtotal);
+      mobileOrderSummaryEl.innerHTML = mobileSummaryMarkup(itemCount);
       bindOrderListInteractions(orderListEl);
       bindOrderListInteractions(mobileOrderListEl);
 
-      mobileBarEl.classList.add("has-items");
-      mobileBarEl.setAttribute("aria-hidden", "false");
-      mobileTitleEl.textContent = `${itemCount} item${itemCount === 1 ? "" : "s"} in your order`;
-      mobileMetaEl.textContent = `${formatCurrency(subtotal)} ready to review`;
       inlineTitleEl.textContent = `${itemCount} item${itemCount === 1 ? "" : "s"} selected`;
-      inlineMetaEl.textContent = `${formatCurrency(subtotal)} total so far. You can still keep browsing.`;
+      inlineMetaEl.textContent = "Review your items any time while browsing the menu.";
 
       const form = document.getElementById("orderForm");
       if (form) {
@@ -1608,11 +1553,10 @@
 
     function setupCartDrawer() {
       const inlineBtn = document.getElementById("orderInlineBtn");
-      const openBtn = document.getElementById("cartMobileOpenBtn");
       const closeBtn = document.getElementById("cartDrawerCloseBtn");
       const backdrop = document.getElementById("cartDrawerBackdrop");
       const desktopSummary = document.getElementById("orderSummaryHeading");
-      if (!openBtn || !closeBtn || !backdrop || !inlineBtn) return;
+      if (!closeBtn || !backdrop || !inlineBtn) return;
 
       inlineBtn.addEventListener("click", () => {
         if (window.matchMedia("(max-width: 640px)").matches) {
@@ -1624,11 +1568,6 @@
         if (desktopSummary) {
           desktopSummary.scrollIntoView({ behavior: "smooth", block: "start" });
         }
-      });
-
-      openBtn.addEventListener("click", () => {
-        if (!cartItems.length) return;
-        openCartDrawer();
       });
 
       closeBtn.addEventListener("click", closeCartDrawer);
