@@ -207,6 +207,7 @@
     }
 
     .menu-page .menu-card {
+      grid-template-columns: 230px minmax(0, 1fr) auto auto;
       background:
         linear-gradient(180deg, rgba(255, 252, 247, 0.94), rgba(249, 243, 233, 0.94)),
         url("../assets/pattern.webp") center / 460px auto;
@@ -233,12 +234,7 @@
     }
 
     .menu-page .menu-side {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 18px;
-      padding-left: 0;
-      white-space: nowrap;
+      display: contents;
     }
 
     .menu-page .menu-add-btn,
@@ -678,6 +674,16 @@
       }
     }
 
+    @media (max-width: 980px) {
+      .menu-page .menu-card {
+        grid-template-columns: 160px minmax(0, 1fr) auto auto;
+      }
+
+      .menu-page .menu-card-actions {
+        justify-content: flex-start;
+      }
+    }
+
     .menu-page .to-top {
       background: linear-gradient(135deg, #5a1122 0%, #d4af37 100%);
       box-shadow: 0 18px 32px rgba(90, 17, 34, 0.22);
@@ -711,6 +717,105 @@
 
     .menu-page .to-top {
       bottom: 76px;
+    }
+
+    .server-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 150;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(16, 10, 8, 0.48);
+      backdrop-filter: blur(6px);
+    }
+
+    .server-modal-backdrop.is-open {
+      display: flex;
+    }
+
+    .server-modal {
+      width: min(100%, 460px);
+      display: grid;
+      gap: 16px;
+      padding: 24px 22px;
+      border-radius: 24px;
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(249, 243, 233, 0.98)),
+        url("../assets/pattern.webp") center / 420px auto;
+      border: 1px solid rgba(125, 98, 63, 0.16);
+      box-shadow: 0 24px 46px rgba(23, 15, 11, 0.2);
+    }
+
+    .server-modal h3,
+    .server-modal p {
+      margin: 0;
+    }
+
+    .server-modal-copy {
+      display: grid;
+      gap: 8px;
+    }
+
+    .server-modal-copy h3 {
+      font-size: 1.45rem;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      color: #211813;
+    }
+
+    .server-modal-copy p {
+      color: rgba(33, 24, 19, 0.72);
+      line-height: 1.55;
+    }
+
+    .server-modal-summary {
+      display: grid;
+      gap: 10px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255, 251, 245, 0.9);
+      border: 1px solid rgba(125, 98, 63, 0.14);
+    }
+
+    .server-modal-summary strong {
+      color: #211813;
+      font-size: 1rem;
+    }
+
+    .server-modal-summary span {
+      color: rgba(33, 24, 19, 0.72);
+      font-size: 0.92rem;
+    }
+
+    .server-modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .server-modal-btn {
+      appearance: none;
+      border: 0;
+      cursor: pointer;
+      min-height: 46px;
+      padding: 0 16px;
+      border-radius: 999px;
+      font: inherit;
+      font-weight: 800;
+    }
+
+    .server-modal-btn-secondary {
+      background: rgba(33, 24, 19, 0.08);
+      color: #211813;
+    }
+
+    .server-modal-btn-primary {
+      background: linear-gradient(135deg, #1f2a44 0%, #2f73bb 100%);
+      color: #fff;
+      box-shadow: 0 14px 28px rgba(31, 42, 68, 0.22);
     }
 
     .menu-page .tabs .tab-drink {
@@ -771,12 +876,8 @@
         flex-direction: column;
       }
 
-      .menu-page .menu-side {
-        display: grid;
-        justify-items: start;
-        gap: 14px;
-        padding-left: 0;
-        white-space: normal;
+      .menu-page .menu-card {
+        grid-template-columns: 1fr;
       }
 
       .menu-page .menu-add-btn {
@@ -990,6 +1091,22 @@
   </div>
   <button class="to-top" id="toTopBtn" type="button" aria-label="Back to top">↑ Top</button>
   <button class="server-call-btn" id="serverCallBtn" type="button" aria-label="Test server call">Server</button>
+  <div class="server-modal-backdrop" id="serverModalBackdrop" hidden>
+    <div class="server-modal" role="dialog" aria-modal="true" aria-labelledby="serverModalHeading">
+      <div class="server-modal-copy">
+        <h3 id="serverModalHeading">Send test server call?</h3>
+        <p id="serverModalMessage">Review the current draft before sending the test flow.</p>
+      </div>
+      <div class="server-modal-summary">
+        <strong id="serverModalSummaryTitle">No items in order</strong>
+        <span id="serverModalSummaryMeta">Add menu items first if you want a realistic payload preview.</span>
+      </div>
+      <div class="server-modal-actions">
+        <button class="server-modal-btn server-modal-btn-secondary" id="serverModalCancelBtn" type="button">Cancel</button>
+        <button class="server-modal-btn server-modal-btn-primary" id="serverModalConfirmBtn" type="button">Send test call</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     /**
@@ -1066,6 +1183,7 @@
     let selectedDietaryTags = new Set();
     let syncStickyHeaderMetrics = () => {};
     let isCartDrawerOpen = false;
+    let isServerModalOpen = false;
 
     function escapeHtml(text = "") {
       return text
@@ -1496,6 +1614,24 @@
       isCartDrawerOpen = false;
     }
 
+    function openServerModal() {
+      const backdrop = document.getElementById("serverModalBackdrop");
+      if (!backdrop) return;
+      backdrop.hidden = false;
+      backdrop.classList.add("is-open");
+      document.body.style.overflow = "hidden";
+      isServerModalOpen = true;
+    }
+
+    function closeServerModal() {
+      const backdrop = document.getElementById("serverModalBackdrop");
+      if (!backdrop) return;
+      backdrop.classList.remove("is-open");
+      backdrop.hidden = true;
+      document.body.style.overflow = isCartDrawerOpen ? "hidden" : "";
+      isServerModalOpen = false;
+    }
+
     function bindOrderListInteractions(root) {
       root.querySelectorAll("[data-qty-action]").forEach((button) => {
         button.addEventListener("click", () => {
@@ -1830,9 +1966,9 @@
               </div>
               <div class="menu-side">
                 <div class="menu-price price">${escapeHtml(formatPrice(item.price))}</div>
-                <div class="menu-card-actions">
-                  <button class="menu-add-btn" data-menu-id="${escapeHtml(getMenuId(item))}" type="button">Add to order</button>
-                </div>
+              </div>
+              <div class="menu-card-actions">
+                <button class="menu-add-btn" data-menu-id="${escapeHtml(getMenuId(item))}" type="button">Add to order</button>
               </div>
             </article>
           `;
@@ -1850,7 +1986,16 @@
     function setupToTopButton() {
       const toTopBtn = document.getElementById("toTopBtn");
       const serverCallBtn = document.getElementById("serverCallBtn");
-      if (!toTopBtn || !serverCallBtn) return;
+      const form = document.getElementById("orderForm");
+      const statusEl = document.getElementById("orderStatus");
+      const previewEl = document.getElementById("orderPayloadPreview");
+      const modalBackdrop = document.getElementById("serverModalBackdrop");
+      const modalMessage = document.getElementById("serverModalMessage");
+      const modalSummaryTitle = document.getElementById("serverModalSummaryTitle");
+      const modalSummaryMeta = document.getElementById("serverModalSummaryMeta");
+      const modalCancelBtn = document.getElementById("serverModalCancelBtn");
+      const modalConfirmBtn = document.getElementById("serverModalConfirmBtn");
+      if (!toTopBtn || !serverCallBtn || !form || !statusEl || !previewEl || !modalBackdrop || !modalMessage || !modalSummaryTitle || !modalSummaryMeta || !modalCancelBtn || !modalConfirmBtn) return;
 
       window.addEventListener("scroll", () => {
         const shouldShow = window.scrollY > 380;
@@ -1862,31 +2007,59 @@
         window.scrollTo({ top: 0, behavior: "smooth" });
       });
 
-      serverCallBtn.addEventListener("click", () => {
-        const form = document.getElementById("orderForm");
-        const statusEl = document.getElementById("orderStatus");
-        const previewEl = document.getElementById("orderPayloadPreview");
-        if (!form || !statusEl || !previewEl) return;
-
-        if (!cartItems.length) {
-          statusEl.textContent = "Add at least one menu item before testing a server call.";
-          statusEl.className = "order-status is-error";
-          return;
-        }
-
-        const shouldProceed = window.confirm("Send this test payload to the server flow?");
-        if (!shouldProceed) {
-          statusEl.textContent = "Server call canceled.";
-          statusEl.className = "order-status";
-          return;
-        }
-
+      const runServerCallTest = () => {
         const formData = new FormData(form);
         const formValues = Object.fromEntries(formData.entries());
         const payload = buildOrderPayload(formValues);
         previewEl.textContent = JSON.stringify(payload, null, 2);
-        statusEl.textContent = "Server call test ready. This button is where the real API request will go.";
-        statusEl.className = "order-status is-success";
+
+        if (!cartItems.length) {
+          statusEl.textContent = "Server test opened, but there are no menu items in the order yet.";
+          statusEl.className = "order-status is-error";
+        } else {
+          statusEl.textContent = "Server call test ready. This button is where the real API request will go.";
+          statusEl.className = "order-status is-success";
+        }
+
+        closeServerModal();
+      };
+
+      serverCallBtn.addEventListener("click", () => {
+        if (cartItems.length) {
+          modalMessage.textContent = "This will use the current table session and order payload for the test server flow.";
+          modalSummaryTitle.textContent = `${getCartItemCount()} item${getCartItemCount() === 1 ? "" : "s"} ready`;
+          modalSummaryMeta.textContent = `${formatCurrency(getCartSubtotal())} subtotal in the current draft.`;
+        } else {
+          modalMessage.textContent = "There is no menu item in the order yet. You can still continue to test the empty server flow if you want.";
+          modalSummaryTitle.textContent = "No items in order";
+          modalSummaryMeta.textContent = "The payload will still include store, table code, guests, and note values from the current form.";
+        }
+
+        openServerModal();
+      });
+
+      modalCancelBtn.addEventListener("click", () => {
+        statusEl.textContent = "Server call canceled.";
+        statusEl.className = "order-status";
+        closeServerModal();
+      });
+
+      modalConfirmBtn.addEventListener("click", runServerCallTest);
+
+      modalBackdrop.addEventListener("click", (event) => {
+        if (event.target === modalBackdrop) {
+          statusEl.textContent = "Server call canceled.";
+          statusEl.className = "order-status";
+          closeServerModal();
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && isServerModalOpen) {
+          statusEl.textContent = "Server call canceled.";
+          statusEl.className = "order-status";
+          closeServerModal();
+        }
       });
     }
 
