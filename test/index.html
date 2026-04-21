@@ -810,6 +810,47 @@
       font-size: 0.92rem;
     }
 
+    .server-request-options {
+      display: grid;
+      gap: 10px;
+    }
+
+    .server-request-options p {
+      margin: 0;
+      color: rgba(33, 24, 19, 0.7);
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .server-request-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .server-request-chip {
+      appearance: none;
+      border: 1px solid rgba(125, 98, 63, 0.16);
+      cursor: pointer;
+      min-height: 42px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: rgba(255, 251, 245, 0.94);
+      color: #4b372b;
+      font: inherit;
+      font-weight: 800;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .server-request-chip.is-active {
+      background: linear-gradient(135deg, #5a1122 0%, #a32147 45%, #d4af37 100%);
+      color: #fffaf3;
+      border-color: rgba(90, 17, 34, 0.24);
+      box-shadow: 0 12px 22px rgba(90, 17, 34, 0.18);
+    }
+
     .server-modal-actions {
       display: flex;
       justify-content: flex-end;
@@ -1091,7 +1132,7 @@
               <textarea id="orderNote" name="orderNote" placeholder="Extra plate, allergy note, no cilantro, vegan adjustment..."></textarea>
             </div>
           </div>
-          <button class="order-submit-btn" type="submit">Build order payload</button>
+          <button class="order-submit-btn" type="submit">Send order</button>
           <p class="order-status" id="orderStatus" aria-live="polite"></p>
           <pre class="order-payload" id="orderPayloadPreview">Add menu items to see the payload preview.</pre>
         </form>
@@ -1123,16 +1164,24 @@
     <div class="server-modal" role="dialog" aria-modal="true" aria-labelledby="serverModalHeading">
       <div class="server-modal-copy">
         <p class="server-modal-eyebrow">Server Check</p>
-        <h3 id="serverModalHeading">Ready to send this draft?</h3>
-        <p id="serverModalMessage">Take one last look before we hand this order draft to the server flow.</p>
+        <h3 id="serverModalHeading">Call service to your table?</h3>
+        <p id="serverModalMessage">Choose what you want to ask for, then send a table service request.</p>
       </div>
       <div class="server-modal-summary">
-        <strong id="serverModalSummaryTitle">No items in order</strong>
-        <span id="serverModalSummaryMeta">Add menu items first if you want a realistic payload preview.</span>
+        <strong id="serverModalSummaryTitle">Table service request</strong>
+        <span id="serverModalSummaryMeta">This call is separate from the food order and uses the current table session.</span>
+      </div>
+      <div class="server-request-options">
+        <p>Request type</p>
+        <div class="server-request-grid" id="serverRequestGrid">
+          <button class="server-request-chip is-active" data-request-type="water" type="button">Water</button>
+          <button class="server-request-chip" data-request-type="napkins" type="button">Napkins</button>
+          <button class="server-request-chip" data-request-type="assistance" type="button">Staff assistance</button>
+        </div>
       </div>
       <div class="server-modal-actions">
         <button class="server-modal-btn server-modal-btn-secondary" id="serverModalCancelBtn" type="button">Not yet</button>
-        <button class="server-modal-btn server-modal-btn-primary" id="serverModalConfirmBtn" type="button">Send draft</button>
+        <button class="server-modal-btn server-modal-btn-primary" id="serverModalConfirmBtn" type="button">Call server</button>
       </div>
     </div>
   </div>
@@ -1213,6 +1262,7 @@
     let syncStickyHeaderMetrics = () => {};
     let isCartDrawerOpen = false;
     let isServerModalOpen = false;
+    let selectedServerRequestType = "water";
 
     function escapeHtml(text = "") {
       return text
@@ -1615,6 +1665,19 @@
       };
     }
 
+    function buildServerRequestPayload(formValues) {
+      return {
+        store: formValues.store,
+        table: {
+          code: formValues.tableCode,
+          guestCount: Number(formValues.guestCount || 0)
+        },
+        source: "table-service-call",
+        requestType: selectedServerRequestType,
+        note: formValues.orderNote || ""
+      };
+    }
+
     function openCartDrawer() {
       const backdrop = document.getElementById("cartDrawerBackdrop");
       const drawer = backdrop?.querySelector(".cart-drawer");
@@ -1783,7 +1846,7 @@
         event.preventDefault();
 
         if (!cartItems.length) {
-          statusEl.textContent = "Add at least one menu item before building the order payload.";
+          statusEl.textContent = "Add at least one menu item before sending the order.";
           statusEl.className = "order-status is-error";
           return;
         }
@@ -1792,7 +1855,7 @@
         const formValues = Object.fromEntries(formData.entries());
         const payload = buildOrderPayload(formValues);
         previewEl.textContent = JSON.stringify(payload, null, 2);
-        statusEl.textContent = "Payload ready. Later we can replace this step with a Supabase insert.";
+        statusEl.textContent = "Order draft is ready. Later this button will send the food order to the backend.";
         statusEl.className = "order-status is-success";
       });
 
@@ -2024,7 +2087,8 @@
       const modalSummaryMeta = document.getElementById("serverModalSummaryMeta");
       const modalCancelBtn = document.getElementById("serverModalCancelBtn");
       const modalConfirmBtn = document.getElementById("serverModalConfirmBtn");
-      if (!toTopBtn || !serverCallBtn || !form || !statusEl || !previewEl || !modalBackdrop || !modalMessage || !modalSummaryTitle || !modalSummaryMeta || !modalCancelBtn || !modalConfirmBtn) return;
+      const requestGrid = document.getElementById("serverRequestGrid");
+      if (!toTopBtn || !serverCallBtn || !form || !statusEl || !previewEl || !modalBackdrop || !modalMessage || !modalSummaryTitle || !modalSummaryMeta || !modalCancelBtn || !modalConfirmBtn || !requestGrid) return;
 
       window.addEventListener("scroll", () => {
         const shouldShow = window.scrollY > 380;
@@ -2039,30 +2103,29 @@
       const runServerCallTest = () => {
         const formData = new FormData(form);
         const formValues = Object.fromEntries(formData.entries());
-        const payload = buildOrderPayload(formValues);
+        const payload = buildServerRequestPayload(formValues);
         previewEl.textContent = JSON.stringify(payload, null, 2);
-
-        if (!cartItems.length) {
-          statusEl.textContent = "Server test opened, but there are no menu items in the order yet.";
-          statusEl.className = "order-status is-error";
-        } else {
-          statusEl.textContent = "Server call test ready. This button is where the real API request will go.";
-          statusEl.className = "order-status is-success";
-        }
+        statusEl.textContent = `Table service request ready: ${selectedServerRequestType}. Later this button will call the staff request endpoint.`;
+        statusEl.className = "order-status is-success";
 
         closeServerModal();
       };
 
+      requestGrid.querySelectorAll("[data-request-type]").forEach((button) => {
+        button.addEventListener("click", () => {
+          selectedServerRequestType = button.getAttribute("data-request-type") || "water";
+          requestGrid.querySelectorAll("[data-request-type]").forEach((chip) => {
+            chip.classList.toggle("is-active", chip === button);
+          });
+        });
+      });
+
       serverCallBtn.addEventListener("click", () => {
-        if (cartItems.length) {
-          modalMessage.textContent = "This will use the current table session and hand the draft over to the server test flow.";
-          modalSummaryTitle.textContent = `${getCartItemCount()} item${getCartItemCount() === 1 ? "" : "s"} ready`;
-          modalSummaryMeta.textContent = `${formatCurrency(getCartSubtotal())} in the current order draft.`;
-        } else {
-          modalMessage.textContent = "There is no menu item in the order yet, but you can still test how an empty draft would reach the server.";
-          modalSummaryTitle.textContent = "No items in this draft";
-          modalSummaryMeta.textContent = "We will still include the current store, table code, guest count, and request note.";
-        }
+        const formData = new FormData(form);
+        const formValues = Object.fromEntries(formData.entries());
+        modalMessage.textContent = "Choose what you want from the staff, then send the request tied to this table session.";
+        modalSummaryTitle.textContent = `Table ${formValues.tableCode || "unknown"}`;
+        modalSummaryMeta.textContent = `${formValues.store || "store"} · ${formValues.guestCount || "0"} guests · request goes out separately from the food order.`;
 
         openServerModal();
       });
