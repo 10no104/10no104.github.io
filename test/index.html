@@ -643,6 +643,10 @@
         url("../assets/pattern.webp") center / 420px auto;
       transform: translateY(100%);
       transition: transform 0.26s ease;
+      border: 1px solid rgba(125, 98, 63, 0.18);
+      box-shadow:
+        0 24px 48px rgba(19, 12, 9, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.72);
     }
 
     .cart-drawer-backdrop.is-open .cart-drawer {
@@ -658,7 +662,7 @@
       height: 5px;
       margin: 0 auto 14px;
       border-radius: 999px;
-      background: rgba(33, 24, 19, 0.16);
+      background: linear-gradient(90deg, rgba(90, 17, 34, 0.22), rgba(212, 175, 55, 0.36));
     }
 
     .cart-drawer-close {
@@ -668,10 +672,11 @@
       width: 40px;
       height: 40px;
       border-radius: 999px;
-      background: rgba(33, 24, 19, 0.08);
-      color: #211813;
+      background: rgba(255, 250, 243, 0.88);
+      color: #5a1122;
       font: inherit;
       font-weight: 800;
+      box-shadow: inset 0 0 0 1px rgba(125, 98, 63, 0.16);
     }
 
     .cart-drawer-header {
@@ -680,6 +685,8 @@
       align-items: center;
       gap: 12px;
       margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(125, 98, 63, 0.12);
     }
 
     .cart-drawer-body {
@@ -689,6 +696,12 @@
 
     .cart-drawer-body .order-card {
       padding: 24px 22px;
+      background:
+        linear-gradient(180deg, rgba(255, 253, 249, 0.96), rgba(248, 240, 228, 0.94)),
+        url("../assets/pattern.webp") center / 420px auto;
+      box-shadow:
+        0 14px 28px rgba(45, 30, 17, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.76);
     }
 
     .cart-drawer-body .order-card-header {
@@ -716,7 +729,9 @@
         margin-top: 0;
         border-radius: 30px;
         padding: 24px 24px 28px;
-        box-shadow: 0 24px 48px rgba(19, 12, 9, 0.24);
+        box-shadow:
+          0 32px 64px rgba(19, 12, 9, 0.28),
+          inset 0 1px 0 rgba(255, 255, 255, 0.74);
         transform: translateY(24px) scale(0.985);
       }
 
@@ -789,14 +804,16 @@
     .server-modal {
       width: min(100%, 460px);
       display: grid;
-      gap: 18px;
-      padding: 26px 24px;
+      gap: 20px;
+      padding: 28px 24px 24px;
       border-radius: 28px;
       background:
         linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(249, 243, 233, 0.98)),
         url("../assets/pattern.webp") center / 420px auto;
       border: 1px solid rgba(125, 98, 63, 0.16);
-      box-shadow: 0 24px 46px rgba(23, 15, 11, 0.2);
+      box-shadow:
+        0 26px 52px rgba(23, 15, 11, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.74);
       position: relative;
       overflow: hidden;
     }
@@ -825,7 +842,9 @@
 
     .server-modal-copy {
       display: grid;
-      gap: 8px;
+      gap: 6px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(125, 98, 63, 0.12);
     }
 
     .server-modal-copy h3 {
@@ -858,11 +877,13 @@
       min-height: 42px;
       padding: 0 14px;
       border-radius: 999px;
-      background: rgba(255, 251, 245, 0.94);
+      background:
+        linear-gradient(180deg, rgba(255, 252, 248, 0.96), rgba(246, 237, 225, 0.94));
       color: #4b372b;
       font: inherit;
       font-weight: 800;
-      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
     }
 
     .server-request-chip.is-active {
@@ -877,6 +898,7 @@
       justify-content: flex-end;
       gap: 10px;
       flex-wrap: wrap;
+      padding-top: 2px;
     }
 
     .server-modal-btn {
@@ -897,9 +919,11 @@
     }
 
     .server-modal-btn-secondary {
-      background: rgba(33, 24, 19, 0.08);
+      background:
+        linear-gradient(180deg, rgba(255, 252, 248, 0.96), rgba(246, 237, 225, 0.94));
       color: #4b372b;
       border: 1px solid rgba(125, 98, 63, 0.12);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
     }
 
     .server-modal-btn-primary {
