@@ -672,7 +672,7 @@
     .server-call-btn {
       position: fixed;
       right: 16px;
-      bottom: 72px;
+      bottom: 18px;
       z-index: 39;
       border: none;
       border-radius: 999px;
@@ -693,6 +693,10 @@
       opacity: 1;
       transform: translateY(0);
       pointer-events: auto;
+    }
+
+    .menu-page .to-top {
+      bottom: 76px;
     }
 
     .menu-page .tabs .tab-drink {
@@ -1850,6 +1854,13 @@
         if (!cartItems.length) {
           statusEl.textContent = "Add at least one menu item before testing a server call.";
           statusEl.className = "order-status is-error";
+          return;
+        }
+
+        const shouldProceed = window.confirm("Send this test payload to the server flow?");
+        if (!shouldProceed) {
+          statusEl.textContent = "Server call canceled.";
+          statusEl.className = "order-status";
           return;
         }
 
