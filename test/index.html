@@ -916,7 +916,24 @@
       }
 
       .order-inline-bar {
+        display: grid;
+        grid-template-columns: 1fr;
+        align-items: stretch;
+        gap: 12px;
         border-radius: 18px;
+      }
+
+      .order-inline-copy {
+        width: 100%;
+      }
+
+      .order-inline-copy strong {
+        font-size: 0.96rem;
+        line-height: 1.15;
+      }
+
+      .order-inline-copy span {
+        font-size: 0.84rem;
       }
 
       .order-inline-btn {
