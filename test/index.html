@@ -207,7 +207,6 @@
     }
 
     .menu-page .menu-card {
-      grid-template-columns: 230px minmax(0, 1fr) auto auto;
       background:
         linear-gradient(180deg, rgba(255, 252, 247, 0.94), rgba(249, 243, 233, 0.94)),
         url("../assets/pattern.webp") center / 460px auto;
@@ -215,21 +214,22 @@
       box-shadow: 0 20px 36px rgba(45, 30, 17, 0.08);
     }
 
-    .menu-page .menu-content {
-      display: grid;
-      gap: 10px;
-      min-width: 0;
-    }
-
     .menu-page .menu-image {
       box-shadow: 0 16px 28px rgba(39, 22, 11, 0.14);
+    }
+
+    .menu-page .menu-price-box {
+      display: grid;
+      justify-items: end;
+      align-content: center;
+      gap: 14px;
     }
 
     .menu-page .menu-card-actions {
       display: flex;
       justify-content: flex-end;
       align-items: center;
-      gap: 12px;
+      gap: 0;
       margin-top: 0;
     }
 
@@ -260,10 +260,6 @@
       letter-spacing: 0.02em;
       box-shadow: 0 10px 18px rgba(90, 17, 34, 0.18);
       transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
-    }
-
-    .menu-page .menu-price {
-      padding-left: 16px;
     }
 
     .menu-page .menu-add-btn:hover,
@@ -680,13 +676,13 @@
     }
 
     @media (max-width: 980px) {
-      .menu-page .menu-card {
-        grid-template-columns: 160px minmax(0, 1fr) auto auto;
-        border-radius: 24px;
-      }
-
       .menu-page .menu-card-actions {
         justify-content: flex-start;
+      }
+
+      .menu-page .menu-price-box {
+        justify-items: end;
+        gap: 12px;
       }
     }
 
@@ -951,12 +947,12 @@
         flex-direction: column;
       }
 
-      .menu-page .menu-card {
-        grid-template-columns: 1fr;
-      }
-
       .menu-page .menu-card-actions {
         margin-top: 8px;
+      }
+
+      .menu-page .menu-price-box {
+        justify-items: start;
       }
 
       .cart-drawer .order-item-price,
@@ -2059,9 +2055,11 @@
                 <p class="menu-desc desc">${escapeHtml(item.description)}</p>
                 ${tagsSection}
               </div>
-              <div class="menu-price price">${escapeHtml(formatPrice(item.price))}</div>
-              <div class="menu-card-actions">
-                <button class="menu-add-btn" data-menu-id="${escapeHtml(getMenuId(item))}" type="button">Add to order</button>
+              <div class="menu-price-box">
+                <div class="menu-price price">${escapeHtml(formatPrice(item.price))}</div>
+                <div class="menu-card-actions">
+                  <button class="menu-add-btn" data-menu-id="${escapeHtml(getMenuId(item))}" type="button">Add to order</button>
+                </div>
               </div>
             </article>
           `;
