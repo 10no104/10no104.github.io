@@ -1182,18 +1182,9 @@
         </section>
         <section class="order-card" aria-label="Order details">
           <form class="order-form" id="orderForm">
+            <input id="storeSelect" name="store" type="hidden" value="downtown" />
+            <input id="tableCode" name="tableCode" type="hidden" value="A12" />
             <div class="order-form-grid">
-              <div class="order-field">
-                <label for="storeSelect">Store</label>
-                <select id="storeSelect" name="store" required>
-                  <option value="downtown">Downtown</option>
-                  <option value="uptown">Uptown</option>
-                </select>
-              </div>
-              <div class="order-field">
-                <label for="tableCode">Table / QR code</label>
-                <input id="tableCode" name="tableCode" type="text" placeholder="A12" required />
-              </div>
               <div class="order-field">
                 <label for="guestCount">Guests</label>
                 <input id="guestCount" name="guestCount" type="number" min="1" max="20" value="2" required />
