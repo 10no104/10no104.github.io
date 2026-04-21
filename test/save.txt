@@ -1,266 +1,368 @@
+﻿
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Menu Test</title>
+  <link rel="stylesheet" href="../css/global.css?v=20260419-1" />
+  <link rel="stylesheet" href="../css/layout.css?v=20260419-1" />
+  <link rel="stylesheet" href="../css/components.css?v=20260419-1" />
   <style>
     :root {
-      --bg: #ececef;
-      --card: #f8f8fa;
-      --text: #242633;
-      --muted: #4d5160;
-      --shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-      --blue: #2f73bb;
+      --menu-bg-cream: #f5efe4;
+      --menu-bg-paper: rgba(255, 251, 244, 0.86);
+      --menu-bg-ink: #211813;
+      --menu-bg-gold: rgba(212, 175, 55, 0.2);
+      --menu-shell-shadow: 0 18px 40px rgba(30, 21, 16, 0.12);
     }
 
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: "Pretendard", "Noto Sans KR", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
+    body.menu-page {
+      position: relative;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(212, 175, 55, 0.18), transparent 28%),
+        radial-gradient(circle at 85% 12%, rgba(90, 17, 34, 0.12), transparent 22%),
+        linear-gradient(180deg, rgba(251, 247, 241, 0.96) 0%, rgba(245, 239, 228, 0.98) 100%);
+      color: var(--menu-bg-ink);
+      overflow-x: hidden;
     }
 
-    .wrap {
-      width: min(960px, 92vw);
-      margin: 54px auto 100px;
-    }
-
-    .tabs {
-      display: flex;
-      gap: 14px;
-      flex-wrap: wrap;
-      margin-bottom: 12px;
-    }
-
-    .tab {
-      border-radius: 999px;
-      padding: 14px 34px;
-      border: 1px solid #d3d5db;
-      background: #f2f2f4;
-      color: #454958;
-      font-size: 22px;
-      font-weight: 600;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-      cursor: pointer;
-      user-select: none;
-    }
-
-    .tab.active {
-      background: var(--blue);
-      color: #fff;
-      border-color: #2a67a8;
-    }
-
-    .menu-list {
-      display: block;
-    }
-
-    .subtabs {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      min-height: 44px;
-    }
-
-    .subtabs-wrap {
-      position: sticky;
-      top: 10px;
-      z-index: 25;
-      background: rgba(236, 236, 239, 0.95);
-      border: 1px solid #d6d8df;
-      border-radius: 16px;
-      padding: 10px 12px;
-      margin-bottom: 16px;
-      backdrop-filter: blur(3px);
-    }
-
-    .subtabs-wrap.hidden {
-      display: none;
-    }
-
-    .subtabs-context {
-      font-size: 15px;
-      font-weight: 800;
-      color: #2f73bb;
-      margin: 0 0 8px;
-      letter-spacing: 0.2px;
-    }
-
-    .subtab {
-      border-radius: 999px;
-      border: 1px solid #d3d5db;
-      background: #fff;
-      color: #454958;
-      padding: 8px 16px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .subtab.active {
-      background: #2f73bb;
-      color: #fff;
-      border-color: #2a67a8;
-    }
-
-    .to-top {
+    body.menu-page::before {
+      content: "";
       position: fixed;
-      right: 16px;
-      bottom: 18px;
-      z-index: 40;
-      border: none;
-      border-radius: 999px;
-      background: #2f73bb;
-      color: #fff;
-      font-size: 14px;
-      font-weight: 700;
-      padding: 12px 14px;
-      box-shadow: var(--shadow);
-      cursor: pointer;
-      opacity: 0;
-      transform: translateY(10px);
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(17, 12, 10, 0.48), rgba(17, 12, 10, 0.12)),
+        url("../assets/background수묵.webp") center top / cover no-repeat;
+      opacity: 0.14;
       pointer-events: none;
-      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: -2;
     }
 
-    .to-top.show {
-      opacity: 1;
-      transform: translateY(0);
-      pointer-events: auto;
+    body.menu-page::after {
+      content: "";
+      position: fixed;
+      inset: auto -8vw -10vh auto;
+      width: min(42vw, 460px);
+      height: min(42vw, 460px);
+      border-radius: 50%;
+      background:
+        radial-gradient(circle, rgba(212, 175, 55, 0.18) 0%, rgba(212, 175, 55, 0.04) 48%, transparent 72%);
+      filter: blur(10px);
+      pointer-events: none;
+      z-index: -1;
     }
 
-    .card {
+    .menu-page .wrap {
+      position: relative;
+      margin-top: 22px;
+      padding: 18px 0 28px;
+    }
+
+    .menu-page .wrap::before {
+      content: "";
+      position: absolute;
+      inset: -10px -18px -18px;
+      border-radius: 36px;
+      background:
+        linear-gradient(180deg, rgba(255, 251, 244, 0.76), rgba(255, 249, 240, 0.58)),
+        url("../assets/pattern.webp") center / 520px auto;
+      opacity: 0.28;
+      box-shadow: 0 24px 60px rgba(34, 24, 17, 0.08);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .menu-sticky-shell {
+      position: relative;
+      padding: 18px 0 8px;
+      background: linear-gradient(to bottom, rgba(249, 245, 238, 0.82), rgba(249, 245, 238, 0.4));
+      backdrop-filter: none;
+      transition: padding 0.24s ease, background 0.24s ease, backdrop-filter 0.24s ease, box-shadow 0.24s ease;
+    }
+
+    .menu-sticky-spacer {
+      height: 0;
+    }
+
+    .menu-sticky-inner {
+      width: min(960px, 92vw);
+      margin: 0 auto;
       display: grid;
-      grid-template-columns: 230px minmax(0, 1fr) auto;
-      gap: 24px;
-      align-items: center;
-      background: var(--card);
-      border-radius: 34px;
-      box-shadow: var(--shadow);
-      padding: 28px;
-      margin-bottom: 22px;
-      border: 1px solid #dbdde2;
+      gap: 16px;
+      padding: 14px 16px;
+      border-radius: 22px;
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.94), rgba(251, 246, 238, 0.88)),
+        url("../assets/pattern.webp") center / 440px auto;
+      border: 1px solid rgba(120, 103, 77, 0.14);
+      box-shadow: var(--menu-shell-shadow);
+      transition: gap 0.24s ease;
     }
 
-    .thumb {
-      width: 230px;
-      height: 230px;
-      border-radius: 30px;
-      object-fit: cover;
-      display: block;
-      background: #d8d8df;
-    }
-
-    .name-ko {
-      margin: 0;
-      font-size: 48px;
-      line-height: 1.12;
-      letter-spacing: -0.4px;
-      font-weight: 700;
-    }
-
-    .name-en {
-      margin: 10px 0 16px;
-      font-size: 32px;
-      line-height: 1.15;
-      font-weight: 700;
-    }
-
-    .desc {
-      margin: 0 0 16px;
-      color: var(--muted);
-      font-size: 26px;
-      line-height: 1.4;
-      max-width: 700px;
-    }
-
-    .tags {
+    .menu-homebar {
       display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-start;
     }
 
-    .tag {
+    .menu-sticky-shell .tabs,
+    .menu-sticky-shell .subtabs-wrap {
+      margin-bottom: 0;
+    }
+
+    .menu-sticky-shell .subtabs-wrap {
+      position: static !important;
+      top: auto !important;
+      margin-bottom: 0;
+    }
+
+    .menu-page .wrap {
+      margin-top: 16px;
+    }
+
+    .menu-page.is-scrolled .menu-sticky-shell {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 60;
+      padding: 10px 0 12px;
+      background: linear-gradient(to bottom, rgba(244, 240, 233, 0.88), rgba(244, 240, 233, 0.54));
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 24px rgba(28, 35, 48, 0.08);
+    }
+
+    .menu-page.is-scrolled .menu-sticky-spacer {
+      height: var(--menu-sticky-height, 0px);
+    }
+
+    .menu-page.is-scrolled .menu-sticky-inner {
+      gap: 12px;
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.97), rgba(251, 246, 238, 0.95)),
+        url("../assets/pattern.webp") center / 420px auto;
+      border-color: rgba(120, 103, 77, 0.16);
+      box-shadow: 0 12px 32px rgba(28, 35, 48, 0.12);
+    }
+
+    .menu-homebar {
+      width: 100%;
+    }
+
+    .menu-home-link {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      justify-content: center;
+      width: 84px;
+      height: 84px;
       border-radius: 999px;
-      padding: 7px 16px;
-      font-size: 18px;
-      font-weight: 700;
-      color: #fff;
-      line-height: 1;
+      background: linear-gradient(180deg, #fffdf9 0%, #f3eadc 100%);
+      border: 1px solid rgba(71, 48, 31, 0.12);
+      box-shadow: 0 12px 28px rgba(42, 28, 18, 0.12);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
-    .tag.red { background: #e13a31; }
-    .tag.green { background: #6ea42e; }
-    .tag.yellow { background: #d8a32a; }
-    .tag.blue { background: #2f73bb; }
-    .tag.gray { background: #7b8090; }
+    .menu-page.is-scrolled .menu-home-link {
+      width: 68px;
+      height: 68px;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
+    }
 
-    .price {
-      font-size: 62px;
+    .menu-home-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 36px rgba(42, 28, 18, 0.16);
+    }
+
+    .menu-home-link:focus-visible {
+      outline: 3px solid rgba(47, 115, 187, 0.24);
+      outline-offset: 4px;
+    }
+
+    .menu-home-logo {
+      width: 56px;
+      height: 56px;
+      object-fit: contain;
+      display: block;
+      transition: width 0.24s ease, height 0.24s ease;
+    }
+
+    .menu-page.is-scrolled .menu-home-logo {
+      width: 44px;
+      height: 44px;
+    }
+
+    .menu-page .menu-card {
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.94), rgba(249, 243, 233, 0.94)),
+        url("../assets/pattern.webp") center / 460px auto;
+      border: 1px solid rgba(125, 98, 63, 0.14);
+      box-shadow: 0 20px 36px rgba(45, 30, 17, 0.08);
+    }
+
+    .menu-page .menu-image {
+      box-shadow: 0 16px 28px rgba(39, 22, 11, 0.14);
+    }
+
+    .menu-page .to-top {
+      background: linear-gradient(135deg, #5a1122 0%, #d4af37 100%);
+      box-shadow: 0 18px 32px rgba(90, 17, 34, 0.22);
+    }
+
+    .menu-page .tabs .tab-drink {
+      position: relative;
+      padding-inline: 42px;
+      background:
+        linear-gradient(135deg, rgba(49, 112, 190, 0.18), rgba(130, 201, 255, 0.3)),
+        #f3fbff;
+      border-color: rgba(61, 127, 199, 0.4);
+      color: #1d5f9f;
       font-weight: 800;
-      line-height: 1;
-      padding-left: 16px;
-      white-space: nowrap;
+      box-shadow:
+        0 10px 24px rgba(47, 115, 187, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.72);
+      transform: translateY(-1px) scale(1.03);
     }
 
-    .empty {
-      padding: 40px;
-      text-align: center;
-      color: var(--muted);
-      font-size: 22px;
+    .menu-page .tabs .tab-drink.active {
+      background: linear-gradient(135deg, #5a1122 0%, #a32147 45%, #d4af37 100%);
+      border-color: rgba(90, 17, 34, 0.9);
+      color: #fffaf3;
+      box-shadow: 0 14px 28px rgba(90, 17, 34, 0.28);
     }
 
-    @media (max-width: 980px) {
-      .card {
-        grid-template-columns: 160px 1fr auto;
+    .menu-page .tabs .tab-drink:hover {
+      transform: translateY(-2px) scale(1.05);
+    }
+
+    @media (max-width: 640px) {
+      body.menu-page::after {
+        width: 62vw;
+        height: 62vw;
+        right: -16vw;
+        bottom: -4vh;
+      }
+
+      .menu-page .wrap::before {
+        inset: -8px -10px -12px;
         border-radius: 24px;
       }
 
-      .thumb { width: 160px; height: 160px; border-radius: 20px; }
-      .name-ko { font-size: 30px; }
-      .name-en { font-size: 28px; }
-      .desc { font-size: 24px; }
-      .price { font-size: 52px; }
-    }
+      .menu-sticky-shell {
+        padding: 14px 0 8px;
+      }
 
-    @media (max-width: 720px) {
-      .tab { font-size: 18px; padding: 10px 20px; }
-      .card {
-        grid-template-columns: 1fr;
-        gap: 16px;
+      .menu-sticky-inner {
+        width: min(calc(100% - 20px), 420px);
+        gap: 12px;
+        padding: 12px 12px 10px;
+        border-radius: 18px;
       }
-      .thumb { width: 100%; height: 220px; }
-      .price {
-        padding-left: 0;
-        font-size: 40px;
+
+      .menu-homebar {
+        justify-content: center;
       }
-      .name-ko { font-size: 26px; }
-      .name-en { font-size: 24px; }
-      .desc { font-size: 20px; }
+
+      .menu-home-link {
+        width: 64px;
+        height: 64px;
+      }
+
+      .menu-home-logo {
+        width: 42px;
+        height: 42px;
+      }
+
+      .wrap {
+        margin-top: 18px;
+      }
+
+      .menu-page.is-scrolled .menu-sticky-shell {
+        padding: 7px 0 8px;
+      }
+
+      .menu-page.is-scrolled .menu-sticky-inner {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px 8px;
+      }
+
+      .menu-page.is-scrolled .menu-homebar {
+        justify-content: flex-start;
+        width: auto;
+        flex: 0 0 auto;
+        margin-bottom: 0;
+      }
+
+      .menu-page.is-scrolled .menu-home-link {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        margin: 0 0 0 2px;
+      }
+
+      .menu-page.is-scrolled .menu-sticky-shell .tabs {
+        flex: 1 1 0;
+        min-width: 0;
+        margin-top: 0;
+        align-items: center;
+      }
+
+      .menu-page.is-scrolled .menu-home-logo {
+        width: 26px;
+        height: 26px;
+      }
+
+      .menu-page.is-scrolled .menu-sticky-shell .subtabs-wrap {
+        width: 100%;
+      }
+
+      .menu-page.is-scrolled .menu-sticky-shell .tabs,
+      .menu-page.is-scrolled .menu-sticky-shell .subtabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+      }
+
+      .menu-page.is-scrolled .menu-sticky-shell .tabs::-webkit-scrollbar,
+      .menu-page.is-scrolled .menu-sticky-shell .subtabs::-webkit-scrollbar {
+        display: none;
+      }
+
+      .menu-page .tabs .tab-drink {
+        padding-inline: 28px;
+      }
     }
   </style>
 </head>
-<body>
+<body class="menu-page">
+  <div class="menu-sticky-spacer" id="menuStickySpacer" aria-hidden="true"></div>
+  <div class="menu-sticky-shell">
+    <div class="menu-sticky-inner">
+      <div class="menu-homebar">
+        <a class="menu-home-link" href="../index.html" aria-label="Go to main page">
+          <img class="menu-home-logo" src="../assets/logo-dark.webp" alt="EHWA home" />
+        </a>
+      </div>
+      <section class="tabs" aria-label="Categories" id="tabs"></section>
+      <section class="subtabs-wrap hidden" id="subtabsWrap">
+        <p class="subtabs-context" id="subtabsContext"></p>
+        <section class="subtabs" aria-label="Subcategories" id="subtabs"></section>
+      </section>
+    </div>
+  </div>
   <main class="wrap">
-    <section class="tabs" aria-label="Categories" id="tabs"></section>
-    <section class="subtabs-wrap hidden" id="subtabsWrap">
-      <p class="subtabs-context" id="subtabsContext"></p>
-      <section class="subtabs" aria-label="Subcategories" id="subtabs"></section>
-    </section>
-    <section class="menu-list" id="menuList"></section>
+    <section class="menu-list menu-grid" id="menuList"></section>
   </main>
   <button class="to-top" id="toTopBtn" type="button" aria-label="Back to top">↑ Top</button>
 
   <script>
     /**
      * [Google Sheet 컬럼 순서]
-     * category | label | nameKo | nameEn | description | price | imageUrl | tags
+     * sortOrder | category | label | nameKo | nameEn | description | price | imageUrl | tags | ingredient
      *
      * tags 예시:
      * 🌶️ Spicy|red, 🌱 Vegan|green, ⭐ Popular|yellow, 🐟 Seafood|blue
@@ -283,7 +385,9 @@
           { label: "🌶️ Spicy", color: "red" },
           { label: "🌱 Vegan", color: "green" },
           { label: "⭐ Popular", color: "yellow" }
-        ]
+        ],
+        ingredient: "",
+        dietaryTags: []
       },
       {
         category: "Mains",
@@ -297,7 +401,9 @@
           { label: "🌶️ Spicy", color: "red" },
           { label: "🐟 Seafood", color: "blue" },
           { label: "⭐ Popular", color: "yellow" }
-        ]
+        ],
+        ingredient: "",
+        dietaryTags: []
       },
       {
         category: "Mains",
@@ -310,13 +416,22 @@
         tags: [
           { label: "🌶️ Spicy", color: "red" },
           { label: "⭐ Popular", color: "blue" }
-        ]
+        ],
+        ingredient: "",
+        dietaryTags: []
       }
     ];
+
+    const VEGAN_CATEGORY = "Vegan 🌱";
+    const SPICY_CATEGORY = "Spicy 🌶️";
+    const POPULAR_CATEGORY = "Popular ⭐";
+    const VEGAN_SUBOPTIONS = ["Seafood", "Egg", "Dairy"];
 
     let allMenus = [];
     let selectedCategory = "All";
     let selectedSubcategory = "All";
+    let selectedDietaryTags = new Set();
+    let syncStickyHeaderMetrics = () => {};
 
     function escapeHtml(text = "") {
       return text
@@ -327,68 +442,115 @@
         .replaceAll("'", "&#39;");
     }
 
+    function getTagKey(label = "") {
+      const normalized = String(label).trim().toLowerCase();
+      if (!normalized) return "tag";
+      if (/^spicy\d*$/.test(normalized)) return "spicy";
+      if (normalized.includes("vegan")) return "vegan";
+      if (normalized.includes("ask server")) return "ask-server";
+      if (normalized.includes("popular")) return "popular";
+      if (normalized.includes("seafood")) return "seafood";
+      if (normalized.includes("sweet")) return "sweet";
+      if (normalized.includes("chicken")) return "chicken";
+      if (normalized.includes("beef")) return "beef";
+      if (normalized.includes("pork")) return "pork";
+      return normalized;
+    }
+
+    function getSpicyLevel(label = "") {
+      const normalized = String(label).trim().toLowerCase();
+      const match = normalized.match(/^spicy(\d*)$/);
+      if (!match) return null;
+      return Math.max(1, Number(match[1] || "1"));
+    }
+
+    function renderTagLabel(label = "") {
+      const raw = String(label).trim();
+      if (!raw) return "Tag";
+
+      const spicyLevel = getSpicyLevel(raw);
+      if (spicyLevel) return "🌶️".repeat(spicyLevel);
+      if (/[\u{1F300}-\u{1FAFF}\u2600-\u27BF]/u.test(raw)) return raw;
+
+      const emojiMap = {
+        spicy: "🌶️",
+        vegan: "🌱",
+        "ask-server": "🌱",
+        popular: "⭐",
+        seafood: "🐟",
+        sweet: "🍯",
+        chicken: "🐔",
+        beef: "🐮",
+        pork: "🐷"
+      };
+
+      const emoji = emojiMap[getTagKey(raw)];
+      return emoji ? `${emoji} ${raw}` : raw;
+    }
+
     function parseTags(raw = "") {
       return String(raw)
         .split(",")
         .map((part) => part.trim())
         .filter(Boolean)
         .map((chunk) => {
-          const [label, color] = chunk.split("|").map((v) => v && v.trim());
+          const [label, color] = chunk.split("|").map((value) => value && value.trim());
+          const key = getTagKey(label || "Tag");
+          const resolvedColor = key === "spicy"
+            ? "chili"
+            : key === "popular"
+              ? "yellow"
+              : (color || (key === "ask-server" ? "green" : "gray"));
+
           return {
-            label: withTagEmoji(label || "Tag"),
-            color: color || "gray"
+            key,
+            label: renderTagLabel(label || "Tag"),
+            color: resolvedColor
           };
         });
     }
 
-    function withTagEmoji(label = "") {
-      const raw = String(label).trim();
-      if (!raw) return "🏷️ Tag";
-      if (/[\u{1F300}-\u{1FAFF}\u2600-\u27BF]/u.test(raw)) return raw;
+    function parseDietaryTagList(raw = "") {
+      return String(raw)
+        .split(",")
+        .map((part) => String(part).trim())
+        .filter(Boolean);
+    }
 
-      const normalized = raw.toLowerCase();
-      const emojiMap = [
-        { keyword: "spicy", emoji: "🌶️" },
-        { keyword: "vegan", emoji: "🌱" },
-        { keyword: "popular", emoji: "⭐" },
-        { keyword: "seafood", emoji: "🐟" },
-        { keyword: "sweet", emoji: "🍯" },
-        { keyword: "chicken", emoji: "🍗" },
-        { keyword: "beef", emoji: "🥩" },
-        { keyword: "pork", emoji: "🐷" }
-      ];
+    function normalizeDietaryTag(value = "") {
+      return String(value).trim().toLowerCase();
+    }
 
-      const matched = emojiMap.find((item) => normalized.includes(item.keyword));
-      if (matched) return `${matched.emoji} ${raw}`;
-      return `🏷️ ${raw}`;
+    function formatDietaryTag(tag = "") {
+      const raw = String(tag).trim();
+      if (!raw) return "";
+      return raw.charAt(0).toUpperCase() + raw.slice(1);
+    }
+
+    function toSortOrder(value = "") {
+      const parsed = Number(String(value).trim());
+      return Number.isFinite(parsed) ? parsed : Number.MAX_SAFE_INTEGER;
     }
 
     function mapSheetRows(rows = []) {
       return rows
         .map((row) => row.c || [])
-        .map((c) => c.map((cell) => (cell?.v ?? "").toString().trim()))
+        .map((cells) => cells.map((cell) => (cell?.v ?? "").toString().trim()))
         .filter((cells) => cells.some(Boolean))
         .map((cells) => ({
-          category: cells[0] || "Uncategorized",
-          label: cells[1] || "",
-          nameKo: cells[2] || "",
-          nameEn: cells[3] || "",
-          description: cells[4] || "",
-          price: cells[5] || "",
-          imageUrl: cells[6] || "",
-          tags: parseTags(cells[7] || "")
-        }));
-    }
-
-    function getSubcategoriesByCategory(menuItems, category) {
-      if (category === "All" || category === "Vegan 🌱" || category === "Spicy 🌶️" || category === "Popular ⭐") return [];
-
-      const categoryMenus = menuItems.filter((item) => item.category === category);
-      const options = categoryMenus
-        .map((item) => String(item.label || "").trim())
-        .filter(Boolean);
-
-      return [...new Set(options)];
+          sortOrder: toSortOrder(cells[0]),
+          category: cells[1] || "Uncategorized",
+          label: cells[2] || "",
+          nameKo: cells[3] || "",
+          nameEn: cells[4] || "",
+          description: cells[5] || "",
+          price: cells[6] || "",
+          imageUrl: cells[7] || "",
+          tags: parseTags(cells[8] || ""),
+          ingredient: cells[9] || "",
+          dietaryTags: parseDietaryTagList(cells[9] || "")
+        }))
+        .sort((a, b) => a.sortOrder - b.sortOrder);
     }
 
     async function fetchMenusFromGoogleSheet() {
@@ -411,18 +573,168 @@
 
     function formatPrice(value = "") {
       if (!value) return "";
-      const v = String(value).trim();
-      if (v.startsWith("$")) return v;
-      return `$${v}`;
+      const normalized = String(value).trim();
+      return normalized.startsWith("$") ? normalized : `$${normalized}`;
+    }
+
+    function isDrinkCategory(category = "") {
+      return String(category).trim().toLowerCase().includes("drink");
+    }
+
+    function prioritizeDrinkCategory(categories = []) {
+      const drinkCategories = categories.filter((category) => isDrinkCategory(category));
+      const otherCategories = categories.filter((category) => !isDrinkCategory(category));
+      return [...drinkCategories, ...otherCategories];
     }
 
     function getCategories(menuItems) {
       const unique = [...new Set(menuItems.map((item) => item.category).filter(Boolean))];
       const base = ["All", ...unique];
-      if (!base.includes("Vegan 🌱")) base.push("Vegan 🌱");
-      if (!base.includes("Spicy 🌶️")) base.push("Spicy 🌶️");
-      if (!base.includes("Popular ⭐")) base.push("Popular ⭐");
-      return base;
+      if (!base.includes(VEGAN_CATEGORY)) base.push(VEGAN_CATEGORY);
+      if (!base.includes(SPICY_CATEGORY)) base.push(SPICY_CATEGORY);
+      if (!base.includes(POPULAR_CATEGORY)) base.push(POPULAR_CATEGORY);
+      return prioritizeDrinkCategory(base);
+    }
+
+    function getSubcategoryValue(item) {
+      return String(item.label || "").trim();
+    }
+
+    function getIngredientTagsForItem(item) {
+      const values = Array.isArray(item.dietaryTags) ? item.dietaryTags : parseDietaryTagList(item.ingredient || "");
+      return values
+        .map((tag) => normalizeDietaryTag(tag))
+        .filter((tag, index, array) => tag && array.indexOf(tag) === index);
+    }
+
+    function getVeganOptionTags(item) {
+      const allowedTags = new Set(["vegetarian", "seafood", "egg", "dairy"]);
+      return getIngredientTagsForItem(item).filter((tag) => allowedTags.has(tag));
+    }
+
+    function getDietaryTagsForItem(item) {
+      return getVeganOptionTags(item);
+    }
+
+    function hasMenuTag(item, key) {
+      return Array.isArray(item.tags) && item.tags.some((tag) => tag.key === key);
+    }
+
+    function getIngredientBadges(item) {
+      const orderedTags = ["vegetarian", "seafood", "egg", "dairy", "chicken", "beef", "pork"];
+      const labelMap = {
+        vegetarian: "\u{1F331} Vegetarian",
+        seafood: "\u{1F41F} Seafood",
+        dairy: "\u{1F95B} Dairy",
+        egg: "\u{1F95A} Egg",
+        chicken: "\u{1F414} Chicken",
+        beef: "\u{1F42E} Beef",
+        pork: "\u{1F437} Pork"
+      };
+      const colorMap = {
+        vegetarian: "green",
+        seafood: "blue",
+        dairy: "blue",
+        egg: "red",
+        chicken: "orange",
+        beef: "brown",
+        pork: "purple"
+      };
+
+      return orderedTags
+        .filter((tag) => getIngredientTagsForItem(item).includes(tag))
+        .map((tag) => ({
+          label: labelMap[tag] || formatDietaryTag(tag),
+          color: colorMap[tag] || "gray"
+        }));
+    }
+
+    function filterBySelectedCategory(menuItems, category) {
+      const normalizedCategory = String(category || "").toLowerCase();
+
+      if (normalizedCategory.includes("vegan")) {
+        return menuItems.filter((item) =>
+          item.tags.some((tag) => tag.key === "vegan" || tag.key === "ask-server")
+        );
+      }
+
+      if (normalizedCategory.includes("spicy")) {
+        return menuItems.filter((item) => item.tags.some((tag) => tag.key === "spicy"));
+      }
+
+      if (normalizedCategory.includes("popular")) {
+        return menuItems.filter((item) => item.tags.some((tag) => tag.key === "popular"));
+      }
+
+      if (category === "All") return menuItems;
+      return menuItems.filter((item) => item.category === category);
+    }
+
+    function getSubcategoriesByCategory(menuItems, category) {
+      if (category === "All") return [];
+
+      const normalizedCategory = String(category || "").toLowerCase();
+      if (normalizedCategory.includes("spicy") || normalizedCategory.includes("popular")) {
+        return [];
+      }
+
+      if (normalizedCategory.includes("vegan")) {
+        return VEGAN_SUBOPTIONS;
+      }
+
+      const options = filterBySelectedCategory(menuItems, category)
+        .map((item) => getSubcategoryValue(item))
+        .filter(Boolean);
+
+      return [...new Set(options)];
+    }
+
+    function matchesAllowedIngredients(item, selectedTags) {
+      const allTags = getVeganOptionTags(item);
+      const compareTags = allTags.filter((tag) => tag !== "vegetarian");
+      const selected = [...selectedTags].map((tag) => normalizeDietaryTag(tag));
+      const hasVegetarianFallback = allTags.includes("vegetarian") && hasMenuTag(item, "ask-server");
+
+      if (!selected.length) return true;
+      if (!compareTags.length) return true;
+      if (hasVegetarianFallback) return true;
+
+      return compareTags.every((tag) => selected.includes(tag));
+    }
+
+    function isDefaultVeganVisible(item) {
+      const allTags = getVeganOptionTags(item);
+      const hasVegetarian = allTags.includes("vegetarian");
+      const compareTags = allTags.filter((tag) => tag !== "vegetarian");
+      const hasVegetarianFallback = allTags.includes("vegetarian") && hasMenuTag(item, "ask-server");
+      if (!hasVegetarian) return false;
+      return !compareTags.length || hasVegetarianFallback;
+    }
+
+    function filterMenus(menuItems) {
+      let filtered = filterBySelectedCategory(menuItems, selectedCategory);
+      const isVeganCategory = String(selectedCategory || "").toLowerCase().includes("vegan");
+
+      if (isVeganCategory) {
+        if (!selectedDietaryTags.size) {
+          filtered = filtered.filter((item) => isDefaultVeganVisible(item));
+        } else {
+          filtered = filtered.filter((item) => matchesAllowedIngredients(item, selectedDietaryTags));
+        }
+        return filtered;
+      }
+
+      if (selectedSubcategory !== "All") {
+        filtered = filtered.filter((item) =>
+          getSubcategoryValue(item).toLowerCase() === selectedSubcategory.toLowerCase()
+        );
+      }
+
+      return filtered;
+    }
+
+    function scrollToCategoryStart() {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     function renderTabs() {
@@ -432,7 +744,8 @@
       tabsEl.innerHTML = categories
         .map((category) => {
           const activeClass = category === selectedCategory ? "active" : "";
-          return `<button class="tab ${activeClass}" data-category="${escapeHtml(category)}" type="button">${escapeHtml(category)}</button>`;
+          const drinkClass = isDrinkCategory(category) ? "tab-drink" : "";
+          return `<button class="tab ${drinkClass} ${activeClass}" data-category="${escapeHtml(category)}" type="button">${escapeHtml(category)}</button>`;
         })
         .join("");
 
@@ -440,6 +753,8 @@
         tabButton.addEventListener("click", () => {
           selectedCategory = tabButton.dataset.category || "All";
           selectedSubcategory = "All";
+          selectedDietaryTags = new Set();
+          scrollToCategoryStart();
           renderTabs();
           renderSubtabs();
           renderMenu();
@@ -452,60 +767,88 @@
       const subtabsWrapEl = document.getElementById("subtabsWrap");
       const subtabsContextEl = document.getElementById("subtabsContext");
       const subcategories = getSubcategoriesByCategory(allMenus, selectedCategory);
+      const isVeganCategory = String(selectedCategory || "").toLowerCase().includes("vegan");
 
       if (!subcategories.length) {
         subtabsEl.innerHTML = "";
         subtabsWrapEl.classList.add("hidden");
+        subtabsWrapEl.classList.remove("vegan-subtabs");
         subtabsContextEl.textContent = "";
+        syncStickyHeaderMetrics();
         return;
       }
 
       subtabsWrapEl.classList.remove("hidden");
-      subtabsContextEl.textContent = selectedCategory;
+      subtabsWrapEl.classList.toggle("vegan-subtabs", isVeganCategory);
+      subtabsContextEl.textContent = isVeganCategory ? "Allowed Ingredients" : selectedCategory;
 
-      const allOptions = ["All", ...subcategories];
-      subtabsEl.innerHTML = allOptions
+      const options = isVeganCategory ? subcategories : ["All", ...subcategories];
+      subtabsEl.innerHTML = options
         .map((sub) => {
-          const activeClass = sub === selectedSubcategory ? "active" : "";
-          return `<button class="subtab ${activeClass}" data-subcategory="${escapeHtml(sub)}" type="button">${escapeHtml(sub)}</button>`;
+          const value = isVeganCategory ? normalizeDietaryTag(sub) : sub;
+          const activeClass = isVeganCategory
+            ? (selectedDietaryTags.has(value) ? "active" : "")
+            : (sub === selectedSubcategory ? "active" : "");
+          const label = isVeganCategory ? formatDietaryTag(sub) : sub;
+          return `<button class="subtab ${activeClass}" data-subcategory="${escapeHtml(value)}" type="button">${escapeHtml(label)}</button>`;
         })
         .join("");
 
       subtabsEl.querySelectorAll(".subtab").forEach((button) => {
         button.addEventListener("click", () => {
-          selectedSubcategory = button.dataset.subcategory || "All";
+          const value = button.dataset.subcategory || "";
+
+          if (isVeganCategory) {
+            if (!value) return;
+            if (selectedDietaryTags.has(value)) {
+              selectedDietaryTags.delete(value);
+            } else {
+              selectedDietaryTags.add(value);
+            }
+          } else {
+            selectedSubcategory = value || "All";
+          }
+
+          scrollToCategoryStart();
           renderSubtabs();
           renderMenu();
         });
       });
+
+      syncStickyHeaderMetrics();
     }
 
-    function filterMenus(menuItems) {
-      let filtered = menuItems;
+    function renderMenu() {
+      const menuListEl = document.getElementById("menuList");
+      const filtered = filterMenus(allMenus);
 
-      if (selectedCategory === "Vegan 🌱") {
-        filtered = menuItems.filter((item) =>
-          item.tags.some((tag) => tag.label.toLowerCase().includes("vegan"))
-        );
-      } else if (selectedCategory === "Spicy 🌶️") {
-        filtered = menuItems.filter((item) =>
-          item.tags.some((tag) => tag.label.toLowerCase().includes("spicy"))
-        );
-      } else if (selectedCategory === "Popular ⭐") {
-        filtered = menuItems.filter((item) =>
-          item.tags.some((tag) => tag.label.toLowerCase().includes("popular"))
-        );
-      } else if (selectedCategory !== "All") {
-        filtered = menuItems.filter((item) => item.category === selectedCategory);
+      if (!filtered.length) {
+        menuListEl.innerHTML = `<div class="empty">No menu items found in this category.</div>`;
+        return;
       }
 
-      if (selectedSubcategory !== "All") {
-        filtered = filtered.filter((item) =>
-          String(item.label || "").toLowerCase() === selectedSubcategory.toLowerCase()
-        );
-      }
+      menuListEl.innerHTML = filtered
+        .map((item) => {
+          const displayTags = [...item.tags.filter((tag) => tag.key !== "vegan"), ...getIngredientBadges(item)];
+          const tagsHtml = displayTags
+            .map((tag) => `<span class="menu-tag ${escapeHtml(tag.color)}">${escapeHtml(tag.label)}</span>`)
+            .join("");
+          const tagsSection = tagsHtml ? `<div class="menu-meta">${tagsHtml}</div>` : "";
 
-      return filtered;
+          return `
+            <article class="menu-card">
+              <img class="menu-image" src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.nameEn || item.nameKo)}" />
+              <div class="menu-content">
+                <p class="menu-title name-ko">${escapeHtml(item.nameKo)}</p>
+                <p class="menu-title menu-title-alt name-en">${escapeHtml(item.nameEn)}</p>
+                <p class="menu-desc desc">${escapeHtml(item.description)}</p>
+                ${tagsSection}
+              </div>
+              <div class="menu-price price">${escapeHtml(formatPrice(item.price))}</div>
+            </article>
+          `;
+        })
+        .join("");
     }
 
     function setupToTopButton() {
@@ -521,35 +864,33 @@
       });
     }
 
-    function renderMenu() {
-      const menuListEl = document.getElementById("menuList");
-      const filtered = filterMenus(allMenus);
+    function setupStickyHeaderState() {
+      const page = document.body;
+      const stickyShell = document.querySelector(".menu-sticky-shell");
+      if (!page || !stickyShell) return;
+      const mobileQuery = window.matchMedia("(max-width: 640px)");
 
-      if (!filtered.length) {
-        menuListEl.innerHTML = `<div class="empty">No menu items found in this category.</div>`;
-        return;
+      const syncHeaderHeight = () => {
+        document.documentElement.style.setProperty("--menu-sticky-height", `${stickyShell.offsetHeight}px`);
+      };
+
+      const syncStickyState = () => {
+        const threshold = mobileQuery.matches
+          ? Math.max(88, stickyShell.offsetHeight - 24)
+          : 16;
+
+        page.classList.toggle("is-scrolled", window.scrollY > threshold);
+        syncHeaderHeight();
+      };
+
+      syncStickyHeaderMetrics = syncHeaderHeight;
+      syncHeaderHeight();
+      syncStickyState();
+      window.addEventListener("scroll", syncStickyState, { passive: true });
+      window.addEventListener("resize", syncStickyState);
+      if (typeof mobileQuery.addEventListener === "function") {
+        mobileQuery.addEventListener("change", syncStickyState);
       }
-
-      menuListEl.innerHTML = filtered
-        .map((item) => {
-          const tagsHtml = item.tags
-            .map((tag) => `<span class="tag ${escapeHtml(tag.color)}">${escapeHtml(tag.label)}</span>`)
-            .join("");
-
-          return `
-            <article class="card">
-              <img class="thumb" src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.nameEn || item.nameKo)}" />
-              <div>
-                <p class="name-ko">${escapeHtml(item.nameKo)}</p>
-                <p class="name-en">${escapeHtml(item.nameEn)}</p>
-                <p class="desc">${escapeHtml(item.description)}</p>
-                <div class="tags">${tagsHtml}</div>
-              </div>
-              <div class="price">${escapeHtml(formatPrice(item.price))}</div>
-            </article>
-          `;
-        })
-        .join("");
     }
 
     async function bootstrap() {
@@ -563,6 +904,7 @@
       renderTabs();
       renderSubtabs();
       renderMenu();
+      setupStickyHeaderState();
       setupToTopButton();
     }
 
@@ -570,3 +912,4 @@
   </script>
 </body>
 </html>
+
