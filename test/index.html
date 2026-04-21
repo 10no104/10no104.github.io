@@ -975,14 +975,64 @@
       }
 
       .order-item {
-        grid-template-columns: minmax(0, 1fr) 58px;
+        grid-template-columns: minmax(0, 1fr) 66px;
+        gap: 10px;
+        padding: 14px;
+      }
+
+      .order-item-main {
+        gap: 8px;
+      }
+
+      .order-item-top {
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        gap: 6px;
+      }
+
+      .order-item-bottom {
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 8px;
       }
 
       .order-item-thumb {
-        width: 58px;
-        height: 58px;
+        width: 66px;
+        height: 66px;
         border-radius: 16px;
         align-self: start;
+      }
+
+      .order-item-name strong {
+        font-size: 0.94rem;
+      }
+
+      .order-item-name span {
+        font-size: 0.84rem;
+      }
+
+      .order-item-price {
+        font-size: 0.95rem;
+      }
+
+      .order-qty {
+        padding: 3px;
+        gap: 3px;
+      }
+
+      .order-qty button {
+        width: 30px;
+        height: 30px;
+      }
+
+      .order-qty span {
+        min-width: 24px;
+      }
+
+      .order-remove-btn {
+        font-size: 0.88rem;
       }
 
       .menu-page .menu-card-actions {
