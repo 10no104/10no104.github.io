@@ -219,15 +219,6 @@
       margin-top: 4px;
     }
 
-    .menu-page .menu-card-note {
-      margin: 0;
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: rgba(33, 24, 19, 0.56);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-
     .menu-page .menu-add-btn,
     .menu-page .order-submit-btn {
       appearance: none;
@@ -273,6 +264,52 @@
     .menu-stage .wrap {
       margin-top: 0;
       padding-top: 0;
+    }
+
+    .order-inline-bar {
+      position: sticky;
+      top: calc(var(--menu-sticky-height, 0px) + 12px);
+      z-index: 30;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin: 0 auto 14px;
+      padding: 14px 16px;
+      border-radius: 20px;
+      background:
+        linear-gradient(135deg, rgba(33, 24, 19, 0.94), rgba(90, 17, 34, 0.92));
+      color: #fffaf3;
+      box-shadow: 0 18px 30px rgba(19, 12, 9, 0.2);
+    }
+
+    .order-inline-copy {
+      display: grid;
+      gap: 4px;
+    }
+
+    .order-inline-copy strong {
+      font-size: 1rem;
+      line-height: 1.1;
+    }
+
+    .order-inline-copy span {
+      color: rgba(255, 250, 243, 0.78);
+      font-size: 0.88rem;
+    }
+
+    .order-inline-btn {
+      appearance: none;
+      border: 0;
+      cursor: pointer;
+      min-height: 42px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: #fffaf3;
+      color: #211813;
+      font: inherit;
+      font-weight: 800;
+      white-space: nowrap;
     }
 
     .order-shell {
@@ -676,6 +713,12 @@
         margin-bottom: 98px;
       }
 
+      .order-inline-bar {
+        top: calc(var(--menu-sticky-height, 0px) + 8px);
+        margin-bottom: 10px;
+        border-radius: 18px;
+      }
+
       .order-shell {
         display: none;
       }
@@ -819,6 +862,13 @@
   </div>
   <div class="order-layout">
     <div class="menu-stage">
+      <div class="order-inline-bar" id="orderInlineBar">
+        <div class="order-inline-copy">
+          <strong id="orderInlineTitle">Your order is empty</strong>
+          <span id="orderInlineMeta">Add items and review them while browsing the menu.</span>
+        </div>
+        <button class="order-inline-btn" id="orderInlineBtn" type="button">Review order</button>
+      </div>
       <main class="wrap">
         <section class="menu-list menu-grid" id="menuList"></section>
       </main>
@@ -835,9 +885,9 @@
       </section>
       <section class="order-card" aria-labelledby="orderFormHeading">
         <div class="order-card-header">
-          <p class="order-eyebrow">Checkout Draft</p>
-          <h3 id="orderFormHeading">Customer info</h3>
-          <p>We will keep this payload shape close to the future DB format so the backend can be plugged in later.</p>
+          <p class="order-eyebrow">Table Session</p>
+          <h3 id="orderFormHeading">QR + table context</h3>
+          <p>This draft is now aligned to a dine-in QR flow. We only keep the table identifier and optional request note here.</p>
         </div>
         <form class="order-form" id="orderForm">
           <div class="order-form-grid">
@@ -849,31 +899,16 @@
               </select>
             </div>
             <div class="order-field">
-              <label for="serviceType">Service</label>
-              <select id="serviceType" name="serviceType" required>
-                <option value="pickup">Pickup</option>
-                <option value="delivery">Delivery</option>
-              </select>
+              <label for="tableCode">Table / QR code</label>
+              <input id="tableCode" name="tableCode" type="text" placeholder="A12 or qr-downtown-08" required />
             </div>
             <div class="order-field">
-              <label for="customerName">Name</label>
-              <input id="customerName" name="customerName" type="text" autocomplete="name" placeholder="Your name" required />
-            </div>
-            <div class="order-field">
-              <label for="customerPhone">Phone</label>
-              <input id="customerPhone" name="customerPhone" type="tel" autocomplete="tel" placeholder="(555) 123-4567" required />
-            </div>
-            <div class="order-field">
-              <label for="requestedDate">Date</label>
-              <input id="requestedDate" name="requestedDate" type="date" required />
-            </div>
-            <div class="order-field">
-              <label for="requestedTime">Time</label>
-              <input id="requestedTime" name="requestedTime" type="time" required />
+              <label for="guestCount">Guests</label>
+              <input id="guestCount" name="guestCount" type="number" min="1" max="20" value="2" required />
             </div>
             <div class="order-field order-field-full">
               <label for="orderNote">Request note</label>
-              <textarea id="orderNote" name="orderNote" placeholder="Allergy, pickup timing, vegan adjustment, extra request..."></textarea>
+              <textarea id="orderNote" name="orderNote" placeholder="Extra plate, allergy note, no cilantro, vegan adjustment..."></textarea>
             </div>
           </div>
           <button class="order-submit-btn" type="submit">Build order payload</button>
@@ -905,7 +940,7 @@
         <div class="order-summary" id="orderSummaryMobile"></div>
       </section>
       <section class="order-card" aria-label="Mobile checkout draft">
-        <p class="order-status" id="orderStatusMobile">Use the main checkout form after reviewing your order here.</p>
+        <p class="order-status" id="orderStatusMobile">Table QR flow: review here, then use the main table session form on the page.</p>
       </section>
     </div>
   </div>
@@ -1351,34 +1386,26 @@
     }
 
     function setInitialOrderFields() {
-      const dateInput = document.getElementById("requestedDate");
-      const timeInput = document.getElementById("requestedTime");
-      const now = new Date();
-      const timezoneOffset = now.getTimezoneOffset();
-      const localDate = new Date(now.getTime() - (timezoneOffset * 60000));
+      const tableCodeInput = document.getElementById("tableCode");
+      const guestCountInput = document.getElementById("guestCount");
 
-      if (dateInput && !dateInput.value) {
-        dateInput.value = localDate.toISOString().slice(0, 10);
+      if (tableCodeInput && !tableCodeInput.value) {
+        tableCodeInput.value = "A12";
       }
 
-      if (timeInput && !timeInput.value) {
-        const rounded = new Date(now.getTime() + (30 * 60000));
-        rounded.setMinutes(Math.ceil(rounded.getMinutes() / 5) * 5, 0, 0);
-        timeInput.value = rounded.toTimeString().slice(0, 5);
+      if (guestCountInput && !guestCountInput.value) {
+        guestCountInput.value = "2";
       }
     }
 
     function buildOrderPayload(formValues) {
       return {
         store: formValues.store,
-        serviceType: formValues.serviceType,
-        customer: {
-          name: formValues.customerName,
-          phone: formValues.customerPhone
+        table: {
+          code: formValues.tableCode,
+          guestCount: Number(formValues.guestCount || 0)
         },
-        requestedAt: formValues.requestedDate && formValues.requestedTime
-          ? `${formValues.requestedDate}T${formValues.requestedTime}`
-          : "",
+        source: "table-qr",
         note: formValues.orderNote,
         totals: {
           itemCount: getCartItemCount(),
@@ -1444,8 +1471,10 @@
       const mobileBarEl = document.getElementById("cartMobileBar");
       const mobileTitleEl = document.getElementById("cartMobileTitle");
       const mobileMetaEl = document.getElementById("cartMobileMeta");
+      const inlineTitleEl = document.getElementById("orderInlineTitle");
+      const inlineMetaEl = document.getElementById("orderInlineMeta");
 
-      if (!orderListEl || !orderSummaryEl || !mobileOrderListEl || !mobileOrderSummaryEl || !previewEl || !mobileBarEl || !mobileTitleEl || !mobileMetaEl) return;
+      if (!orderListEl || !orderSummaryEl || !mobileOrderListEl || !mobileOrderSummaryEl || !previewEl || !mobileBarEl || !mobileTitleEl || !mobileMetaEl || !inlineTitleEl || !inlineMetaEl) return;
 
       const emptyMarkup = `
         <div class="order-empty">
@@ -1467,6 +1496,8 @@
         mobileBarEl.setAttribute("aria-hidden", "true");
         mobileTitleEl.textContent = "Your order";
         mobileMetaEl.textContent = "No items yet";
+        inlineTitleEl.textContent = "Your order is empty";
+        inlineMetaEl.textContent = "Add items and review them while browsing the menu.";
         if (isCartDrawerOpen) closeCartDrawer();
         return;
       }
@@ -1506,6 +1537,8 @@
       mobileBarEl.setAttribute("aria-hidden", "false");
       mobileTitleEl.textContent = `${itemCount} item${itemCount === 1 ? "" : "s"} in your order`;
       mobileMetaEl.textContent = `${formatCurrency(subtotal)} ready to review`;
+      inlineTitleEl.textContent = `${itemCount} item${itemCount === 1 ? "" : "s"} selected`;
+      inlineMetaEl.textContent = `${formatCurrency(subtotal)} total so far. You can still keep browsing.`;
 
       const form = document.getElementById("orderForm");
       if (form) {
@@ -1556,10 +1589,24 @@
     }
 
     function setupCartDrawer() {
+      const inlineBtn = document.getElementById("orderInlineBtn");
       const openBtn = document.getElementById("cartMobileOpenBtn");
       const closeBtn = document.getElementById("cartDrawerCloseBtn");
       const backdrop = document.getElementById("cartDrawerBackdrop");
-      if (!openBtn || !closeBtn || !backdrop) return;
+      const desktopSummary = document.getElementById("orderSummaryHeading");
+      if (!openBtn || !closeBtn || !backdrop || !inlineBtn) return;
+
+      inlineBtn.addEventListener("click", () => {
+        if (window.matchMedia("(max-width: 640px)").matches) {
+          if (!cartItems.length) return;
+          openCartDrawer();
+          return;
+        }
+
+        if (desktopSummary) {
+          desktopSummary.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      });
 
       openBtn.addEventListener("click", () => {
         if (!cartItems.length) return;
@@ -1688,7 +1735,6 @@
                 <p class="menu-desc desc">${escapeHtml(item.description)}</p>
                 ${tagsSection}
                 <div class="menu-card-actions">
-                  <p class="menu-card-note">${escapeHtml(item.category || "Menu")}</p>
                   <button class="menu-add-btn" data-menu-id="${escapeHtml(getMenuId(item))}" type="button">Add to order</button>
                 </div>
               </div>
