@@ -273,14 +273,13 @@
     }
 
     .order-inline-bar {
-      position: sticky;
-      top: calc(var(--menu-sticky-height, 0px) + 12px);
+      width: 100%;
       z-index: 30;
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 14px;
-      margin: 0 auto 14px;
+      margin: 0;
       padding: 14px 16px;
       border-radius: 20px;
       background:
@@ -316,6 +315,12 @@
       font: inherit;
       font-weight: 800;
       white-space: nowrap;
+    }
+
+    .menu-page.is-scrolled .order-inline-bar {
+      padding: 12px 14px;
+      border-radius: 18px;
+      box-shadow: 0 12px 24px rgba(19, 12, 9, 0.16);
     }
 
     .order-shell {
@@ -690,8 +695,6 @@
       }
 
       .order-inline-bar {
-        top: calc(var(--menu-sticky-height, 0px) + 8px);
-        margin-bottom: 10px;
         border-radius: 18px;
       }
 
@@ -840,10 +843,6 @@
         <p class="subtabs-context" id="subtabsContext"></p>
         <section class="subtabs" aria-label="Subcategories" id="subtabs"></section>
       </section>
-    </div>
-  </div>
-  <div class="order-layout">
-    <div class="menu-stage">
       <div class="order-inline-bar" id="orderInlineBar">
         <div class="order-inline-copy">
           <strong id="orderInlineTitle">Your order is empty</strong>
@@ -851,6 +850,10 @@
         </div>
         <button class="order-inline-btn" id="orderInlineBtn" type="button">Review order</button>
       </div>
+    </div>
+  </div>
+  <div class="order-layout">
+    <div class="menu-stage">
       <main class="wrap">
         <section class="menu-list menu-grid" id="menuList"></section>
       </main>
