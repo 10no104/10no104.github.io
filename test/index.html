@@ -207,7 +207,6 @@
     }
 
     .menu-page .menu-card {
-      grid-template-columns: 230px minmax(0, 1fr) auto auto;
       background:
         linear-gradient(180deg, rgba(255, 252, 247, 0.94), rgba(249, 243, 233, 0.94)),
         url("../assets/pattern.webp") center / 460px auto;
@@ -227,10 +226,19 @@
 
     .menu-page .menu-card-actions {
       display: flex;
-      justify-content: flex-end;
+      justify-content: flex-start;
       align-items: center;
       gap: 12px;
       margin-top: 0;
+    }
+
+    .menu-page .menu-side {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 18px;
+      padding-left: 16px;
+      white-space: nowrap;
     }
 
     .menu-page .menu-add-btn,
@@ -761,6 +769,14 @@
       .menu-page .menu-card-actions {
         align-items: flex-start;
         flex-direction: column;
+      }
+
+      .menu-page .menu-side {
+        display: grid;
+        justify-items: start;
+        gap: 14px;
+        padding-left: 0;
+        white-space: normal;
       }
 
       .menu-page .menu-add-btn {
@@ -1812,9 +1828,11 @@
                 <p class="menu-desc desc">${escapeHtml(item.description)}</p>
                 ${tagsSection}
               </div>
-              <div class="menu-price price">${escapeHtml(formatPrice(item.price))}</div>
-              <div class="menu-card-actions">
-                <button class="menu-add-btn" data-menu-id="${escapeHtml(getMenuId(item))}" type="button">Add to order</button>
+              <div class="menu-side">
+                <div class="menu-price price">${escapeHtml(formatPrice(item.price))}</div>
+                <div class="menu-card-actions">
+                  <button class="menu-add-btn" data-menu-id="${escapeHtml(getMenuId(item))}" type="button">Add to order</button>
+                </div>
               </div>
             </article>
           `;
