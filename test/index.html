@@ -75,7 +75,11 @@
     }
 
     .menu-sticky-shell {
-      position: relative;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 60;
       padding: 18px 0 8px;
       background: linear-gradient(to bottom, rgba(249, 245, 238, 0.82), rgba(249, 245, 238, 0.4));
       backdrop-filter: none;
@@ -83,7 +87,8 @@
     }
 
     .menu-sticky-spacer {
-      height: 0;
+      height: var(--menu-sticky-height, 0px);
+      transition: height 0.24s ease;
     }
 
     .menu-sticky-inner {
@@ -123,11 +128,6 @@
     }
 
     .menu-page.is-scrolled .menu-sticky-shell {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 60;
       padding: 10px 0 12px;
       background: linear-gradient(to bottom, rgba(244, 240, 233, 0.88), rgba(244, 240, 233, 0.54));
       backdrop-filter: blur(10px);
@@ -886,6 +886,12 @@
       syncStickyHeaderMetrics = syncHeaderHeight;
       syncHeaderHeight();
       syncStickyState();
+      if (typeof ResizeObserver === "function") {
+        const resizeObserver = new ResizeObserver(() => {
+          syncHeaderHeight();
+        });
+        resizeObserver.observe(stickyShell);
+      }
       window.addEventListener("scroll", syncStickyState, { passive: true });
       window.addEventListener("resize", syncStickyState);
       if (typeof mobileQuery.addEventListener === "function") {
