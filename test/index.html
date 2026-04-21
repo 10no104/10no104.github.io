@@ -76,7 +76,9 @@
     }
 
     .menu-sticky-shell {
-      position: relative;
+      position: sticky;
+      top: 0;
+      z-index: 60;
       padding: 18px 0 8px;
       background: linear-gradient(to bottom, rgba(249, 245, 238, 0.82), rgba(249, 245, 238, 0.4));
       backdrop-filter: none;
@@ -155,11 +157,6 @@
     }
 
     .menu-page.is-scrolled .menu-sticky-shell {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 60;
       padding: 10px 0 12px;
       background: linear-gradient(to bottom, rgba(244, 240, 233, 0.88), rgba(244, 240, 233, 0.54));
       backdrop-filter: blur(10px);
@@ -167,7 +164,7 @@
     }
 
     .menu-page.is-scrolled .menu-sticky-spacer {
-      height: var(--menu-sticky-height, 0px);
+      height: 0;
     }
 
     .menu-page.is-scrolled .menu-sticky-inner {
