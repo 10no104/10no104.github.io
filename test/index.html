@@ -605,6 +605,10 @@
       transform: translateY(0);
     }
 
+    .cart-drawer.is-dragging {
+      transition: none;
+    }
+
     .cart-drawer-grab {
       width: 52px;
       height: 5px;
@@ -1396,16 +1400,26 @@
 
     function openCartDrawer() {
       const backdrop = document.getElementById("cartDrawerBackdrop");
+      const drawer = backdrop?.querySelector(".cart-drawer");
       if (!backdrop) return;
       backdrop.hidden = false;
       backdrop.classList.add("is-open");
+      if (drawer) {
+        drawer.classList.remove("is-dragging");
+        drawer.style.transform = "";
+      }
       document.body.style.overflow = "hidden";
       isCartDrawerOpen = true;
     }
 
     function closeCartDrawer() {
       const backdrop = document.getElementById("cartDrawerBackdrop");
+      const drawer = backdrop?.querySelector(".cart-drawer");
       if (!backdrop) return;
+      if (drawer) {
+        drawer.classList.remove("is-dragging");
+        drawer.style.transform = "";
+      }
       backdrop.classList.remove("is-open");
       backdrop.hidden = true;
       document.body.style.overflow = "";
@@ -1555,8 +1569,20 @@
       const inlineBtn = document.getElementById("orderInlineBtn");
       const closeBtn = document.getElementById("cartDrawerCloseBtn");
       const backdrop = document.getElementById("cartDrawerBackdrop");
+      const drawer = backdrop?.querySelector(".cart-drawer");
       const desktopSummary = document.getElementById("orderSummaryHeading");
-      if (!closeBtn || !backdrop || !inlineBtn) return;
+      if (!closeBtn || !backdrop || !inlineBtn || !drawer) return;
+
+      let touchStartY = 0;
+      let currentDragY = 0;
+      let isGestureActive = false;
+
+      const resetDrawerDrag = () => {
+        currentDragY = 0;
+        isGestureActive = false;
+        drawer.classList.remove("is-dragging");
+        drawer.style.transform = "";
+      };
 
       inlineBtn.addEventListener("click", () => {
         if (window.matchMedia("(max-width: 640px)").matches) {
@@ -1577,6 +1603,46 @@
           closeCartDrawer();
         }
       });
+
+      drawer.addEventListener("touchstart", (event) => {
+        if (!isCartDrawerOpen) return;
+        if (drawer.scrollTop > 0) return;
+        touchStartY = event.touches[0]?.clientY || 0;
+        currentDragY = 0;
+        isGestureActive = true;
+      }, { passive: true });
+
+      drawer.addEventListener("touchmove", (event) => {
+        if (!isGestureActive) return;
+        const nextY = event.touches[0]?.clientY || 0;
+        const deltaY = Math.max(0, nextY - touchStartY);
+
+        if (deltaY <= 0) return;
+        if (drawer.scrollTop > 0) {
+          resetDrawerDrag();
+          return;
+        }
+
+        currentDragY = deltaY;
+        drawer.classList.add("is-dragging");
+        drawer.style.transform = `translateY(${Math.min(deltaY * 0.95, 240)}px)`;
+
+        if (event.cancelable) {
+          event.preventDefault();
+        }
+      }, { passive: false });
+
+      drawer.addEventListener("touchend", () => {
+        if (!isGestureActive) return;
+        if (currentDragY > 110) {
+          closeCartDrawer();
+          return;
+        }
+
+        resetDrawerDrag();
+      });
+
+      drawer.addEventListener("touchcancel", resetDrawerDrag);
 
       document.addEventListener("keydown", (event) => {
         if (event.key === "Escape" && isCartDrawerOpen) {
