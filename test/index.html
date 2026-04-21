@@ -219,10 +219,11 @@
     }
 
     .menu-page .menu-price-box {
-      display: grid;
-      justify-items: end;
-      align-content: center;
-      gap: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 16px;
+      min-width: max-content;
     }
 
     .menu-page .menu-card-actions {
@@ -717,7 +718,6 @@
       }
 
       .menu-page .menu-price-box {
-        justify-items: end;
         gap: 12px;
       }
     }
@@ -999,7 +999,8 @@
       }
 
       .menu-page .menu-price-box {
-        justify-items: start;
+        justify-content: flex-start;
+        flex-wrap: wrap;
       }
 
       .cart-drawer .order-item-price,
