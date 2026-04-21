@@ -612,10 +612,6 @@
       return getIngredientTagsForItem(item).filter((tag) => allowedTags.has(tag));
     }
 
-    function getDietaryTagsForItem(item) {
-      return getVeganOptionTags(item);
-    }
-
     function hasMenuTag(item, key) {
       return Array.isArray(item.tags) && item.tags.some((tag) => tag.key === key);
     }
