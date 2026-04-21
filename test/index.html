@@ -132,6 +132,7 @@
       background: linear-gradient(to bottom, rgba(244, 240, 233, 0.88), rgba(244, 240, 233, 0.54));
       backdrop-filter: blur(10px);
       box-shadow: 0 8px 24px rgba(28, 35, 48, 0.08);
+      animation: stickyShellDrop 0.34s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .menu-page.is-scrolled .menu-sticky-spacer {
@@ -145,6 +146,18 @@
         url("../assets/pattern.webp") center / 420px auto;
       border-color: rgba(120, 103, 77, 0.16);
       box-shadow: 0 12px 32px rgba(28, 35, 48, 0.12);
+    }
+
+    @keyframes stickyShellDrop {
+      0% {
+        opacity: 0;
+        transform: translateY(-18px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .menu-homebar {
