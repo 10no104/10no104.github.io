@@ -1132,7 +1132,10 @@
           <strong id="orderInlineTitle">Your order is empty</strong>
           <span id="orderInlineMeta">Add items to start.</span>
         </div>
-        <button class="order-inline-btn" id="orderInlineBtn" type="button">Review order</button>
+        <div class="order-inline-actions">
+          <button class="order-inline-btn" id="orderInlineBtn" type="button">Review order</button>
+          <button class="order-inline-submit" id="orderInlineSubmitBtn" type="button">Send order</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1198,6 +1201,7 @@
       <section class="order-card" aria-label="Mobile order summary">
         <div class="order-list" id="orderListMobile"></div>
         <div class="order-summary" id="orderSummaryMobile"></div>
+        <button class="drawer-submit-btn" id="drawerSubmitBtn" type="button">Send order</button>
       </section>
       <section class="order-card" aria-label="Mobile checkout draft">
         <p class="order-status" id="orderStatusMobile">Table order</p>
@@ -1859,7 +1863,7 @@
       bindOrderListInteractions(mobileOrderListEl);
 
       inlineTitleEl.textContent = `${itemCount} item${itemCount === 1 ? "" : "s"} selected`;
-      inlineMetaEl.textContent = "Review anytime.";
+      inlineMetaEl.textContent = `${formatCurrency(subtotal)} total`;
 
       const form = document.getElementById("orderForm");
       if (form) {
@@ -2126,6 +2130,7 @@
       const serverCallBtn = document.getElementById("serverCallBtn");
       const form = document.getElementById("orderForm");
       const statusEl = document.getElementById("orderStatus");
+      const mobileStatusEl = document.getElementById("orderStatusMobile");
       const previewEl = document.getElementById("orderPayloadPreview");
       const modalBackdrop = document.getElementById("serverModalBackdrop");
       const modalMessage = document.getElementById("serverModalMessage");
@@ -2134,7 +2139,9 @@
       const modalCancelBtn = document.getElementById("serverModalCancelBtn");
       const modalConfirmBtn = document.getElementById("serverModalConfirmBtn");
       const requestGrid = document.getElementById("serverRequestGrid");
-      if (!toTopBtn || !serverCallBtn || !form || !statusEl || !previewEl || !modalBackdrop || !modalMessage || !modalSummaryTitle || !modalSummaryMeta || !modalCancelBtn || !modalConfirmBtn || !requestGrid) return;
+      const inlineSubmitBtn = document.getElementById("orderInlineSubmitBtn");
+      const drawerSubmitBtn = document.getElementById("drawerSubmitBtn");
+      if (!toTopBtn || !serverCallBtn || !form || !statusEl || !mobileStatusEl || !previewEl || !modalBackdrop || !modalMessage || !modalSummaryTitle || !modalSummaryMeta || !modalCancelBtn || !modalConfirmBtn || !requestGrid || !inlineSubmitBtn || !drawerSubmitBtn) return;
 
       window.addEventListener("scroll", () => {
         const shouldShow = window.scrollY > 380;
@@ -2144,6 +2151,25 @@
 
       toTopBtn.addEventListener("click", () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
+      const submitOrderFromShortcut = () => {
+        if (!cartItems.length) {
+          statusEl.textContent = "Add items first.";
+          statusEl.className = "order-status is-error";
+          mobileStatusEl.textContent = "Add items first.";
+          return;
+        }
+
+        form.requestSubmit();
+      };
+
+      inlineSubmitBtn.addEventListener("click", submitOrderFromShortcut);
+      drawerSubmitBtn.addEventListener("click", () => {
+        submitOrderFromShortcut();
+        if (isCartDrawerOpen) {
+          closeCartDrawer();
+        }
       });
 
       const runServerCallTest = () => {
@@ -2167,11 +2193,9 @@
       });
 
       serverCallBtn.addEventListener("click", () => {
-        const formData = new FormData(form);
-        const formValues = Object.fromEntries(formData.entries());
         modalMessage.textContent = "Choose a request.";
-        modalSummaryTitle.textContent = `Table ${formValues.tableCode || "unknown"}`;
-        modalSummaryMeta.textContent = `${formValues.store || "store"} · ${formValues.guestCount || "0"} guests`;
+        modalSummaryTitle.textContent = "Service request";
+        modalSummaryMeta.textContent = "Sent separately from the order.";
 
         openServerModal();
       });
