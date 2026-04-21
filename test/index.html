@@ -283,12 +283,17 @@
       }
 
       .menu-page.is-scrolled .menu-sticky-inner {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
         gap: 6px 8px;
       }
 
       .menu-page.is-scrolled .menu-homebar {
-        justify-content: center;
-        width: 100%;
+        justify-content: flex-start;
+        width: auto;
+        flex: 0 0 auto;
+        margin-bottom: 0;
       }
 
       .menu-page.is-scrolled .menu-home-link {
@@ -299,8 +304,10 @@
       }
 
       .menu-page.is-scrolled .menu-sticky-shell .tabs {
+        flex: 1 1 0;
+        min-width: 0;
         margin-top: 0;
-        width: 100%;
+        align-items: center;
       }
 
       .menu-page.is-scrolled .menu-home-logo {
@@ -336,7 +343,7 @@
   <div class="menu-sticky-shell">
     <div class="menu-sticky-inner">
       <div class="menu-homebar">
-        <a class="menu-home-link" href="../../index.html" aria-label="Go to main page">
+        <a class="menu-home-link" href="../index.html" aria-label="Go to main page">
           <img class="menu-home-logo" src="../assets/logo-dark.webp" alt="EHWA home" />
         </a>
       </div>
