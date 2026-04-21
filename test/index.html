@@ -1164,9 +1164,6 @@
         <div class="order-summary" id="orderSummaryMobile"></div>
         <button class="drawer-submit-btn" id="drawerSubmitBtn" type="button">Send order</button>
       </section>
-      <section class="order-card" aria-label="Mobile checkout draft">
-        <p class="order-status" id="orderStatusMobile"></p>
-      </section>
     </div>
   </div>
   <button class="to-top" id="toTopBtn" type="button" aria-label="Back to top">↑ Top</button>
@@ -2086,7 +2083,6 @@
       const serverCallBtn = document.getElementById("serverCallBtn");
       const form = document.getElementById("orderForm");
       const statusEl = document.getElementById("orderStatus");
-      const mobileStatusEl = document.getElementById("orderStatusMobile");
       const previewEl = document.getElementById("orderPayloadPreview");
       const modalBackdrop = document.getElementById("serverModalBackdrop");
       const modalMessage = document.getElementById("serverModalMessage");
@@ -2094,7 +2090,7 @@
       const modalConfirmBtn = document.getElementById("serverModalConfirmBtn");
       const requestGrid = document.getElementById("serverRequestGrid");
       const drawerSubmitBtn = document.getElementById("drawerSubmitBtn");
-      if (!toTopBtn || !serverCallBtn || !form || !statusEl || !mobileStatusEl || !previewEl || !modalBackdrop || !modalMessage || !modalCancelBtn || !modalConfirmBtn || !requestGrid || !drawerSubmitBtn) return;
+      if (!toTopBtn || !serverCallBtn || !form || !statusEl || !previewEl || !modalBackdrop || !modalMessage || !modalCancelBtn || !modalConfirmBtn || !requestGrid || !drawerSubmitBtn) return;
 
       window.addEventListener("scroll", () => {
         const shouldShow = window.scrollY > 380;
@@ -2110,7 +2106,6 @@
         if (!cartItems.length) {
           statusEl.textContent = "Add items first.";
           statusEl.className = "order-status is-error";
-          mobileStatusEl.textContent = "Add items first.";
           return;
         }
 
