@@ -15,7 +15,6 @@
       --menu-bg-ink: #211813;
       --menu-bg-gold: rgba(212, 175, 55, 0.2);
       --menu-shell-shadow: 0 18px 40px rgba(30, 21, 16, 0.12);
-      --menu-compact-progress: 0;
     }
 
     body.menu-page {
@@ -76,14 +75,11 @@
     }
 
     .menu-sticky-shell {
-      position: sticky;
-      top: 0;
-      z-index: 60;
+      position: relative;
       padding: 18px 0 8px;
       background: linear-gradient(to bottom, rgba(249, 245, 238, 0.82), rgba(249, 245, 238, 0.4));
       backdrop-filter: none;
-      transform-origin: top center;
-      transition: padding 0.42s cubic-bezier(0.22, 1, 0.36, 1), background 0.42s ease, backdrop-filter 0.42s ease, box-shadow 0.42s ease, transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+      transition: padding 0.24s ease, background 0.24s ease, backdrop-filter 0.24s ease, box-shadow 0.24s ease;
     }
 
     .menu-sticky-spacer {
@@ -102,54 +98,24 @@
         url("../assets/pattern.webp") center / 440px auto;
       border: 1px solid rgba(120, 103, 77, 0.14);
       box-shadow: var(--menu-shell-shadow);
-      transform-origin: top center;
-      transition: gap 0.42s cubic-bezier(0.22, 1, 0.36, 1), padding 0.42s cubic-bezier(0.22, 1, 0.36, 1), border-radius 0.42s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.42s ease, transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+      transition: gap 0.24s ease;
     }
 
     .menu-homebar {
       display: flex;
       align-items: center;
       justify-content: flex-start;
-      transform-origin: left center;
-      transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.32s ease;
     }
 
     .menu-sticky-shell .tabs,
     .menu-sticky-shell .subtabs-wrap {
       margin-bottom: 0;
-      transform-origin: top center;
-      transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
     }
 
     .menu-sticky-shell .subtabs-wrap {
       position: static !important;
       top: auto !important;
       margin-bottom: 0;
-      transform: translateY(calc(var(--menu-compact-progress) * -3px)) scale(calc(1 - (var(--menu-compact-progress) * 0.03)));
-      opacity: calc(1 - (var(--menu-compact-progress) * 0.08));
-    }
-
-    .menu-sticky-shell .tabs {
-      transform: translateY(calc(var(--menu-compact-progress) * -2px)) scale(calc(1 - (var(--menu-compact-progress) * 0.045)));
-    }
-
-    .menu-sticky-shell .tab {
-      transform-origin: center center;
-      padding: calc(14px - (var(--menu-compact-progress) * 3px)) calc(34px - (var(--menu-compact-progress) * 8px));
-      font-size: calc(22px - (var(--menu-compact-progress) * 3px));
-      transition: padding 0.42s cubic-bezier(0.22, 1, 0.36, 1), font-size 0.42s cubic-bezier(0.22, 1, 0.36, 1), transform 0.42s cubic-bezier(0.22, 1, 0.36, 1), border-radius 0.42s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    .menu-sticky-shell .subtabs-context {
-      font-size: calc(15px - (var(--menu-compact-progress) * 1px));
-      transition: font-size 0.42s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
-    }
-
-    .menu-sticky-shell .subtab {
-      transform-origin: center center;
-      padding: calc(8px - (var(--menu-compact-progress) * 1px)) calc(16px - (var(--menu-compact-progress) * 3px));
-      font-size: calc(16px - (var(--menu-compact-progress) * 1px));
-      transition: padding 0.42s cubic-bezier(0.22, 1, 0.36, 1), font-size 0.42s cubic-bezier(0.22, 1, 0.36, 1), transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .menu-page .wrap {
@@ -157,6 +123,11 @@
     }
 
     .menu-page.is-scrolled .menu-sticky-shell {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 60;
       padding: 10px 0 12px;
       background: linear-gradient(to bottom, rgba(244, 240, 233, 0.88), rgba(244, 240, 233, 0.54));
       backdrop-filter: blur(10px);
@@ -164,7 +135,7 @@
     }
 
     .menu-page.is-scrolled .menu-sticky-spacer {
-      height: 0;
+      height: var(--menu-sticky-height, 0px);
     }
 
     .menu-page.is-scrolled .menu-sticky-inner {
@@ -174,7 +145,6 @@
         url("../assets/pattern.webp") center / 420px auto;
       border-color: rgba(120, 103, 77, 0.16);
       box-shadow: 0 12px 32px rgba(28, 35, 48, 0.12);
-      transform: translateY(calc(var(--menu-compact-progress) * -1px));
     }
 
     .menu-homebar {
@@ -191,8 +161,7 @@
       background: linear-gradient(180deg, #fffdf9 0%, #f3eadc 100%);
       border: 1px solid rgba(71, 48, 31, 0.12);
       box-shadow: 0 12px 28px rgba(42, 28, 18, 0.12);
-      transform-origin: center center;
-      transition: width 0.42s cubic-bezier(0.22, 1, 0.36, 1), height 0.42s cubic-bezier(0.22, 1, 0.36, 1), border-radius 0.42s cubic-bezier(0.22, 1, 0.36, 1), transform 0.28s ease, box-shadow 0.32s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     .menu-page.is-scrolled .menu-home-link {
@@ -216,13 +185,12 @@
       height: 56px;
       object-fit: contain;
       display: block;
-      transition: width 0.42s cubic-bezier(0.22, 1, 0.36, 1), height 0.42s cubic-bezier(0.22, 1, 0.36, 1), transform 0.42s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+      transition: width 0.24s ease, height 0.24s ease;
     }
 
     .menu-page.is-scrolled .menu-home-logo {
       width: 44px;
       height: 44px;
-      transform: scale(calc(1 - (var(--menu-compact-progress) * 0.02)));
     }
 
     .menu-page .menu-card {
@@ -901,18 +869,16 @@
       const stickyShell = document.querySelector(".menu-sticky-shell");
       if (!page || !stickyShell) return;
       const mobileQuery = window.matchMedia("(max-width: 640px)");
-      const root = document.documentElement;
 
       const syncHeaderHeight = () => {
-        root.style.setProperty("--menu-sticky-height", `${stickyShell.offsetHeight}px`);
+        document.documentElement.style.setProperty("--menu-sticky-height", `${stickyShell.offsetHeight}px`);
       };
 
       const syncStickyState = () => {
-        const threshold = mobileQuery.matches ? 10 : 6;
-        const compactRange = mobileQuery.matches ? 150 : 120;
-        const progress = Math.min(Math.max((window.scrollY - threshold) / compactRange, 0), 1);
+        const threshold = mobileQuery.matches
+          ? Math.max(88, stickyShell.offsetHeight - 24)
+          : 16;
 
-        root.style.setProperty("--menu-compact-progress", progress.toFixed(3));
         page.classList.toggle("is-scrolled", window.scrollY > threshold);
         syncHeaderHeight();
       };
