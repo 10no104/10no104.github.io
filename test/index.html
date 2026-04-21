@@ -982,20 +982,25 @@
       }
 
       .order-item-top,
-      .order-item-bottom,
-      .menu-page .menu-card-actions {
+      .order-item-bottom {
         align-items: flex-start;
         flex-direction: column;
       }
 
       .menu-page .menu-card-actions {
-        margin-top: 8px;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+        margin-top: 0;
+        margin-left: 0;
         transform: none;
       }
 
       .menu-page .menu-price-box {
-        justify-content: flex-start;
-        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: nowrap;
       }
 
       #orderSummaryMobile {
