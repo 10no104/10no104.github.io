@@ -532,6 +532,15 @@
       color: #211813;
     }
 
+    .order-summary-grand-total {
+      margin-top: 2px;
+      padding-top: 10px;
+      border-top: 1px dashed rgba(125, 98, 63, 0.16);
+      font-size: 1.08rem;
+      font-weight: 800;
+      color: #211813;
+    }
+
     .drawer-submit-btn {
       width: 100%;
       min-height: 50px;
@@ -1303,6 +1312,7 @@
     const SPICY_CATEGORY = "Spicy 🌶️";
     const POPULAR_CATEGORY = "Popular ⭐";
     const VEGAN_SUBOPTIONS = ["Seafood", "Egg", "Dairy"];
+    const ONTARIO_HST_RATE = 0.13;
 
     let allMenus = [];
     let cartItems = [];
@@ -1647,6 +1657,14 @@
       return cartItems.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
     }
 
+    function getCartTax() {
+      return Number((getCartSubtotal() * ONTARIO_HST_RATE).toFixed(2));
+    }
+
+    function getCartTotal() {
+      return Number((getCartSubtotal() + getCartTax()).toFixed(2));
+    }
+
     function addToCart(menuId) {
       const menuItem = allMenus.find((item) => getMenuId(item) === menuId);
       if (!menuItem) return;
@@ -1701,7 +1719,9 @@
         note: formValues.orderNote,
         totals: {
           itemCount: getCartItemCount(),
-          subtotal: Number(getCartSubtotal().toFixed(2))
+          subtotal: Number(getCartSubtotal().toFixed(2)),
+          tax: getCartTax(),
+          total: getCartTotal()
         },
         items: cartItems.map((item) => ({
           menuId: item.menuId,
@@ -1808,13 +1828,15 @@
           No items yet.
         </div>
       `;
-      const summaryMarkup = (itemCount, subtotal) => `
+      const summaryMarkup = (itemCount, subtotal, tax, total) => `
         <div class="order-summary-row"><span>Items</span><strong>${itemCount}</strong></div>
         <div class="order-summary-row order-summary-total"><span>Subtotal</span><strong>${formatCurrency(subtotal)}</strong></div>
+        <div class="order-summary-row"><span>Tax</span><strong>${formatCurrency(tax)}</strong></div>
+        <div class="order-summary-row order-summary-grand-total"><span>Total</span><strong>${formatCurrency(total)}</strong></div>
       `;
       if (!cartItems.length) {
         mobileOrderListEl.innerHTML = emptyMarkup;
-        mobileOrderSummaryEl.innerHTML = summaryMarkup(0, 0);
+        mobileOrderSummaryEl.innerHTML = summaryMarkup(0, 0, 0, 0);
         inlineTitleEl.textContent = "Your order is empty";
         if (isCartDrawerOpen) closeCartDrawer();
         return;
@@ -1846,9 +1868,11 @@
         .join("");
       const itemCount = getCartItemCount();
       const subtotal = getCartSubtotal();
+      const tax = getCartTax();
+      const total = getCartTotal();
 
       mobileOrderListEl.innerHTML = itemsMarkup;
-      mobileOrderSummaryEl.innerHTML = summaryMarkup(itemCount, subtotal);
+      mobileOrderSummaryEl.innerHTML = summaryMarkup(itemCount, subtotal, tax, total);
       bindOrderListInteractions(mobileOrderListEl);
 
       inlineTitleEl.textContent = `${itemCount} item${itemCount === 1 ? "" : "s"} selected`;
