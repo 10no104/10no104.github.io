@@ -3,937 +3,126 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reservation Test | EHWA</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/global.css?v=20260423-1" />
+  <title>Reservation Connect Test</title>
   <style>
-    :root {
-      --reservation-bg: #f5efe4;
-      --reservation-paper: rgba(255, 251, 245, 0.88);
-      --reservation-ink: #1f1813;
-      --reservation-muted: #67584c;
-      --reservation-accent: #d4af37;
-      --reservation-accent-strong: #8e2438;
-      --reservation-border: rgba(107, 83, 57, 0.16);
-      --reservation-shadow: 0 22px 48px rgba(40, 26, 16, 0.12);
-      --reservation-radius-xl: 32px;
-      --reservation-radius-lg: 24px;
-      --reservation-radius-md: 18px;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body.reservation-page {
-      min-height: 100vh;
+    * { box-sizing: border-box; }
+    body {
       margin: 0;
-      color: var(--reservation-ink);
-      background:
-        radial-gradient(circle at top left, rgba(212, 175, 55, 0.18), transparent 28%),
-        radial-gradient(circle at 88% 10%, rgba(142, 36, 56, 0.14), transparent 24%),
-        linear-gradient(180deg, #fbf6ef 0%, var(--reservation-bg) 100%);
-      font-family: "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      overflow-x: hidden;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f6f3ee;
+      color: #1f1813;
     }
-
-    body.reservation-page::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background:
-        linear-gradient(180deg, rgba(255, 251, 245, 0.24), rgba(255, 251, 245, 0.08)),
-        url("../assets/pattern.webp") center / 680px auto;
-      opacity: 0.12;
-      pointer-events: none;
-      z-index: -2;
-    }
-
-    body.reservation-page::after {
-      content: "";
-      position: fixed;
-      inset: auto auto -120px -120px;
-      width: 360px;
-      height: 360px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(212, 175, 55, 0.14), transparent 70%);
-      filter: blur(12px);
-      pointer-events: none;
-      z-index: -1;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    .reservation-shell {
-      width: min(1160px, calc(100% - 32px));
-      margin: 0 auto;
-      padding: 28px 0 56px;
-    }
-
-    .reservation-topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 18px;
-    }
-
-    .reservation-brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .reservation-logo-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 74px;
-      height: 74px;
-      border-radius: 999px;
-      background: linear-gradient(180deg, #fffdf9 0%, #f3eadc 100%);
-      border: 1px solid rgba(71, 48, 31, 0.12);
-      box-shadow: 0 14px 28px rgba(42, 28, 18, 0.12);
-    }
-
-    .reservation-logo {
-      width: 50px;
-      height: 50px;
-      object-fit: contain;
-    }
-
-    .reservation-eyebrow {
-      margin: 0 0 6px;
-      font-size: 0.86rem;
-      font-weight: 800;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--reservation-accent-strong);
-    }
-
-    .reservation-brand h1 {
-      margin: 0;
-      font-size: clamp(1.5rem, 2.4vw, 2.2rem);
-      letter-spacing: -0.04em;
-    }
-
-    .reservation-top-actions {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      gap: 10px;
-    }
-
-    .ghost-link,
-    .accent-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 46px;
-      padding: 0 18px;
-      border-radius: 999px;
-      font-weight: 700;
-      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
-    }
-
-    .ghost-link {
-      background: rgba(255, 251, 245, 0.74);
-      border: 1px solid var(--reservation-border);
-      box-shadow: 0 10px 24px rgba(44, 29, 18, 0.08);
-    }
-
-    .accent-link {
-      color: #fff;
-      background: linear-gradient(135deg, var(--reservation-accent-strong), #c08b1d);
-      box-shadow: 0 14px 28px rgba(120, 33, 49, 0.24);
-    }
-
-    .ghost-link:hover,
-    .accent-link:hover {
-      transform: translateY(-1px);
-      opacity: 0.96;
-    }
-
-    .reservation-hero {
-      position: relative;
-      overflow: hidden;
-      display: grid;
-      grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
-      gap: 20px;
+    .wrap {
+      width: min(560px, calc(100% - 32px));
+      margin: 48px auto;
       padding: 28px;
-      border-radius: var(--reservation-radius-xl);
-      background:
-        linear-gradient(135deg, rgba(22, 16, 12, 0.98) 0%, rgba(40, 24, 16, 0.95) 44%, rgba(64, 22, 31, 0.92) 100%),
-        url("../assets/pattern.webp") center / 520px auto;
-      color: #fff7ef;
-      box-shadow: 0 30px 60px rgba(27, 18, 11, 0.2);
-    }
-
-    .reservation-hero::after {
-      content: "";
-      position: absolute;
-      inset: auto -50px -80px auto;
-      width: 260px;
-      height: 260px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(212, 175, 55, 0.26), transparent 68%);
-      filter: blur(8px);
-      pointer-events: none;
-    }
-
-    .hero-copy,
-    .hero-panel {
-      position: relative;
-      z-index: 1;
-    }
-
-    .hero-kicker {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 16px;
-      color: #f1c760;
-      font-size: 0.92rem;
-      font-weight: 800;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-    }
-
-    .hero-copy h2 {
-      margin: 0 0 18px;
-      font-size: clamp(2.2rem, 5vw, 4.2rem);
-      line-height: 0.94;
-      letter-spacing: -0.06em;
-    }
-
-    .hero-copy p {
-      max-width: 560px;
-      margin: 0 0 24px;
-      color: rgba(255, 247, 239, 0.84);
-      font-size: 1rem;
-    }
-
-    .hero-points {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    .hero-points li {
-      padding: 14px 16px;
-      border-radius: 18px;
-      background: rgba(255, 249, 241, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(8px);
-    }
-
-    .hero-points strong,
-    .hero-points span {
-      display: block;
-    }
-
-    .hero-points strong {
-      margin-bottom: 4px;
-      font-size: 1.1rem;
-    }
-
-    .hero-points span {
-      color: rgba(255, 247, 239, 0.7);
-      font-size: 0.9rem;
-    }
-
-    .hero-panel {
-      align-self: stretch;
-      display: grid;
-      gap: 14px;
-      padding: 20px;
-      border-radius: 26px;
-      background: linear-gradient(180deg, rgba(255, 250, 244, 0.14), rgba(255, 250, 244, 0.08));
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      backdrop-filter: blur(10px);
-    }
-
-    .hero-panel-label {
-      margin: 0;
-      color: rgba(255, 247, 239, 0.76);
-      font-size: 0.92rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .slot-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-    }
-
-    .slot-chip {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 48px;
-      padding: 0 12px;
-      border-radius: 16px;
-      background: rgba(255, 249, 241, 0.92);
-      color: var(--reservation-ink);
-      font-weight: 700;
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      box-shadow: 0 12px 20px rgba(14, 10, 8, 0.12);
-    }
-
-    .slot-chip.is-muted {
-      background: rgba(255, 249, 241, 0.12);
-      color: rgba(255, 247, 239, 0.68);
-      border-style: dashed;
-      box-shadow: none;
-    }
-
-    .reservation-main {
-      display: grid;
-      grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.88fr);
-      gap: 20px;
-      margin-top: 22px;
-      align-items: start;
-    }
-
-    .reservation-card {
-      background:
-        linear-gradient(180deg, rgba(255, 252, 247, 0.96), rgba(248, 242, 232, 0.96)),
-        url("../assets/pattern.webp") center / 460px auto;
-      border: 1px solid var(--reservation-border);
-      border-radius: var(--reservation-radius-xl);
-      box-shadow: var(--reservation-shadow);
-    }
-
-    .reservation-form-card {
-      padding: 28px;
-    }
-
-    .section-title {
-      margin: 0 0 6px;
-      font-size: 1.7rem;
-      letter-spacing: -0.04em;
-    }
-
-    .section-copy {
-      margin: 0 0 22px;
-      color: var(--reservation-muted);
-    }
-
-    .reservation-form {
-      display: grid;
-      gap: 24px;
-    }
-
-    .form-section {
-      display: grid;
-      gap: 16px;
-      padding-top: 20px;
-      border-top: 1px solid rgba(107, 83, 57, 0.12);
-    }
-
-    .form-section:first-of-type {
-      padding-top: 0;
-      border-top: 0;
-    }
-
-    .form-section h3 {
-      margin: 0;
-      font-size: 1.08rem;
-      letter-spacing: -0.03em;
-    }
-
-    .field-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
-    }
-
-    .field {
-      display: grid;
-      gap: 8px;
-    }
-
-    .field.full {
-      grid-column: 1 / -1;
-    }
-
-    .field label,
-    .checkbox-block strong,
-    .choice-group strong {
-      font-size: 0.96rem;
-      font-weight: 700;
-    }
-
-    .field input,
-    .field select,
-    .field textarea {
-      width: 100%;
-      padding: 14px 16px;
-      border: 1px solid rgba(107, 83, 57, 0.18);
-      border-radius: 16px;
-      background: rgba(255, 255, 255, 0.74);
-      color: var(--reservation-ink);
-      font: inherit;
-      outline: none;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-    }
-
-    .field input:focus,
-    .field select:focus,
-    .field textarea:focus {
-      border-color: rgba(142, 36, 56, 0.42);
-      box-shadow: 0 0 0 4px rgba(142, 36, 56, 0.1);
-      background: #fff;
-    }
-
-    .field textarea {
-      min-height: 130px;
-      resize: vertical;
-    }
-
-    .field small {
-      color: var(--reservation-muted);
-    }
-
-    .choice-group,
-    .checkbox-block {
-      display: grid;
-      gap: 12px;
-    }
-
-    .choice-grid,
-    .checkbox-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-    }
-
-    .choice-card,
-    .checkbox-card {
-      position: relative;
-      display: block;
-      cursor: pointer;
-    }
-
-    .choice-card input,
-    .checkbox-card input {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .choice-card span,
-    .checkbox-card span {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 58px;
-      padding: 12px 14px;
-      border-radius: 18px;
-      border: 1px solid rgba(107, 83, 57, 0.16);
-      background: rgba(255, 255, 255, 0.62);
-      text-align: center;
-      font-weight: 700;
-      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
-    }
-
-    .choice-card input:checked + span,
-    .checkbox-card input:checked + span {
-      transform: translateY(-1px);
-      border-color: rgba(142, 36, 56, 0.42);
-      background: rgba(142, 36, 56, 0.08);
-      box-shadow: 0 14px 24px rgba(76, 38, 21, 0.08);
-    }
-
-    .summary-stack {
-      display: grid;
-      gap: 18px;
-      position: sticky;
-      top: 22px;
-    }
-
-    .summary-card,
-    .notes-card {
-      padding: 24px;
-    }
-
-    .summary-card h3,
-    .notes-card h3 {
-      margin: 0 0 14px;
-      font-size: 1.2rem;
-      letter-spacing: -0.03em;
-    }
-
-    .summary-panel {
-      display: grid;
-      gap: 12px;
-      padding: 18px;
-      border-radius: 22px;
-      background: linear-gradient(180deg, rgba(35, 23, 16, 0.96), rgba(68, 30, 39, 0.96));
-      color: #fff7ef;
-    }
-
-    .summary-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-    }
-
-    .summary-row:last-child {
-      padding-bottom: 0;
-      border-bottom: 0;
-    }
-
-    .summary-label {
-      color: rgba(255, 247, 239, 0.68);
-      font-size: 0.92rem;
-    }
-
-    .summary-value {
-      text-align: right;
-      font-weight: 700;
-    }
-
-    .summary-highlight {
-      display: grid;
-      gap: 6px;
-      padding: 16px 18px;
       border-radius: 20px;
-      background: rgba(212, 175, 55, 0.14);
-      border: 1px solid rgba(212, 175, 55, 0.18);
+      background: #fff;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
     }
-
-    .summary-highlight strong {
-      font-size: 1.08rem;
+    h1 {
+      margin: 0 0 8px;
+      font-size: 1.8rem;
     }
-
-    .summary-highlight span {
-      color: var(--reservation-muted);
+    p {
+      margin: 0 0 20px;
+      color: #5e544b;
     }
-
-    .status-pill {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 42px;
-      padding: 0 14px;
-      border-radius: 999px;
-      background: rgba(212, 175, 55, 0.14);
-      color: #6a4d0b;
-      font-size: 0.92rem;
-      font-weight: 800;
-      letter-spacing: 0.03em;
+    .field {
+      margin-bottom: 14px;
     }
-
-    .status-pill.is-success {
-      background: rgba(56, 130, 83, 0.14);
-      color: #245838;
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 700;
     }
-
-    .notes-list {
-      display: grid;
-      gap: 12px;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-      color: var(--reservation-muted);
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #d8cfc4;
+      border-radius: 12px;
+      font: inherit;
     }
-
-    .notes-list li {
+    button {
+      width: 100%;
+      margin-top: 8px;
       padding: 14px 16px;
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.6);
-      border: 1px solid rgba(107, 83, 57, 0.1);
-    }
-
-    .form-actions {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 12px;
-      padding-top: 4px;
-    }
-
-    .submit-btn {
       border: 0;
-      cursor: pointer;
-      min-height: 52px;
-      padding: 0 24px;
       border-radius: 999px;
+      background: #7b1f2f;
       color: #fff;
-      background: linear-gradient(135deg, var(--reservation-accent-strong), #b98618);
       font: inherit;
       font-weight: 800;
-      box-shadow: 0 18px 30px rgba(120, 33, 49, 0.22);
-      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+      cursor: pointer;
     }
-
-    .submit-btn:hover {
-      transform: translateY(-1px);
-      opacity: 0.97;
-      box-shadow: 0 22px 34px rgba(120, 33, 49, 0.26);
+    .status {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: #f4ead0;
+      color: #6d5313;
+      font-weight: 700;
     }
-
-    .muted-note {
-      color: var(--reservation-muted);
-      font-size: 0.94rem;
-    }
-
-    @media (max-width: 980px) {
-      .reservation-hero,
-      .reservation-main {
-        grid-template-columns: 1fr;
-      }
-
-      .summary-stack {
-        position: static;
-      }
-    }
-
-    @media (max-width: 720px) {
-      .reservation-shell {
-        width: min(100% - 20px, 100%);
-        padding-top: 20px;
-      }
-
-      .reservation-topbar {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .reservation-top-actions {
-        width: 100%;
-        justify-content: flex-start;
-      }
-
-      .reservation-brand {
-        align-items: flex-start;
-      }
-
-      .reservation-hero,
-      .reservation-form-card,
-      .summary-card,
-      .notes-card {
-        padding: 20px;
-      }
-
-      .hero-points,
-      .field-grid,
-      .choice-grid,
-      .checkbox-grid,
-      .slot-grid {
-        grid-template-columns: 1fr;
-      }
+    .status.success {
+      background: #e3f4e8;
+      color: #23623b;
     }
   </style>
 </head>
-<body class="reservation-page">
-  <div class="reservation-shell">
-    <header class="reservation-topbar">
-      <div class="reservation-brand">
-        <a class="reservation-logo-link" href="../index.html" aria-label="메인 페이지로 이동">
-          <img class="reservation-logo" src="../assets/logo-dark.webp" alt="EHWA logo" />
-        </a>
-        <div>
-          <p class="reservation-eyebrow">Reservation Test</p>
-          <h1>예약 테스트 페이지</h1>
-        </div>
+<body>
+  <main class="wrap">
+    <h1>Apps Script 연결 테스트</h1>
+    <p>시트에 한 줄 추가되는지만 확인하는 최소 테스트 페이지입니다.</p>
+
+    <form id="testForm">
+      <div class="field">
+        <label for="name">이름</label>
+        <input id="name" name="name" type="text" value="홍길동" required />
       </div>
-      <div class="reservation-top-actions">
-        <a class="ghost-link" href="./index.html">메뉴 테스트로 이동</a>
-        <a class="accent-link" href="#reservationForm">지금 예약 입력</a>
+
+      <div class="field">
+        <label for="phone">연락처</label>
+        <input id="phone" name="phone" type="text" value="010-1234-5678" required />
       </div>
-    </header>
 
-    <section class="reservation-hero" aria-labelledby="reservationHeroTitle">
-      <div class="hero-copy">
-        <div class="hero-kicker">EHWA Dining Flow</div>
-        <h2 id="reservationHeroTitle">테스트용으로 빠르게 확인할 수 있는 예약 화면</h2>
-        <p>
-          날짜, 시간, 인원, 좌석 선호도, 요청사항까지 한 번에 입력하고
-          오른쪽 요약 카드에서 즉시 확인할 수 있게 구성했습니다.
-        </p>
-        <ul class="hero-points">
-          <li>
-            <strong>Simple</strong>
-            <span>바로 테스트 가능한 단일 페이지</span>
-          </li>
-          <li>
-            <strong>Live Summary</strong>
-            <span>입력값이 실시간으로 우측에 반영</span>
-          </li>
-          <li>
-            <strong>Mobile Ready</strong>
-            <span>모바일에서도 흐름이 깨지지 않게 구성</span>
-          </li>
-        </ul>
+      <div class="field">
+        <label for="date">날짜</label>
+        <input id="date" name="date" type="date" required />
       </div>
-      <aside class="hero-panel" aria-label="추천 시간대">
-        <p class="hero-panel-label">Suggested Slots</p>
-        <div class="slot-grid">
-          <div class="slot-chip">17:30 Prime</div>
-          <div class="slot-chip">18:00 Signature</div>
-          <div class="slot-chip">19:30 Popular</div>
-          <div class="slot-chip">20:00 Late Dinner</div>
-          <div class="slot-chip is-muted">21:00 Waitlist</div>
-          <div class="slot-chip is-muted">21:30 Closing Soon</div>
-        </div>
-      </aside>
-    </section>
 
-    <main class="reservation-main">
-      <section class="reservation-card reservation-form-card">
-        <h2 class="section-title">Reservation Details</h2>
-        <p class="section-copy">
-          실제 저장 없이 화면 흐름과 입력 구성을 테스트하기 좋은 형태로 준비했습니다.
-        </p>
+      <button type="submit">전송 테스트</button>
+    </form>
 
-        <form class="reservation-form" id="reservationForm">
-          <section class="form-section">
-            <h3>기본 예약 정보</h3>
-            <div class="field-grid">
-              <div class="field">
-                <label for="date">예약 날짜</label>
-                <input id="date" name="reservationDate" type="date" required />
-              </div>
-              <div class="field">
-                <label for="time">예약 시간</label>
-                <select id="time" name="reservationTime" required>
-                  <option value="17:30">17:30</option>
-                  <option value="18:00" selected>18:00</option>
-                  <option value="18:30">18:30</option>
-                  <option value="19:00">19:00</option>
-                  <option value="19:30">19:30</option>
-                  <option value="20:00">20:00</option>
-                  <option value="20:30">20:30</option>
-                </select>
-              </div>
-              <div class="field">
-                <label for="people">예약 인원</label>
-                <select id="people" name="guestCount">
-                  <option value="2명">2명</option>
-                  <option value="3명">3명</option>
-                  <option value="4명" selected>4명</option>
-                  <option value="5명">5명</option>
-                  <option value="6명">6명</option>
-                  <option value="8명">8명</option>
-                </select>
-              </div>
-              <div class="field">
-                <label for="occasion">방문 목적</label>
-                <select id="occasion" name="occasion">
-                  <option value="일반 식사" selected>일반 식사</option>
-                  <option value="기념일">기념일</option>
-                  <option value="비즈니스 미팅">비즈니스 미팅</option>
-                  <option value="가족 모임">가족 모임</option>
-                  <option value="테스트 방문">테스트 방문</option>
-                </select>
-              </div>
-            </div>
-          </section>
+    <div class="status" id="status">아직 전송 안 함</div>
+  </main>
 
-          <section class="form-section">
-            <h3>좌석 및 식사 옵션</h3>
-            <div class="choice-group">
-              <strong>좌석 선호</strong>
-              <div class="choice-grid">
-                <label class="choice-card">
-                  <input type="radio" name="seatPreference" value="홀 좌석" checked />
-                  <span>홀 좌석</span>
-                </label>
-                <label class="choice-card">
-                  <input type="radio" name="seatPreference" value="창가 좌석" />
-                  <span>창가 좌석</span>
-                </label>
-                <label class="choice-card">
-                  <input type="radio" name="seatPreference" value="프라이빗 룸" />
-                  <span>프라이빗 룸</span>
-                </label>
-              </div>
-            </div>
-
-            <div class="checkbox-block">
-              <strong>추가 요청</strong>
-              <div class="checkbox-grid">
-                <label class="checkbox-card">
-                  <input type="checkbox" name="extras" value="유아 의자" />
-                  <span>유아 의자</span>
-                </label>
-                <label class="checkbox-card">
-                  <input type="checkbox" name="extras" value="채식 메뉴 문의" />
-                  <span>채식 메뉴 문의</span>
-                </label>
-                <label class="checkbox-card">
-                  <input type="checkbox" name="extras" value="생일 디저트" />
-                  <span>생일 디저트</span>
-                </label>
-              </div>
-            </div>
-          </section>
-
-          <section class="form-section">
-            <h3>예약자 정보</h3>
-            <div class="field-grid">
-              <div class="field">
-                <label for="name">예약자명</label>
-                <input id="name" name="guestName" type="text" value="홍길동" placeholder="이름을 입력하세요" required />
-              </div>
-              <div class="field">
-                <label for="phone">연락처</label>
-                <input id="phone" name="guestPhone" type="tel" value="010-1234-5678" placeholder="010-0000-0000" required />
-              </div>
-              <div class="field full">
-                <label for="guestEmail">이메일</label>
-                <input id="guestEmail" name="guestEmail" type="email" value="test@ehwa.kr" placeholder="example@email.com" />
-                <small>테스트 목적이라면 임시 값으로 두고 화면만 확인해도 됩니다.</small>
-              </div>
-              <div class="field full">
-                <label for="notes">요청사항</label>
-                <textarea id="notes" name="specialRequest" placeholder="알레르기, 좌석 요청, 기념일 메시지 등을 입력하세요.">창가 쪽이 가능하면 부탁드립니다.</textarea>
-              </div>
-            </div>
-          </section>
-
-          <div class="form-actions">
-            <button class="submit-btn" type="submit">예약 테스트 완료</button>
-            <span class="muted-note">제출 시 실제 저장은 하지 않고 확인 메시지만 표시합니다.</span>
-          </div>
-        </form>
-      </section>
-
-      <aside class="summary-stack">
-        <section class="reservation-card summary-card">
-          <h3>Reservation Summary</h3>
-          <div class="summary-panel">
-            <div class="summary-row">
-              <span class="summary-label">예약일</span>
-              <strong class="summary-value" id="summaryDate">날짜 선택 전</strong>
-            </div>
-            <div class="summary-row">
-              <span class="summary-label">시간</span>
-              <strong class="summary-value" id="summaryTime">18:00</strong>
-            </div>
-            <div class="summary-row">
-              <span class="summary-label">인원</span>
-              <strong class="summary-value" id="summaryGuests">4명</strong>
-            </div>
-            <div class="summary-row">
-              <span class="summary-label">좌석</span>
-              <strong class="summary-value" id="summarySeat">홀 좌석</strong>
-            </div>
-            <div class="summary-row">
-              <span class="summary-label">방문 목적</span>
-              <strong class="summary-value" id="summaryOccasion">일반 식사</strong>
-            </div>
-          </div>
-          <div class="summary-highlight">
-            <strong id="summaryGuestName">홍길동 님 예약 준비 중</strong>
-            <span id="summaryExtras">추가 요청 없음</span>
-          </div>
-          <div class="status-pill" id="reservationStatus">입력값을 확인하는 중</div>
-        </section>
-
-        <section class="reservation-card notes-card">
-          <h3>테스트 메모</h3>
-          <ul class="notes-list">
-            <li>이 페이지는 레이아웃, 입력 흐름, 요약 카드 확인용 테스트 버전입니다.</li>
-            <li>제출 버튼을 누르면 우측 상태 문구만 성공 상태로 바뀝니다.</li>
-            <li>원하시면 다음 단계로 API 연결 전용 구조까지 바로 이어서 붙일 수 있습니다.</li>
-          </ul>
-        </section>
-      </aside>
-    </main>
-  </div>
-  <iframe name="reservationSubmitFrame" title="Reservation Submit Frame" hidden></iframe>
+  <iframe name="submitFrame" hidden></iframe>
 
   <script>
     (function () {
-      const form = document.getElementById("reservationForm");
-      if (!form) return;
-
-      const dateInput = document.getElementById("date");
-      const timeInput = document.getElementById("time");
-      const guestCountInput = document.getElementById("people");
-      const occasionInput = document.getElementById("occasion");
-      const guestNameInput = document.getElementById("name");
-      const guestPhoneInput = document.getElementById("phone");
-      const notesInput = document.getElementById("notes");
-      const extrasInputs = Array.from(document.querySelectorAll('input[name="extras"]'));
-      const seatInputs = Array.from(document.querySelectorAll('input[name="seatPreference"]'));
-
-      const summaryDate = document.getElementById("summaryDate");
-      const summaryTime = document.getElementById("summaryTime");
-      const summaryGuests = document.getElementById("summaryGuests");
-      const summarySeat = document.getElementById("summarySeat");
-      const summaryOccasion = document.getElementById("summaryOccasion");
-      const summaryGuestName = document.getElementById("summaryGuestName");
-      const summaryExtras = document.getElementById("summaryExtras");
-      const reservationStatus = document.getElementById("reservationStatus");
       const scriptUrl = "https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3liujn95evZuFiyLNrJUo_-H6rKngdxt0EeBFVw/exec";
-
-      const formatDate = (value) => {
-        if (!value) return "날짜 선택 전";
-        const date = new Date(value + "T00:00:00");
-        if (Number.isNaN(date.getTime())) return value;
-        return new Intl.DateTimeFormat("ko-KR", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-          weekday: "short"
-        }).format(date);
-      };
-
-      const getSelectedSeat = () => {
-        const selected = seatInputs.find((input) => input.checked);
-        return selected ? selected.value : "미정";
-      };
-
-      const getSelectedExtras = () => {
-        const selected = extrasInputs
-          .filter((input) => input.checked)
-          .map((input) => input.value);
-        return selected.length ? selected.join(", ") : "추가 요청 없음";
-      };
-
-      const syncSummary = () => {
-        summaryDate.textContent = formatDate(dateInput.value);
-        summaryTime.textContent = timeInput.value || "미정";
-        summaryGuests.textContent = guestCountInput.value || "미정";
-        summarySeat.textContent = getSelectedSeat();
-        summaryOccasion.textContent = occasionInput.value || "미정";
-        summaryGuestName.textContent = `${guestNameInput.value || "고객"} 님 예약 준비 중`;
-        summaryExtras.textContent = getSelectedExtras();
-      };
+      const form = document.getElementById("testForm");
+      const status = document.getElementById("status");
+      const dateInput = document.getElementById("date");
 
       const today = new Date();
-      const tomorrow = new Date(today);
-      tomorrow.setDate(today.getDate() + 1);
+      today.setDate(today.getDate() + 1);
       const pad = (num) => String(num).padStart(2, "0");
-      const toInputDate = (date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-      const defaultDate = toInputDate(tomorrow);
-      dateInput.min = toInputDate(today);
-      dateInput.value = defaultDate;
+      dateInput.value = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
 
-      form.addEventListener("input", syncSummary);
-      form.addEventListener("change", syncSummary);
-      const postWithHiddenForm = (payload) => {
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const payload = {
+          name: document.getElementById("name").value,
+          phone: document.getElementById("phone").value,
+          date: document.getElementById("date").value
+        };
+
         const submitForm = document.createElement("form");
         submitForm.method = "POST";
         submitForm.action = scriptUrl;
-        submitForm.target = "reservationSubmitFrame";
+        submitForm.target = "submitFrame";
         submitForm.style.display = "none";
 
         Object.entries(payload).forEach(([key, value]) => {
@@ -946,41 +135,11 @@
 
         document.body.appendChild(submitForm);
         submitForm.submit();
-        window.setTimeout(() => {
-          submitForm.remove();
-        }, 1000);
-      };
+        submitForm.remove();
 
-      form.addEventListener("submit", (event) => {
-        event.preventDefault();
-        syncSummary();
-        reservationStatus.textContent = "예약 전송 중";
-        reservationStatus.classList.remove("is-success");
-
-        const payload = {
-          name: guestNameInput.value,
-          phone: guestPhoneInput.value,
-          date: dateInput.value,
-          time: timeInput.value,
-          people: guestCountInput.value,
-          notes: notesInput.value
-        };
-
-        try {
-          postWithHiddenForm(payload);
-          console.log("Reservation request sent:", payload);
-          reservationStatus.textContent = "예약 전송 요청 완료";
-          reservationStatus.classList.add("is-success");
-          alert("Reservation submitted");
-        } catch (error) {
-          console.error("Reservation submit failed:", error);
-          reservationStatus.textContent = "예약 전송 실패";
-          reservationStatus.classList.remove("is-success");
-          alert(`Error submitting reservation: ${error.message}`);
-        }
+        status.textContent = "전송 요청 보냄. 시트에 새 줄 들어갔는지 확인하세요.";
+        status.classList.add("success");
       });
-
-      syncSummary();
     })();
   </script>
 </body>
