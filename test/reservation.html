@@ -74,7 +74,7 @@
     <h1>Apps Script 연결 테스트</h1>
     <p>시트에 한 줄 추가되는지만 확인하는 최소 테스트 페이지입니다.</p>
 
-    <form id="testForm">
+    <form method="POST" action="https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3liujn95evZuFiyLNrJUo_-H6rKngdxt0EeBFVw/exec" target="_blank">
       <div class="field">
         <label for="name">이름</label>
         <input id="name" name="name" type="text" value="홍길동" required />
@@ -93,53 +93,17 @@
       <button type="submit">전송 테스트</button>
     </form>
 
-    <div class="status" id="status">아직 전송 안 함</div>
+    <div class="status">버튼 누르면 새 탭에서 `ok`가 떠야 정상입니다.</div>
   </main>
-
-  <iframe name="submitFrame" hidden></iframe>
 
   <script>
     (function () {
-      const scriptUrl = "https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3liujn95evZuFiyLNrJUo_-H6rKngdxt0EeBFVw/exec";
-      const form = document.getElementById("testForm");
-      const status = document.getElementById("status");
       const dateInput = document.getElementById("date");
 
       const today = new Date();
       today.setDate(today.getDate() + 1);
       const pad = (num) => String(num).padStart(2, "0");
       dateInput.value = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
-
-      form.addEventListener("submit", (event) => {
-        event.preventDefault();
-
-        const payload = {
-          name: document.getElementById("name").value,
-          phone: document.getElementById("phone").value,
-          date: document.getElementById("date").value
-        };
-
-        const submitForm = document.createElement("form");
-        submitForm.method = "POST";
-        submitForm.action = scriptUrl;
-        submitForm.target = "submitFrame";
-        submitForm.style.display = "none";
-
-        Object.entries(payload).forEach(([key, value]) => {
-          const input = document.createElement("input");
-          input.type = "hidden";
-          input.name = key;
-          input.value = value;
-          submitForm.appendChild(input);
-        });
-
-        document.body.appendChild(submitForm);
-        submitForm.submit();
-        submitForm.remove();
-
-        status.textContent = "전송 요청 보냄. 시트에 새 줄 들어갔는지 확인하세요.";
-        status.classList.add("success");
-      });
     })();
   </script>
 </body>
