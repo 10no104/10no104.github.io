@@ -706,12 +706,12 @@
             <h3>기본 예약 정보</h3>
             <div class="field-grid">
               <div class="field">
-                <label for="reservationDate">예약 날짜</label>
-                <input id="reservationDate" name="reservationDate" type="date" required />
+                <label for="date">예약 날짜</label>
+                <input id="date" name="reservationDate" type="date" required />
               </div>
               <div class="field">
-                <label for="reservationTime">예약 시간</label>
-                <select id="reservationTime" name="reservationTime" required>
+                <label for="time">예약 시간</label>
+                <select id="time" name="reservationTime" required>
                   <option value="17:30">17:30</option>
                   <option value="18:00" selected>18:00</option>
                   <option value="18:30">18:30</option>
@@ -722,8 +722,8 @@
                 </select>
               </div>
               <div class="field">
-                <label for="guestCount">예약 인원</label>
-                <select id="guestCount" name="guestCount">
+                <label for="people">예약 인원</label>
+                <select id="people" name="guestCount">
                   <option value="2명">2명</option>
                   <option value="3명">3명</option>
                   <option value="4명" selected>4명</option>
@@ -788,12 +788,12 @@
             <h3>예약자 정보</h3>
             <div class="field-grid">
               <div class="field">
-                <label for="guestName">예약자명</label>
-                <input id="guestName" name="guestName" type="text" value="홍길동" placeholder="이름을 입력하세요" required />
+                <label for="name">예약자명</label>
+                <input id="name" name="guestName" type="text" value="홍길동" placeholder="이름을 입력하세요" required />
               </div>
               <div class="field">
-                <label for="guestPhone">연락처</label>
-                <input id="guestPhone" name="guestPhone" type="tel" value="010-1234-5678" placeholder="010-0000-0000" required />
+                <label for="phone">연락처</label>
+                <input id="phone" name="guestPhone" type="tel" value="010-1234-5678" placeholder="010-0000-0000" required />
               </div>
               <div class="field full">
                 <label for="guestEmail">이메일</label>
@@ -801,8 +801,8 @@
                 <small>테스트 목적이라면 임시 값으로 두고 화면만 확인해도 됩니다.</small>
               </div>
               <div class="field full">
-                <label for="specialRequest">요청사항</label>
-                <textarea id="specialRequest" name="specialRequest" placeholder="알레르기, 좌석 요청, 기념일 메시지 등을 입력하세요.">창가 쪽이 가능하면 부탁드립니다.</textarea>
+                <label for="notes">요청사항</label>
+                <textarea id="notes" name="specialRequest" placeholder="알레르기, 좌석 요청, 기념일 메시지 등을 입력하세요.">창가 쪽이 가능하면 부탁드립니다.</textarea>
               </div>
             </div>
           </section>
@@ -863,11 +863,13 @@
       const form = document.getElementById("reservationForm");
       if (!form) return;
 
-      const dateInput = document.getElementById("reservationDate");
-      const timeInput = document.getElementById("reservationTime");
-      const guestCountInput = document.getElementById("guestCount");
+      const dateInput = document.getElementById("date");
+      const timeInput = document.getElementById("time");
+      const guestCountInput = document.getElementById("people");
       const occasionInput = document.getElementById("occasion");
-      const guestNameInput = document.getElementById("guestName");
+      const guestNameInput = document.getElementById("name");
+      const guestPhoneInput = document.getElementById("phone");
+      const notesInput = document.getElementById("notes");
       const extrasInputs = Array.from(document.querySelectorAll('input[name="extras"]'));
       const seatInputs = Array.from(document.querySelectorAll('input[name="seatPreference"]'));
 
@@ -925,11 +927,41 @@
 
       form.addEventListener("input", syncSummary);
       form.addEventListener("change", syncSummary);
-      form.addEventListener("submit", (event) => {
+      form.addEventListener("submit", async (event) => {
         event.preventDefault();
         syncSummary();
-        reservationStatus.textContent = "예약 테스트 완료";
-        reservationStatus.classList.add("is-success");
+        reservationStatus.textContent = "예약 전송 중";
+        reservationStatus.classList.remove("is-success");
+
+        const payload = {
+          name: guestNameInput.value,
+          phone: guestPhoneInput.value,
+          date: dateInput.value,
+          time: timeInput.value,
+          people: guestCountInput.value,
+          notes: notesInput.value
+        };
+
+        try {
+          const response = await fetch("https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3liujn95evZuFiyLNrJUo_-H6rKngdxt0EeBFVw/exec", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+          });
+
+          const data = await response.json();
+          console.log("Reservation response:", data);
+          reservationStatus.textContent = "예약 테스트 완료";
+          reservationStatus.classList.add("is-success");
+          alert("Reservation submitted");
+        } catch (error) {
+          console.error("Reservation submit failed:", error);
+          reservationStatus.textContent = "예약 전송 실패";
+          reservationStatus.classList.remove("is-success");
+          alert("Error submitting reservation");
+        }
       });
 
       syncSummary();
