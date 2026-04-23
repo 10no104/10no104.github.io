@@ -857,6 +857,7 @@
       </aside>
     </main>
   </div>
+  <iframe name="reservationSubmitFrame" title="Reservation Submit Frame" hidden></iframe>
 
   <script>
     (function () {
@@ -881,6 +882,7 @@
       const summaryGuestName = document.getElementById("summaryGuestName");
       const summaryExtras = document.getElementById("summaryExtras");
       const reservationStatus = document.getElementById("reservationStatus");
+      const scriptUrl = "https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3liujn95evZuFiyLNrJUo_-H6rKngdxt0EeBFVw/exec";
 
       const formatDate = (value) => {
         if (!value) return "날짜 선택 전";
@@ -927,7 +929,29 @@
 
       form.addEventListener("input", syncSummary);
       form.addEventListener("change", syncSummary);
-      form.addEventListener("submit", async (event) => {
+      const postWithHiddenForm = (payload) => {
+        const submitForm = document.createElement("form");
+        submitForm.method = "POST";
+        submitForm.action = scriptUrl;
+        submitForm.target = "reservationSubmitFrame";
+        submitForm.style.display = "none";
+
+        Object.entries(payload).forEach(([key, value]) => {
+          const input = document.createElement("input");
+          input.type = "hidden";
+          input.name = key;
+          input.value = value;
+          submitForm.appendChild(input);
+        });
+
+        document.body.appendChild(submitForm);
+        submitForm.submit();
+        window.setTimeout(() => {
+          submitForm.remove();
+        }, 1000);
+      };
+
+      form.addEventListener("submit", (event) => {
         event.preventDefault();
         syncSummary();
         reservationStatus.textContent = "예약 전송 중";
@@ -943,29 +967,9 @@
         };
 
         try {
-          const response = await fetch("https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3liujn95evZuFiyLNrJUo_-H6rKngdxt0EeBFVw/exec", {
-            method: "POST",
-            headers: {
-              "Content-Type": "text/plain;charset=utf-8"
-            },
-            body: JSON.stringify(payload)
-          });
-
-          const rawText = await response.text();
-          let data = null;
-
-          try {
-            data = rawText ? JSON.parse(rawText) : null;
-          } catch (parseError) {
-            console.warn("Reservation response was not JSON:", rawText, parseError);
-          }
-
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-          }
-
-          console.log("Reservation response:", data ?? rawText);
-          reservationStatus.textContent = "예약 테스트 완료";
+          postWithHiddenForm(payload);
+          console.log("Reservation request sent:", payload);
+          reservationStatus.textContent = "예약 전송 요청 완료";
           reservationStatus.classList.add("is-success");
           alert("Reservation submitted");
         } catch (error) {
