@@ -596,17 +596,17 @@
 
           <div class="field">
             <label for="name">Name</label>
-            <input id="name" name="name" type="text" placeholder="Your name" required />
+            <input id="name" name="name" type="text" placeholder="Your name" enterkeyhint="next" required />
           </div>
 
           <div class="field">
             <label for="phone">Phone</label>
-            <input id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="Phone number" required />
+            <input id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" enterkeyhint="done" placeholder="Phone number" required />
           </div>
 
           <div class="field full">
             <label for="notes">Notes</label>
-            <textarea id="notes" name="notes" placeholder="Add any request or occasion."></textarea>
+            <textarea id="notes" name="notes" enterkeyhint="done" placeholder="Add any request or occasion."></textarea>
           </div>
         </div>
 
@@ -662,6 +662,9 @@
       const timeDisplay = document.getElementById("timeDisplay");
       const peopleDisplay = document.getElementById("peopleDisplay");
       const peopleCustomInput = document.getElementById("peopleCustomInput");
+      const nameInput = document.getElementById("name");
+      const phoneInput = document.getElementById("phone");
+      const notesInput = document.getElementById("notes");
 
       const modal = document.getElementById("reservationModal");
       const modalClose = document.getElementById("reservationModalClose");
@@ -880,6 +883,32 @@
           peopleCustomInput.classList.remove("is-open");
           peopleDisplay.style.display = "";
         }
+      });
+
+      const formatPhoneNumber = (value) => {
+        const digits = value.replace(/\D/g, "").slice(0, 11);
+        if (digits.length < 4) return digits;
+        if (digits.length < 8) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+        return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+      };
+
+      phoneInput.addEventListener("input", () => {
+        phoneInput.value = formatPhoneNumber(phoneInput.value);
+      });
+
+      nameInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          phoneInput.focus();
+        }
+      });
+
+      [phoneInput, notesInput].forEach((input) => {
+        input.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            input.blur();
+          }
+        });
       });
 
       form.addEventListener("submit", () => {
