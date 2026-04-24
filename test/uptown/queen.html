@@ -656,8 +656,15 @@
 
     .reservation-focus {
       display: grid;
-      gap: 10px;
+      gap: 12px;
       margin-bottom: 14px;
+    }
+
+    .reservation-pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
     }
 
     .reservation-time-pill {
@@ -676,12 +683,28 @@
       box-shadow: 0 14px 26px rgba(87, 31, 18, 0.22);
     }
 
+    .reservation-guests-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 18px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #d7a236, #f4d488);
+      color: #4c2600;
+      font-size: 1.04rem;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      width: fit-content;
+      box-shadow: 0 14px 24px rgba(167, 108, 14, 0.2);
+    }
+
     .reservation-name {
       margin: 0;
       padding: 14px 16px;
       border-radius: 18px;
-      background: linear-gradient(135deg, rgba(255, 238, 204, 0.92), rgba(255, 250, 239, 0.98));
-      border: 1px solid rgba(183, 133, 49, 0.22);
+      background: linear-gradient(135deg, rgba(123, 31, 47, 0.08), rgba(255, 244, 224, 0.98));
+      border: 1px solid rgba(123, 31, 47, 0.18);
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
       font-size: 1.48rem;
       line-height: 1;
@@ -749,13 +772,13 @@
     }
 
     .meta-box.guests-box {
-      background: linear-gradient(135deg, rgba(123, 31, 47, 0.14), rgba(255, 220, 146, 0.38));
-      border: 1px solid rgba(123, 31, 47, 0.2);
-      box-shadow: 0 10px 18px rgba(123, 31, 47, 0.08);
+      background: linear-gradient(135deg, rgba(123, 31, 47, 0.1), rgba(255, 245, 229, 0.98));
+      border: 1px solid rgba(123, 31, 47, 0.18);
+      box-shadow: 0 10px 18px rgba(123, 31, 47, 0.06);
     }
 
     .meta-box.guests-box strong {
-      font-size: 1.24rem;
+      font-size: 1.18rem;
       color: #561b28;
     }
 
@@ -1332,13 +1355,16 @@
             <span class="status-badge ${status.className}">${status.label}</span>
           </div>
           <div class="reservation-focus">
-            <div class="reservation-time-pill">${item.time || "-"}</div>
+            <div class="reservation-pill-row">
+              <div class="reservation-time-pill">${item.time || "-"}</div>
+              <div class="reservation-guests-pill">${item.people || "-"}</div>
+            </div>
             <h4 class="reservation-name">${item.name || "Guest"}</h4>
           </div>
           <div class="reservation-meta">
             <div class="meta-box guests-box">
-              <span>Guests</span>
-              <strong>${item.people || "-"}</strong>
+              <span>Name</span>
+              <strong>${item.name || "Guest"}</strong>
             </div>
             <div class="meta-box">
               <span>Phone</span>
