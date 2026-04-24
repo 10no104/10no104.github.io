@@ -1,1 +1,605 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reservations Admin | EHWA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/global.css?v=20260423-8" />
+  <style>
+    :root {
+      --ink: #211813;
+      --muted: #74665a;
+      --wine: #7b1f2f;
+      --gold: #d4af37;
+      --line: rgba(109, 86, 59, 0.14);
+      --paper: rgba(255, 251, 245, 0.94);
+      --shadow: 0 24px 52px rgba(29, 19, 12, 0.1);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+    }
 
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(212, 175, 55, 0.18), transparent 28%),
+        radial-gradient(circle at 86% 12%, rgba(123, 31, 47, 0.12), transparent 24%),
+        linear-gradient(180deg, rgba(251, 247, 241, 0.98) 0%, rgba(245, 239, 228, 0.98) 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.18), rgba(255, 252, 247, 0.06)),
+        url("../assets/pattern.webp") center / 760px auto;
+      opacity: 0.14;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .shell {
+      width: min(100% - 18px, 1180px);
+      margin: 0 auto;
+      padding: 18px 0 40px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .logo-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 62px;
+      height: 62px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255, 254, 250, 0.98), rgba(243, 231, 215, 0.94));
+      border: 1px solid rgba(73, 53, 36, 0.12);
+      box-shadow: 0 14px 28px rgba(42, 28, 18, 0.1);
+      flex: none;
+    }
+
+    .logo-link img {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+    }
+
+    .brand-copy p {
+      margin: 0 0 4px;
+      color: var(--wine);
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .brand-copy h1 {
+      margin: 0;
+      font-size: clamp(1.45rem, 5vw, 2.3rem);
+      letter-spacing: -0.05em;
+    }
+
+    .top-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(113, 88, 60, 0.14);
+      background: rgba(255, 251, 245, 0.72);
+      color: #2c2016;
+      font-size: 0.92rem;
+      font-weight: 700;
+      white-space: nowrap;
+      box-shadow: 0 10px 22px rgba(32, 20, 13, 0.05);
+    }
+
+    .hero {
+      display: grid;
+      gap: 14px;
+      padding: 20px;
+      border-radius: var(--radius-xl);
+      background:
+        linear-gradient(135deg, rgba(22, 15, 11, 0.96) 0%, rgba(37, 23, 16, 0.94) 45%, rgba(68, 24, 33, 0.92) 100%),
+        url("../assets/pattern.webp") center / 520px auto;
+      color: #fff8f0;
+      box-shadow: 0 28px 56px rgba(17, 11, 8, 0.18);
+      margin-bottom: 16px;
+    }
+
+    .hero h2 {
+      margin: 0;
+      font-size: clamp(1.7rem, 5vw, 3rem);
+      letter-spacing: -0.05em;
+      line-height: 0.95;
+    }
+
+    .hero p {
+      margin: 0;
+      color: rgba(255, 248, 240, 0.78);
+      max-width: 780px;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .metric-card {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255, 250, 244, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .metric-card span,
+    .metric-card strong {
+      display: block;
+    }
+
+    .metric-card span {
+      margin-bottom: 6px;
+      color: rgba(255, 248, 240, 0.68);
+      font-size: 0.82rem;
+    }
+
+    .metric-card strong {
+      font-size: 1.2rem;
+    }
+
+    .layout {
+      display: grid;
+      gap: 16px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.97), rgba(248, 241, 231, 0.96)),
+        url("../assets/pattern.webp") center / 440px auto;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px 18px 0;
+    }
+
+    .panel-head h3 {
+      margin: 0;
+      font-size: 1.14rem;
+      letter-spacing: -0.03em;
+    }
+
+    .panel-head span {
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .filters {
+      display: flex;
+      gap: 10px;
+      overflow: auto;
+      padding: 14px 18px 0;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .filter-chip {
+      min-height: 40px;
+      padding: 0 14px;
+      border: 1px solid rgba(113, 88, 60, 0.14);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.76);
+      color: #2a1d14;
+      font: inherit;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .filter-chip.is-active {
+      background: linear-gradient(135deg, rgba(123, 31, 47, 0.12), rgba(212, 175, 55, 0.12));
+      border-color: rgba(123, 31, 47, 0.28);
+      color: #6b2230;
+    }
+
+    .reservation-list {
+      display: grid;
+      gap: 12px;
+      padding: 18px;
+    }
+
+    .reservation-card {
+      padding: 16px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(113, 88, 60, 0.12);
+    }
+
+    .reservation-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .reservation-top h4 {
+      margin: 0 0 4px;
+      font-size: 1rem;
+      letter-spacing: -0.03em;
+    }
+
+    .reservation-top p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .status-badge.confirmed {
+      background: rgba(47, 135, 87, 0.14);
+      color: #236240;
+    }
+
+    .status-badge.pending {
+      background: rgba(212, 175, 55, 0.18);
+      color: #7a5a07;
+    }
+
+    .status-badge.call {
+      background: rgba(123, 31, 47, 0.12);
+      color: #6b2230;
+    }
+
+    .reservation-meta {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .meta-box {
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(249, 243, 233, 0.92);
+      border: 1px solid rgba(113, 88, 60, 0.08);
+    }
+
+    .meta-box span,
+    .meta-box strong {
+      display: block;
+    }
+
+    .meta-box span {
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .meta-box strong {
+      font-size: 0.96rem;
+    }
+
+    .reservation-notes {
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255, 251, 245, 0.84);
+      border: 1px solid rgba(113, 88, 60, 0.08);
+      color: #4e4137;
+      line-height: 1.5;
+      font-size: 0.9rem;
+    }
+
+    .reservation-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .action-btn {
+      min-height: 42px;
+      border: 0;
+      border-radius: 14px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .action-btn.primary {
+      background: linear-gradient(135deg, var(--wine), #b9871f);
+      color: #fff;
+    }
+
+    .action-btn.neutral {
+      background: rgba(113, 88, 60, 0.1);
+      color: #55463a;
+    }
+
+    .action-btn.light {
+      background: rgba(255, 255, 255, 0.82);
+      color: #2a1d14;
+      border: 1px solid rgba(113, 88, 60, 0.1);
+    }
+
+    .side-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .staff-list,
+    .timeline {
+      display: grid;
+      gap: 10px;
+      padding: 18px;
+    }
+
+    .staff-item,
+    .timeline-item {
+      display: grid;
+      gap: 4px;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.74);
+      border: 1px solid rgba(113, 88, 60, 0.08);
+    }
+
+    .staff-item strong,
+    .timeline-item strong {
+      font-size: 0.96rem;
+    }
+
+    .staff-item span,
+    .timeline-item span {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    @media (min-width: 980px) {
+      .layout {
+        grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+        align-items: start;
+      }
+
+      .side-grid {
+        position: sticky;
+        top: 18px;
+      }
+
+      .metric-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <a class="logo-link" href="../index.html" aria-label="EHWA home">
+          <img src="../assets/logo-dark.webp" alt="EHWA logo" />
+        </a>
+        <div class="brand-copy">
+          <p>Reservations Admin</p>
+          <h1>Floor Dashboard</h1>
+        </div>
+      </div>
+      <a class="top-link" href="./reservation.html">Guest Form</a>
+    </header>
+
+    <section class="hero">
+      <h2>Manage today’s bookings in one glance.</h2>
+      <p>Track arrivals, confirm large parties, and keep the floor team aligned without switching screens.</p>
+      <div class="metric-grid">
+        <div class="metric-card">
+          <span>Total Covers</span>
+          <strong>46</strong>
+        </div>
+        <div class="metric-card">
+          <span>Confirmed</span>
+          <strong>18</strong>
+        </div>
+        <div class="metric-card">
+          <span>Pending</span>
+          <strong>5</strong>
+        </div>
+        <div class="metric-card">
+          <span>Walk-in Hold</span>
+          <strong>3 tables</strong>
+        </div>
+      </div>
+    </section>
+
+    <main class="layout">
+      <section class="panel">
+        <div class="panel-head">
+          <h3>Today’s Reservations</h3>
+          <span>April 23, 2026</span>
+        </div>
+
+        <div class="filters">
+          <button class="filter-chip is-active" type="button">All</button>
+          <button class="filter-chip" type="button">Confirmed</button>
+          <button class="filter-chip" type="button">Pending</button>
+          <button class="filter-chip" type="button">Large Party</button>
+          <button class="filter-chip" type="button">Needs Call</button>
+        </div>
+
+        <div class="reservation-list">
+          <article class="reservation-card">
+            <div class="reservation-top">
+              <div>
+                <h4>James Park</h4>
+                <p>6:00 PM arrival</p>
+              </div>
+              <span class="status-badge confirmed">Confirmed</span>
+            </div>
+            <div class="reservation-meta">
+              <div class="meta-box">
+                <span>Guests</span>
+                <strong>4 guests</strong>
+              </div>
+              <div class="meta-box">
+                <span>Phone</span>
+                <strong>(604) 555-1288</strong>
+              </div>
+            </div>
+            <div class="reservation-notes">Anniversary dinner. Prefers a quiet table if available.</div>
+            <div class="reservation-actions">
+              <button class="action-btn primary" type="button">Seated</button>
+              <button class="action-btn neutral" type="button">Call</button>
+              <button class="action-btn light" type="button">Edit</button>
+            </div>
+          </article>
+
+          <article class="reservation-card">
+            <div class="reservation-top">
+              <div>
+                <h4>Olivia Chen</h4>
+                <p>7:30 PM arrival</p>
+              </div>
+              <span class="status-badge pending">Pending</span>
+            </div>
+            <div class="reservation-meta">
+              <div class="meta-box">
+                <span>Guests</span>
+                <strong>10 guests</strong>
+              </div>
+              <div class="meta-box">
+                <span>Phone</span>
+                <strong>(778) 555-4421</strong>
+              </div>
+            </div>
+            <div class="reservation-notes">Large party. Needs confirmation for pre-set menu options.</div>
+            <div class="reservation-actions">
+              <button class="action-btn primary" type="button">Confirm</button>
+              <button class="action-btn neutral" type="button">Call</button>
+              <button class="action-btn light" type="button">Edit</button>
+            </div>
+          </article>
+
+          <article class="reservation-card">
+            <div class="reservation-top">
+              <div>
+                <h4>Emma Wilson</h4>
+                <p>9:00 PM arrival</p>
+              </div>
+              <span class="status-badge call">Needs Call</span>
+            </div>
+            <div class="reservation-meta">
+              <div class="meta-box">
+                <span>Guests</span>
+                <strong>2 guests</strong>
+              </div>
+              <div class="meta-box">
+                <span>Phone</span>
+                <strong>(236) 555-9032</strong>
+              </div>
+            </div>
+            <div class="reservation-notes">Late booking. Verify arrival time and kitchen cutoff.</div>
+            <div class="reservation-actions">
+              <button class="action-btn primary" type="button">Reached</button>
+              <button class="action-btn neutral" type="button">Text</button>
+              <button class="action-btn light" type="button">Edit</button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <aside class="side-grid">
+        <section class="panel">
+          <div class="panel-head">
+            <h3>Floor Notes</h3>
+            <span>Shift view</span>
+          </div>
+          <div class="staff-list">
+            <div class="staff-item">
+              <strong>Main Dining</strong>
+              <span>3 tables still open between 6:00 PM and 7:00 PM</span>
+            </div>
+            <div class="staff-item">
+              <strong>Private Events</strong>
+              <span>One 10-person booking needs manager approval</span>
+            </div>
+            <div class="staff-item">
+              <strong>Kitchen</strong>
+              <span>Last tasting menu seating should be locked by 8:30 PM</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h3>Recent Activity</h3>
+            <span>Live</span>
+          </div>
+          <div class="timeline">
+            <div class="timeline-item">
+              <strong>5:42 PM</strong>
+              <span>James Park reservation marked confirmed by front desk.</span>
+            </div>
+            <div class="timeline-item">
+              <strong>5:18 PM</strong>
+              <span>Olivia Chen booking updated from 8 to 10 guests.</span>
+            </div>
+            <div class="timeline-item">
+              <strong>4:57 PM</strong>
+              <span>Emma Wilson added with late seating request.</span>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </main>
+  </div>
+</body>
+</html>
