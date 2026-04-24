@@ -946,9 +946,9 @@
       if (!cell) return "";
       if (typeof cell.f === "string" && cell.f.trim()) return cell.f.trim();
       const value = cell.v;
-      if (value instanceof Date) return value.toISOString().slice(0, 10);
+      if (value instanceof Date) return formatInputDate(value);
       if (value && typeof value === "object" && typeof value.getMonth === "function") {
-        return new Date(value).toISOString().slice(0, 10);
+        return formatInputDate(new Date(value));
       }
       return (value ?? "").toString().trim();
     }
@@ -970,6 +970,12 @@
 
     function toSafeDate(dateString = "") {
       const normalized = String(dateString).trim();
+      if (!normalized) return null;
+      const match = normalized.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (match) {
+        const [, year, month, day] = match;
+        return new Date(Number(year), Number(month) - 1, Number(day));
+      }
       const date = new Date(normalized);
       return Number.isNaN(date.getTime()) ? null : date;
     }
@@ -1030,7 +1036,7 @@
 
       if (range === "today") {
         end.setDate(end.getDate() + 1);
-        return { start, end, label: formatDateLabel(start.toISOString()) };
+        return { start, end, label: formatDateLabel(formatInputDate(start)) };
       }
 
       if (range === "week") {
