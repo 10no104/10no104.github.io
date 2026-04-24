@@ -268,7 +268,7 @@
       height: 11px;
       border-right: 3px solid rgba(109, 35, 51, 0.86);
       border-bottom: 3px solid rgba(109, 35, 51, 0.86);
-      transform: rotate(45deg);
+      transform: rotate(-135deg);
       transition: transform 0.18s ease;
     }
 
@@ -277,7 +277,7 @@
     }
 
     .add-panel.is-collapsed .add-toggle::after {
-      transform: rotate(-135deg);
+      transform: rotate(45deg);
     }
 
     .add-panel.is-collapsed .add-toggle {
@@ -592,9 +592,10 @@
     }
 
     .trash-toggle {
-      width: 100%;
-      justify-content: center;
+      width: fit-content;
+      justify-self: end;
       margin-top: 2px;
+      padding: 0 16px;
       background: rgba(255, 255, 255, 0.82);
     }
 
@@ -705,7 +706,7 @@
 
     .reservation-meta {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: 1.15fr 0.85fr;
       gap: 10px;
       margin-bottom: 12px;
     }
@@ -730,9 +731,18 @@
     }
 
     .meta-box strong {
-      font-size: 1.02rem;
+      font-size: 1.08rem;
       color: #241812;
       letter-spacing: -0.02em;
+    }
+
+    .meta-box.guests-box {
+      background: linear-gradient(135deg, rgba(123, 31, 47, 0.08), rgba(255, 230, 170, 0.3));
+      border: 1px solid rgba(123, 31, 47, 0.16);
+    }
+
+    .meta-box.guests-box strong {
+      font-size: 1.16rem;
     }
 
     .reservation-notes {
@@ -743,6 +753,14 @@
       color: #42352c;
       line-height: 1.5;
       font-size: 0.94rem;
+    }
+
+    .reservation-phone {
+      margin-top: 12px;
+      color: #7d6858;
+      font-size: 0.84rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
     }
 
     .reservation-actions {
@@ -1092,7 +1110,7 @@
 
         <div class="control-row">
           <div class="range-chips" id="dateFilterChips"></div>
-          <button class="chip-btn trash-toggle" id="trashToggle" type="button">Trash</button>
+          <button class="chip-btn trash-toggle" id="trashToggle" type="button">🗑 Trash</button>
         </div>
 
         <div class="reservation-list" id="reservationList"></div>
@@ -1310,16 +1328,17 @@
             <h4 class="reservation-name">${item.name || "Guest"}</h4>
           </div>
           <div class="reservation-meta">
-            <div class="meta-box">
+            <div class="meta-box guests-box">
               <span>Guests</span>
               <strong>${item.people || "-"}</strong>
             </div>
             <div class="meta-box">
-              <span>Phone</span>
-              <strong>${item.phone || "-"}</strong>
+              <span>Status</span>
+              <strong>${status.label}</strong>
             </div>
           </div>
           <div class="reservation-notes">${item.notes || "No notes"}</div>
+          <div class="reservation-phone">Phone: ${item.phone || "-"}</div>
           <div class="reservation-actions">
             <button class="action-btn primary" type="button" data-action="${primaryAction}" data-sheet="${item.sheetName}" data-row="${item.rowNumber}">${primaryLabel}</button>
             <button class="action-btn light" type="button" data-action="edit" data-sheet="${item.sheetName}" data-row="${item.rowNumber}">Edit</button>
