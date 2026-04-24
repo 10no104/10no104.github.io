@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/global.css?v=20260423-8" />
+  <link rel="stylesheet" href="../css/global.css?v=20260423-9" />
   <style>
     :root {
       --ink: #211813;
@@ -49,9 +49,10 @@
       z-index: -1;
     }
 
-    a {
-      color: inherit;
-      text-decoration: none;
+    button,
+    input,
+    textarea {
+      font: inherit;
     }
 
     .shell {
@@ -86,6 +87,7 @@
       border: 1px solid rgba(73, 53, 36, 0.12);
       box-shadow: 0 14px 28px rgba(42, 28, 18, 0.1);
       flex: none;
+      text-decoration: none;
     }
 
     .logo-link img {
@@ -109,7 +111,14 @@
       letter-spacing: -0.05em;
     }
 
-    .top-link {
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill-btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -123,6 +132,15 @@
       font-weight: 700;
       white-space: nowrap;
       box-shadow: 0 10px 22px rgba(32, 20, 13, 0.05);
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .pill-btn.primary {
+      color: #fff;
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--wine), #b9871f);
+      box-shadow: 0 18px 30px rgba(123, 31, 47, 0.18);
     }
 
     .hero {
@@ -214,15 +232,21 @@
       font-weight: 700;
     }
 
-    .filters {
+    .control-row {
+      display: grid;
+      gap: 10px;
+      padding: 14px 18px 0;
+    }
+
+    .range-chips,
+    .option-chips {
       display: flex;
       gap: 10px;
       overflow: auto;
-      padding: 14px 18px 0;
       -webkit-overflow-scrolling: touch;
     }
 
-    .filter-chip {
+    .chip-btn {
       min-height: 40px;
       padding: 0 14px;
       border: 1px solid rgba(113, 88, 60, 0.14);
@@ -235,7 +259,7 @@
       cursor: pointer;
     }
 
-    .filter-chip.is-active {
+    .chip-btn.is-active {
       background: linear-gradient(135deg, rgba(123, 31, 47, 0.12), rgba(212, 175, 55, 0.12));
       border-color: rgba(123, 31, 47, 0.28);
       color: #6b2230;
@@ -247,17 +271,16 @@
       padding: 18px;
     }
 
-    .empty-state {
-      padding: 18px;
-      color: var(--muted);
-      font-size: 0.96rem;
-    }
-
     .reservation-card {
       padding: 16px;
       border-radius: 20px;
       background: rgba(255, 255, 255, 0.72);
       border: 1px solid rgba(113, 88, 60, 0.12);
+    }
+
+    .reservation-card.is-removed {
+      opacity: 0.7;
+      background: rgba(241, 235, 228, 0.84);
     }
 
     .reservation-top {
@@ -292,17 +315,17 @@
       white-space: nowrap;
     }
 
-    .status-badge.confirmed {
+    .status-badge.active {
       background: rgba(47, 135, 87, 0.14);
       color: #236240;
     }
 
-    .status-badge.pending {
+    .status-badge.large {
       background: rgba(212, 175, 55, 0.18);
       color: #7a5a07;
     }
 
-    .status-badge.call {
+    .status-badge.removed {
       background: rgba(123, 31, 47, 0.12);
       color: #6b2230;
     }
@@ -348,7 +371,7 @@
 
     .reservation-actions {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
       margin-top: 12px;
     }
@@ -365,11 +388,6 @@
     .action-btn.primary {
       background: linear-gradient(135deg, var(--wine), #b9871f);
       color: #fff;
-    }
-
-    .action-btn.neutral {
-      background: rgba(113, 88, 60, 0.1);
-      color: #55463a;
     }
 
     .action-btn.light {
@@ -411,6 +429,118 @@
       font-size: 0.88rem;
     }
 
+    .empty-state {
+      padding: 18px;
+      color: var(--muted);
+      font-size: 0.96rem;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(18, 12, 9, 0.56);
+      backdrop-filter: blur(6px);
+      z-index: 100;
+    }
+
+    .modal-backdrop.is-open {
+      display: flex;
+    }
+
+    .modal {
+      width: min(100%, 520px);
+      padding: 22px;
+      border-radius: 24px;
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(247, 239, 228, 0.98)),
+        url("../assets/pattern.webp") center / 400px auto;
+      border: 1px solid rgba(108, 85, 58, 0.14);
+      box-shadow: 0 28px 54px rgba(18, 12, 9, 0.2);
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .modal-head h3 {
+      margin: 0;
+      font-size: 1.28rem;
+      letter-spacing: -0.03em;
+    }
+
+    .modal-close {
+      width: 38px;
+      height: 38px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(113, 88, 60, 0.1);
+      color: #5c4c41;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .admin-form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .admin-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .admin-field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .admin-field label {
+      color: #2b1e14;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .admin-field input,
+    .admin-field textarea {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid rgba(113, 88, 60, 0.18);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.92);
+      color: #1f1712;
+      outline: none;
+    }
+
+    .admin-field textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .admin-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    @media (min-width: 720px) {
+      .admin-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .admin-field.full {
+        grid-column: 1 / -1;
+      }
+    }
+
     @media (min-width: 980px) {
       .layout {
         grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
@@ -440,12 +570,15 @@
           <h1>Floor Dashboard</h1>
         </div>
       </div>
-      <a class="top-link" href="./reservation.html">Guest Form</a>
+      <div class="top-actions">
+        <button class="pill-btn primary" id="openAddModal" type="button">Add Reservation</button>
+        <a class="pill-btn" href="./reservation.html">Guest Form</a>
+      </div>
     </header>
 
     <section class="hero">
       <h2>Manage today’s bookings in one glance.</h2>
-      <p>Track arrivals, confirm large parties, and keep the floor team aligned without switching screens.</p>
+      <p>Today is the default view. Switch to weekly, monthly, or full history when you need a wider range.</p>
       <div class="metric-grid">
         <div class="metric-card">
           <span>Total Covers</span>
@@ -469,16 +602,21 @@
     <main class="layout">
       <section class="panel">
         <div class="panel-head">
-          <h3>Today’s Reservations</h3>
+          <h3>Reservations</h3>
           <span id="reservationDateLabel">Loading</span>
         </div>
 
-        <div class="filters">
-          <button class="filter-chip is-active" type="button">All</button>
-          <button class="filter-chip" type="button">Confirmed</button>
-          <button class="filter-chip" type="button">Pending</button>
-          <button class="filter-chip" type="button">Large Party</button>
-          <button class="filter-chip" type="button">Needs Call</button>
+        <div class="control-row">
+          <div class="range-chips">
+            <button class="chip-btn is-active" data-range="today" type="button">Today</button>
+            <button class="chip-btn" data-range="week" type="button">This Week</button>
+            <button class="chip-btn" data-range="month" type="button">This Month</button>
+            <button class="chip-btn" data-range="all" type="button">All Reservations</button>
+          </div>
+          <div class="option-chips">
+            <button class="chip-btn is-active" data-removed="hide" type="button">Hide Removed</button>
+            <button class="chip-btn" data-removed="show" type="button">Show Removed</button>
+          </div>
         </div>
 
         <div class="reservation-list" id="reservationList"></div>
@@ -493,15 +631,15 @@
           <div class="staff-list">
             <div class="staff-item">
               <strong>Main Dining</strong>
-              <span>3 tables still open between 6:00 PM and 7:00 PM</span>
+              <span>Check large parties first and confirm arrival timing before 6 PM.</span>
             </div>
             <div class="staff-item">
               <strong>Private Events</strong>
-              <span>One 10-person booking needs manager approval</span>
+              <span>Removed bookings remain visible when “Show Removed” is enabled.</span>
             </div>
             <div class="staff-item">
-              <strong>Kitchen</strong>
-              <span>Last tasting menu seating should be locked by 8:30 PM</span>
+              <strong>Editing</strong>
+              <span>You can add, edit, or remove reservations directly from this page.</span>
             </div>
           </div>
         </section>
@@ -511,31 +649,79 @@
             <h3>Recent Activity</h3>
             <span>Live</span>
           </div>
-          <div class="timeline">
+          <div class="timeline" id="timelineList">
             <div class="timeline-item">
-              <strong>5:42 PM</strong>
-              <span>James Park reservation marked confirmed by front desk.</span>
-            </div>
-            <div class="timeline-item">
-              <strong>5:18 PM</strong>
-              <span>Olivia Chen booking updated from 8 to 10 guests.</span>
-            </div>
-            <div class="timeline-item">
-              <strong>4:57 PM</strong>
-              <span>Emma Wilson added with late seating request.</span>
+              <strong>Waiting for data</strong>
+              <span>Recent reservation activity will appear here after loading.</span>
             </div>
           </div>
         </section>
       </aside>
     </main>
   </div>
+
+  <iframe name="adminMutationFrame" hidden></iframe>
+
+  <div class="modal-backdrop" id="editorModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="editorTitle">
+      <div class="modal-head">
+        <h3 id="editorTitle">Add Reservation</h3>
+        <button class="modal-close" id="closeEditorModal" type="button">×</button>
+      </div>
+
+      <form class="admin-form" id="editorForm">
+        <input id="editorAction" name="action" type="hidden" value="create" />
+        <input id="editorRowNumber" name="rowNumber" type="hidden" value="" />
+        <input id="editorStatus" name="status" type="hidden" value="active" />
+
+        <div class="admin-grid">
+          <div class="admin-field">
+            <label for="editorDate">Date</label>
+            <input id="editorDate" name="date" type="date" required />
+          </div>
+          <div class="admin-field">
+            <label for="editorTime">Time</label>
+            <input id="editorTime" name="time" type="text" placeholder="6:00 PM" required />
+          </div>
+          <div class="admin-field">
+            <label for="editorPeople">Guests</label>
+            <input id="editorPeople" name="people" type="text" placeholder="4 guests" required />
+          </div>
+          <div class="admin-field">
+            <label for="editorName">Name</label>
+            <input id="editorName" name="name" type="text" required />
+          </div>
+          <div class="admin-field">
+            <label for="editorPhone">Phone</label>
+            <input id="editorPhone" name="phone" type="text" required />
+          </div>
+          <div class="admin-field full">
+            <label for="editorNotes">Notes</label>
+            <textarea id="editorNotes" name="notes"></textarea>
+          </div>
+        </div>
+
+        <div class="admin-actions">
+          <button class="pill-btn" id="cancelEditor" type="button">Cancel</button>
+          <button class="pill-btn primary" type="submit">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
-    const RESERVATION_SHEET_CONFIG = {
+    const ADMIN_SHEET_CONFIG = {
       sheetId: "1xa9OZbctYnlbaAL8lKIgmefM5hvSw0Plk01lxp5G2fc",
       gid: "1826326008"
     };
 
-    const EMPTY_MESSAGE = '<div class="empty-state">No reservations found in the sheet yet.</div>';
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3Iiujn95evZuFiyLNrJUo-_H6rKngdxt0EeBFVw/exec";
+
+    const state = {
+      reservations: [],
+      range: "today",
+      showRemoved: false
+    };
 
     function parseGvizText(text = "") {
       return JSON.parse(
@@ -546,42 +732,46 @@
       );
     }
 
-    function mapReservationRows(rows = []) {
-      return rows
-        .map((row) => row.c || [])
-        .map((cells) => cells.map((cell) => (cell?.v ?? "").toString().trim()))
-        .filter((cells) => cells.some(Boolean))
-        .map((cells) => ({
-          timestamp: cells[0] || "",
-          date: cells[1] || "",
-          time: cells[2] || "",
-          people: cells[3] || "",
-          name: cells[4] || "",
-          phone: cells[5] || "",
-          notes: cells[6] || ""
-        }))
-        .sort((a, b) => {
-          const dateA = new Date(`${a.date || ""} ${a.time || ""}`.trim());
-          const dateB = new Date(`${b.date || ""} ${b.time || ""}`.trim());
-          if (Number.isNaN(dateA.getTime()) || Number.isNaN(dateB.getTime())) return 0;
-          return dateA - dateB;
-        });
+    function normalizeReservation(cells = [], index = 0) {
+      const values = cells.map((cell) => (cell?.v ?? "").toString().trim());
+      return {
+        rowNumber: index + 1,
+        timestamp: values[0] || "",
+        date: values[1] || "",
+        time: values[2] || "",
+        people: values[3] || "",
+        name: values[4] || "",
+        phone: values[5] || "",
+        notes: values[6] || "",
+        status: values[7] || "active"
+      };
     }
 
-    async function fetchReservationsFromGoogleSheet() {
-      const { sheetId, gid } = RESERVATION_SHEET_CONFIG;
+    function toSafeDate(dateString = "") {
+      const date = new Date(dateString);
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+
+    function parseGuestCount(value = "") {
+      const count = Number.parseInt(String(value).replace(/\D/g, ""), 10);
+      return Number.isFinite(count) ? count : 0;
+    }
+
+    async function fetchReservations() {
+      const { sheetId, gid } = ADMIN_SHEET_CONFIG;
       const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?gid=${gid}&tqx=out:json`;
       const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch reservation sheet");
-      const text = await response.text();
-      const data = parseGvizText(text);
-      return mapReservationRows(data.table?.rows || []);
+      const data = parseGvizText(await response.text());
+      return (data.table?.rows || [])
+        .map((row) => row.c || [])
+        .map((cells, index) => normalizeReservation(cells, index))
+        .filter((item) => item.timestamp || item.date || item.name);
     }
 
     function formatDateLabel(value = "") {
-      if (!value) return "No date";
-      const date = new Date(value);
-      if (Number.isNaN(date.getTime())) return value;
+      const date = toSafeDate(value);
+      if (!date) return value || "No date";
       return new Intl.DateTimeFormat("en-US", {
         month: "long",
         day: "numeric",
@@ -589,18 +779,63 @@
       }).format(date);
     }
 
-    function getStatusForReservation(item) {
-      const count = Number.parseInt(String(item.people).replace(/\D/g, ""), 10);
-      if (count >= 8) return { label: "Large Party", className: "pending" };
-      if (!item.phone) return { label: "Needs Call", className: "call" };
-      return { label: "Confirmed", className: "confirmed" };
+    function getDateBounds(range) {
+      const now = new Date();
+      const start = new Date(now);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(start);
+
+      if (range === "today") {
+        end.setDate(end.getDate() + 1);
+        return { start, end, label: formatDateLabel(start.toISOString()) };
+      }
+
+      if (range === "week") {
+        const day = start.getDay();
+        start.setDate(start.getDate() - day);
+        end.setTime(start.getTime());
+        end.setDate(end.getDate() + 7);
+        return { start, end, label: "This Week" };
+      }
+
+      if (range === "month") {
+        start.setDate(1);
+        end.setTime(start.getTime());
+        end.setMonth(end.getMonth() + 1);
+        return {
+          start,
+          end,
+          label: new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" }).format(start)
+        };
+      }
+
+      return { start: null, end: null, label: "All Reservations" };
+    }
+
+    function filterReservations() {
+      const { start, end } = getDateBounds(state.range);
+      return state.reservations.filter((item) => {
+        if (!state.showRemoved && item.status === "removed") return false;
+        if (!start || !end) return true;
+        const date = toSafeDate(item.date);
+        if (!date) return false;
+        return date >= start && date < end;
+      });
+    }
+
+    function getStatusBadge(item) {
+      if (item.status === "removed") return { label: "Removed", className: "removed" };
+      if (parseGuestCount(item.people) >= 8) return { label: "Large Party", className: "large" };
+      return { label: "Active", className: "active" };
     }
 
     function renderReservationCard(item) {
-      const status = getStatusForReservation(item);
-      const notes = item.notes || "No notes";
+      const status = getStatusBadge(item);
+      const primaryLabel = item.status === "removed" ? "Restore" : "Remove";
+      const primaryAction = item.status === "removed" ? "restore" : "remove";
+
       return `
-        <article class="reservation-card">
+        <article class="reservation-card ${item.status === "removed" ? "is-removed" : ""}">
           <div class="reservation-top">
             <div>
               <h4>${item.name || "Guest"}</h4>
@@ -610,6 +845,10 @@
           </div>
           <div class="reservation-meta">
             <div class="meta-box">
+              <span>Date</span>
+              <strong>${formatDateLabel(item.date)}</strong>
+            </div>
+            <div class="meta-box">
               <span>Guests</span>
               <strong>${item.people || "-"}</strong>
             </div>
@@ -617,58 +856,151 @@
               <span>Phone</span>
               <strong>${item.phone || "-"}</strong>
             </div>
+            <div class="meta-box">
+              <span>Row</span>
+              <strong>#${item.rowNumber}</strong>
+            </div>
           </div>
-          <div class="reservation-notes">${notes}</div>
+          <div class="reservation-notes">${item.notes || "No notes"}</div>
           <div class="reservation-actions">
-            <button class="action-btn primary" type="button">Confirm</button>
-            <button class="action-btn neutral" type="button">Call</button>
-            <button class="action-btn light" type="button">Edit</button>
+            <button class="action-btn primary" type="button" data-action="${primaryAction}" data-row="${item.rowNumber}">${primaryLabel}</button>
+            <button class="action-btn light" type="button" data-action="edit" data-row="${item.rowNumber}">Edit</button>
           </div>
         </article>
       `;
     }
 
-    function renderReservations(reservations = []) {
-      const reservationList = document.getElementById("reservationList");
-      const metricCovers = document.getElementById("metricCovers");
-      const metricReservations = document.getElementById("metricReservations");
-      const metricLargeParties = document.getElementById("metricLargeParties");
-      const metricLatest = document.getElementById("metricLatest");
-      const reservationDateLabel = document.getElementById("reservationDateLabel");
+    function renderMetrics(reservations) {
+      const covers = reservations.reduce((sum, item) => sum + parseGuestCount(item.people), 0);
+      const largeParties = reservations.filter((item) => parseGuestCount(item.people) >= 8 && item.status !== "removed").length;
+      const latest = [...reservations].sort((a, b) => String(b.timestamp).localeCompare(String(a.timestamp)))[0];
 
-      if (!reservations.length) {
-        reservationList.innerHTML = EMPTY_MESSAGE;
-        metricCovers.textContent = "0";
-        metricReservations.textContent = "0";
-        metricLargeParties.textContent = "0";
-        metricLatest.textContent = "-";
-        reservationDateLabel.textContent = "No reservations";
+      document.getElementById("metricCovers").textContent = String(covers);
+      document.getElementById("metricReservations").textContent = String(reservations.length);
+      document.getElementById("metricLargeParties").textContent = String(largeParties);
+      document.getElementById("metricLatest").textContent = latest?.time || "-";
+    }
+
+    function renderTimeline() {
+      const timeline = document.getElementById("timelineList");
+      const recent = [...state.reservations].slice(-3).reverse();
+
+      if (!recent.length) {
+        timeline.innerHTML = `
+          <div class="timeline-item">
+            <strong>No activity yet</strong>
+            <span>Recent reservation updates will appear here.</span>
+          </div>
+        `;
         return;
       }
 
-      const totalCovers = reservations.reduce((sum, item) => {
-        const count = Number.parseInt(String(item.people).replace(/\D/g, ""), 10);
-        return sum + (Number.isFinite(count) ? count : 0);
-      }, 0);
-      const largeParties = reservations.filter((item) => {
-        const count = Number.parseInt(String(item.people).replace(/\D/g, ""), 10);
-        return Number.isFinite(count) && count >= 8;
-      }).length;
-      const latest = reservations[reservations.length - 1];
-      const firstDate = reservations[0]?.date || "";
-
-      metricCovers.textContent = String(totalCovers);
-      metricReservations.textContent = String(reservations.length);
-      metricLargeParties.textContent = String(largeParties);
-      metricLatest.textContent = latest?.time || "-";
-      reservationDateLabel.textContent = formatDateLabel(firstDate);
-      reservationList.innerHTML = reservations.map(renderReservationCard).join("");
+      timeline.innerHTML = recent.map((item) => `
+        <div class="timeline-item">
+          <strong>${item.time || "Unknown time"} · ${item.name || "Guest"}</strong>
+          <span>${item.status === "removed" ? "Removed from active list." : `${item.people || "-"} on ${formatDateLabel(item.date)}`}</span>
+        </div>
+      `).join("");
     }
 
-    async function bootstrapReservationsAdmin() {
+    function renderReservations() {
+      const filtered = filterReservations();
+      const reservationList = document.getElementById("reservationList");
+      const reservationDateLabel = document.getElementById("reservationDateLabel");
+      const { label } = getDateBounds(state.range);
+
+      reservationDateLabel.textContent = label;
+      renderMetrics(filtered);
+      renderTimeline();
+
+      if (!filtered.length) {
+        reservationList.innerHTML = '<div class="empty-state">No reservations in this view.</div>';
+        return;
+      }
+
+      reservationList.innerHTML = filtered.map(renderReservationCard).join("");
+    }
+
+    function setActiveChip(group, value) {
+      document.querySelectorAll(group).forEach((button) => {
+        const isMatch = button.dataset.range === value || button.dataset.removed === value;
+        button.classList.toggle("is-active", isMatch);
+      });
+    }
+
+    function buildMutationForm(fields) {
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = APPS_SCRIPT_URL;
+      form.target = "adminMutationFrame";
+      form.style.display = "none";
+
+      Object.entries(fields).forEach(([key, value]) => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = key;
+        input.value = value;
+        form.appendChild(input);
+      });
+
+      document.body.appendChild(form);
+      form.submit();
+      window.setTimeout(() => form.remove(), 1200);
+    }
+
+    function refreshAfterMutation() {
+      window.setTimeout(async () => {
+        state.reservations = await fetchReservations();
+        renderReservations();
+      }, 900);
+    }
+
+    const editorModal = document.getElementById("editorModal");
+    const editorTitle = document.getElementById("editorTitle");
+    const editorForm = document.getElementById("editorForm");
+    const editorAction = document.getElementById("editorAction");
+    const editorRowNumber = document.getElementById("editorRowNumber");
+    const editorStatus = document.getElementById("editorStatus");
+    const editorDate = document.getElementById("editorDate");
+    const editorTime = document.getElementById("editorTime");
+    const editorPeople = document.getElementById("editorPeople");
+    const editorName = document.getElementById("editorName");
+    const editorPhone = document.getElementById("editorPhone");
+    const editorNotes = document.getElementById("editorNotes");
+
+    function openEditor(item = null) {
+      if (item) {
+        editorTitle.textContent = "Edit Reservation";
+        editorAction.value = "update";
+        editorRowNumber.value = String(item.rowNumber);
+        editorStatus.value = item.status || "active";
+        editorDate.value = item.date || "";
+        editorTime.value = item.time || "";
+        editorPeople.value = item.people || "";
+        editorName.value = item.name || "";
+        editorPhone.value = item.phone || "";
+        editorNotes.value = item.notes || "";
+      } else {
+        editorTitle.textContent = "Add Reservation";
+        editorAction.value = "create";
+        editorRowNumber.value = "";
+        editorStatus.value = "active";
+        editorForm.reset();
+      }
+
+      editorModal.classList.add("is-open");
+      editorModal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeEditor() {
+      editorModal.classList.remove("is-open");
+      editorModal.setAttribute("aria-hidden", "true");
+    }
+
+    async function bootstrapAdmin() {
       try {
-        const reservations = await fetchReservationsFromGoogleSheet();
-        renderReservations(reservations);
+        state.reservations = await fetchReservations();
+        renderReservations();
       } catch (error) {
         console.error(error);
         document.getElementById("reservationList").innerHTML =
@@ -676,7 +1008,70 @@
       }
     }
 
-    bootstrapReservationsAdmin();
+    document.getElementById("openAddModal").addEventListener("click", () => openEditor());
+    document.getElementById("closeEditorModal").addEventListener("click", closeEditor);
+    document.getElementById("cancelEditor").addEventListener("click", closeEditor);
+    editorModal.addEventListener("click", (event) => {
+      if (event.target === editorModal) closeEditor();
+    });
+
+    editorForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      buildMutationForm({
+        action: editorAction.value,
+        rowNumber: editorRowNumber.value,
+        status: editorStatus.value,
+        date: editorDate.value,
+        time: editorTime.value,
+        people: editorPeople.value,
+        name: editorName.value,
+        phone: editorPhone.value,
+        notes: editorNotes.value
+      });
+      closeEditor();
+      refreshAfterMutation();
+    });
+
+    document.querySelectorAll("[data-range]").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.range = button.dataset.range;
+        setActiveChip("[data-range]", state.range);
+        renderReservations();
+      });
+    });
+
+    document.querySelectorAll("[data-removed]").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.showRemoved = button.dataset.removed === "show";
+        setActiveChip("[data-removed]", state.showRemoved ? "show" : "hide");
+        renderReservations();
+      });
+    });
+
+    document.getElementById("reservationList").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-action]");
+      if (!button) return;
+
+      const rowNumber = Number(button.dataset.row);
+      const reservation = state.reservations.find((item) => item.rowNumber === rowNumber);
+      if (!reservation) return;
+
+      if (button.dataset.action === "edit") {
+        openEditor(reservation);
+        return;
+      }
+
+      if (button.dataset.action === "remove" || button.dataset.action === "restore") {
+        buildMutationForm({
+          action: "status",
+          rowNumber: String(rowNumber),
+          status: button.dataset.action === "remove" ? "removed" : "active"
+        });
+        refreshAfterMutation();
+      }
+    });
+
+    bootstrapAdmin();
   </script>
 </body>
 </html>
