@@ -1238,7 +1238,7 @@
 
       const dateOptions = [];
       const start = new Date();
-      start.setDate(start.getDate() + 1);
+      start.setHours(0, 0, 0, 0);
       for (let i = 0; i < 10; i += 1) {
         const optionDate = new Date(start);
         optionDate.setDate(start.getDate() + i);
@@ -1461,6 +1461,8 @@
       const monthStart = new Date(state.calendarCursor.getFullYear(), state.calendarCursor.getMonth(), 1);
       const monthEnd = new Date(state.calendarCursor.getFullYear(), state.calendarCursor.getMonth() + 1, 0);
       const firstWeekday = monthStart.getDay();
+      const todayFloor = new Date();
+      todayFloor.setHours(0, 0, 0, 0);
 
       for (let i = 0; i < firstWeekday; i += 1) {
         const empty = document.createElement("div");
@@ -1475,12 +1477,17 @@
         button.type = "button";
         button.className = "calendar-day";
         button.textContent = String(day);
+        if (date < todayFloor) {
+          button.classList.add("is-disabled");
+          button.disabled = true;
+        } else {
+          button.addEventListener("click", () => {
+            refs.dateInput.value = value;
+            refs.renderDateGrid();
+            closeSheet();
+          });
+        }
         if (refs.dateInput.value === value) button.classList.add("is-selected");
-        button.addEventListener("click", () => {
-          refs.dateInput.value = value;
-          refs.renderDateGrid();
-          closeSheet();
-        });
         calendarGrid.appendChild(button);
       }
     }
