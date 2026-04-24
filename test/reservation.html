@@ -285,9 +285,9 @@
     }
 
     .date-chip.more-chip {
-      background: linear-gradient(135deg, rgba(255, 241, 209, 0.94), rgba(255, 250, 240, 0.98));
-      color: #3a281b;
-      border-color: rgba(245, 220, 154, 0.82);
+      background: rgba(255, 252, 247, 0.96);
+      color: #1f1712;
+      border-color: rgba(255, 255, 255, 0.1);
     }
 
     .date-chip.more-chip span,
@@ -892,8 +892,11 @@
         return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
       };
 
+      const isValidKoreanMobile = (value) => /^01[0-9]-\d{3,4}-\d{4}$/.test(value);
+
       phoneInput.addEventListener("input", () => {
         phoneInput.value = formatPhoneNumber(phoneInput.value);
+        phoneInput.setCustomValidity("");
       });
 
       nameInput.addEventListener("keydown", (event) => {
@@ -911,7 +914,16 @@
         });
       });
 
-      form.addEventListener("submit", () => {
+      form.addEventListener("submit", (event) => {
+        if (!isValidKoreanMobile(phoneInput.value)) {
+          event.preventDefault();
+          phoneInput.setCustomValidity("Please enter a valid mobile number.");
+          phoneInput.reportValidity();
+          phoneInput.focus();
+          return;
+        }
+
+        phoneInput.setCustomValidity("");
         window.setTimeout(openModal, 250);
       });
 
