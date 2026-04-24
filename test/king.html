@@ -956,7 +956,7 @@
     function normalizeReservation(cells = [], index = 0) {
       const values = cells.map((cell) => getCellText(cell));
       return {
-        rowNumber: index + 2,
+        rowNumber: index + 1,
         timestamp: values[0] || "",
         date: values[1] || "",
         time: values[2] || "",
