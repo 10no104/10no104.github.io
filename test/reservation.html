@@ -750,7 +750,6 @@
           button.innerHTML = `<span>${new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date)}</span><strong>${new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date)}</strong>`;
           button.addEventListener("click", () => {
             dateInput.value = value;
-            nativeDatePicker.value = value;
             syncDateState();
           });
           dateGrid.appendChild(button);
@@ -796,6 +795,8 @@
 
         if (key === "date") {
           sheetTitle.textContent = "Choose date";
+          const selectedDate = dateInput.value ? new Date(dateInput.value + "T00:00:00") : new Date();
+          calendarCursor = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
           calendarShell.hidden = false;
           renderCalendar();
           sheet.classList.add("is-open");
@@ -858,14 +859,6 @@
         });
       });
 
-      nativeDatePicker.min = dateOptions[0];
-      nativeDatePicker.value = dateOptions[0];
-      nativeDatePicker.addEventListener("change", () => {
-        if (!nativeDatePicker.value) return;
-        dateInput.value = nativeDatePicker.value;
-        syncDateState();
-      });
-
       peopleCustomInput.addEventListener("keydown", (event) => {
         if (event.key === "Enter") {
           event.preventDefault();
@@ -880,6 +873,13 @@
           return;
         }
         applyCustomGuestValue();
+      });
+
+      peopleDisplay.addEventListener("click", () => {
+        if (peopleCustomInput.classList.contains("is-open")) {
+          peopleCustomInput.classList.remove("is-open");
+          peopleDisplay.style.display = "";
+        }
       });
 
       form.addEventListener("submit", () => {
