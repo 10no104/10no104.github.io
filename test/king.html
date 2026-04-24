@@ -247,6 +247,12 @@
       padding: 18px;
     }
 
+    .empty-state {
+      padding: 18px;
+      color: var(--muted);
+      font-size: 0.96rem;
+    }
+
     .reservation-card {
       padding: 16px;
       border-radius: 20px;
@@ -443,19 +449,19 @@
       <div class="metric-grid">
         <div class="metric-card">
           <span>Total Covers</span>
-          <strong>46</strong>
+          <strong id="metricCovers">0</strong>
         </div>
         <div class="metric-card">
-          <span>Confirmed</span>
-          <strong>18</strong>
+          <span>Total Reservations</span>
+          <strong id="metricReservations">0</strong>
         </div>
         <div class="metric-card">
-          <span>Pending</span>
-          <strong>5</strong>
+          <span>Large Parties</span>
+          <strong id="metricLargeParties">0</strong>
         </div>
         <div class="metric-card">
-          <span>Walk-in Hold</span>
-          <strong>3 tables</strong>
+          <span>Latest Booking</span>
+          <strong id="metricLatest">-</strong>
         </div>
       </div>
     </section>
@@ -464,7 +470,7 @@
       <section class="panel">
         <div class="panel-head">
           <h3>Today’s Reservations</h3>
-          <span>April 23, 2026</span>
+          <span id="reservationDateLabel">Loading</span>
         </div>
 
         <div class="filters">
@@ -475,85 +481,7 @@
           <button class="filter-chip" type="button">Needs Call</button>
         </div>
 
-        <div class="reservation-list">
-          <article class="reservation-card">
-            <div class="reservation-top">
-              <div>
-                <h4>James Park</h4>
-                <p>6:00 PM arrival</p>
-              </div>
-              <span class="status-badge confirmed">Confirmed</span>
-            </div>
-            <div class="reservation-meta">
-              <div class="meta-box">
-                <span>Guests</span>
-                <strong>4 guests</strong>
-              </div>
-              <div class="meta-box">
-                <span>Phone</span>
-                <strong>(604) 555-1288</strong>
-              </div>
-            </div>
-            <div class="reservation-notes">Anniversary dinner. Prefers a quiet table if available.</div>
-            <div class="reservation-actions">
-              <button class="action-btn primary" type="button">Seated</button>
-              <button class="action-btn neutral" type="button">Call</button>
-              <button class="action-btn light" type="button">Edit</button>
-            </div>
-          </article>
-
-          <article class="reservation-card">
-            <div class="reservation-top">
-              <div>
-                <h4>Olivia Chen</h4>
-                <p>7:30 PM arrival</p>
-              </div>
-              <span class="status-badge pending">Pending</span>
-            </div>
-            <div class="reservation-meta">
-              <div class="meta-box">
-                <span>Guests</span>
-                <strong>10 guests</strong>
-              </div>
-              <div class="meta-box">
-                <span>Phone</span>
-                <strong>(778) 555-4421</strong>
-              </div>
-            </div>
-            <div class="reservation-notes">Large party. Needs confirmation for pre-set menu options.</div>
-            <div class="reservation-actions">
-              <button class="action-btn primary" type="button">Confirm</button>
-              <button class="action-btn neutral" type="button">Call</button>
-              <button class="action-btn light" type="button">Edit</button>
-            </div>
-          </article>
-
-          <article class="reservation-card">
-            <div class="reservation-top">
-              <div>
-                <h4>Emma Wilson</h4>
-                <p>9:00 PM arrival</p>
-              </div>
-              <span class="status-badge call">Needs Call</span>
-            </div>
-            <div class="reservation-meta">
-              <div class="meta-box">
-                <span>Guests</span>
-                <strong>2 guests</strong>
-              </div>
-              <div class="meta-box">
-                <span>Phone</span>
-                <strong>(236) 555-9032</strong>
-              </div>
-            </div>
-            <div class="reservation-notes">Late booking. Verify arrival time and kitchen cutoff.</div>
-            <div class="reservation-actions">
-              <button class="action-btn primary" type="button">Reached</button>
-              <button class="action-btn neutral" type="button">Text</button>
-              <button class="action-btn light" type="button">Edit</button>
-            </div>
-          </article>
-        </div>
+        <div class="reservation-list" id="reservationList"></div>
       </section>
 
       <aside class="side-grid">
@@ -601,5 +529,154 @@
       </aside>
     </main>
   </div>
+  <script>
+    const RESERVATION_SHEET_CONFIG = {
+      sheetId: "1xa9OZbctYnlbaAL8lKIgmefM5hvSw0Plk01lxp5G2fc",
+      gid: "1826326008"
+    };
+
+    const EMPTY_MESSAGE = '<div class="empty-state">No reservations found in the sheet yet.</div>';
+
+    function parseGvizText(text = "") {
+      return JSON.parse(
+        text
+          .replace("/*O_o*/", "")
+          .replace("google.visualization.Query.setResponse(", "")
+          .slice(0, -2)
+      );
+    }
+
+    function mapReservationRows(rows = []) {
+      return rows
+        .map((row) => row.c || [])
+        .map((cells) => cells.map((cell) => (cell?.v ?? "").toString().trim()))
+        .filter((cells) => cells.some(Boolean))
+        .map((cells) => ({
+          timestamp: cells[0] || "",
+          date: cells[1] || "",
+          time: cells[2] || "",
+          people: cells[3] || "",
+          name: cells[4] || "",
+          phone: cells[5] || "",
+          notes: cells[6] || ""
+        }))
+        .sort((a, b) => {
+          const dateA = new Date(`${a.date || ""} ${a.time || ""}`.trim());
+          const dateB = new Date(`${b.date || ""} ${b.time || ""}`.trim());
+          if (Number.isNaN(dateA.getTime()) || Number.isNaN(dateB.getTime())) return 0;
+          return dateA - dateB;
+        });
+    }
+
+    async function fetchReservationsFromGoogleSheet() {
+      const { sheetId, gid } = RESERVATION_SHEET_CONFIG;
+      const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?gid=${gid}&tqx=out:json`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Failed to fetch reservation sheet");
+      const text = await response.text();
+      const data = parseGvizText(text);
+      return mapReservationRows(data.table?.rows || []);
+    }
+
+    function formatDateLabel(value = "") {
+      if (!value) return "No date";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+      return new Intl.DateTimeFormat("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric"
+      }).format(date);
+    }
+
+    function getStatusForReservation(item) {
+      const count = Number.parseInt(String(item.people).replace(/\D/g, ""), 10);
+      if (count >= 8) return { label: "Large Party", className: "pending" };
+      if (!item.phone) return { label: "Needs Call", className: "call" };
+      return { label: "Confirmed", className: "confirmed" };
+    }
+
+    function renderReservationCard(item) {
+      const status = getStatusForReservation(item);
+      const notes = item.notes || "No notes";
+      return `
+        <article class="reservation-card">
+          <div class="reservation-top">
+            <div>
+              <h4>${item.name || "Guest"}</h4>
+              <p>${item.time || "Time not set"} arrival</p>
+            </div>
+            <span class="status-badge ${status.className}">${status.label}</span>
+          </div>
+          <div class="reservation-meta">
+            <div class="meta-box">
+              <span>Guests</span>
+              <strong>${item.people || "-"}</strong>
+            </div>
+            <div class="meta-box">
+              <span>Phone</span>
+              <strong>${item.phone || "-"}</strong>
+            </div>
+          </div>
+          <div class="reservation-notes">${notes}</div>
+          <div class="reservation-actions">
+            <button class="action-btn primary" type="button">Confirm</button>
+            <button class="action-btn neutral" type="button">Call</button>
+            <button class="action-btn light" type="button">Edit</button>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderReservations(reservations = []) {
+      const reservationList = document.getElementById("reservationList");
+      const metricCovers = document.getElementById("metricCovers");
+      const metricReservations = document.getElementById("metricReservations");
+      const metricLargeParties = document.getElementById("metricLargeParties");
+      const metricLatest = document.getElementById("metricLatest");
+      const reservationDateLabel = document.getElementById("reservationDateLabel");
+
+      if (!reservations.length) {
+        reservationList.innerHTML = EMPTY_MESSAGE;
+        metricCovers.textContent = "0";
+        metricReservations.textContent = "0";
+        metricLargeParties.textContent = "0";
+        metricLatest.textContent = "-";
+        reservationDateLabel.textContent = "No reservations";
+        return;
+      }
+
+      const totalCovers = reservations.reduce((sum, item) => {
+        const count = Number.parseInt(String(item.people).replace(/\D/g, ""), 10);
+        return sum + (Number.isFinite(count) ? count : 0);
+      }, 0);
+      const largeParties = reservations.filter((item) => {
+        const count = Number.parseInt(String(item.people).replace(/\D/g, ""), 10);
+        return Number.isFinite(count) && count >= 8;
+      }).length;
+      const latest = reservations[reservations.length - 1];
+      const firstDate = reservations[0]?.date || "";
+
+      metricCovers.textContent = String(totalCovers);
+      metricReservations.textContent = String(reservations.length);
+      metricLargeParties.textContent = String(largeParties);
+      metricLatest.textContent = latest?.time || "-";
+      reservationDateLabel.textContent = formatDateLabel(firstDate);
+      reservationList.innerHTML = reservations.map(renderReservationCard).join("");
+    }
+
+    async function bootstrapReservationsAdmin() {
+      try {
+        const reservations = await fetchReservationsFromGoogleSheet();
+        renderReservations(reservations);
+      } catch (error) {
+        console.error(error);
+        document.getElementById("reservationList").innerHTML =
+          '<div class="empty-state">Could not load reservation data.</div>';
+      }
+    }
+
+    bootstrapReservationsAdmin();
+  </script>
 </body>
 </html>
