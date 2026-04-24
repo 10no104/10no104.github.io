@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Modify Reservation | EHWA Test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/global.css?v=20260423-modify" />
+  <style>
+    :root {
+      --ink: #211813;
+      --muted: #74665a;
+      --wine: #7b1f2f;
+      --line: rgba(109, 86, 59, 0.14);
+      --shadow: 0 24px 52px rgba(29, 19, 12, 0.1);
+      --radius-xl: 28px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(212, 175, 55, 0.18), transparent 28%),
+        radial-gradient(circle at 86% 12%, rgba(123, 31, 47, 0.12), transparent 24%),
+        linear-gradient(180deg, rgba(251, 247, 241, 0.98) 0%, rgba(245, 239, 228, 0.98) 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.18), rgba(255, 252, 247, 0.06)),
+        url("../assets/pattern.webp") center / 760px auto;
+      opacity: 0.14;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .shell {
+      width: min(100% - 18px, 760px);
+      margin: 0 auto;
+      padding: 20px 0 40px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      background: linear-gradient(180deg, rgba(255, 252, 247, 0.97), rgba(248, 241, 231, 0.96));
+      box-shadow: var(--shadow);
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--wine);
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(1.8rem, 7vw, 2.8rem);
+      letter-spacing: -0.05em;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      margin-top: 18px;
+      border-radius: 999px;
+      padding: 0 18px;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, var(--wine), #b9871f);
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="panel">
+      <p class="eyebrow">Reservation</p>
+      <h1>Modify Existing Reservation</h1>
+      <p>This test destination is ready for the guest lookup and edit flow. We can connect phone-based search here next.</p>
+      <a class="btn" href="./index.html">Back to Test Home</a>
+    </section>
+  </main>
+</body>
+</html>
