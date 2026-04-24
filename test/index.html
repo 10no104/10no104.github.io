@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test Hub | EHWA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/global.css?v=20260423-test" />
+  <style>
+    :root {
+      --ink: #201712;
+      --muted: #74665b;
+      --wine: #7b1f2f;
+      --gold: #d4af37;
+      --line: rgba(113, 88, 60, 0.14);
+      --shadow: 0 24px 52px rgba(29, 19, 12, 0.1);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(212, 175, 55, 0.18), transparent 28%),
+        radial-gradient(circle at 86% 12%, rgba(123, 31, 47, 0.12), transparent 24%),
+        linear-gradient(180deg, rgba(251, 247, 241, 0.98) 0%, rgba(245, 239, 228, 0.98) 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.18), rgba(255, 252, 247, 0.06)),
+        url("../assets/pattern.webp") center / 760px auto;
+      opacity: 0.14;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .shell {
+      width: min(100% - 18px, 980px);
+      margin: 0 auto;
+      padding: 20px 0 40px;
+    }
+
+    .hero,
+    .section {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      background: linear-gradient(180deg, rgba(255, 252, 247, 0.97), rgba(248, 241, 231, 0.96));
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+
+    .hero p {
+      margin: 0 0 8px;
+      color: var(--wine);
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(1.9rem, 7vw, 3.2rem);
+      letter-spacing: -0.06em;
+    }
+
+    .hero span {
+      display: block;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.98rem;
+      line-height: 1.6;
+    }
+
+    .section {
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+
+    .section h2 {
+      margin: 0 0 12px;
+      font-size: 1.15rem;
+      letter-spacing: -0.03em;
+    }
+
+    .grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .card {
+      display: block;
+      padding: 18px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(113, 88, 60, 0.14);
+      background: rgba(255, 251, 245, 0.82);
+    }
+
+    .card strong,
+    .card span {
+      display: block;
+    }
+
+    .card strong {
+      margin-bottom: 6px;
+      font-size: 1.04rem;
+    }
+
+    .card span {
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 0.92rem;
+    }
+
+    @media (min-width: 720px) {
+      .grid.two {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <p>EHWA Test</p>
+      <h1>Internal Test Hub</h1>
+      <span>Quick links for the pages inside the test folder.</span>
+    </section>
+
+    <section class="section">
+      <h2>Main Test Pages</h2>
+      <div class="grid two">
+        <a class="card" href="./king.html">
+          <strong>Shared Admin</strong>
+          <span>Current combined reservation admin page.</span>
+        </a>
+        <a class="card" href="./downtown/queen.html">
+          <strong>Downtown Admin</strong>
+          <span>Downtown test dashboard.</span>
+        </a>
+        <a class="card" href="./uptown/queen.html">
+          <strong>Uptown Admin</strong>
+          <span>Uptown test dashboard.</span>
+        </a>
+        <a class="card" href="./downtown/reservation/reservation.html">
+          <strong>Downtown Reservation</strong>
+          <span>Downtown guest reservation form.</span>
+        </a>
+        <a class="card" href="./uptown/reservation/reservation.html">
+          <strong>Uptown Reservation</strong>
+          <span>Uptown guest reservation form.</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Menus</h2>
+      <div class="grid two">
+        <a class="card" href="./downtown/menu/index.html">
+          <strong>Downtown Menu</strong>
+          <span>Downtown menu test page.</span>
+        </a>
+        <a class="card" href="./uptown/menu/index.html">
+          <strong>Uptown Menu</strong>
+          <span>Uptown menu test page.</span>
+        </a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
