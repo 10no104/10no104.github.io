@@ -134,17 +134,32 @@
     }
 
     .booking-card {
+      position: relative;
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: var(--radius-xl);
       background:
-        linear-gradient(180deg, rgba(255, 252, 247, 0.97), rgba(248, 241, 231, 0.96)),
-        url("../assets/pattern.webp") center / 440px auto;
+        linear-gradient(180deg, rgba(22, 16, 12, 0.82), rgba(44, 22, 18, 0.76)),
+        url("../assets/ehwa-gung.webp") center / cover no-repeat;
       box-shadow: var(--shadow);
       overflow: hidden;
       backdrop-filter: blur(8px);
     }
 
+    .booking-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at top left, rgba(212, 175, 55, 0.16), transparent 28%),
+        linear-gradient(180deg, rgba(14, 10, 8, 0.14), rgba(14, 10, 8, 0.28)),
+        url("../assets/pattern.webp") center / 460px auto;
+      opacity: 0.36;
+      pointer-events: none;
+    }
+
     .booking-form {
+      position: relative;
+      z-index: 1;
       display: grid;
       gap: 16px;
       padding: 18px;
@@ -171,7 +186,7 @@
       padding: 14px 15px;
       border: 1px solid rgba(113, 88, 60, 0.18);
       border-radius: var(--radius-md);
-      background: rgba(255, 255, 255, 0.82);
+      background: rgba(255, 251, 245, 0.9);
       color: var(--ink);
       font: inherit;
       outline: none;
@@ -199,7 +214,7 @@
       padding: 14px 15px;
       border: 1px solid rgba(113, 88, 60, 0.18);
       border-radius: var(--radius-md);
-      background: rgba(255, 255, 255, 0.82);
+      background: rgba(255, 251, 245, 0.9);
       color: var(--ink);
       font: inherit;
       text-align: left;
@@ -368,6 +383,47 @@
       background: rgba(123, 31, 47, 0.08);
     }
 
+    .date-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .date-chip {
+      width: 100%;
+      min-height: 66px;
+      padding: 10px 8px;
+      border-radius: 18px;
+      border: 1px solid rgba(113, 88, 60, 0.14);
+      background: rgba(255, 251, 245, 0.82);
+      color: var(--ink);
+      font: inherit;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .date-chip span,
+    .date-chip strong {
+      display: block;
+    }
+
+    .date-chip span {
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      text-transform: uppercase;
+    }
+
+    .date-chip strong {
+      font-size: 0.94rem;
+    }
+
+    .date-chip.is-active {
+      border-color: rgba(123, 31, 47, 0.34);
+      background: rgba(123, 31, 47, 0.08);
+      box-shadow: 0 12px 22px rgba(17, 11, 8, 0.08);
+    }
+
     @media (min-width: 720px) {
       .shell {
         width: min(100% - 28px, 960px);
@@ -413,9 +469,10 @@
     <section class="booking-card">
       <form class="booking-form" id="reservationForm" method="POST" action="https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3Iiujn95evZuFiyLNrJUo-_H6rKngdxt0EeBFVw/exec" target="reservationSubmitFrame">
         <div class="field-grid">
-          <div class="field">
+          <div class="field full">
             <label for="date">Date</label>
-            <input id="date" name="date" type="date" required />
+            <div class="date-grid" id="dateGrid"></div>
+            <input id="date" name="date" type="hidden" required />
           </div>
 
           <div class="field">
@@ -425,9 +482,8 @@
           </div>
 
           <div class="field">
-            <label for="peopleDisplay">Guests</label>
-            <button class="picker-trigger" id="peopleDisplay" type="button" data-picker="people">4 guests</button>
-            <input id="people" name="people" type="hidden" value="4 guests" />
+            <label for="people">Guests</label>
+            <input id="people" name="people" type="number" inputmode="numeric" min="2" placeholder="Enter guest count" required />
           </div>
 
           <div class="field">
@@ -475,10 +531,10 @@
     (function () {
       const form = document.getElementById("reservationForm");
       const dateInput = document.getElementById("date");
+      const dateGrid = document.getElementById("dateGrid");
       const timeInput = document.getElementById("time");
       const peopleInput = document.getElementById("people");
       const timeDisplay = document.getElementById("timeDisplay");
-      const peopleDisplay = document.getElementById("peopleDisplay");
 
       const modal = document.getElementById("reservationModal");
       const modalClose = document.getElementById("reservationModalClose");
@@ -510,30 +566,48 @@
             "12:30 AM",
             "1:00 AM"
           ]
-        },
-        people: {
-          title: "Select guests",
-          input: peopleInput,
-          display: peopleDisplay,
-          options: [
-            "1 guest",
-            "2 guests",
-            "3 guests",
-            "4 guests",
-            "5 guests",
-            "6 guests",
-            "7 guests",
-            "8 guests"
-          ]
         }
       };
 
       let activePicker = null;
 
       const pad = (num) => String(num).padStart(2, "0");
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      dateInput.value = `${tomorrow.getFullYear()}-${pad(tomorrow.getMonth() + 1)}-${pad(tomorrow.getDate())}`;
+      const formatInputDate = (date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+      const formatDateChip = (date) => ({
+        label: new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date),
+        value: new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date)
+      });
+
+      const renderDateOptions = () => {
+        const start = new Date();
+        start.setDate(start.getDate() + 1);
+        dateGrid.innerHTML = "";
+
+        for (let i = 0; i < 6; i += 1) {
+          const optionDate = new Date(start);
+          optionDate.setDate(start.getDate() + i);
+          const chipText = formatDateChip(optionDate);
+          const inputValue = formatInputDate(optionDate);
+
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "date-chip";
+          button.dataset.value = inputValue;
+          button.innerHTML = `<span>${chipText.label}</span><strong>${chipText.value}</strong>`;
+          button.addEventListener("click", () => {
+            dateInput.value = inputValue;
+            dateGrid.querySelectorAll(".date-chip").forEach((chip) => {
+              chip.classList.toggle("is-active", chip === button);
+            });
+          });
+          dateGrid.appendChild(button);
+        }
+
+        const firstChip = dateGrid.querySelector(".date-chip");
+        if (firstChip) {
+          firstChip.click();
+        }
+      };
 
       const openModal = () => {
         modal.classList.add("is-open");
@@ -618,6 +692,8 @@
           }
         }
       });
+
+      renderDateOptions();
     })();
   </script>
 </body>
