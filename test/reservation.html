@@ -7,17 +7,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/global.css?v=20260423-4" />
+  <link rel="stylesheet" href="../css/global.css?v=20260423-5" />
   <style>
     :root {
-      --bg: #f5efe4;
+      --bg: #120f0d;
+      --ink: #201712;
+      --muted: #72655b;
       --paper: rgba(255, 251, 245, 0.94);
-      --ink: #1f1712;
-      --muted: #6d6055;
+      --line: rgba(109, 86, 59, 0.16);
       --wine: #7b1f2f;
       --gold: #d4af37;
-      --line: rgba(109, 86, 59, 0.16);
-      --shadow: 0 24px 54px rgba(35, 23, 16, 0.12);
+      --shadow: 0 30px 64px rgba(17, 11, 8, 0.24);
       --radius-xl: 28px;
       --radius-lg: 20px;
       --radius-md: 15px;
@@ -29,12 +29,13 @@
 
     body {
       margin: 0;
+      min-height: 100vh;
       color: var(--ink);
-      background:
-        radial-gradient(circle at top left, rgba(212, 175, 55, 0.18), transparent 28%),
-        radial-gradient(circle at 86% 12%, rgba(123, 31, 47, 0.12), transparent 24%),
-        linear-gradient(180deg, rgba(251, 247, 241, 0.98) 0%, rgba(245, 239, 228, 0.98) 100%);
       font-family: "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        linear-gradient(180deg, rgba(14, 10, 8, 0.62), rgba(14, 10, 8, 0.68)),
+        url("../assets/background수묵.webp") center top / cover no-repeat,
+        linear-gradient(180deg, #171210 0%, #0f0c0a 100%);
       overflow-x: hidden;
     }
 
@@ -43,9 +44,10 @@
       position: fixed;
       inset: 0;
       background:
-        linear-gradient(180deg, rgba(255, 252, 247, 0.18), rgba(255, 252, 247, 0.06)),
-        url("../assets/pattern.webp") center / 720px auto;
-      opacity: 0.12;
+        radial-gradient(circle at top left, rgba(212, 175, 55, 0.14), transparent 28%),
+        radial-gradient(circle at 88% 14%, rgba(123, 31, 47, 0.16), transparent 24%),
+        url("../assets/pattern.webp") center / 760px auto;
+      opacity: 0.18;
       pointer-events: none;
       z-index: -2;
     }
@@ -53,13 +55,12 @@
     body::after {
       content: "";
       position: fixed;
-      right: -110px;
-      bottom: -110px;
+      inset: auto -80px -120px auto;
       width: 340px;
       height: 340px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(212, 175, 55, 0.16), transparent 72%);
-      filter: blur(14px);
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.18), transparent 72%);
+      filter: blur(18px);
       pointer-events: none;
       z-index: -1;
     }
@@ -72,7 +73,7 @@
     .shell {
       width: min(100% - 18px, 760px);
       margin: 0 auto;
-      padding: 16px 0 40px;
+      padding: 18px 0 40px;
     }
 
     .topbar {
@@ -80,7 +81,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
     }
 
     .brand {
@@ -97,9 +98,9 @@
       width: 62px;
       height: 62px;
       border-radius: 999px;
-      background: linear-gradient(180deg, #fffdf9 0%, #f2e7d8 100%);
-      border: 1px solid rgba(73, 53, 36, 0.12);
-      box-shadow: 0 14px 28px rgba(42, 28, 18, 0.1);
+      background: linear-gradient(180deg, rgba(255, 254, 250, 0.98), rgba(243, 231, 215, 0.94));
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.16);
       flex: none;
     }
 
@@ -111,6 +112,7 @@
 
     .brand h1 {
       margin: 0;
+      color: #fff8f0;
       font-size: clamp(1.45rem, 6vw, 2.2rem);
       letter-spacing: -0.05em;
     }
@@ -122,66 +124,24 @@
       min-height: 42px;
       padding: 0 14px;
       border-radius: 999px;
-      border: 1px solid var(--line);
-      background: rgba(255, 251, 245, 0.72);
-      box-shadow: 0 10px 22px rgba(32, 20, 13, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 250, 243, 0.08);
+      backdrop-filter: blur(10px);
+      color: #fff7ef;
       font-size: 0.92rem;
       font-weight: 700;
       white-space: nowrap;
     }
 
     .booking-card {
-      border: 1px solid var(--line);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: var(--radius-xl);
       background:
-        linear-gradient(180deg, rgba(255, 252, 247, 0.96), rgba(249, 243, 233, 0.96)),
+        linear-gradient(180deg, rgba(255, 252, 247, 0.97), rgba(248, 241, 231, 0.96)),
         url("../assets/pattern.webp") center / 440px auto;
       box-shadow: var(--shadow);
       overflow: hidden;
-    }
-
-    .booking-summary {
-      padding: 18px;
-      background: linear-gradient(180deg, rgba(31, 20, 14, 0.98), rgba(69, 27, 36, 0.96));
-      color: #fff8f0;
-    }
-
-    .summary-title {
-      margin: 0 0 14px;
-      font-size: 0.88rem;
-      font-weight: 800;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: rgba(241, 201, 100, 0.94);
-    }
-
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .summary-item {
-      padding: 12px 14px;
-      border-radius: 16px;
-      background: rgba(255, 250, 244, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .summary-item span,
-    .summary-item strong {
-      display: block;
-    }
-
-    .summary-item span {
-      margin-bottom: 4px;
-      color: rgba(255, 248, 240, 0.66);
-      font-size: 0.8rem;
-    }
-
-    .summary-item strong {
-      font-size: 1rem;
-      line-height: 1.3;
+      backdrop-filter: blur(8px);
     }
 
     .booking-form {
@@ -206,22 +166,23 @@
     }
 
     input,
-    select,
     textarea {
       width: 100%;
       padding: 14px 15px;
       border: 1px solid rgba(113, 88, 60, 0.18);
       border-radius: var(--radius-md);
-      background: rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.82);
       color: var(--ink);
       font: inherit;
       outline: none;
       transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+      appearance: none;
+      -webkit-appearance: none;
     }
 
     input:focus,
-    select:focus,
-    textarea:focus {
+    textarea:focus,
+    .picker-trigger:focus {
       border-color: rgba(123, 31, 47, 0.38);
       box-shadow: 0 0 0 4px rgba(123, 31, 47, 0.1);
       background: #fff;
@@ -230,6 +191,34 @@
     textarea {
       min-height: 120px;
       resize: vertical;
+    }
+
+    .picker-trigger {
+      width: 100%;
+      min-height: 53px;
+      padding: 14px 15px;
+      border: 1px solid rgba(113, 88, 60, 0.18);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.82);
+      color: var(--ink);
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+      outline: none;
+      position: relative;
+    }
+
+    .picker-trigger::after {
+      content: "";
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      width: 10px;
+      height: 10px;
+      border-right: 2px solid rgba(60, 44, 30, 0.7);
+      border-bottom: 2px solid rgba(60, 44, 30, 0.7);
+      transform: translateY(-60%) rotate(45deg);
+      pointer-events: none;
     }
 
     .submit-btn {
@@ -252,7 +241,8 @@
       opacity: 0.97;
     }
 
-    .modal-backdrop {
+    .modal-backdrop,
+    .sheet-backdrop {
       position: fixed;
       inset: 0;
       display: none;
@@ -266,6 +256,10 @@
 
     .modal-backdrop.is-open {
       display: flex;
+    }
+
+    .sheet-backdrop.is-open {
+      display: block;
     }
 
     .modal {
@@ -303,6 +297,77 @@
       font-weight: 800;
     }
 
+    .sheet-backdrop {
+      z-index: 110;
+    }
+
+    .picker-sheet {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: 0 auto;
+      width: min(100%, 760px);
+      max-height: min(72vh, 520px);
+      border-radius: 24px 24px 0 0;
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(247, 239, 228, 0.98)),
+        url("../assets/pattern.webp") center / 420px auto;
+      box-shadow: 0 -16px 48px rgba(17, 11, 8, 0.22);
+      overflow: hidden;
+    }
+
+    .sheet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px 18px 12px;
+    }
+
+    .sheet-header h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      letter-spacing: -0.04em;
+    }
+
+    .sheet-close {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .sheet-options {
+      display: grid;
+      gap: 10px;
+      padding: 0 18px 18px;
+      max-height: calc(min(72vh, 520px) - 72px);
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .sheet-option {
+      width: 100%;
+      min-height: 54px;
+      padding: 0 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(113, 88, 60, 0.14);
+      background: rgba(255, 255, 255, 0.76);
+      color: var(--ink);
+      font: inherit;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .sheet-option.is-active {
+      border-color: rgba(123, 31, 47, 0.34);
+      background: rgba(123, 31, 47, 0.08);
+    }
+
     @media (min-width: 720px) {
       .shell {
         width: min(100% - 28px, 960px);
@@ -319,21 +384,8 @@
         height: 50px;
       }
 
-      .booking-card {
-        display: grid;
-        grid-template-columns: minmax(300px, 0.92fr) minmax(0, 1.08fr);
-      }
-
-      .booking-summary {
-        padding: 24px;
-      }
-
-      .summary-grid {
-        grid-template-columns: 1fr;
-      }
-
       .booking-form {
-        padding: 24px;
+        padding: 26px;
       }
 
       .field-grid {
@@ -359,76 +411,38 @@
     </header>
 
     <section class="booking-card">
-      <div class="booking-summary">
-        <p class="summary-title">Booking Overview</p>
-        <div class="summary-grid">
-          <div class="summary-item">
-            <span>Date</span>
-            <strong id="summaryDate">Not set</strong>
-          </div>
-          <div class="summary-item">
-            <span>Time</span>
-            <strong id="summaryTime">6:00 PM</strong>
-          </div>
-          <div class="summary-item">
-            <span>Guests</span>
-            <strong id="summaryPeople">4 guests</strong>
-          </div>
-          <div class="summary-item">
-            <span>Name</span>
-            <strong id="summaryName">Hong Gil-dong</strong>
-          </div>
-          <div class="summary-item">
-            <span>Phone</span>
-            <strong id="summaryPhone">010-1234-5678</strong>
-          </div>
-          <div class="summary-item">
-            <span>Notes</span>
-            <strong id="summaryNotes">Window seat if available.</strong>
-          </div>
-        </div>
-      </div>
-
       <form class="booking-form" id="reservationForm" method="POST" action="https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3Iiujn95evZuFiyLNrJUo-_H6rKngdxt0EeBFVw/exec" target="reservationSubmitFrame">
         <div class="field-grid">
           <div class="field">
             <label for="date">Date</label>
             <input id="date" name="date" type="date" required />
           </div>
+
           <div class="field">
-            <label for="time">Time</label>
-            <select id="time" name="time">
-              <option value="5:30 PM">5:30 PM</option>
-              <option value="6:00 PM" selected>6:00 PM</option>
-              <option value="6:30 PM">6:30 PM</option>
-              <option value="7:00 PM">7:00 PM</option>
-              <option value="7:30 PM">7:30 PM</option>
-              <option value="8:00 PM">8:00 PM</option>
-              <option value="8:30 PM">8:30 PM</option>
-            </select>
+            <label for="timeDisplay">Time</label>
+            <button class="picker-trigger" id="timeDisplay" type="button" data-picker="time">6:00 PM</button>
+            <input id="time" name="time" type="hidden" value="6:00 PM" />
           </div>
+
           <div class="field">
-            <label for="people">Guests</label>
-            <select id="people" name="people">
-              <option value="2 guests">2 guests</option>
-              <option value="3 guests">3 guests</option>
-              <option value="4 guests" selected>4 guests</option>
-              <option value="5 guests">5 guests</option>
-              <option value="6 guests">6 guests</option>
-              <option value="8 guests">8 guests</option>
-            </select>
+            <label for="peopleDisplay">Guests</label>
+            <button class="picker-trigger" id="peopleDisplay" type="button" data-picker="people">4 guests</button>
+            <input id="people" name="people" type="hidden" value="4 guests" />
           </div>
+
           <div class="field">
             <label for="name">Name</label>
-            <input id="name" name="name" type="text" value="Hong Gil-dong" required />
+            <input id="name" name="name" type="text" required />
           </div>
+
           <div class="field">
             <label for="phone">Phone</label>
-            <input id="phone" name="phone" type="text" value="010-1234-5678" required />
+            <input id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" required />
           </div>
+
           <div class="field full">
             <label for="notes">Notes</label>
-            <textarea id="notes" name="notes" placeholder="Add any request or occasion.">Window seat if available.</textarea>
+            <textarea id="notes" name="notes"></textarea>
           </div>
         </div>
 
@@ -447,50 +461,79 @@
     </div>
   </div>
 
+  <div class="sheet-backdrop" id="pickerSheet" aria-hidden="true">
+    <div class="picker-sheet" role="dialog" aria-modal="true" aria-labelledby="pickerTitle">
+      <div class="sheet-header">
+        <h2 id="pickerTitle">Select</h2>
+        <button class="sheet-close" id="pickerClose" type="button">Close</button>
+      </div>
+      <div class="sheet-options" id="pickerOptions"></div>
+    </div>
+  </div>
+
   <script>
     (function () {
       const form = document.getElementById("reservationForm");
       const dateInput = document.getElementById("date");
       const timeInput = document.getElementById("time");
       const peopleInput = document.getElementById("people");
-      const nameInput = document.getElementById("name");
-      const phoneInput = document.getElementById("phone");
-      const notesInput = document.getElementById("notes");
-
-      const summaryDate = document.getElementById("summaryDate");
-      const summaryTime = document.getElementById("summaryTime");
-      const summaryPeople = document.getElementById("summaryPeople");
-      const summaryName = document.getElementById("summaryName");
-      const summaryPhone = document.getElementById("summaryPhone");
-      const summaryNotes = document.getElementById("summaryNotes");
+      const timeDisplay = document.getElementById("timeDisplay");
+      const peopleDisplay = document.getElementById("peopleDisplay");
 
       const modal = document.getElementById("reservationModal");
       const modalClose = document.getElementById("reservationModalClose");
+
+      const sheet = document.getElementById("pickerSheet");
+      const sheetTitle = document.getElementById("pickerTitle");
+      const sheetOptions = document.getElementById("pickerOptions");
+      const sheetClose = document.getElementById("pickerClose");
+
+      const pickerConfig = {
+        time: {
+          title: "Select time",
+          input: timeInput,
+          display: timeDisplay,
+          options: [
+            "6:00 PM",
+            "6:30 PM",
+            "7:00 PM",
+            "7:30 PM",
+            "8:00 PM",
+            "8:30 PM",
+            "9:00 PM",
+            "9:30 PM",
+            "10:00 PM",
+            "10:30 PM",
+            "11:00 PM",
+            "11:30 PM",
+            "12:00 AM",
+            "12:30 AM",
+            "1:00 AM"
+          ]
+        },
+        people: {
+          title: "Select guests",
+          input: peopleInput,
+          display: peopleDisplay,
+          options: [
+            "1 guest",
+            "2 guests",
+            "3 guests",
+            "4 guests",
+            "5 guests",
+            "6 guests",
+            "7 guests",
+            "8 guests"
+          ]
+        }
+      };
+
+      let activePicker = null;
 
       const pad = (num) => String(num).padStart(2, "0");
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
       dateInput.value = `${tomorrow.getFullYear()}-${pad(tomorrow.getMonth() + 1)}-${pad(tomorrow.getDate())}`;
-
-      const formatDate = (value) => {
-        if (!value) return "Not set";
-        const date = new Date(value + "T00:00:00");
-        if (Number.isNaN(date.getTime())) return value;
-        return new Intl.DateTimeFormat("en-US", {
-          month: "short",
-          day: "numeric",
-          year: "numeric"
-        }).format(date);
-      };
-
-      const syncSummary = () => {
-        summaryDate.textContent = formatDate(dateInput.value);
-        summaryTime.textContent = timeInput.value || "-";
-        summaryPeople.textContent = peopleInput.value || "-";
-        summaryName.textContent = nameInput.value || "-";
-        summaryPhone.textContent = phoneInput.value || "-";
-        summaryNotes.textContent = notesInput.value || "No notes";
-      };
 
       const openModal = () => {
         modal.classList.add("is-open");
@@ -502,9 +545,50 @@
         modal.setAttribute("aria-hidden", "true");
       };
 
-      [dateInput, timeInput, peopleInput, nameInput, phoneInput, notesInput].forEach((input) => {
-        input.addEventListener("input", syncSummary);
-        input.addEventListener("change", syncSummary);
+      const closeSheet = () => {
+        sheet.classList.remove("is-open");
+        sheet.setAttribute("aria-hidden", "true");
+        activePicker = null;
+        sheetOptions.innerHTML = "";
+      };
+
+      const selectOption = (key, value) => {
+        const config = pickerConfig[key];
+        config.input.value = value;
+        config.display.textContent = value;
+        closeSheet();
+      };
+
+      const openSheet = (key) => {
+        const config = pickerConfig[key];
+        if (!config) return;
+
+        activePicker = key;
+        sheetTitle.textContent = config.title;
+        sheetOptions.innerHTML = "";
+
+        config.options.forEach((option) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "sheet-option";
+          button.textContent = option;
+          if (config.input.value === option) {
+            button.classList.add("is-active");
+          }
+          button.addEventListener("click", () => {
+            selectOption(key, option);
+          });
+          sheetOptions.appendChild(button);
+        });
+
+        sheet.classList.add("is-open");
+        sheet.setAttribute("aria-hidden", "false");
+      };
+
+      document.querySelectorAll("[data-picker]").forEach((button) => {
+        button.addEventListener("click", () => {
+          openSheet(button.getAttribute("data-picker"));
+        });
       });
 
       form.addEventListener("submit", () => {
@@ -518,13 +602,22 @@
         }
       });
 
-      document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape" && modal.classList.contains("is-open")) {
-          closeModal();
+      sheetClose.addEventListener("click", closeSheet);
+      sheet.addEventListener("click", (event) => {
+        if (event.target === sheet) {
+          closeSheet();
         }
       });
 
-      syncSummary();
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          if (sheet.classList.contains("is-open")) {
+            closeSheet();
+          } else if (modal.classList.contains("is-open")) {
+            closeModal();
+          }
+        }
+      });
     })();
   </script>
 </body>
