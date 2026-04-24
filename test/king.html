@@ -151,6 +151,7 @@
 
     .metric-grid {
       display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
     }
 
@@ -175,6 +176,37 @@
     .metric-card strong.large {
       font-size: 1.5rem;
       line-height: 1.05;
+    }
+
+    .next-booking-card {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255, 250, 244, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .next-booking-card span,
+    .next-booking-card strong {
+      display: block;
+    }
+
+    .next-booking-card span {
+      margin-bottom: 6px;
+      color: rgba(255, 248, 240, 0.68);
+      font-size: 0.82rem;
+    }
+
+    .next-booking-card strong {
+      margin-bottom: 6px;
+      font-size: 1.52rem;
+      line-height: 1.04;
+    }
+
+    .next-booking-card p {
+      margin: 0;
+      color: rgba(255, 248, 240, 0.84);
+      font-size: 0.96rem;
+      font-weight: 700;
     }
 
     .layout {
@@ -344,6 +376,10 @@
     .guest-custom-input.is-open { display: block; }
 
     .form-actions { display: grid; gap: 10px; }
+
+    #quickAddForm .form-actions {
+      grid-template-columns: 1fr;
+    }
 
     .control-row {
       display: grid;
@@ -739,16 +775,18 @@
       <h2 id="todayHeading">Today</h2>
       <div class="metric-grid">
         <div class="metric-card">
-          <span>Next Booking</span>
-          <strong class="large" id="metricNextName">-</strong>
-          <span id="metricNextMeta">No upcoming reservation</span>
-        </div>
-        <div class="metric-card">
           <span>Total Reservations</span>
           <strong id="metricReservations">0</strong>
+        </div>
+        <div class="metric-card">
           <span>Large Parties</span>
           <strong id="metricLargeParties">0</strong>
         </div>
+      </div>
+      <div class="next-booking-card">
+        <span>Next Booking</span>
+        <strong id="metricNextName">-</strong>
+        <p id="metricNextMeta">No upcoming reservation</p>
       </div>
     </section>
 
