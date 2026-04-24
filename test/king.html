@@ -613,45 +613,6 @@
       line-height: 1.6;
     }
 
-    .feedback-backdrop {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-      background: rgba(18, 12, 9, 0.42);
-      backdrop-filter: blur(4px);
-      z-index: 120;
-    }
-
-    .feedback-backdrop.is-open {
-      display: flex;
-    }
-
-    .feedback-modal {
-      width: min(100%, 380px);
-      padding: 22px;
-      border-radius: 22px;
-      background:
-        linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(247, 239, 228, 0.98)),
-        url("../assets/pattern.webp") center / 360px auto;
-      border: 1px solid rgba(108, 85, 58, 0.14);
-      box-shadow: 0 24px 44px rgba(18, 12, 9, 0.18);
-    }
-
-    .feedback-modal h3 {
-      margin: 0 0 8px;
-      font-size: 1.22rem;
-      letter-spacing: -0.03em;
-    }
-
-    .feedback-modal p {
-      margin: 0 0 18px;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
     .modal-head {
       display: flex;
       align-items: center;
@@ -1408,6 +1369,10 @@
     const editorRowNumber = document.getElementById("editorRowNumber");
     const editorStatus = document.getElementById("editorStatus");
     const editorFields = setupReservationForm(document.getElementById("editorFields"), "editor");
+    const feedbackModal = document.getElementById("feedbackModal");
+    const feedbackTitle = document.getElementById("feedbackTitle");
+    const feedbackMessage = document.getElementById("feedbackMessage");
+    const closeFeedbackModal = document.getElementById("closeFeedbackModal");
 
     const sheet = document.getElementById("pickerSheet");
     const sheetTitle = document.getElementById("pickerTitle");
@@ -1545,6 +1510,18 @@
       editorModal.setAttribute("aria-hidden", "true");
     }
 
+    function openFeedback(title, message) {
+      feedbackTitle.textContent = title;
+      feedbackMessage.textContent = message;
+      feedbackModal.classList.add("is-open");
+      feedbackModal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeFeedback() {
+      feedbackModal.classList.remove("is-open");
+      feedbackModal.setAttribute("aria-hidden", "true");
+    }
+
     function serializeReservationForm(form) {
       return Object.fromEntries(new FormData(form).entries());
     }
@@ -1559,6 +1536,7 @@
         buildMutationForm(payload);
         if (form === editorForm) {
           closeEditor();
+          openFeedback("Reservation Updated", "Your booking changes have been saved.");
         } else {
           form.reset();
           quickFormFields.dateInput.value = formatInputDate(new Date());
@@ -1572,6 +1550,7 @@
           quickFormFields.phoneInput.value = "";
           quickFormFields.notesInput.value = "";
           quickFormFields.renderDateGrid();
+          openFeedback("Reservation Added", "The new reservation has been submitted.");
         }
         refreshAfterMutation();
       });
@@ -1609,6 +1588,10 @@
     editorModal.addEventListener("click", (event) => {
       if (event.target === editorModal) closeEditor();
     });
+    closeFeedbackModal.addEventListener("click", closeFeedback);
+    feedbackModal.addEventListener("click", (event) => {
+      if (event.target === feedbackModal) closeFeedback();
+    });
 
     document.querySelectorAll("[data-range]").forEach((button) => {
       button.addEventListener("click", () => {
@@ -1640,11 +1623,18 @@
       }
 
       if (button.dataset.action === "remove" || button.dataset.action === "restore") {
+        const isRestore = button.dataset.action === "restore";
         buildMutationForm({
           action: "status",
           rowNumber: String(rowNumber),
-          status: button.dataset.action === "remove" ? "removed" : "active"
+          status: isRestore ? "active" : "removed"
         });
+        openFeedback(
+          isRestore ? "Reservation Restored" : "Reservation Removed",
+          isRestore
+            ? "This booking is visible in the active list again."
+            : "This booking has been moved out of the active list."
+        );
         refreshAfterMutation();
       }
     });
@@ -1668,6 +1658,8 @@
       if (event.key === "Escape") {
         if (sheet.classList.contains("is-open")) {
           closeSheet();
+        } else if (feedbackModal.classList.contains("is-open")) {
+          closeFeedback();
         } else if (editorModal.classList.contains("is-open")) {
           closeEditor();
         }
