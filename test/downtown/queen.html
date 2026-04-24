@@ -839,6 +839,7 @@
         <form class="booking-form" id="quickAddForm">
           <input name="action" type="hidden" value="create" />
           <input name="status" type="hidden" value="active" />
+          <input name="sheetName" type="hidden" value="Downtown Reservation" />
           <div class="field-grid" id="quickAddFields"></div>
           <div class="form-actions">
             <button class="pill-btn primary" type="submit">Add Reservation</button>
@@ -881,6 +882,7 @@
       <form class="booking-form" id="editorForm">
         <input id="editorAction" name="action" type="hidden" value="update" />
         <input id="editorRowNumber" name="rowNumber" type="hidden" value="" />
+        <input id="editorSheetName" name="sheetName" type="hidden" value="Downtown Reservation" />
         <input id="editorStatus" name="status" type="hidden" value="active" />
         <div class="field-grid" id="editorFields"></div>
         <div class="form-actions">
@@ -923,7 +925,8 @@
   <script>
     const ADMIN_SHEET_CONFIG = {
       sheetId: "1xa9OZbctYnlbaAL8lKIgmefM5hvSw0Plk01lxp5G2fc",
-      gid: "1826326008"
+      sheetName: "Downtown Reservation",
+      branchLabel: "Downtown"
     };
 
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3Iiujn95evZuFiyLNrJUo-_H6rKngdxt0EeBFVw/exec";
@@ -957,6 +960,8 @@
       const values = cells.map((cell) => getCellText(cell));
       return {
         rowNumber: index + 1,
+        sheetName: ADMIN_SHEET_CONFIG.sheetName,
+        branch: ADMIN_SHEET_CONFIG.branchLabel,
         timestamp: values[0] || "",
         date: values[1] || "",
         time: values[2] || "",
@@ -997,8 +1002,8 @@
     }
 
     async function fetchReservations() {
-      const { sheetId, gid } = ADMIN_SHEET_CONFIG;
-      const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?gid=${gid}&tqx=out:json`;
+      const { sheetId, sheetName } = ADMIN_SHEET_CONFIG;
+      const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&tqx=out:json`;
       const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch reservation sheet");
       const data = parseGvizText(await response.text());
@@ -1111,8 +1116,8 @@
           </div>
           <div class="reservation-notes">${item.notes || "No notes"}</div>
           <div class="reservation-actions">
-            <button class="action-btn primary" type="button" data-action="${primaryAction}" data-row="${item.rowNumber}">${primaryLabel}</button>
-            <button class="action-btn light" type="button" data-action="edit" data-row="${item.rowNumber}">Edit</button>
+            <button class="action-btn primary" type="button" data-action="${primaryAction}" data-sheet="${item.sheetName}" data-row="${item.rowNumber}">${primaryLabel}</button>
+            <button class="action-btn light" type="button" data-action="edit" data-sheet="${item.sheetName}" data-row="${item.rowNumber}">Edit</button>
           </div>
         </article>
       `;
@@ -1376,6 +1381,7 @@
     const editorForm = document.getElementById("editorForm");
     const editorAction = document.getElementById("editorAction");
     const editorRowNumber = document.getElementById("editorRowNumber");
+    const editorSheetName = document.getElementById("editorSheetName");
     const editorStatus = document.getElementById("editorStatus");
     const editorFields = setupReservationForm(document.getElementById("editorFields"), "editor");
     const feedbackModal = document.getElementById("feedbackModal");
@@ -1505,6 +1511,7 @@
       editorTitle.textContent = "Edit Reservation";
       editorAction.value = "update";
       editorRowNumber.value = String(item.rowNumber);
+      editorSheetName.value = item.sheetName || ADMIN_SHEET_CONFIG.sheetName;
       editorStatus.value = item.status || "active";
       editorFields.dateInput.value = item.date || formatInputDate(new Date());
       editorFields.timeInput.value = item.time || "6:00 PM";
@@ -1630,7 +1637,8 @@
       if (!button) return;
 
       const rowNumber = Number(button.dataset.row);
-      const reservation = state.reservations.find((item) => item.rowNumber === rowNumber);
+      const sheetName = button.dataset.sheet || ADMIN_SHEET_CONFIG.sheetName;
+      const reservation = state.reservations.find((item) => item.rowNumber === rowNumber && item.sheetName === sheetName);
       if (!reservation) return;
 
       if (button.dataset.action === "edit") {
@@ -1642,6 +1650,7 @@
         const isRestore = button.dataset.action === "restore";
         buildMutationForm({
           action: "status",
+          sheetName,
           rowNumber: String(rowNumber),
           status: isRestore ? "active" : "removed"
         });
