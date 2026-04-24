@@ -7,16 +7,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/global.css?v=20260423-5" />
+  <link rel="stylesheet" href="../css/global.css?v=20260423-6" />
   <style>
     :root {
-      --bg: #120f0d;
       --ink: #201712;
-      --muted: #72655b;
-      --paper: rgba(255, 251, 245, 0.94);
-      --line: rgba(109, 86, 59, 0.16);
+      --muted: #74665b;
       --wine: #7b1f2f;
       --gold: #d4af37;
+      --line: rgba(255, 255, 255, 0.12);
+      --paper-line: rgba(113, 88, 60, 0.18);
       --shadow: 0 30px 64px rgba(17, 11, 8, 0.24);
       --radius-xl: 28px;
       --radius-lg: 20px;
@@ -135,11 +134,11 @@
 
     .booking-card {
       position: relative;
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--line);
       border-radius: var(--radius-xl);
       background:
-        linear-gradient(180deg, rgba(255, 251, 245, 0.96), rgba(246, 237, 224, 0.94)),
-        url("../assets/pattern.webp") center / 420px auto;
+        linear-gradient(135deg, rgba(22, 15, 11, 0.96) 0%, rgba(37, 23, 16, 0.94) 45%, rgba(68, 24, 33, 0.92) 100%),
+        url("../assets/pattern.webp") center / 520px auto;
       box-shadow: var(--shadow);
       overflow: hidden;
       backdrop-filter: blur(8px);
@@ -150,9 +149,10 @@
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(circle at top left, rgba(212, 175, 55, 0.12), transparent 30%),
-        radial-gradient(circle at 88% 14%, rgba(123, 31, 47, 0.08), transparent 26%);
-      opacity: 1;
+        radial-gradient(circle at top left, rgba(212, 175, 55, 0.16), transparent 30%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+        url("../assets/pattern.webp") center / 460px auto;
+      opacity: 0.24;
       pointer-events: none;
     }
 
@@ -177,16 +177,16 @@
     label {
       font-size: 0.92rem;
       font-weight: 700;
-      color: #2a1d14;
+      color: rgba(255, 248, 240, 0.92);
     }
 
     input,
     textarea {
       width: 100%;
       padding: 14px 15px;
-      border: 1px solid rgba(113, 88, 60, 0.18);
+      border: 1px solid var(--paper-line);
       border-radius: var(--radius-md);
-      background: rgba(255, 255, 255, 0.96);
+      background: rgba(255, 252, 247, 0.97);
       color: #1f1712;
       font: inherit;
       outline: none;
@@ -203,6 +203,11 @@
       background: #fff;
     }
 
+    input::placeholder,
+    textarea::placeholder {
+      color: #897a6d;
+    }
+
     textarea {
       min-height: 120px;
       resize: vertical;
@@ -212,9 +217,9 @@
       width: 100%;
       min-height: 53px;
       padding: 14px 15px;
-      border: 1px solid rgba(113, 88, 60, 0.18);
+      border: 1px solid var(--paper-line);
       border-radius: var(--radius-md);
-      background: rgba(255, 255, 255, 0.96);
+      background: rgba(255, 252, 247, 0.97);
       color: #1f1712;
       font: inherit;
       text-align: left;
@@ -236,9 +241,58 @@
       pointer-events: none;
     }
 
-    input::placeholder,
-    textarea::placeholder {
-      color: #8a7a6e;
+    .date-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .date-chip {
+      width: 100%;
+      min-height: 68px;
+      padding: 10px 8px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 252, 247, 0.96);
+      color: #1f1712;
+      font: inherit;
+      cursor: pointer;
+      text-align: center;
+      transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+    }
+
+    .date-chip span,
+    .date-chip strong {
+      display: block;
+    }
+
+    .date-chip span {
+      margin-bottom: 4px;
+      color: #7f7063;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+    }
+
+    .date-chip strong {
+      font-size: 0.94rem;
+    }
+
+    .date-chip.is-active {
+      border-color: rgba(123, 31, 47, 0.38);
+      background: rgba(123, 31, 47, 0.08);
+      box-shadow: 0 12px 22px rgba(17, 11, 8, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .date-chip.more-chip {
+      background: rgba(255, 248, 240, 0.12);
+      color: #fff8f0;
+      border-color: rgba(255, 255, 255, 0.14);
+    }
+
+    .date-chip.more-chip span,
+    .date-chip.more-chip strong {
+      color: inherit;
     }
 
     .submit-btn {
@@ -388,35 +442,46 @@
       background: rgba(123, 31, 47, 0.08);
     }
 
-    .date-row {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
+    .sheet-option.is-custom {
+      border-style: dashed;
+      border-color: rgba(123, 31, 47, 0.28);
+      background: linear-gradient(135deg, rgba(123, 31, 47, 0.08), rgba(212, 175, 55, 0.08));
+      color: #6b2230;
+    }
+
+    .custom-guest-box {
+      display: none;
       gap: 10px;
-      align-items: stretch;
+      padding: 0 18px 18px;
     }
 
-    .date-preview {
-      display: flex;
-      align-items: center;
-      min-height: 53px;
-      padding: 14px 15px;
-      border: 1px solid rgba(113, 88, 60, 0.18);
-      border-radius: var(--radius-md);
-      background: rgba(255, 255, 255, 0.96);
-      color: #1f1712;
-      font-weight: 600;
+    .custom-guest-box.is-open {
+      display: grid;
     }
 
-    .date-open-btn {
-      min-width: 94px;
-      padding: 0 16px;
-      border: 1px solid rgba(113, 88, 60, 0.18);
-      border-radius: var(--radius-md);
-      background: rgba(255, 255, 255, 0.96);
-      color: #1f1712;
+    .custom-guest-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .custom-guest-btn {
+      min-height: 46px;
+      border-radius: 14px;
+      border: 0;
+      cursor: pointer;
       font: inherit;
       font-weight: 700;
-      cursor: pointer;
+    }
+
+    .custom-guest-btn.cancel {
+      background: rgba(109, 96, 85, 0.12);
+      color: #65564a;
+    }
+
+    .custom-guest-btn.apply {
+      background: linear-gradient(135deg, var(--wine), #b9871f);
+      color: #fff;
     }
 
     @media (min-width: 720px) {
@@ -466,10 +531,7 @@
         <div class="field-grid">
           <div class="field full">
             <label for="date">Date</label>
-            <div class="date-row">
-              <div class="date-preview" id="datePreview">Not selected</div>
-              <button class="date-open-btn" id="dateOpenBtn" type="button">Choose</button>
-            </div>
+            <div class="date-grid" id="dateGrid"></div>
             <input id="date" name="date" type="hidden" required />
           </div>
 
@@ -523,6 +585,13 @@
         <button class="sheet-close" id="pickerClose" type="button">Close</button>
       </div>
       <div class="sheet-options" id="pickerOptions"></div>
+      <div class="custom-guest-box" id="customGuestBox">
+        <input id="customGuestInput" type="number" inputmode="numeric" min="2" placeholder="Enter guest count" />
+        <div class="custom-guest-actions">
+          <button class="custom-guest-btn cancel" id="customGuestCancel" type="button">Cancel</button>
+          <button class="custom-guest-btn apply" id="customGuestApply" type="button">Apply</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -530,8 +599,7 @@
     (function () {
       const form = document.getElementById("reservationForm");
       const dateInput = document.getElementById("date");
-      const datePreview = document.getElementById("datePreview");
-      const dateOpenBtn = document.getElementById("dateOpenBtn");
+      const dateGrid = document.getElementById("dateGrid");
       const timeInput = document.getElementById("time");
       const peopleInput = document.getElementById("people");
       const timeDisplay = document.getElementById("timeDisplay");
@@ -544,6 +612,10 @@
       const sheetTitle = document.getElementById("pickerTitle");
       const sheetOptions = document.getElementById("pickerOptions");
       const sheetClose = document.getElementById("pickerClose");
+      const customGuestBox = document.getElementById("customGuestBox");
+      const customGuestInput = document.getElementById("customGuestInput");
+      const customGuestCancel = document.getElementById("customGuestCancel");
+      const customGuestApply = document.getElementById("customGuestApply");
 
       const pickerConfig = {
         time: {
@@ -582,12 +654,10 @@
             "8 guests",
             "Custom"
           ]
+        },
+        date: {
+          title: "Select date"
         }
-      };
-
-      let activePicker = null;
-      const customValues = {
-        people: null
       };
 
       const pad = (num) => String(num).padStart(2, "0");
@@ -612,8 +682,37 @@
         dateOptions.push(formatInputDate(optionDate));
       }
 
-      const syncDatePreview = () => {
-        datePreview.textContent = formatDisplayDate(dateInput.value);
+      const renderDateGrid = () => {
+        dateGrid.innerHTML = "";
+
+        dateOptions.slice(0, 5).forEach((value) => {
+          const date = new Date(value + "T00:00:00");
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "date-chip";
+          button.innerHTML = `<span>${new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date)}</span><strong>${new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date)}</strong>`;
+          button.addEventListener("click", () => {
+            dateInput.value = value;
+            syncDateState();
+          });
+          dateGrid.appendChild(button);
+        });
+
+        const moreButton = document.createElement("button");
+        moreButton.type = "button";
+        moreButton.className = "date-chip more-chip";
+        moreButton.innerHTML = "<span>More</span><strong>Choose</strong>";
+        moreButton.addEventListener("click", () => {
+          openSheet("date");
+        });
+        dateGrid.appendChild(moreButton);
+      };
+
+      const syncDateState = () => {
+        dateGrid.querySelectorAll(".date-chip").forEach((chip, index) => {
+          if (chip.classList.contains("more-chip")) return;
+          chip.classList.toggle("is-active", dateOptions[index] === dateInput.value);
+        });
       };
 
       const openModal = () => {
@@ -629,25 +728,23 @@
       const closeSheet = () => {
         sheet.classList.remove("is-open");
         sheet.setAttribute("aria-hidden", "true");
-        activePicker = null;
         sheetOptions.innerHTML = "";
+        customGuestBox.classList.remove("is-open");
+        customGuestInput.value = "";
       };
 
       const selectOption = (key, value) => {
         if (key === "people" && value === "Custom") {
-          const raw = window.prompt("Enter guest count", "");
-          if (!raw) return;
-          const count = Number.parseInt(raw, 10);
-          if (!Number.isFinite(count) || count < 2) {
-            return;
-          }
-          value = `${count} guests`;
-          customValues.people = value;
+          customGuestBox.classList.add("is-open");
+          window.setTimeout(() => {
+            customGuestInput.focus();
+          }, 30);
+          return;
         }
 
         if (key === "date") {
           dateInput.value = value;
-          syncDatePreview();
+          syncDateState();
           closeSheet();
           return;
         }
@@ -662,9 +759,9 @@
         const config = pickerConfig[key];
         if (!config) return;
 
-        activePicker = key;
         sheetTitle.textContent = config.title;
         sheetOptions.innerHTML = "";
+        customGuestBox.classList.remove("is-open");
 
         const options = key === "date" ? dateOptions : config.options;
 
@@ -672,6 +769,9 @@
           const button = document.createElement("button");
           button.type = "button";
           button.className = "sheet-option";
+          if (key === "people" && option === "Custom") {
+            button.classList.add("is-custom");
+          }
           button.textContent = key === "date" ? formatDisplayDate(option) : option;
           if ((key === "date" && dateInput.value === option) || (key !== "date" && config.input.value === option)) {
             button.classList.add("is-active");
@@ -692,8 +792,21 @@
         });
       });
 
-      dateOpenBtn.addEventListener("click", () => {
-        openSheet("date");
+      customGuestCancel.addEventListener("click", () => {
+        customGuestBox.classList.remove("is-open");
+        customGuestInput.value = "";
+      });
+
+      customGuestApply.addEventListener("click", () => {
+        const count = Number.parseInt(customGuestInput.value, 10);
+        if (!Number.isFinite(count) || count < 2) {
+          customGuestInput.focus();
+          return;
+        }
+        const value = `${count} guests`;
+        peopleInput.value = value;
+        peopleDisplay.textContent = value;
+        closeSheet();
       });
 
       form.addEventListener("submit", () => {
@@ -724,9 +837,9 @@
         }
       });
 
-      pickerConfig.date = { title: "Select date" };
       dateInput.value = dateOptions[0];
-      syncDatePreview();
+      renderDateGrid();
+      syncDateState();
     })();
   </script>
 </body>
