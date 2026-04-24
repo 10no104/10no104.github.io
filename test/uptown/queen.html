@@ -27,12 +27,12 @@
     body {
       margin: 0;
       min-height: 100vh;
-      color: var(--ink);
+      color: #f4e7d7;
       font-family: "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(212, 175, 55, 0.18), transparent 28%),
-        radial-gradient(circle at 86% 12%, rgba(123, 31, 47, 0.12), transparent 24%),
-        linear-gradient(180deg, rgba(251, 247, 241, 0.98) 0%, rgba(245, 239, 228, 0.98) 100%);
+        radial-gradient(circle at top left, rgba(212, 175, 55, 0.14), transparent 28%),
+        radial-gradient(circle at 86% 12%, rgba(123, 31, 47, 0.18), transparent 24%),
+        linear-gradient(180deg, #120d0a 0%, #1d130f 42%, #261712 100%);
     }
 
     body::before {
@@ -40,9 +40,9 @@
       position: fixed;
       inset: 0;
       background:
-        linear-gradient(180deg, rgba(255, 252, 247, 0.18), rgba(255, 252, 247, 0.06)),
+        linear-gradient(180deg, rgba(255, 252, 247, 0.06), rgba(255, 252, 247, 0.02)),
         url("../assets/pattern.webp") center / 760px auto;
-      opacity: 0.14;
+      opacity: 0.18;
       pointer-events: none;
       z-index: -1;
     }
@@ -78,9 +78,9 @@
       width: 62px;
       height: 62px;
       border-radius: 999px;
-      background: linear-gradient(180deg, rgba(255, 254, 250, 0.98), rgba(243, 231, 215, 0.94));
+      background: linear-gradient(180deg, rgba(255, 252, 247, 0.12), rgba(255, 243, 224, 0.08));
       border: 1px solid rgba(73, 53, 36, 0.12);
-      box-shadow: 0 14px 28px rgba(42, 28, 18, 0.1);
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.18);
       flex: none;
     }
 
@@ -92,7 +92,7 @@
 
     .brand-copy p {
       margin: 0 0 4px;
-      color: var(--wine);
+      color: #e9bf69;
       font-size: 0.8rem;
       font-weight: 800;
       letter-spacing: 0.14em;
@@ -112,13 +112,13 @@
       min-height: 42px;
       padding: 0 14px;
       border-radius: 999px;
-      border: 1px solid rgba(113, 88, 60, 0.14);
-      background: rgba(255, 251, 245, 0.72);
-      color: #2c2016;
+      border: 1px solid rgba(255, 233, 194, 0.14);
+      background: rgba(255, 248, 238, 0.08);
+      color: #f6e7d4;
       font-size: 0.92rem;
       font-weight: 700;
       white-space: nowrap;
-      box-shadow: 0 10px 22px rgba(32, 20, 13, 0.05);
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.14);
       cursor: pointer;
     }
 
@@ -222,11 +222,11 @@
 
     .add-panel {
       position: relative;
-      border-color: rgba(123, 31, 47, 0.16);
+      border-color: rgba(255, 215, 150, 0.18);
       background:
-        linear-gradient(180deg, rgba(255, 248, 238, 0.98), rgba(255, 252, 247, 0.94)),
-        radial-gradient(circle at top right, rgba(255, 211, 116, 0.26), transparent 42%);
-      box-shadow: 0 24px 54px rgba(123, 31, 47, 0.1);
+        linear-gradient(180deg, rgba(46, 28, 23, 0.96), rgba(29, 19, 15, 0.98)),
+        radial-gradient(circle at top right, rgba(255, 211, 116, 0.12), transparent 42%);
+      box-shadow: 0 26px 56px rgba(0, 0, 0, 0.26);
     }
 
     .add-panel .panel-head {
@@ -234,7 +234,7 @@
       display: block;
       text-align: center;
       background:
-        linear-gradient(180deg, rgba(123, 31, 47, 0.08), rgba(255, 250, 244, 0));
+        linear-gradient(180deg, rgba(255, 212, 136, 0.08), rgba(255, 250, 244, 0));
     }
 
     .add-toggle {
@@ -247,8 +247,8 @@
       margin-top: 14px;
       border-radius: 14px;
       border: 0;
-      background: linear-gradient(90deg, rgba(123, 31, 47, 0.1), rgba(255, 216, 120, 0.22), rgba(123, 31, 47, 0.1));
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      background: linear-gradient(90deg, rgba(123, 31, 47, 0.3), rgba(255, 216, 120, 0.26), rgba(123, 31, 47, 0.3));
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
       cursor: pointer;
       transition: opacity 0.18s ease, background 0.18s ease;
     }
@@ -259,15 +259,15 @@
       font-weight: 800;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: #6d2333;
+      color: #f8ddba;
     }
 
     .add-toggle::after {
       content: "";
       width: 11px;
       height: 11px;
-      border-right: 3px solid rgba(109, 35, 51, 0.86);
-      border-bottom: 3px solid rgba(109, 35, 51, 0.86);
+      border-right: 3px solid rgba(248, 221, 186, 0.92);
+      border-bottom: 3px solid rgba(248, 221, 186, 0.92);
       transform: rotate(-135deg);
       transition: transform 0.18s ease;
     }
@@ -281,15 +281,15 @@
     }
 
     .add-panel.is-collapsed .add-toggle {
-      background: linear-gradient(90deg, rgba(123, 31, 47, 0.16), rgba(255, 216, 120, 0.28), rgba(123, 31, 47, 0.16));
+      background: linear-gradient(90deg, rgba(123, 31, 47, 0.4), rgba(255, 216, 120, 0.34), rgba(123, 31, 47, 0.4));
     }
 
     .add-panel.is-collapsed {
-      border-color: rgba(123, 31, 47, 0.28);
+      border-color: rgba(255, 215, 150, 0.24);
       background:
-        linear-gradient(135deg, rgba(123, 31, 47, 0.12), rgba(255, 224, 150, 0.3)),
-        linear-gradient(180deg, rgba(255, 248, 238, 1), rgba(255, 251, 246, 0.98));
-      box-shadow: 0 28px 60px rgba(123, 31, 47, 0.16);
+        linear-gradient(135deg, rgba(123, 31, 47, 0.34), rgba(255, 224, 150, 0.16)),
+        linear-gradient(180deg, rgba(52, 30, 24, 0.98), rgba(34, 21, 16, 0.98));
+      box-shadow: 0 30px 64px rgba(0, 0, 0, 0.3);
     }
 
     .booking-summary {
@@ -613,20 +613,20 @@
     .reservation-list {
       display: grid;
       gap: 12px;
-      padding: 18px;
+      padding: 14px 18px 18px;
     }
 
     .reservation-card {
-      padding: 18px;
+      padding: 14px 18px 18px;
       border-radius: 22px;
       background:
-        linear-gradient(180deg, rgba(255, 254, 250, 0.98), rgba(248, 241, 232, 0.96));
-      border: 1px solid rgba(113, 88, 60, 0.14);
-      box-shadow: 0 12px 28px rgba(38, 24, 17, 0.08);
+        linear-gradient(180deg, rgba(255, 249, 240, 0.96), rgba(246, 236, 223, 0.94));
+      border: 1px solid rgba(177, 132, 78, 0.14);
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.16);
     }
 
     .reservation-card.is-removed {
-      opacity: 0.9;
+      opacity: 0.92;
       background:
         linear-gradient(180deg, rgba(245, 239, 232, 0.96), rgba(236, 229, 220, 0.94));
     }
@@ -636,7 +636,7 @@
       align-items: flex-start;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .reservation-top h4 {
@@ -656,8 +656,8 @@
 
     .reservation-focus {
       display: grid;
-      gap: 12px;
-      margin-bottom: 14px;
+      gap: 10px;
+      margin-bottom: 10px;
     }
 
     .reservation-pill-row {
@@ -699,19 +699,6 @@
       box-shadow: 0 14px 24px rgba(167, 108, 14, 0.2);
     }
 
-    .reservation-name {
-      margin: 0;
-      padding: 14px 16px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, rgba(123, 31, 47, 0.08), rgba(255, 244, 224, 0.98));
-      border: 1px solid rgba(123, 31, 47, 0.18);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
-      font-size: 1.48rem;
-      line-height: 1;
-      letter-spacing: -0.04em;
-      color: #20150f;
-    }
-
     .status-badge {
       display: inline-flex;
       align-items: center;
@@ -741,9 +728,9 @@
 
     .reservation-meta {
       display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
+      grid-template-columns: 1fr 1fr;
       gap: 10px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .meta-box {
@@ -789,7 +776,7 @@
       border: 1px solid rgba(113, 88, 60, 0.12);
       color: #42352c;
       line-height: 1.5;
-      font-size: 0.94rem;
+      font-size: 0.9rem;
     }
 
     .reservation-actions {
@@ -1359,7 +1346,6 @@
               <div class="reservation-time-pill">${item.time || "-"}</div>
               <div class="reservation-guests-pill">${item.people || "-"}</div>
             </div>
-            <h4 class="reservation-name">${item.name || "Guest"}</h4>
           </div>
           <div class="reservation-meta">
             <div class="meta-box guests-box">
