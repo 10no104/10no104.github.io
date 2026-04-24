@@ -373,6 +373,10 @@
       line-height: 1.6;
     }
 
+    .modal-details {
+      margin: 0 0 20px;
+    }
+
     .modal-btn {
       width: 100%;
       border: 0;
@@ -630,6 +634,7 @@
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="reservationModalTitle">
       <h2 id="reservationModalTitle">Reservation request sent</h2>
       <p>Your request has been submitted. We will contact you using the phone number you provided.</p>
+      <div class="modal-details" id="reservationModalDetails" hidden></div>
       <button class="modal-btn" type="button" id="reservationModalClose">Close</button>
     </div>
   </div>
@@ -677,6 +682,7 @@
 
       const modal = document.getElementById("reservationModal");
       const modalClose = document.getElementById("reservationModalClose");
+      const modalDetails = document.getElementById("reservationModalDetails");
 
       const sheet = document.getElementById("pickerSheet");
       const sheetTitle = document.getElementById("pickerTitle");
@@ -791,7 +797,39 @@
         renderDateGrid();
       };
 
+      const renderModalDetails = () => {
+        modalDetails.hidden = false;
+        modalDetails.innerHTML = `
+          <div class="booking-summary">
+            <div class="booking-summary-grid">
+              <div class="booking-summary-box">
+                <span>Date</span>
+                <strong>${dateInput.value ? formatDisplayDate(dateInput.value) : "-"}</strong>
+              </div>
+              <div class="booking-summary-box">
+                <span>Time</span>
+                <strong>${timeInput.value || "-"}</strong>
+              </div>
+              <div class="booking-summary-box">
+                <span>Guests</span>
+                <strong>${peopleInput.value || "-"}</strong>
+              </div>
+              <div class="booking-summary-box">
+                <span>Name</span>
+                <strong>${nameInput.value.trim() || "Guest"}</strong>
+              </div>
+              <div class="booking-summary-box">
+                <span>Phone</span>
+                <strong>${phoneInput.value.trim() || "-"}</strong>
+              </div>
+            </div>
+            <div class="booking-summary-note">${notesInput.value.trim() || "No notes."}</div>
+          </div>
+        `;
+      };
+
       const openModal = () => {
+        renderModalDetails();
         modal.classList.add("is-open");
         modal.setAttribute("aria-hidden", "false");
       };

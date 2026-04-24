@@ -149,25 +149,18 @@
     }
 
     .hero p {
-      margin: 0 0 8px;
-      color: var(--wine);
-      font-size: 0.84rem;
-      font-weight: 800;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
+      display: none;
     }
 
     .hero h2 {
-      margin: 0 0 10px;
+      margin: 0;
       font-size: clamp(1.9rem, 6vw, 3rem);
       letter-spacing: -0.05em;
       line-height: 0.95;
     }
 
     .hero span {
-      display: block;
-      color: var(--muted);
-      line-height: 1.65;
+      display: none;
     }
 
     .layout {
@@ -528,6 +521,10 @@
       line-height: 1.6;
     }
 
+    .feedback-details {
+      margin: 0 0 18px;
+    }
+
     .modal-head {
       display: flex;
       align-items: center;
@@ -719,9 +716,7 @@
     </header>
 
     <section class="hero">
-      <p>Guest Access</p>
-      <h2>View past and upcoming reservations with your phone number.</h2>
-      <span>Search once to see every matching booking across Downtown and Uptown. Upcoming bookings stay editable, while past bookings are clearly separated below.</span>
+      <h2>Find Your Booking</h2>
     </section>
 
     <div class="layout">
@@ -735,7 +730,6 @@
             <div class="field full">
               <label for="lookupPhone">Phone</label>
               <input id="lookupPhone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="(437) 123-4567" required />
-              <small>Use the same phone number that was used when the reservation was created.</small>
             </div>
           </div>
           <div class="form-actions">
@@ -817,6 +811,7 @@
     <div class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
       <h3 id="feedbackTitle">Updated</h3>
       <p id="feedbackMessage">Reservation updated.</p>
+      <div class="feedback-details" id="feedbackDetails" hidden></div>
       <button class="pill-btn primary" id="closeFeedbackModal" type="button" style="width:100%;">Close</button>
     </div>
   </div>
@@ -951,6 +946,7 @@
     }
 
     function isPastReservation(item) {
+      if (item.status === "removed") return true;
       const dateTime = getReservationDateTime(item);
       if (!dateTime) return false;
       return dateTime < new Date();
@@ -990,7 +986,7 @@
             </div>
             <div class="badge-row">
               <span class="badge branch">${item.branch}</span>
-              ${past ? '<span class="badge past">Past</span>' : ""}
+              ${past ? `<span class="badge past">${item.status === "removed" ? "Removed" : "Past"}</span>` : ""}
             </div>
           </div>
           <div class="reservation-meta">
@@ -1077,7 +1073,6 @@
     async function rerunSearch() {
       if (!state.lastSearchDigits) return;
       state.matches = state.allReservations
-        .filter((item) => item.status !== "removed")
         .filter((item) => normalizePhoneDigits(item.phone) === state.lastSearchDigits);
       renderMatches();
     }
@@ -1089,9 +1084,51 @@
       }, 900);
     }
 
-    function openFeedback(title, message) {
+    function renderFeedbackDetails(data) {
+      if (!data) {
+        feedbackDetails.hidden = true;
+        feedbackDetails.innerHTML = "";
+        return;
+      }
+
+      feedbackDetails.hidden = false;
+      feedbackDetails.innerHTML = `
+        <div class="booking-summary">
+          <div class="booking-summary-head">
+            <strong>Reservation Details</strong>
+            <span>${data.branch || ""}</span>
+          </div>
+          <div class="booking-summary-grid">
+            <div class="booking-summary-box">
+              <span>Date</span>
+              <strong>${data.date ? formatDateLabel(data.date) : "-"}</strong>
+            </div>
+            <div class="booking-summary-box">
+              <span>Time</span>
+              <strong>${data.time || "-"}</strong>
+            </div>
+            <div class="booking-summary-box">
+              <span>Guests</span>
+              <strong>${data.people || "-"}</strong>
+            </div>
+            <div class="booking-summary-box">
+              <span>Name</span>
+              <strong>${data.name || "Guest"}</strong>
+            </div>
+            <div class="booking-summary-box">
+              <span>Phone</span>
+              <strong>${data.phone || "-"}</strong>
+            </div>
+          </div>
+          <div class="booking-summary-note">${data.notes || "No notes."}</div>
+        </div>
+      `;
+    }
+
+    function openFeedback(title, message, details = null) {
       feedbackTitle.textContent = title;
       feedbackMessage.textContent = message;
+      renderFeedbackDetails(details);
       feedbackModal.classList.add("is-open");
       feedbackModal.setAttribute("aria-hidden", "false");
     }
@@ -1294,6 +1331,7 @@
     const feedbackModal = document.getElementById("feedbackModal");
     const feedbackTitle = document.getElementById("feedbackTitle");
     const feedbackMessage = document.getElementById("feedbackMessage");
+    const feedbackDetails = document.getElementById("feedbackDetails");
     const closeFeedbackModal = document.getElementById("closeFeedbackModal");
     const sheet = document.getElementById("pickerSheet");
     const sheetTitle = document.getElementById("pickerTitle");
@@ -1458,9 +1496,13 @@
 
       const payload = serializeReservationForm(editorForm);
       payload.phone = formatPhoneNumber(payload.phone);
+      const feedbackPayload = {
+        ...payload,
+        branch: RESERVATION_SHEETS.find((sheetInfo) => sheetInfo.name === payload.sheetName)?.label || ""
+      };
       buildMutationForm(payload);
       closeEditor();
-      openFeedback("Reservation Updated", "Your booking changes have been saved.");
+      openFeedback("Reservation Updated", "Your booking changes have been saved.", feedbackPayload);
       refreshAfterMutation();
     });
 
