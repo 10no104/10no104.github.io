@@ -163,12 +163,6 @@
       line-height: 0.95;
     }
 
-    .hero p {
-      margin: 0;
-      color: rgba(255, 248, 240, 0.78);
-      max-width: 780px;
-    }
-
     .metric-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -401,15 +395,13 @@
       gap: 16px;
     }
 
-    .staff-list,
-    .timeline {
+    .staff-list {
       display: grid;
       gap: 10px;
       padding: 18px;
     }
 
-    .staff-item,
-    .timeline-item {
+    .staff-item {
       display: grid;
       gap: 4px;
       padding: 14px;
@@ -418,13 +410,11 @@
       border: 1px solid rgba(113, 88, 60, 0.08);
     }
 
-    .staff-item strong,
-    .timeline-item strong {
+    .staff-item strong {
       font-size: 0.96rem;
     }
 
-    .staff-item span,
-    .timeline-item span {
+    .staff-item span {
       color: var(--muted);
       font-size: 0.88rem;
     }
@@ -625,36 +615,43 @@
       <aside class="side-grid">
         <section class="panel">
           <div class="panel-head">
-            <h3>Floor Notes</h3>
-            <span>Shift view</span>
+            <h3>Add Reservation</h3>
+            <span>Admin input</span>
           </div>
-          <div class="staff-list">
-            <div class="staff-item">
-              <strong>Main Dining</strong>
-              <span>Check large parties first and confirm arrival timing before 6 PM.</span>
+          <form class="admin-form" id="quickAddForm" style="padding:18px;">
+            <input name="action" type="hidden" value="create" />
+            <input name="status" type="hidden" value="active" />
+            <div class="admin-grid">
+              <div class="admin-field">
+                <label for="quickDate">Date</label>
+                <input id="quickDate" name="date" type="date" required />
+              </div>
+              <div class="admin-field">
+                <label for="quickTime">Time</label>
+                <input id="quickTime" name="time" type="text" placeholder="6:00 PM" required />
+              </div>
+              <div class="admin-field">
+                <label for="quickPeople">Guests</label>
+                <input id="quickPeople" name="people" type="text" placeholder="4 guests" required />
+              </div>
+              <div class="admin-field">
+                <label for="quickName">Name</label>
+                <input id="quickName" name="name" type="text" required />
+              </div>
+              <div class="admin-field">
+                <label for="quickPhone">Phone</label>
+                <input id="quickPhone" name="phone" type="text" required />
+              </div>
+              <div class="admin-field full">
+                <label for="quickNotes">Notes</label>
+                <textarea id="quickNotes" name="notes"></textarea>
+              </div>
             </div>
-            <div class="staff-item">
-              <strong>Private Events</strong>
-              <span>Removed bookings remain visible when “Show Removed” is enabled.</span>
+            <div class="admin-actions" style="margin-top:14px;">
+              <button class="pill-btn" id="openAddModal" type="button">Open Full Editor</button>
+              <button class="pill-btn primary" type="submit">Add Reservation</button>
             </div>
-            <div class="staff-item">
-              <strong>Editing</strong>
-              <span>You can add, edit, or remove reservations directly from this page.</span>
-            </div>
-          </div>
-        </section>
-
-        <section class="panel">
-          <div class="panel-head">
-            <h3>Recent Activity</h3>
-            <span>Live</span>
-          </div>
-          <div class="timeline" id="timelineList">
-            <div class="timeline-item">
-              <strong>Waiting for data</strong>
-              <span>Recent reservation activity will appear here after loading.</span>
-            </div>
-          </div>
+          </form>
         </section>
       </aside>
     </main>
@@ -732,8 +729,19 @@
       );
     }
 
+    function getCellText(cell) {
+      if (!cell) return "";
+      if (typeof cell.f === "string" && cell.f.trim()) return cell.f.trim();
+      const value = cell.v;
+      if (value instanceof Date) return value.toISOString().slice(0, 10);
+      if (value && typeof value === "object" && typeof value.getMonth === "function") {
+        return new Date(value).toISOString().slice(0, 10);
+      }
+      return (value ?? "").toString().trim();
+    }
+
     function normalizeReservation(cells = [], index = 0) {
-      const values = cells.map((cell) => (cell?.v ?? "").toString().trim());
+      const values = cells.map((cell) => getCellText(cell));
       return {
         rowNumber: index + 1,
         timestamp: values[0] || "",
@@ -748,7 +756,8 @@
     }
 
     function toSafeDate(dateString = "") {
-      const date = new Date(dateString);
+      const normalized = String(dateString).trim();
+      const date = new Date(normalized);
       return Number.isNaN(date.getTime()) ? null : date;
     }
 
@@ -881,28 +890,6 @@
       document.getElementById("metricLatest").textContent = latest?.time || "-";
     }
 
-    function renderTimeline() {
-      const timeline = document.getElementById("timelineList");
-      const recent = [...state.reservations].slice(-3).reverse();
-
-      if (!recent.length) {
-        timeline.innerHTML = `
-          <div class="timeline-item">
-            <strong>No activity yet</strong>
-            <span>Recent reservation updates will appear here.</span>
-          </div>
-        `;
-        return;
-      }
-
-      timeline.innerHTML = recent.map((item) => `
-        <div class="timeline-item">
-          <strong>${item.time || "Unknown time"} · ${item.name || "Guest"}</strong>
-          <span>${item.status === "removed" ? "Removed from active list." : `${item.people || "-"} on ${formatDateLabel(item.date)}`}</span>
-        </div>
-      `).join("");
-    }
-
     function renderReservations() {
       const filtered = filterReservations();
       const reservationList = document.getElementById("reservationList");
@@ -911,7 +898,6 @@
 
       reservationDateLabel.textContent = label;
       renderMetrics(filtered);
-      renderTimeline();
 
       if (!filtered.length) {
         reservationList.innerHTML = '<div class="empty-state">No reservations in this view.</div>';
@@ -1032,6 +1018,14 @@
       refreshAfterMutation();
     });
 
+    document.getElementById("quickAddForm").addEventListener("submit", (event) => {
+      event.preventDefault();
+      const formData = new FormData(event.currentTarget);
+      buildMutationForm(Object.fromEntries(formData.entries()));
+      event.currentTarget.reset();
+      refreshAfterMutation();
+    });
+
     document.querySelectorAll("[data-range]").forEach((button) => {
       button.addEventListener("click", () => {
         state.range = button.dataset.range;
@@ -1070,6 +1064,17 @@
         refreshAfterMutation();
       }
     });
+
+    document.querySelector(".hero h2").textContent = new Intl.DateTimeFormat("en-CA", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      year: "numeric"
+    }).format(new Date());
+
+    const todayInput = new Date().toISOString().slice(0, 10);
+    document.getElementById("quickDate").value = todayInput;
+    editorDate.value = todayInput;
 
     bootstrapAdmin();
   </script>
