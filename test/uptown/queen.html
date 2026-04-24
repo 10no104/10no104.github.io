@@ -230,68 +230,58 @@
     }
 
     .add-panel .panel-head {
-      padding: 2px 0 14px;
+      padding: 2px 0 4px;
       background:
         linear-gradient(180deg, rgba(123, 31, 47, 0.08), rgba(255, 250, 244, 0));
     }
 
     .add-toggle {
       display: flex;
-      flex-direction: column;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
+      gap: 10px;
       width: 100%;
-      min-height: 72px;
-      border-radius: 22px;
-      border: 1px solid rgba(123, 31, 47, 0.18);
-      background:
-        linear-gradient(135deg, rgba(123, 31, 47, 0.12), rgba(255, 216, 120, 0.22)),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0));
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.5),
-        0 14px 30px rgba(123, 31, 47, 0.08);
+      min-height: 42px;
+      margin-top: 14px;
+      border-radius: 14px;
+      border: 0;
+      background: linear-gradient(90deg, rgba(123, 31, 47, 0.1), rgba(255, 216, 120, 0.22), rgba(123, 31, 47, 0.1));
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
       cursor: pointer;
-      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+      transition: opacity 0.18s ease, background 0.18s ease;
     }
 
     .add-toggle span {
       display: block;
-      font-size: 0.78rem;
+      font-size: 0.74rem;
       font-weight: 800;
       letter-spacing: 0.14em;
       text-transform: uppercase;
       color: #6d2333;
     }
 
+    .add-toggle::before,
     .add-toggle::after {
       content: "";
-      width: 30px;
-      height: 30px;
-      margin-top: 6px;
-      border-right: 4px solid rgba(109, 35, 51, 0.9);
-      border-bottom: 4px solid rgba(109, 35, 51, 0.9);
+      width: 11px;
+      height: 11px;
+      border-right: 3px solid rgba(109, 35, 51, 0.86);
+      border-bottom: 3px solid rgba(109, 35, 51, 0.86);
       transform: rotate(45deg);
       transition: transform 0.18s ease;
     }
 
     .add-toggle:hover {
-      transform: translateY(-1px);
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.52),
-        0 18px 36px rgba(123, 31, 47, 0.12);
+      opacity: 0.92;
     }
 
+    .add-panel.is-collapsed .add-toggle::before,
     .add-panel.is-collapsed .add-toggle::after {
       transform: rotate(-135deg);
     }
 
     .add-panel.is-collapsed .add-toggle {
-      background:
-        linear-gradient(135deg, rgba(123, 31, 47, 0.18), rgba(255, 216, 120, 0.28)),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.52), rgba(255, 255, 255, 0));
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.5),
-        0 20px 40px rgba(123, 31, 47, 0.12);
+      background: linear-gradient(90deg, rgba(123, 31, 47, 0.16), rgba(255, 216, 120, 0.28), rgba(123, 31, 47, 0.16));
     }
 
     .add-panel.is-collapsed {
@@ -772,6 +762,10 @@
       line-height: 1.6;
     }
 
+    .feedback-details {
+      margin: 0 0 18px;
+    }
+
     .modal-head {
       display: flex;
       align-items: center;
@@ -992,9 +986,6 @@
       <section class="panel add-panel" id="quickAddPanel">
         <div class="panel-head">
           <h3>Add Reservation</h3>
-          <button class="add-toggle" id="toggleQuickAdd" type="button" aria-expanded="true">
-            <span>Hide Form</span>
-          </button>
         </div>
 
         <form class="booking-form" id="quickAddForm">
@@ -1002,11 +993,13 @@
           <input name="status" type="hidden" value="active" />
           <input name="sheetName" type="hidden" value="Uptown Reservation" />
           <div class="field-grid" id="quickAddFields"></div>
-          <div class="booking-summary" id="quickSummary"></div>
           <div class="form-actions">
             <button class="pill-btn primary" type="submit">Add Reservation</button>
           </div>
         </form>
+        <button class="add-toggle" id="toggleQuickAdd" type="button" aria-expanded="true">
+          <span>Hide Form</span>
+        </button>
       </section>
 
       <section class="panel">
@@ -1047,7 +1040,6 @@
         <input id="editorSheetName" name="sheetName" type="hidden" value="Uptown Reservation" />
         <input id="editorStatus" name="status" type="hidden" value="active" />
         <div class="field-grid" id="editorFields"></div>
-        <div class="booking-summary" id="editorSummary"></div>
         <div class="form-actions">
           <button class="pill-btn" id="cancelEditor" type="button">Cancel</button>
           <button class="pill-btn primary" type="submit">Save Changes</button>
@@ -1081,6 +1073,7 @@
     <div class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
       <h3 id="feedbackTitle">Updated</h3>
       <p id="feedbackMessage">Reservation updated.</p>
+      <div class="feedback-details" id="feedbackDetails" hidden></div>
       <button class="pill-btn primary" id="closeFeedbackModal" type="button" style="width:100%;">Close</button>
     </div>
   </div>
@@ -1412,7 +1405,6 @@
       const nameInput = document.getElementById(`${prefix}Name`);
       const phoneInput = document.getElementById(`${prefix}Phone`);
       const notesInput = document.getElementById(`${prefix}Notes`);
-      const summary = document.getElementById(`${prefix}Summary`);
 
       const dateOptions = [];
       const start = new Date();
@@ -1424,40 +1416,7 @@
       }
 
       function renderSummary() {
-        if (!summary) return;
-        summary.innerHTML = `
-          <div class="booking-summary-head">
-            <strong>Reservation Preview</strong>
-            <span>${prefix === "editor" ? "Editing live entry" : "Before you submit"}</span>
-          </div>
-          <div class="booking-summary-grid">
-            <div class="booking-summary-box">
-              <span>Date</span>
-              <strong>${dateInput.value ? formatDisplayDate(dateInput.value) : "-"}</strong>
-            </div>
-            <div class="booking-summary-box">
-              <span>Time</span>
-              <strong>${timeInput.value || "-"}</strong>
-            </div>
-            <div class="booking-summary-box">
-              <span>Guests</span>
-              <strong>${peopleInput.value || "-"}</strong>
-            </div>
-            <div class="booking-summary-box">
-              <span>Name</span>
-              <strong>${nameInput.value.trim() || "-"}</strong>
-            </div>
-            <div class="booking-summary-box">
-              <span>Phone</span>
-              <strong>${phoneInput.value.trim() || "-"}</strong>
-            </div>
-            <div class="booking-summary-box">
-              <span>Status</span>
-              <strong>${prefix === "editor" ? "Editing reservation" : "Ready to add"}</strong>
-            </div>
-          </div>
-          <div class="booking-summary-note">${notesInput.value.trim() || "No notes yet."}</div>
-        `;
+        return;
       }
 
       function renderDateGrid() {
@@ -1597,6 +1556,7 @@
     const feedbackModal = document.getElementById("feedbackModal");
     const feedbackTitle = document.getElementById("feedbackTitle");
     const feedbackMessage = document.getElementById("feedbackMessage");
+    const feedbackDetails = document.getElementById("feedbackDetails");
     const closeFeedbackModal = document.getElementById("closeFeedbackModal");
 
     const sheet = document.getElementById("pickerSheet");
@@ -1746,9 +1706,55 @@
       editorModal.setAttribute("aria-hidden", "true");
     }
 
-    function openFeedback(title, message) {
+    function renderFeedbackDetails(data) {
+      if (!data) {
+        feedbackDetails.hidden = true;
+        feedbackDetails.innerHTML = "";
+        return;
+      }
+
+      feedbackDetails.hidden = false;
+      feedbackDetails.innerHTML = `
+        <div class="booking-summary">
+          <div class="booking-summary-head">
+            <strong>Reservation Details</strong>
+            <span>${ADMIN_SHEET_CONFIG.branchLabel}</span>
+          </div>
+          <div class="booking-summary-grid">
+            <div class="booking-summary-box">
+              <span>Date</span>
+              <strong>${data.date ? formatDisplayDate(data.date) : "-"}</strong>
+            </div>
+            <div class="booking-summary-box">
+              <span>Time</span>
+              <strong>${data.time || "-"}</strong>
+            </div>
+            <div class="booking-summary-box">
+              <span>Guests</span>
+              <strong>${data.people || "-"}</strong>
+            </div>
+            <div class="booking-summary-box">
+              <span>Name</span>
+              <strong>${(data.name || "").trim() || "Guest"}</strong>
+            </div>
+            <div class="booking-summary-box">
+              <span>Phone</span>
+              <strong>${(data.phone || "").trim() || "-"}</strong>
+            </div>
+            <div class="booking-summary-box">
+              <span>Status</span>
+              <strong>${data.status === "removed" ? "Removed" : "Active"}</strong>
+            </div>
+          </div>
+          <div class="booking-summary-note">${(data.notes || "").trim() || "No notes."}</div>
+        </div>
+      `;
+    }
+
+    function openFeedback(title, message, details = null) {
       feedbackTitle.textContent = title;
       feedbackMessage.textContent = message;
+      renderFeedbackDetails(details);
       feedbackModal.classList.add("is-open");
       feedbackModal.setAttribute("aria-hidden", "false");
     }
@@ -1769,10 +1775,11 @@
           ...serializeReservationForm(form),
           ...extraFields
         };
+        const feedbackPayload = { ...payload };
         buildMutationForm(payload);
         if (form === editorForm) {
           closeEditor();
-          openFeedback("Reservation Updated", "Your booking changes have been saved.");
+          openFeedback("Reservation Updated", "Your booking changes have been saved.", feedbackPayload);
         } else {
           form.reset();
           quickFormFields.dateInput.value = formatInputDate(new Date());
@@ -1787,7 +1794,7 @@
           quickFormFields.notesInput.value = "";
           quickFormFields.renderDateGrid();
           quickFormFields.renderSummary();
-          openFeedback("Reservation Added", "The new reservation has been submitted.");
+          openFeedback("Reservation Added", "The new reservation has been submitted.", feedbackPayload);
         }
         refreshAfterMutation();
       });
@@ -1881,7 +1888,11 @@
           isRestore ? "Reservation Restored" : "Reservation Removed",
           isRestore
             ? "This booking is visible in the active list again."
-            : "This booking has been moved out of the active list."
+            : "This booking has been moved out of the active list.",
+          {
+            ...item,
+            status: isRestore ? "active" : "removed"
+          }
         );
         refreshAfterMutation();
       }
