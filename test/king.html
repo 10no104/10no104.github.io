@@ -1035,11 +1035,15 @@
           <div class="reservation-top">
             <div>
               <h4>${item.name || "Guest"}</h4>
-              <p>${item.time || "Time not set"} · ${formatDateLabel(item.date)}</p>
+              <p>${formatDateLabel(item.date)}</p>
             </div>
             <span class="status-badge ${status.className}">${status.label}</span>
           </div>
           <div class="reservation-meta">
+            <div class="meta-box">
+              <span>Time</span>
+              <strong>${item.time || "-"}</strong>
+            </div>
             <div class="meta-box">
               <span>Guests</span>
               <strong>${item.people || "-"}</strong>
