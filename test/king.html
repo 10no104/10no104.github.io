@@ -574,6 +574,45 @@
       box-shadow: 0 28px 54px rgba(18, 12, 9, 0.2);
     }
 
+    .feedback-backdrop {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(18, 12, 9, 0.42);
+      backdrop-filter: blur(4px);
+      z-index: 120;
+    }
+
+    .feedback-backdrop.is-open {
+      display: flex;
+    }
+
+    .feedback-modal {
+      width: min(100%, 380px);
+      padding: 22px;
+      border-radius: 22px;
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(247, 239, 228, 0.98)),
+        url("../assets/pattern.webp") center / 360px auto;
+      border: 1px solid rgba(108, 85, 58, 0.14);
+      box-shadow: 0 24px 44px rgba(18, 12, 9, 0.18);
+    }
+
+    .feedback-modal h3 {
+      margin: 0 0 8px;
+      font-size: 1.22rem;
+      letter-spacing: -0.03em;
+    }
+
+    .feedback-modal p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
     .modal-head {
       display: flex;
       align-items: center;
@@ -870,6 +909,14 @@
         </div>
         <div class="calendar-grid" id="calendarGrid"></div>
       </div>
+    </div>
+  </div>
+
+  <div class="feedback-backdrop" id="feedbackModal" aria-hidden="true">
+    <div class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
+      <h3 id="feedbackTitle">Updated</h3>
+      <p id="feedbackMessage">Reservation updated.</p>
+      <button class="pill-btn primary" id="closeFeedbackModal" type="button" style="width:100%;">Close</button>
     </div>
   </div>
 
