@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -385,6 +385,87 @@
       padding-bottom: 16px;
     }
 
+    .reservation-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(14, 10, 8, 0.48);
+      backdrop-filter: blur(8px);
+      z-index: 120;
+    }
+
+    .reservation-modal-backdrop.is-open {
+      display: flex;
+    }
+
+    .reservation-modal {
+      width: min(100%, 420px);
+      padding: 24px;
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at top left, rgba(212, 175, 55, 0.16), transparent 30%),
+        linear-gradient(135deg, #120f0b 0%, #22160e 45%, #0d0a08 100%);
+      color: #fff8f0;
+      box-shadow: 0 28px 60px rgba(14, 10, 8, 0.28);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .reservation-modal p {
+      margin: 0 0 8px;
+      color: rgba(212, 175, 55, 0.92);
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .reservation-modal h3 {
+      margin: 0 0 18px;
+      font-size: clamp(1.5rem, 6vw, 2rem);
+      letter-spacing: -0.05em;
+      line-height: 0.98;
+    }
+
+    .reservation-modal-links {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .reservation-choice {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      min-height: 62px;
+      padding: 0 18px;
+      border-radius: 18px;
+      background: rgba(255, 250, 244, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: inherit;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .reservation-choice span,
+    .reservation-choice strong {
+      display: block;
+    }
+
+    .reservation-choice span {
+      color: rgba(255, 248, 240, 0.66);
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .reservation-close {
+      width: 100%;
+    }
+
     @media (max-width: 1080px) {
       .hub-hero-content {
         padding: 40px 34px;
@@ -465,9 +546,9 @@
       .hub-hero-visual::after {
         inset: 0;
         background:
-          url("assets/flower.webp") left 10% top 14% / 54% auto no-repeat,
-          url("assets/flower.webp") right 2% top 24% / 44% auto no-repeat,
-          url("assets/flower.webp") center 68% / 58% auto no-repeat;
+        url("assets/flower.webp") left 10% top 14% / 54% auto no-repeat,
+        url("assets/flower.webp") right 2% top 24% / 44% auto no-repeat,
+        url("assets/flower.webp") center 68% / 58% auto no-repeat;
         opacity: 0.88;
       }
 
@@ -491,7 +572,7 @@
         </p>
         <h1>Korean Kitchen & Soju Bar</h1>
         <div class="hub-actions">
-          <a class="hub-btn hub-btn-primary" href="https://example.com/reservation">Online Reservation</a>
+          <a class="hub-btn hub-btn-primary" href="downtown/reservation/reservation.html" id="openReservationModal">Online Reservation</a>
           <a class="hub-btn hub-btn-secondary" href="#locations">Online Order</a>
           <a class="hub-btn hub-btn-instagram" href="https://www.instagram.com/ehwa_restaurant" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
             <span class="hub-btn-icon" aria-hidden="true">
@@ -519,7 +600,7 @@
       <div class="location-grid">
         <article class="location-card" aria-label="Uptown location">
           <h3>Uptown</h3>
-          <a class="hub-btn hub-btn-primary" href="menu/uptown/index.html">View Uptown Menu</a>
+          <a class="hub-btn hub-btn-primary" href="./uptown/menu/index.html">View Uptown Menu</a>
           <div class="location-actions order-links">
             <a class="hub-btn hub-btn-secondary" href="https://www.doordash.com/store/ehwa-north-york-40211481/93983346/" target="_blank" rel="noopener noreferrer">DoorDash</a>
             <a class="hub-btn hub-btn-secondary" href="https://www.ubereats.com/ca/store/ehwa-uptown/44ZHz__IVJaTPeUckFF6Yg" target="_blank" rel="noopener noreferrer">Uber Eats</a>
@@ -534,7 +615,7 @@
 
         <article class="location-card" aria-label="Downtown location">
           <h3>Downtown</h3>
-          <a class="hub-btn hub-btn-primary" href="menu/downtown/index.html">View Downtown Menu</a>
+          <a class="hub-btn hub-btn-primary" href="./downtown/menu/index.html">View Downtown Menu</a>
           <div class="location-actions order-links">
             <a class="hub-btn hub-btn-secondary" href="https://www.doordash.com/store/ehwa-toronto-40211483/93877348/" target="_blank" rel="noopener noreferrer">DoorDash</a>
             <a class="hub-btn hub-btn-secondary" href="https://www.ubereats.com/ca/store/ehwa-downtown/2_rjxtHlQXWsv1OBu5rufQ" target="_blank" rel="noopener noreferrer">Uber Eats</a>
@@ -553,5 +634,59 @@
       &copy; EHWA Restaurant. All rights reserved.
     </footer>
   </main>
+  <div class="reservation-modal-backdrop" id="reservationModal" aria-hidden="true">
+    <div class="reservation-modal" role="dialog" aria-modal="true" aria-labelledby="reservationModalTitle">
+      <p>Reservation</p>
+      <h3 id="reservationModalTitle">Choose your next step</h3>
+      <div class="reservation-modal-links">
+        <a class="reservation-choice" href="downtown/reservation/reservation.html">
+          <strong>Downtown</strong>
+          <span>Book Isabella St.</span>
+        </a>
+        <a class="reservation-choice" href="uptown/reservation/reservation.html">
+          <strong>Uptown</strong>
+          <span>Book Yonge St.</span>
+        </a>
+        <a class="reservation-choice" href="modify.html">
+          <strong>Modify Existing Reservation</strong>
+          <span>Open guest edit page</span>
+        </a>
+      </div>
+      <button class="hub-btn hub-btn-secondary reservation-close" id="closeReservationModal" type="button">Close</button>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const openButton = document.getElementById("openReservationModal");
+      const modal = document.getElementById("reservationModal");
+      const closeButton = document.getElementById("closeReservationModal");
+
+      if (!openButton || !modal || !closeButton) return;
+
+      const openModal = (event) => {
+        event.preventDefault();
+        modal.classList.add("is-open");
+        modal.setAttribute("aria-hidden", "false");
+      };
+
+      const closeModal = () => {
+        modal.classList.remove("is-open");
+        modal.setAttribute("aria-hidden", "true");
+      };
+
+      openButton.addEventListener("click", openModal);
+      closeButton.addEventListener("click", closeModal);
+      modal.addEventListener("click", (event) => {
+        if (event.target === modal) closeModal();
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && modal.classList.contains("is-open")) {
+          closeModal();
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
+
