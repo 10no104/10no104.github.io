@@ -151,7 +151,6 @@
 
     .metric-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
     }
 
@@ -172,6 +171,11 @@
     }
 
     .metric-card strong { font-size: 1.2rem; }
+
+    .metric-card strong.large {
+      font-size: 1.5rem;
+      line-height: 1.05;
+    }
 
     .layout {
       display: grid;
@@ -339,11 +343,7 @@
     .guest-custom-input { display: none; }
     .guest-custom-input.is-open { display: block; }
 
-    .form-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
+    .form-actions { display: grid; gap: 10px; }
 
     .control-row {
       display: grid;
@@ -406,7 +406,7 @@
 
     .reservation-top h4 {
       margin: 0 0 4px;
-      font-size: 1rem;
+      font-size: 1.14rem;
       letter-spacing: -0.03em;
     }
 
@@ -716,7 +716,7 @@
         align-items: start;
       }
 
-      .metric-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .metric-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
     }
   </style>
 </head>
@@ -739,20 +739,15 @@
       <h2 id="todayHeading">Today</h2>
       <div class="metric-grid">
         <div class="metric-card">
-          <span>Total Covers</span>
-          <strong id="metricCovers">0</strong>
+          <span>Next Booking</span>
+          <strong class="large" id="metricNextName">-</strong>
+          <span id="metricNextMeta">No upcoming reservation</span>
         </div>
         <div class="metric-card">
           <span>Total Reservations</span>
           <strong id="metricReservations">0</strong>
-        </div>
-        <div class="metric-card">
           <span>Large Parties</span>
           <strong id="metricLargeParties">0</strong>
-        </div>
-        <div class="metric-card">
-          <span>Latest Booking</span>
-          <strong id="metricLatest">-</strong>
         </div>
       </div>
     </section>
@@ -769,7 +764,6 @@
           <input name="status" type="hidden" value="active" />
           <div class="field-grid" id="quickAddFields"></div>
           <div class="form-actions">
-            <button class="pill-btn" id="openFullEditor" type="button">Open Full Editor</button>
             <button class="pill-btn primary" type="submit">Add Reservation</button>
           </div>
         </form>
@@ -877,7 +871,7 @@
     function normalizeReservation(cells = [], index = 0) {
       const values = cells.map((cell) => getCellText(cell));
       return {
-        rowNumber: index + 1,
+        rowNumber: index + 2,
         timestamp: values[0] || "",
         date: values[1] || "",
         time: values[2] || "",
@@ -1003,7 +997,7 @@
           <div class="reservation-top">
             <div>
               <h4>${item.name || "Guest"}</h4>
-              <p>${formatDateLabel(item.date)} · ${item.time || "Time not set"}</p>
+              <p>${item.time || "Time not set"} · ${formatDateLabel(item.date)}</p>
             </div>
             <span class="status-badge ${status.className}">${status.label}</span>
           </div>
@@ -1027,14 +1021,27 @@
     }
 
     function renderMetrics(reservations) {
-      const covers = reservations.reduce((sum, item) => sum + parseGuestCount(item.people), 0);
       const largeParties = reservations.filter((item) => parseGuestCount(item.people) >= 8 && item.status !== "removed").length;
-      const latest = [...reservations].sort((a, b) => String(b.timestamp).localeCompare(String(a.timestamp)))[0];
+      const upcoming = reservations
+        .filter((item) => item.status !== "removed")
+        .map((item) => {
+          const date = toSafeDate(item.date);
+          const minutes = parseTimeForSort(item.time);
+          if (!date || !Number.isFinite(minutes)) return null;
+          const withTime = new Date(date);
+          withTime.setHours(Math.floor(minutes / 60), minutes % 60, 0, 0);
+          return { ...item, sortDate: withTime };
+        })
+        .filter(Boolean)
+        .filter((item) => item.sortDate >= new Date())
+        .sort((a, b) => a.sortDate - b.sortDate)[0];
 
-      document.getElementById("metricCovers").textContent = String(covers);
       document.getElementById("metricReservations").textContent = String(reservations.length);
       document.getElementById("metricLargeParties").textContent = String(largeParties);
-      document.getElementById("metricLatest").textContent = latest?.time || "-";
+      document.getElementById("metricNextName").textContent = upcoming?.name || "-";
+      document.getElementById("metricNextMeta").textContent = upcoming
+        ? `${upcoming.time || "-"} · ${upcoming.people || "-"}`
+        : "No upcoming reservation";
     }
 
     function renderReservations() {
@@ -1433,6 +1440,9 @@
           quickFormFields.peopleDisplay.textContent = "4 guests";
           quickFormFields.peopleCustomInput.classList.remove("is-open");
           quickFormFields.peopleDisplay.style.display = "";
+          quickFormFields.nameInput.value = "";
+          quickFormFields.phoneInput.value = "";
+          quickFormFields.notesInput.value = "";
           quickFormFields.renderDateGrid();
         }
         refreshAfterMutation();
@@ -1465,26 +1475,6 @@
 
     bindFormSubmission(document.getElementById("quickAddForm"));
     bindFormSubmission(editorForm);
-
-    document.getElementById("openFullEditor").addEventListener("click", () => {
-      editorAction.value = "create";
-      editorRowNumber.value = "";
-      editorStatus.value = "active";
-      editorFields.dateInput.value = todayInput;
-      editorFields.timeInput.value = "6:00 PM";
-      editorFields.timeDisplay.textContent = "6:00 PM";
-      editorFields.peopleInput.value = "4 guests";
-      editorFields.peopleDisplay.textContent = "4 guests";
-      editorFields.nameInput.value = "";
-      editorFields.phoneInput.value = "";
-      editorFields.notesInput.value = "";
-      editorFields.peopleCustomInput.classList.remove("is-open");
-      editorFields.peopleDisplay.style.display = "";
-      editorTitle.textContent = "Add Reservation";
-      editorFields.renderDateGrid();
-      editorModal.classList.add("is-open");
-      editorModal.setAttribute("aria-hidden", "false");
-    });
 
     document.getElementById("closeEditorModal").addEventListener("click", closeEditor);
     document.getElementById("cancelEditor").addEventListener("click", closeEditor);
