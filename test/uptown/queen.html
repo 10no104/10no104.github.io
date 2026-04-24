@@ -220,6 +220,85 @@
       display: none;
     }
 
+    .add-panel {
+      position: relative;
+      border-color: rgba(123, 31, 47, 0.16);
+      background:
+        linear-gradient(180deg, rgba(255, 248, 238, 0.98), rgba(255, 252, 247, 0.94)),
+        radial-gradient(circle at top right, rgba(255, 211, 116, 0.26), transparent 42%);
+      box-shadow: 0 24px 54px rgba(123, 31, 47, 0.1);
+    }
+
+    .add-panel .panel-head {
+      padding: 2px 0 14px;
+      background:
+        linear-gradient(180deg, rgba(123, 31, 47, 0.08), rgba(255, 250, 244, 0));
+    }
+
+    .add-toggle {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      min-height: 72px;
+      border-radius: 22px;
+      border: 1px solid rgba(123, 31, 47, 0.18);
+      background:
+        linear-gradient(135deg, rgba(123, 31, 47, 0.12), rgba(255, 216, 120, 0.22)),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0));
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.5),
+        0 14px 30px rgba(123, 31, 47, 0.08);
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+
+    .add-toggle span {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #6d2333;
+    }
+
+    .add-toggle::after {
+      content: "";
+      width: 30px;
+      height: 30px;
+      margin-top: 6px;
+      border-right: 4px solid rgba(109, 35, 51, 0.9);
+      border-bottom: 4px solid rgba(109, 35, 51, 0.9);
+      transform: rotate(45deg);
+      transition: transform 0.18s ease;
+    }
+
+    .add-toggle:hover {
+      transform: translateY(-1px);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.52),
+        0 18px 36px rgba(123, 31, 47, 0.12);
+    }
+
+    .add-panel.is-collapsed .add-toggle::after {
+      transform: rotate(-135deg);
+    }
+
+    .add-panel.is-collapsed .add-toggle {
+      background:
+        linear-gradient(135deg, rgba(123, 31, 47, 0.18), rgba(255, 216, 120, 0.28)),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.52), rgba(255, 255, 255, 0));
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.5),
+        0 20px 40px rgba(123, 31, 47, 0.12);
+    }
+
+    .add-panel.is-collapsed {
+      border-color: rgba(123, 31, 47, 0.24);
+      box-shadow: 0 26px 56px rgba(123, 31, 47, 0.12);
+    }
+
     .booking-summary {
       display: grid;
       gap: 10px;
@@ -913,7 +992,9 @@
       <section class="panel add-panel" id="quickAddPanel">
         <div class="panel-head">
           <h3>Add Reservation</h3>
-          <button class="pill-btn" id="toggleQuickAdd" type="button" aria-expanded="true">Hide</button>
+          <button class="add-toggle" id="toggleQuickAdd" type="button" aria-expanded="true">
+            <span>Hide Form</span>
+          </button>
         </div>
 
         <form class="booking-form" id="quickAddForm">
@@ -1744,7 +1825,7 @@
     const toggleQuickAdd = document.getElementById("toggleQuickAdd");
     toggleQuickAdd.addEventListener("click", () => {
       const collapsed = quickAddPanel.classList.toggle("is-collapsed");
-      toggleQuickAdd.textContent = collapsed ? "Show" : "Hide";
+      toggleQuickAdd.querySelector("span").textContent = collapsed ? "Show Form" : "Hide Form";
       toggleQuickAdd.setAttribute("aria-expanded", String(!collapsed));
     });
 
