@@ -231,6 +231,8 @@
 
     .add-panel .panel-head {
       padding: 2px 0 4px;
+      display: block;
+      text-align: center;
       background:
         linear-gradient(180deg, rgba(123, 31, 47, 0.08), rgba(255, 250, 244, 0));
     }
@@ -260,7 +262,6 @@
       color: #6d2333;
     }
 
-    .add-toggle::before,
     .add-toggle::after {
       content: "";
       width: 11px;
@@ -275,7 +276,6 @@
       opacity: 0.92;
     }
 
-    .add-panel.is-collapsed .add-toggle::before,
     .add-panel.is-collapsed .add-toggle::after {
       transform: rotate(-135deg);
     }
@@ -536,8 +536,7 @@
       padding: 14px 18px 0;
     }
 
-    .range-chips,
-    .option-chips {
+    .range-chips {
       display: flex;
       gap: 10px;
       overflow: auto;
@@ -563,6 +562,46 @@
       color: #6b2230;
     }
 
+    .chip-btn.day-chip {
+      min-width: 82px;
+      min-height: 62px;
+      padding: 10px 14px;
+      border-radius: 18px;
+      display: grid;
+      align-content: center;
+      justify-items: start;
+      text-align: left;
+      gap: 3px;
+    }
+
+    .chip-btn.day-chip span,
+    .chip-btn.day-chip strong {
+      display: block;
+    }
+
+    .chip-btn.day-chip span {
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .chip-btn.day-chip strong {
+      font-size: 1rem;
+      letter-spacing: -0.03em;
+    }
+
+    .trash-toggle {
+      width: 100%;
+      justify-content: center;
+      margin-top: 2px;
+      background: rgba(255, 255, 255, 0.82);
+    }
+
+    .trash-toggle.is-active {
+      background: linear-gradient(135deg, rgba(123, 31, 47, 0.18), rgba(189, 128, 58, 0.18));
+    }
+
     .reservation-list {
       display: grid;
       gap: 12px;
@@ -570,15 +609,18 @@
     }
 
     .reservation-card {
-      padding: 16px;
-      border-radius: 20px;
-      background: rgba(255, 255, 255, 0.72);
-      border: 1px solid rgba(113, 88, 60, 0.12);
+      padding: 18px;
+      border-radius: 22px;
+      background:
+        linear-gradient(180deg, rgba(255, 254, 250, 0.98), rgba(248, 241, 232, 0.96));
+      border: 1px solid rgba(113, 88, 60, 0.14);
+      box-shadow: 0 12px 28px rgba(38, 24, 17, 0.08);
     }
 
     .reservation-card.is-removed {
-      opacity: 0.7;
-      background: rgba(241, 235, 228, 0.84);
+      opacity: 0.9;
+      background:
+        linear-gradient(180deg, rgba(245, 239, 232, 0.96), rgba(236, 229, 220, 0.94));
     }
 
     .reservation-top {
@@ -597,8 +639,41 @@
 
     .reservation-top p {
       margin: 0;
-      color: var(--muted);
-      font-size: 0.9rem;
+      color: #7b6756;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .reservation-focus {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .reservation-time-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--wine), #b9871f);
+      color: #fff7ed;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      width: fit-content;
+      box-shadow: 0 10px 20px rgba(87, 31, 18, 0.18);
+    }
+
+    .reservation-name {
+      margin: 0;
+      font-size: 1.34rem;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      color: #20150f;
     }
 
     .status-badge {
@@ -624,8 +699,8 @@
     }
 
     .status-badge.removed {
-      background: rgba(123, 31, 47, 0.12);
-      color: #6b2230;
+      background: rgba(92, 78, 68, 0.14);
+      color: #58473d;
     }
 
     .reservation-meta {
@@ -636,10 +711,10 @@
     }
 
     .meta-box {
-      padding: 12px;
+      padding: 13px 14px;
       border-radius: 16px;
-      background: rgba(249, 243, 233, 0.92);
-      border: 1px solid rgba(113, 88, 60, 0.08);
+      background: rgba(255, 255, 255, 0.84);
+      border: 1px solid rgba(113, 88, 60, 0.12);
     }
 
     .meta-box span,
@@ -647,20 +722,27 @@
 
     .meta-box span {
       margin-bottom: 4px;
-      color: var(--muted);
-      font-size: 0.78rem;
+      color: #8b7561;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
 
-    .meta-box strong { font-size: 0.96rem; }
+    .meta-box strong {
+      font-size: 1.02rem;
+      color: #241812;
+      letter-spacing: -0.02em;
+    }
 
     .reservation-notes {
       padding: 12px 14px;
       border-radius: 16px;
-      background: rgba(255, 251, 245, 0.84);
-      border: 1px solid rgba(113, 88, 60, 0.08);
-      color: #4e4137;
+      background: rgba(255, 251, 245, 0.94);
+      border: 1px solid rgba(113, 88, 60, 0.12);
+      color: #42352c;
       line-height: 1.5;
-      font-size: 0.9rem;
+      font-size: 0.94rem;
     }
 
     .reservation-actions {
@@ -1009,16 +1091,8 @@
         </div>
 
         <div class="control-row">
-          <div class="range-chips">
-            <button class="chip-btn is-active" data-range="today" type="button">Today</button>
-            <button class="chip-btn" data-range="week" type="button">This Week</button>
-            <button class="chip-btn" data-range="month" type="button">This Month</button>
-            <button class="chip-btn" data-range="all" type="button">All Reservations</button>
-          </div>
-          <div class="option-chips">
-            <button class="chip-btn is-active" data-removed="hide" type="button">Hide Removed</button>
-            <button class="chip-btn" data-removed="show" type="button">Show Removed</button>
-          </div>
+          <div class="range-chips" id="dateFilterChips"></div>
+          <button class="chip-btn trash-toggle" id="trashToggle" type="button">Trash</button>
         </div>
 
         <div class="reservation-list" id="reservationList"></div>
@@ -1089,8 +1163,8 @@
 
     const state = {
       reservations: [],
-      range: "today",
-      showRemoved: false,
+      selectedDate: "",
+      trashMode: false,
       activeForm: "quick",
       calendarCursor: null
     };
@@ -1189,47 +1263,26 @@
       }).format(date);
     }
 
-    function getDateBounds(range) {
-      const now = new Date();
-      const start = new Date(now);
+    function getFilterDates() {
+      const dates = [];
+      const start = new Date();
       start.setHours(0, 0, 0, 0);
-      const end = new Date(start);
-
-      if (range === "today") {
-        end.setDate(end.getDate() + 1);
-        return { start, end, label: formatDateLabel(formatInputDate(start)) };
+      for (let i = 0; i < 7; i += 1) {
+        const optionDate = new Date(start);
+        optionDate.setDate(start.getDate() + i);
+        dates.push(formatInputDate(optionDate));
       }
-
-      if (range === "week") {
-        const day = start.getDay();
-        start.setDate(start.getDate() - day);
-        end.setTime(start.getTime());
-        end.setDate(end.getDate() + 7);
-        return { start, end, label: "This Week" };
-      }
-
-      if (range === "month") {
-        start.setDate(1);
-        end.setTime(start.getTime());
-        end.setMonth(end.getMonth() + 1);
-        return {
-          start,
-          end,
-          label: new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" }).format(start)
-        };
-      }
-
-      return { start: null, end: null, label: "All Reservations" };
+      return dates;
     }
 
     function filterReservations() {
-      const { start, end } = getDateBounds(state.range);
       return state.reservations.filter((item) => {
-        if (!state.showRemoved && item.status === "removed") return false;
-        if (!start || !end) return true;
+        if (state.trashMode) return item.status === "removed";
+        if (item.status === "removed") return false;
+        if (!state.selectedDate) return true;
         const date = toSafeDate(item.date);
         if (!date) return false;
-        return date >= start && date < end;
+        return formatInputDate(date) === state.selectedDate;
       });
     }
 
@@ -1252,15 +1305,11 @@
             </div>
             <span class="status-badge ${status.className}">${status.label}</span>
           </div>
+          <div class="reservation-focus">
+            <div class="reservation-time-pill">${item.time || "-"}</div>
+            <h4 class="reservation-name">${item.name || "Guest"}</h4>
+          </div>
           <div class="reservation-meta">
-            <div class="meta-box">
-              <span>Time</span>
-              <strong>${item.time || "-"}</strong>
-            </div>
-            <div class="meta-box">
-              <span>Name</span>
-              <strong>${item.name || "Guest"}</strong>
-            </div>
             <div class="meta-box">
               <span>Guests</span>
               <strong>${item.people || "-"}</strong>
@@ -1277,6 +1326,21 @@
           </div>
         </article>
       `;
+    }
+
+    function renderDateFilters() {
+      const chipRow = document.getElementById("dateFilterChips");
+      const dates = getFilterDates();
+      chipRow.innerHTML = dates.map((value) => {
+        const date = toSafeDate(value);
+        const isActive = state.selectedDate === value;
+        return `
+          <button class="chip-btn day-chip ${isActive ? "is-active" : ""}" data-date="${value}" type="button">
+            <span>${new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date)}</span>
+            <strong>${new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date)}</strong>
+          </button>
+        `;
+      }).join("") + `<button class="chip-btn" data-date="" type="button">All</button>`;
     }
 
     function renderMetrics(reservations) {
@@ -1307,24 +1371,20 @@
       const filtered = filterReservations();
       const reservationList = document.getElementById("reservationList");
       const reservationDateLabel = document.getElementById("reservationDateLabel");
-      const { label } = getDateBounds(state.range);
-
-      reservationDateLabel.textContent = label;
+      const trashToggle = document.getElementById("trashToggle");
+      reservationDateLabel.textContent = state.trashMode
+        ? "Removed Reservations"
+        : (state.selectedDate ? formatDateLabel(state.selectedDate) : "All Active Reservations");
+      trashToggle.classList.toggle("is-active", state.trashMode);
       renderMetrics(filtered);
+      renderDateFilters();
 
       if (!filtered.length) {
-        reservationList.innerHTML = '<div class="empty-state">No reservations in this view.</div>';
+        reservationList.innerHTML = `<div class="empty-state">${state.trashMode ? "Trash is empty." : "No reservations for this date."}</div>`;
         return;
       }
 
       reservationList.innerHTML = filtered.map(renderReservationCard).join("");
-    }
-
-    function setActiveChip(group, value) {
-      document.querySelectorAll(group).forEach((button) => {
-        const isMatch = button.dataset.range === value || button.dataset.removed === value;
-        button.classList.toggle("is-active", isMatch);
-      });
     }
 
     function buildMutationForm(fields) {
@@ -1821,6 +1881,7 @@
     }).format(new Date());
 
     const todayInput = formatInputDate(new Date());
+    state.selectedDate = todayInput;
     quickFormFields.dateInput.value = todayInput;
     quickFormFields.renderDateGrid();
     quickFormFields.renderSummary();
@@ -1846,20 +1907,19 @@
       if (event.target === feedbackModal) closeFeedback();
     });
 
-    document.querySelectorAll("[data-range]").forEach((button) => {
-      button.addEventListener("click", () => {
-        state.range = button.dataset.range;
-        setActiveChip("[data-range]", state.range);
+    document.addEventListener("click", (event) => {
+      const dateButton = event.target.closest("[data-date]");
+      if (dateButton) {
+        state.selectedDate = dateButton.dataset.date || "";
+        state.trashMode = false;
         renderReservations();
-      });
+        return;
+      }
     });
 
-    document.querySelectorAll("[data-removed]").forEach((button) => {
-      button.addEventListener("click", () => {
-        state.showRemoved = button.dataset.removed === "show";
-        setActiveChip("[data-removed]", state.showRemoved ? "show" : "hide");
-        renderReservations();
-      });
+    document.getElementById("trashToggle").addEventListener("click", () => {
+      state.trashMode = !state.trashMode;
+      renderReservations();
     });
 
     document.getElementById("reservationList").addEventListener("click", (event) => {
