@@ -295,6 +295,12 @@
       color: inherit;
     }
 
+    .date-chip.more-chip.is-active {
+      border-color: rgba(255, 228, 155, 0.92);
+      background: linear-gradient(135deg, rgba(255, 229, 158, 0.92), rgba(255, 247, 227, 1));
+      box-shadow: 0 12px 22px rgba(17, 11, 8, 0.14);
+    }
+
     .guest-custom-input {
       display: none;
     }
@@ -744,12 +750,16 @@
 
       const renderDateGrid = () => {
         dateGrid.innerHTML = "";
+        const visibleDates = dateOptions.slice(0, 5);
 
-        dateOptions.slice(0, 5).forEach((value) => {
+        visibleDates.forEach((value) => {
           const date = new Date(value + "T00:00:00");
           const button = document.createElement("button");
           button.type = "button";
           button.className = "date-chip";
+          if (dateInput.value === value) {
+            button.classList.add("is-active");
+          }
           button.innerHTML = `<span>${new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date)}</span><strong>${new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date)}</strong>`;
           button.addEventListener("click", () => {
             dateInput.value = value;
@@ -761,7 +771,13 @@
         const moreButton = document.createElement("button");
         moreButton.type = "button";
         moreButton.className = "date-chip more-chip";
-        moreButton.innerHTML = "<span>More</span><strong>Choose</strong>";
+        const selectedIsCustom = dateInput.value && !visibleDates.includes(dateInput.value);
+        moreButton.innerHTML = selectedIsCustom
+          ? `<span>Chosen</span><strong>${formatDisplayDate(dateInput.value)}</strong>`
+          : "<span>More</span><strong>Choose</strong>";
+        if (selectedIsCustom) {
+          moreButton.classList.add("is-active");
+        }
         moreButton.addEventListener("click", () => {
           openSheet("date");
         });
@@ -769,10 +785,7 @@
       };
 
       const syncDateState = () => {
-        dateGrid.querySelectorAll(".date-chip").forEach((chip, index) => {
-          if (chip.classList.contains("more-chip")) return;
-          chip.classList.toggle("is-active", dateOptions[index] === dateInput.value);
-        });
+        renderDateGrid();
       };
 
       const openModal = () => {
