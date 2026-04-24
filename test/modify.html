@@ -3,19 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Modify Reservation | EHWA Test</title>
+  <title>Modify Reservation | EHWA</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/global.css?v=20260423-modify" />
+  <link rel="stylesheet" href="../css/global.css?v=20260424-modify" />
   <style>
     :root {
       --ink: #211813;
       --muted: #74665a;
       --wine: #7b1f2f;
+      --gold: #d4af37;
       --line: rgba(109, 86, 59, 0.14);
+      --paper-line: rgba(113, 88, 60, 0.18);
       --shadow: 0 24px 52px rgba(29, 19, 12, 0.1);
       --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
     }
 
     * { box-sizing: border-box; }
@@ -43,65 +47,1470 @@
       z-index: -1;
     }
 
+    button, input, textarea { font: inherit; }
     a { color: inherit; text-decoration: none; }
 
     .shell {
-      width: min(100% - 18px, 760px);
+      width: min(100% - 18px, 1020px);
       margin: 0 auto;
-      padding: 20px 0 40px;
+      padding: 18px 0 40px;
     }
 
-    .panel {
-      border: 1px solid var(--line);
-      border-radius: var(--radius-xl);
-      padding: 24px;
-      background: linear-gradient(180deg, rgba(255, 252, 247, 0.97), rgba(248, 241, 231, 0.96));
-      box-shadow: var(--shadow);
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
     }
 
-    .eyebrow {
-      margin: 0 0 8px;
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .logo-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 62px;
+      height: 62px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255, 254, 250, 0.98), rgba(243, 231, 215, 0.94));
+      border: 1px solid rgba(73, 53, 36, 0.12);
+      box-shadow: 0 14px 28px rgba(42, 28, 18, 0.1);
+      flex: none;
+    }
+
+    .logo-link img {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+    }
+
+    .brand-copy p {
+      margin: 0 0 4px;
       color: var(--wine);
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       font-weight: 800;
       letter-spacing: 0.14em;
       text-transform: uppercase;
     }
 
-    h1 {
-      margin: 0 0 10px;
-      font-size: clamp(1.8rem, 7vw, 2.8rem);
+    .brand-copy h1 {
+      margin: 0;
+      font-size: clamp(1.45rem, 5vw, 2.3rem);
       letter-spacing: -0.05em;
     }
 
-    p {
-      margin: 0;
+    .back-link,
+    .pill-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(113, 88, 60, 0.14);
+      background: rgba(255, 251, 245, 0.72);
+      color: #2c2016;
+      font-size: 0.92rem;
+      font-weight: 700;
+      white-space: nowrap;
+      box-shadow: 0 10px 22px rgba(32, 20, 13, 0.05);
+      cursor: pointer;
+    }
+
+    .pill-btn.primary {
+      color: #fff;
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--wine), #b9871f);
+      box-shadow: 0 18px 30px rgba(123, 31, 47, 0.18);
+    }
+
+    .hero,
+    .panel,
+    .editor-modal,
+    .feedback-modal,
+    .sheet-panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.97), rgba(248, 241, 231, 0.96)),
+        url("../assets/pattern.webp") center / 420px auto;
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      padding: 22px;
+      margin-bottom: 16px;
+    }
+
+    .hero p {
+      margin: 0 0 8px;
+      color: var(--wine);
+      font-size: 0.84rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .hero h2 {
+      margin: 0 0 10px;
+      font-size: clamp(1.9rem, 6vw, 3rem);
+      letter-spacing: -0.05em;
+      line-height: 0.95;
+    }
+
+    .hero span {
+      display: block;
       color: var(--muted);
       line-height: 1.65;
     }
 
-    .btn {
+    .layout {
+      display: grid;
+      gap: 16px;
+    }
+
+    .panel {
+      overflow: hidden;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px 18px 0;
+    }
+
+    .panel-head h3 {
+      margin: 0;
+      font-size: 1.14rem;
+      letter-spacing: -0.03em;
+    }
+
+    .panel-head span {
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .search-form,
+    .editor-form {
+      display: grid;
+      gap: 16px;
+      padding: 18px;
+    }
+
+    .field-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field label {
+      font-size: 0.88rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      min-height: 53px;
+      padding: 14px 15px;
+      border: 1px solid var(--paper-line);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.9);
+      color: #231812;
+      outline: none;
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+      border-color: rgba(123, 31, 47, 0.35);
+      box-shadow: 0 0 0 3px rgba(123, 31, 47, 0.08);
+    }
+
+    .field small {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .picker-trigger {
+      width: 100%;
+      min-height: 53px;
+      padding: 14px 15px;
+      border: 1px solid var(--paper-line);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.9);
+      text-align: left;
+      color: #231812;
+      cursor: pointer;
+    }
+
+    .guest-custom-input {
+      display: none;
+    }
+
+    .guest-custom-input.is-open {
+      display: block;
+    }
+
+    .date-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .date-chip {
+      width: 100%;
+      min-height: 68px;
+      padding: 10px 8px;
+      border-radius: 18px;
+      border: 1px solid rgba(113, 88, 60, 0.14);
+      background: rgba(255, 255, 255, 0.84);
+      text-align: center;
+      color: #2a1d13;
+      cursor: pointer;
+    }
+
+    .date-chip span,
+    .date-chip strong {
+      display: block;
+    }
+
+    .date-chip span {
+      margin-bottom: 4px;
+      color: #7f7063;
+      font-size: 0.76rem;
+    }
+
+    .date-chip strong { font-size: 0.94rem; }
+
+    .date-chip.is-active,
+    .date-chip.more-chip.is-active {
+      border-color: rgba(255, 228, 155, 0.92);
+      background: linear-gradient(135deg, rgba(255, 229, 158, 0.92), rgba(255, 247, 227, 1));
+      box-shadow: 0 12px 22px rgba(17, 11, 8, 0.14);
+    }
+
+    .date-chip.more-chip {
+      background: rgba(255, 252, 247, 0.96);
+      color: #1f1712;
+    }
+
+    .date-chip.more-chip span,
+    .date-chip.more-chip strong {
+      color: inherit;
+    }
+
+    .results {
+      display: grid;
+      gap: 16px;
+      padding: 18px;
+    }
+
+    .results[hidden] {
+      display: none;
+    }
+
+    .section-block {
+      display: grid;
+      gap: 12px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .section-head h4 {
+      margin: 0;
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .section-head span {
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 700;
+    }
+
+    .reservation-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .reservation-card {
+      padding: 16px;
+      border-radius: 20px;
+      background: rgba(255, 251, 245, 0.84);
+      border: 1px solid rgba(109, 86, 59, 0.12);
+    }
+
+    .reservation-card.is-past {
+      background:
+        linear-gradient(180deg, rgba(240, 234, 227, 0.92), rgba(232, 225, 216, 0.94));
+      border-style: dashed;
+      opacity: 0.92;
+    }
+
+    .reservation-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .reservation-top h4 {
+      margin: 0 0 4px;
+      font-size: 1.06rem;
+    }
+
+    .reservation-top p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .badge-row {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .badge {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 48px;
-      margin-top: 18px;
+      min-height: 30px;
+      padding: 0 12px;
       border-radius: 999px;
-      padding: 0 18px;
-      font-weight: 700;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .badge.branch {
+      color: #fff;
+      background: linear-gradient(135deg, rgba(123, 31, 47, 0.96), rgba(185, 135, 31, 0.9));
+    }
+
+    .badge.past {
+      color: #5b4a3a;
+      background: rgba(204, 190, 176, 0.76);
+    }
+
+    .reservation-meta {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .meta-box {
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(109, 86, 59, 0.1);
+    }
+
+    .meta-box span,
+    .meta-box strong {
+      display: block;
+    }
+
+    .meta-box span {
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .meta-box strong {
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+      word-break: break-word;
+    }
+
+    .reservation-notes {
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255, 251, 245, 0.84);
+      border: 1px solid rgba(109, 86, 59, 0.08);
+      color: #3d2c1f;
+      line-height: 1.55;
+    }
+
+    .reservation-actions {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .action-btn {
+      min-height: 44px;
+      border: 0;
+      border-radius: 14px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .action-btn.primary {
       color: #fff;
       background: linear-gradient(135deg, var(--wine), #b9871f);
+    }
+
+    .empty-state {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255, 251, 245, 0.74);
+      color: var(--muted);
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .modal-backdrop,
+    .feedback-backdrop,
+    .sheet-backdrop {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(18, 12, 9, 0.42);
+      backdrop-filter: blur(4px);
+      z-index: 120;
+    }
+
+    .modal-backdrop.is-open,
+    .feedback-backdrop.is-open,
+    .sheet-backdrop.is-open {
+      display: flex;
+    }
+
+    .editor-modal,
+    .feedback-modal {
+      width: min(100%, 560px);
+      padding: 22px;
+    }
+
+    .feedback-modal {
+      width: min(100%, 380px);
+      text-align: center;
+    }
+
+    .feedback-modal h3 {
+      margin: 0 0 8px;
+      font-size: 1.22rem;
+    }
+
+    .feedback-modal p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .modal-head h3 {
+      margin: 0;
+      font-size: 1.28rem;
+      letter-spacing: -0.03em;
+    }
+
+    .modal-close {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      border: 1px solid rgba(109, 86, 59, 0.14);
+      background: rgba(255, 251, 245, 0.82);
+      cursor: pointer;
+    }
+
+    .form-actions {
+      display: grid;
+      gap: 10px;
+    }
+
+    .form-actions .pill-btn {
+      width: 100%;
+    }
+
+    .sheet-panel {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: 0 auto;
+      width: min(100%, 760px);
+      max-height: min(72vh, 520px);
+      border-radius: 24px 24px 0 0;
+      overflow: hidden;
+      transform: translateY(100%);
+      transition: transform 0.22s ease;
+    }
+
+    .sheet-backdrop.is-open .sheet-panel {
+      transform: translateY(0);
+    }
+
+    .sheet-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px;
+    }
+
+    .sheet-head h3 {
+      margin: 0;
+      font-size: 1.06rem;
+    }
+
+    .sheet-options {
+      display: grid;
+      gap: 10px;
+      padding: 0 18px 18px;
+      max-height: calc(min(72vh, 520px) - 72px);
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .sheet-option {
+      width: 100%;
+      min-height: 54px;
+      padding: 0 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(113, 88, 60, 0.14);
+      background: rgba(255, 255, 255, 0.86);
+      text-align: left;
+      color: #2a1d13;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .sheet-option.is-active {
+      border-color: rgba(123, 31, 47, 0.26);
+      background: rgba(123, 31, 47, 0.06);
+    }
+
+    .sheet-option.is-custom {
+      border-style: dashed;
+      background: linear-gradient(135deg, rgba(255, 251, 245, 0.94), rgba(249, 238, 217, 0.94));
+    }
+
+    .calendar-shell {
+      display: grid;
+      gap: 14px;
+      padding: 0 18px 18px;
+    }
+
+    .calendar-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .calendar-nav {
+      width: 40px;
+      height: 40px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.86);
+      cursor: pointer;
+    }
+
+    .calendar-label {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #2e2016;
+    }
+
+    .calendar-weekdays,
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .calendar-weekdays span {
+      text-align: center;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .calendar-day {
+      min-height: 48px;
+      border: 1px solid rgba(113, 88, 60, 0.12);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.78);
+      color: #231812;
+      cursor: pointer;
+    }
+
+    .calendar-day.is-empty { visibility: hidden; }
+    .calendar-day.is-disabled { opacity: 0.34; cursor: default; }
+    .calendar-day.is-selected {
+      border-color: rgba(255, 216, 110, 0.98);
+      background: linear-gradient(135deg, rgba(255, 225, 140, 0.98), rgba(255, 246, 220, 1));
+      box-shadow: 0 10px 18px rgba(17, 11, 8, 0.12);
+    }
+
+    @media (min-width: 720px) {
+      .field-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .field.full {
+        grid-column: 1 / -1;
+      }
+
+      .form-actions {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 719px) {
+      .reservation-top {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 <body>
   <main class="shell">
-    <section class="panel">
-      <p class="eyebrow">Reservation</p>
-      <h1>Modify Existing Reservation</h1>
-      <p>This test destination is ready for the guest lookup and edit flow. We can connect phone-based search here next.</p>
-      <a class="btn" href="./index.html">Back to Test Home</a>
+    <header class="topbar">
+      <div class="brand">
+        <a class="logo-link" href="./index.html" aria-label="EHWA test home">
+          <img src="../assets/logo-dark.webp" alt="EHWA logo" />
+        </a>
+        <div class="brand-copy">
+          <p>Reservation</p>
+          <h1>Find Your Booking</h1>
+        </div>
+      </div>
+      <a class="back-link" href="./index.html">Back</a>
+    </header>
+
+    <section class="hero">
+      <p>Guest Access</p>
+      <h2>View past and upcoming reservations with your phone number.</h2>
+      <span>Search once to see every matching booking across Downtown and Uptown. Upcoming bookings stay editable, while past bookings are clearly separated below.</span>
     </section>
+
+    <div class="layout">
+      <section class="panel">
+        <div class="panel-head">
+          <h3>Search Reservation</h3>
+          <span id="searchStatus">Phone lookup</span>
+        </div>
+        <form class="search-form" id="lookupForm">
+          <div class="field-grid">
+            <div class="field full">
+              <label for="lookupPhone">Phone</label>
+              <input id="lookupPhone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="(437) 123-4567" required />
+              <small>Use the same phone number that was used when the reservation was created.</small>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="pill-btn primary" type="submit">Find Reservation</button>
+            <button class="pill-btn" id="clearResults" type="button">Clear</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h3>Reservations</h3>
+          <span id="resultLabel">No search yet</span>
+        </div>
+        <div class="results" id="resultsPanel" hidden>
+          <section class="section-block">
+            <div class="section-head">
+              <h4>Upcoming Reservations</h4>
+              <span id="upcomingCount">0 found</span>
+            </div>
+            <div class="reservation-list" id="upcomingList"></div>
+          </section>
+          <section class="section-block">
+            <div class="section-head">
+              <h4>Past Reservations</h4>
+              <span id="pastCount">0 found</span>
+            </div>
+            <div class="reservation-list" id="pastList"></div>
+          </section>
+        </div>
+      </section>
+    </div>
   </main>
+
+  <iframe name="modifySubmitFrame" hidden></iframe>
+
+  <div class="modal-backdrop" id="editorModal" aria-hidden="true">
+    <div class="editor-modal" role="dialog" aria-modal="true" aria-labelledby="editorTitle">
+      <div class="modal-head">
+        <h3 id="editorTitle">Edit Reservation</h3>
+        <button class="modal-close" id="closeEditorModal" type="button">×</button>
+      </div>
+      <form class="editor-form" id="editorForm">
+        <input id="editorAction" name="action" type="hidden" value="update" />
+        <input id="editorRowNumber" name="rowNumber" type="hidden" value="" />
+        <input id="editorSheetName" name="sheetName" type="hidden" value="" />
+        <input id="editorStatus" name="status" type="hidden" value="active" />
+        <div class="field-grid" id="editorFields"></div>
+        <div class="form-actions">
+          <button class="pill-btn primary" type="submit">Save Changes</button>
+          <button class="pill-btn" id="cancelEditor" type="button">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="sheet-backdrop" id="pickerSheet" aria-hidden="true">
+    <div class="sheet-panel">
+      <div class="sheet-head">
+        <h3 id="pickerTitle">Select</h3>
+        <button class="modal-close" id="pickerClose" type="button">×</button>
+      </div>
+      <div class="sheet-options" id="pickerOptions"></div>
+      <div class="calendar-shell" id="calendarShell" hidden>
+        <div class="calendar-toolbar">
+          <button class="calendar-nav" id="calendarPrev" type="button" aria-label="Previous month">&lt;</button>
+          <div class="calendar-label" id="calendarLabel">Month</div>
+          <button class="calendar-nav" id="calendarNext" type="button" aria-label="Next month">&gt;</button>
+        </div>
+        <div class="calendar-weekdays">
+          <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="feedback-backdrop" id="feedbackModal" aria-hidden="true">
+    <div class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
+      <h3 id="feedbackTitle">Updated</h3>
+      <p id="feedbackMessage">Reservation updated.</p>
+      <button class="pill-btn primary" id="closeFeedbackModal" type="button" style="width:100%;">Close</button>
+    </div>
+  </div>
+
+  <script>
+    const SHEET_ID = "1xa9OZbctYnlbaAL8lKIgmefM5hvSw0Plk01lxp5G2fc";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3Iiujn95evZuFiyLNrJUo-_H6rKngdxt0EeBFVw/exec";
+    const RESERVATION_SHEETS = [
+      { name: "Downtown", label: "Downtown" },
+      { name: "Uptown", label: "Uptown" }
+    ];
+
+    const state = {
+      allReservations: [],
+      matches: [],
+      lastSearchDigits: "",
+      activeForm: "editor",
+      calendarCursor: null
+    };
+
+    function parseGvizText(text = "") {
+      const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]+)\);/);
+      if (!match) throw new Error("Unexpected sheet response");
+      return JSON.parse(match[1]);
+    }
+
+    function formatInputDate(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function getCellText(cell) {
+      if (!cell) return "";
+      if (typeof cell.f === "string" && cell.f.trim()) return cell.f.trim();
+      const value = cell.v;
+      if (value instanceof Date) return formatInputDate(value);
+      if (value && typeof value === "object" && typeof value.getMonth === "function") {
+        return formatInputDate(new Date(value));
+      }
+      return (value ?? "").toString().trim();
+    }
+
+    function normalizeReservation(cells = [], index = 0, sheetConfig) {
+      const values = cells.map((cell) => getCellText(cell));
+      return {
+        rowNumber: index + 1,
+        sheetName: sheetConfig.name,
+        branch: sheetConfig.label,
+        timestamp: values[0] || "",
+        date: values[1] || "",
+        time: values[2] || "",
+        people: values[3] || "",
+        name: values[4] || "",
+        phone: values[5] || "",
+        notes: values[6] || "",
+        status: values[7] || "active"
+      };
+    }
+
+    function toSafeDate(dateString = "") {
+      const normalized = String(dateString).trim();
+      if (!normalized) return null;
+      const match = normalized.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (match) {
+        const [, year, month, day] = match;
+        return new Date(Number(year), Number(month) - 1, Number(day));
+      }
+      const date = new Date(normalized);
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+
+    function parseTimeForSort(value = "") {
+      const match = String(value).trim().match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+      if (!match) return Number.MAX_SAFE_INTEGER;
+      let hour = Number(match[1]);
+      const minute = Number(match[2]);
+      const meridiem = match[3].toUpperCase();
+      if (meridiem === "PM" && hour !== 12) hour += 12;
+      if (meridiem === "AM" && hour === 12) hour = 0;
+      return hour * 60 + minute;
+    }
+
+    function formatPhoneNumber(value) {
+      let digits = String(value || "").replace(/\D/g, "");
+      if (digits.startsWith("1")) digits = digits.slice(1);
+      digits = digits.slice(0, 10);
+      if (digits.length < 4) return digits;
+      if (digits.length < 7) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+      return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+    }
+
+    function normalizePhoneDigits(value = "") {
+      let digits = String(value || "").replace(/\D/g, "");
+      if (digits.length === 11 && digits.startsWith("1")) digits = digits.slice(1);
+      return digits;
+    }
+
+    function isValidPhone(value = "") {
+      const digits = normalizePhoneDigits(value);
+      return digits.length === 10;
+    }
+
+    function formatDateLabel(value = "") {
+      const date = toSafeDate(value);
+      if (!date) return value || "No date";
+      return new Intl.DateTimeFormat("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric"
+      }).format(date);
+    }
+
+    function formatDisplayDate(value = "") {
+      const date = toSafeDate(value);
+      if (!date) return "Not selected";
+      return new Intl.DateTimeFormat("en-US", {
+        weekday: "short",
+        month: "short",
+        day: "numeric"
+      }).format(date);
+    }
+
+    function getReservationDateTime(item) {
+      const date = toSafeDate(item.date);
+      const minutes = parseTimeForSort(item.time);
+      if (!date || !Number.isFinite(minutes)) return null;
+      const withTime = new Date(date);
+      withTime.setHours(Math.floor(minutes / 60), minutes % 60, 0, 0);
+      return withTime;
+    }
+
+    function isPastReservation(item) {
+      const dateTime = getReservationDateTime(item);
+      if (!dateTime) return false;
+      return dateTime < new Date();
+    }
+
+    async function fetchSheetReservations(sheetConfig) {
+      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(sheetConfig.name)}&tqx=out:json`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`Failed to fetch ${sheetConfig.label}`);
+      const data = parseGvizText(await response.text());
+      return (data.table?.rows || [])
+        .map((row) => row.c || [])
+        .map((cells, index) => normalizeReservation(cells, index, sheetConfig))
+        .filter((item) => item.timestamp || item.date || item.name);
+    }
+
+    async function fetchAllReservations() {
+      const groups = await Promise.all(RESERVATION_SHEETS.map(fetchSheetReservations));
+      return groups.flat().sort((a, b) => {
+        const dateA = toSafeDate(a.date);
+        const dateB = toSafeDate(b.date);
+        const timeA = parseTimeForSort(a.time);
+        const timeB = parseTimeForSort(b.time);
+        if (dateA && dateB && dateA.getTime() !== dateB.getTime()) return dateA - dateB;
+        return timeA - timeB;
+      });
+    }
+
+    function renderReservationCard(item) {
+      const past = isPastReservation(item);
+      return `
+        <article class="reservation-card ${past ? "is-past" : ""}">
+          <div class="reservation-top">
+            <div>
+              <h4>${item.name || "Guest"}</h4>
+              <p>${formatDateLabel(item.date)}</p>
+            </div>
+            <div class="badge-row">
+              <span class="badge branch">${item.branch}</span>
+              ${past ? '<span class="badge past">Past</span>' : ""}
+            </div>
+          </div>
+          <div class="reservation-meta">
+            <div class="meta-box">
+              <span>Time</span>
+              <strong>${item.time || "-"}</strong>
+            </div>
+            <div class="meta-box">
+              <span>Guests</span>
+              <strong>${item.people || "-"}</strong>
+            </div>
+            <div class="meta-box">
+              <span>Phone</span>
+              <strong>${item.phone || "-"}</strong>
+            </div>
+            <div class="meta-box">
+              <span>Location</span>
+              <strong>${item.branch}</strong>
+            </div>
+          </div>
+          <div class="reservation-notes">${item.notes || "No notes"}</div>
+          <div class="reservation-actions">
+            <button class="action-btn primary" type="button" data-action="edit" data-sheet="${item.sheetName}" data-row="${item.rowNumber}">Edit Reservation</button>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderMatches() {
+      const resultsPanel = document.getElementById("resultsPanel");
+      const upcomingList = document.getElementById("upcomingList");
+      const pastList = document.getElementById("pastList");
+      const upcomingCount = document.getElementById("upcomingCount");
+      const pastCount = document.getElementById("pastCount");
+      const resultLabel = document.getElementById("resultLabel");
+
+      resultsPanel.hidden = false;
+
+      if (!state.matches.length) {
+        upcomingList.innerHTML = '<div class="empty-state">No reservations were found for this phone number.</div>';
+        pastList.innerHTML = '<div class="empty-state">Past reservations will appear here when they exist.</div>';
+        upcomingCount.textContent = "0 found";
+        pastCount.textContent = "0 found";
+        resultLabel.textContent = "No matches";
+        return;
+      }
+
+      const upcoming = state.matches.filter((item) => !isPastReservation(item));
+      const past = state.matches.filter((item) => isPastReservation(item));
+
+      upcomingList.innerHTML = upcoming.length
+        ? upcoming.map(renderReservationCard).join("")
+        : '<div class="empty-state">No upcoming reservations for this phone number.</div>';
+
+      pastList.innerHTML = past.length
+        ? past.map(renderReservationCard).join("")
+        : '<div class="empty-state">No past reservations for this phone number.</div>';
+
+      upcomingCount.textContent = `${upcoming.length} found`;
+      pastCount.textContent = `${past.length} found`;
+      resultLabel.textContent = `${state.matches.length} total matches`;
+    }
+
+    function buildMutationForm(fields) {
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = APPS_SCRIPT_URL;
+      form.target = "modifySubmitFrame";
+      form.style.display = "none";
+
+      Object.entries(fields).forEach(([key, value]) => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = key;
+        input.value = value;
+        form.appendChild(input);
+      });
+
+      document.body.appendChild(form);
+      form.submit();
+      window.setTimeout(() => form.remove(), 1200);
+    }
+
+    async function rerunSearch() {
+      if (!state.lastSearchDigits) return;
+      state.matches = state.allReservations
+        .filter((item) => item.status !== "removed")
+        .filter((item) => normalizePhoneDigits(item.phone) === state.lastSearchDigits);
+      renderMatches();
+    }
+
+    async function refreshAfterMutation() {
+      window.setTimeout(async () => {
+        state.allReservations = await fetchAllReservations();
+        await rerunSearch();
+      }, 900);
+    }
+
+    function openFeedback(title, message) {
+      feedbackTitle.textContent = title;
+      feedbackMessage.textContent = message;
+      feedbackModal.classList.add("is-open");
+      feedbackModal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeFeedback() {
+      feedbackModal.classList.remove("is-open");
+      feedbackModal.setAttribute("aria-hidden", "true");
+    }
+
+    function openEditor(item) {
+      editorAction.value = "update";
+      editorRowNumber.value = String(item.rowNumber);
+      editorSheetName.value = item.sheetName;
+      editorStatus.value = item.status || "active";
+      editorFields.dateInput.value = item.date || formatInputDate(new Date());
+      editorFields.timeInput.value = item.time || "6:00 PM";
+      editorFields.timeDisplay.textContent = item.time || "6:00 PM";
+      editorFields.peopleInput.value = item.people || "4 guests";
+      editorFields.peopleDisplay.textContent = item.people || "4 guests";
+      editorFields.nameInput.value = item.name || "";
+      editorFields.phoneInput.value = item.phone || "";
+      editorFields.notesInput.value = item.notes || "";
+      editorFields.peopleCustomInput.classList.remove("is-open");
+      editorFields.peopleDisplay.style.display = "";
+      editorFields.renderDateGrid();
+      editorModal.classList.add("is-open");
+      editorModal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeEditor() {
+      editorModal.classList.remove("is-open");
+      editorModal.setAttribute("aria-hidden", "true");
+    }
+
+    function serializeReservationForm(form) {
+      return Object.fromEntries(new FormData(form).entries());
+    }
+
+    function setupReservationForm(container, prefix) {
+      container.innerHTML = `
+        <div class="field full">
+          <label for="${prefix}Date">Date</label>
+          <div class="date-grid" id="${prefix}DateGrid"></div>
+          <input id="${prefix}Date" name="date" type="hidden" required />
+        </div>
+        <div class="field">
+          <label for="${prefix}TimeDisplay">Time</label>
+          <button class="picker-trigger" id="${prefix}TimeDisplay" type="button" data-picker="time" data-prefix="${prefix}">6:00 PM</button>
+          <input id="${prefix}Time" name="time" type="hidden" value="6:00 PM" />
+        </div>
+        <div class="field">
+          <label for="${prefix}PeopleDisplay">Guests</label>
+          <button class="picker-trigger" id="${prefix}PeopleDisplay" type="button" data-picker="people" data-prefix="${prefix}">4 guests</button>
+          <input id="${prefix}PeopleCustom" class="guest-custom-input" type="number" inputmode="numeric" min="2" placeholder="Enter guest count" />
+          <input id="${prefix}People" name="people" type="hidden" value="4 guests" required />
+        </div>
+        <div class="field">
+          <label for="${prefix}Name">Name</label>
+          <input id="${prefix}Name" name="name" type="text" placeholder="Your name" required />
+        </div>
+        <div class="field">
+          <label for="${prefix}Phone">Phone</label>
+          <input id="${prefix}Phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="(437) 123-4567" required />
+        </div>
+        <div class="field full">
+          <label for="${prefix}Notes">Notes</label>
+          <textarea id="${prefix}Notes" name="notes" placeholder="Add any request or occasion."></textarea>
+        </div>
+      `;
+
+      const dateInput = document.getElementById(`${prefix}Date`);
+      const dateGrid = document.getElementById(`${prefix}DateGrid`);
+      const timeInput = document.getElementById(`${prefix}Time`);
+      const peopleInput = document.getElementById(`${prefix}People`);
+      const timeDisplay = document.getElementById(`${prefix}TimeDisplay`);
+      const peopleDisplay = document.getElementById(`${prefix}PeopleDisplay`);
+      const peopleCustomInput = document.getElementById(`${prefix}PeopleCustom`);
+      const nameInput = document.getElementById(`${prefix}Name`);
+      const phoneInput = document.getElementById(`${prefix}Phone`);
+      const notesInput = document.getElementById(`${prefix}Notes`);
+
+      const dateOptions = [];
+      const start = new Date();
+      start.setHours(0, 0, 0, 0);
+      for (let i = 0; i < 10; i += 1) {
+        const optionDate = new Date(start);
+        optionDate.setDate(start.getDate() + i);
+        dateOptions.push(formatInputDate(optionDate));
+      }
+
+      function renderDateGrid() {
+        dateGrid.innerHTML = "";
+        const visibleDates = dateOptions.slice(0, 5);
+
+        visibleDates.forEach((value) => {
+          const date = new Date(value + "T00:00:00");
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "date-chip";
+          if (dateInput.value === value) button.classList.add("is-active");
+          button.innerHTML = `<span>${new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date)}</span><strong>${new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date)}</strong>`;
+          button.addEventListener("click", () => {
+            dateInput.value = value;
+            renderDateGrid();
+          });
+          dateGrid.appendChild(button);
+        });
+
+        const moreButton = document.createElement("button");
+        moreButton.type = "button";
+        moreButton.className = "date-chip more-chip";
+        const selectedIsCustom = dateInput.value && !visibleDates.includes(dateInput.value);
+        moreButton.innerHTML = selectedIsCustom
+          ? `<span>Chosen</span><strong>${formatDisplayDate(dateInput.value)}</strong>`
+          : "<span>More</span><strong>Choose</strong>";
+        if (selectedIsCustom) moreButton.classList.add("is-active");
+        moreButton.addEventListener("click", () => {
+          state.activeForm = prefix;
+          state.calendarCursor = new Date((dateInput.value || dateOptions[0]) + "T00:00:00");
+          openSheet("date");
+        });
+        dateGrid.appendChild(moreButton);
+      }
+
+      phoneInput.addEventListener("input", () => {
+        phoneInput.value = formatPhoneNumber(phoneInput.value);
+      });
+
+      peopleCustomInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          const count = Number.parseInt(peopleCustomInput.value, 10);
+          if (!Number.isFinite(count) || count < 2) return;
+          const value = `${count} guests`;
+          peopleInput.value = value;
+          peopleDisplay.textContent = value;
+          peopleCustomInput.classList.remove("is-open");
+          peopleDisplay.style.display = "";
+        }
+      });
+
+      peopleCustomInput.addEventListener("blur", () => {
+        if (!peopleCustomInput.value.trim()) {
+          peopleCustomInput.classList.remove("is-open");
+          peopleDisplay.style.display = "";
+          return;
+        }
+        const count = Number.parseInt(peopleCustomInput.value, 10);
+        if (!Number.isFinite(count) || count < 2) return;
+        const value = `${count} guests`;
+        peopleInput.value = value;
+        peopleDisplay.textContent = value;
+        peopleCustomInput.classList.remove("is-open");
+        peopleDisplay.style.display = "";
+      });
+
+      timeDisplay.addEventListener("click", () => {
+        state.activeForm = prefix;
+        openSheet("time");
+      });
+
+      peopleDisplay.addEventListener("click", () => {
+        if (peopleCustomInput.classList.contains("is-open")) {
+          peopleCustomInput.classList.remove("is-open");
+          peopleDisplay.style.display = "";
+        }
+        state.activeForm = prefix;
+        openSheet("people");
+      });
+
+      dateInput.value = dateOptions[0];
+      renderDateGrid();
+
+      return {
+        prefix,
+        dateInput,
+        timeInput,
+        peopleInput,
+        timeDisplay,
+        peopleDisplay,
+        peopleCustomInput,
+        nameInput,
+        phoneInput,
+        notesInput,
+        renderDateGrid
+      };
+    }
+
+    const lookupForm = document.getElementById("lookupForm");
+    const lookupPhone = document.getElementById("lookupPhone");
+    const clearResults = document.getElementById("clearResults");
+    const searchStatus = document.getElementById("searchStatus");
+    const editorModal = document.getElementById("editorModal");
+    const editorForm = document.getElementById("editorForm");
+    const editorAction = document.getElementById("editorAction");
+    const editorRowNumber = document.getElementById("editorRowNumber");
+    const editorSheetName = document.getElementById("editorSheetName");
+    const editorStatus = document.getElementById("editorStatus");
+    const editorFields = setupReservationForm(document.getElementById("editorFields"), "editor");
+    const feedbackModal = document.getElementById("feedbackModal");
+    const feedbackTitle = document.getElementById("feedbackTitle");
+    const feedbackMessage = document.getElementById("feedbackMessage");
+    const closeFeedbackModal = document.getElementById("closeFeedbackModal");
+    const sheet = document.getElementById("pickerSheet");
+    const sheetTitle = document.getElementById("pickerTitle");
+    const sheetOptions = document.getElementById("pickerOptions");
+    const sheetClose = document.getElementById("pickerClose");
+    const calendarShell = document.getElementById("calendarShell");
+    const calendarGrid = document.getElementById("calendarGrid");
+    const calendarLabel = document.getElementById("calendarLabel");
+    const calendarPrev = document.getElementById("calendarPrev");
+    const calendarNext = document.getElementById("calendarNext");
+
+    function getFormRefs(prefix) {
+      return prefix === "editor" ? editorFields : editorFields;
+    }
+
+    function closeSheet() {
+      sheet.classList.remove("is-open");
+      sheet.setAttribute("aria-hidden", "true");
+      sheetOptions.innerHTML = "";
+      calendarShell.hidden = true;
+    }
+
+    function openSheet(type) {
+      sheetOptions.innerHTML = "";
+      calendarShell.hidden = true;
+      const refs = getFormRefs(state.activeForm);
+
+      if (type === "date") {
+        sheetTitle.textContent = "Choose date";
+        state.calendarCursor = new Date((refs.dateInput.value || formatInputDate(new Date())) + "T00:00:00");
+        state.calendarCursor = new Date(state.calendarCursor.getFullYear(), state.calendarCursor.getMonth(), 1);
+        calendarShell.hidden = false;
+        renderCalendar();
+        sheet.classList.add("is-open");
+        sheet.setAttribute("aria-hidden", "false");
+        return;
+      }
+
+      sheetTitle.textContent = type === "time" ? "Select time" : "Select guests";
+      const options = type === "time"
+        ? ["6:00 PM","6:30 PM","7:00 PM","7:30 PM","8:00 PM","8:30 PM","9:00 PM","9:30 PM","10:00 PM","10:30 PM","11:00 PM","11:30 PM","12:00 AM","12:30 AM","1:00 AM"]
+        : ["Custom","2 guests","3 guests","4 guests","5 guests","6 guests","7 guests","8 guests"];
+
+      options.forEach((option) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "sheet-option";
+        if (type === "people" && option === "Custom") button.classList.add("is-custom");
+        button.textContent = option;
+        const currentValue = type === "time" ? refs.timeInput.value : refs.peopleInput.value;
+        if (currentValue === option) button.classList.add("is-active");
+        button.addEventListener("click", () => {
+          if (type === "people" && option === "Custom") {
+            closeSheet();
+            refs.peopleDisplay.style.display = "none";
+            refs.peopleCustomInput.classList.add("is-open");
+            refs.peopleCustomInput.value = "";
+            window.setTimeout(() => refs.peopleCustomInput.focus(), 30);
+            return;
+          }
+
+          if (type === "time") {
+            refs.timeInput.value = option;
+            refs.timeDisplay.textContent = option;
+          } else {
+            refs.peopleInput.value = option;
+            refs.peopleDisplay.textContent = option;
+          }
+          closeSheet();
+        });
+        sheetOptions.appendChild(button);
+      });
+
+      sheet.classList.add("is-open");
+      sheet.setAttribute("aria-hidden", "false");
+    }
+
+    function renderCalendar() {
+      const refs = getFormRefs(state.activeForm);
+      calendarGrid.innerHTML = "";
+      calendarLabel.textContent = new Intl.DateTimeFormat("en-US", {
+        month: "long",
+        year: "numeric"
+      }).format(state.calendarCursor);
+
+      const monthStart = new Date(state.calendarCursor.getFullYear(), state.calendarCursor.getMonth(), 1);
+      const monthEnd = new Date(state.calendarCursor.getFullYear(), state.calendarCursor.getMonth() + 1, 0);
+      const firstWeekday = monthStart.getDay();
+      const todayFloor = new Date();
+      todayFloor.setHours(0, 0, 0, 0);
+
+      for (let i = 0; i < firstWeekday; i += 1) {
+        const empty = document.createElement("div");
+        empty.className = "calendar-day is-empty";
+        calendarGrid.appendChild(empty);
+      }
+
+      for (let day = 1; day <= monthEnd.getDate(); day += 1) {
+        const date = new Date(state.calendarCursor.getFullYear(), state.calendarCursor.getMonth(), day);
+        const value = formatInputDate(date);
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "calendar-day";
+        button.textContent = String(day);
+        if (date < todayFloor) {
+          button.classList.add("is-disabled");
+          button.disabled = true;
+        } else {
+          button.addEventListener("click", () => {
+            refs.dateInput.value = value;
+            refs.renderDateGrid();
+            closeSheet();
+          });
+        }
+        if (refs.dateInput.value === value) button.classList.add("is-selected");
+        calendarGrid.appendChild(button);
+      }
+    }
+
+    lookupPhone.addEventListener("input", () => {
+      lookupPhone.value = formatPhoneNumber(lookupPhone.value);
+    });
+
+    lookupForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!isValidPhone(lookupPhone.value)) {
+        openFeedback("Invalid Phone", "Please enter a valid Canadian phone number before searching.");
+        return;
+      }
+
+      const digits = normalizePhoneDigits(lookupPhone.value);
+      state.lastSearchDigits = digits;
+      searchStatus.textContent = "Searching...";
+
+      try {
+        state.allReservations = await fetchAllReservations();
+        await rerunSearch();
+        searchStatus.textContent = "Results loaded";
+      } catch (error) {
+        console.error(error);
+        searchStatus.textContent = "Search failed";
+        openFeedback("Could not Load", "We could not load reservation data right now. Please try again.");
+      }
+    });
+
+    clearResults.addEventListener("click", () => {
+      lookupForm.reset();
+      lookupPhone.value = "";
+      state.lastSearchDigits = "";
+      state.matches = [];
+      document.getElementById("resultsPanel").hidden = true;
+      document.getElementById("resultLabel").textContent = "No search yet";
+      searchStatus.textContent = "Phone lookup";
+    });
+
+    editorForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!isValidPhone(editorFields.phoneInput.value)) {
+        openFeedback("Invalid Phone", "Please enter a valid Canadian phone number before saving.");
+        return;
+      }
+
+      const payload = serializeReservationForm(editorForm);
+      payload.phone = formatPhoneNumber(payload.phone);
+      buildMutationForm(payload);
+      closeEditor();
+      openFeedback("Reservation Updated", "Your booking changes have been saved.");
+      refreshAfterMutation();
+    });
+
+    document.getElementById("closeEditorModal").addEventListener("click", closeEditor);
+    document.getElementById("cancelEditor").addEventListener("click", closeEditor);
+    editorModal.addEventListener("click", (event) => {
+      if (event.target === editorModal) closeEditor();
+    });
+
+    closeFeedbackModal.addEventListener("click", closeFeedback);
+    feedbackModal.addEventListener("click", (event) => {
+      if (event.target === feedbackModal) closeFeedback();
+    });
+
+    document.body.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-action='edit']");
+      if (!button) return;
+      const rowNumber = Number(button.dataset.row);
+      const sheetName = button.dataset.sheet;
+      const reservation = state.matches.find((item) => item.rowNumber === rowNumber && item.sheetName === sheetName);
+      if (!reservation) return;
+      openEditor(reservation);
+    });
+
+    sheetClose.addEventListener("click", closeSheet);
+    sheet.addEventListener("click", (event) => {
+      if (event.target === sheet) closeSheet();
+    });
+
+    calendarPrev.addEventListener("click", () => {
+      state.calendarCursor = new Date(state.calendarCursor.getFullYear(), state.calendarCursor.getMonth() - 1, 1);
+      renderCalendar();
+    });
+
+    calendarNext.addEventListener("click", () => {
+      state.calendarCursor = new Date(state.calendarCursor.getFullYear(), state.calendarCursor.getMonth() + 1, 1);
+      renderCalendar();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        if (sheet.classList.contains("is-open")) {
+          closeSheet();
+        } else if (feedbackModal.classList.contains("is-open")) {
+          closeFeedback();
+        } else if (editorModal.classList.contains("is-open")) {
+          closeEditor();
+        }
+      }
+    });
+  </script>
 </body>
 </html>
