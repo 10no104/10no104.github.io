@@ -1,0 +1,1037 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reserve | EHWA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/global.css?v=20260423-7" />
+  <style>
+    :root {
+      --ink: #201712;
+      --muted: #74665b;
+      --wine: #7b1f2f;
+      --gold: #d4af37;
+      --line: rgba(255, 255, 255, 0.12);
+      --paper-line: rgba(113, 88, 60, 0.18);
+      --shadow: 0 30px 64px rgba(17, 11, 8, 0.2);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 15px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(212, 175, 55, 0.18), transparent 28%),
+        radial-gradient(circle at 86% 12%, rgba(123, 31, 47, 0.12), transparent 24%),
+        linear-gradient(180deg, rgba(251, 247, 241, 0.98) 0%, rgba(245, 239, 228, 0.98) 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.18), rgba(255, 252, 247, 0.06)),
+        url("../assets/pattern.webp") center / 760px auto;
+      opacity: 0.14;
+      pointer-events: none;
+      z-index: -2;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: auto -80px -120px auto;
+      width: 340px;
+      height: 340px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.12), transparent 72%);
+      filter: blur(14px);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .shell {
+      width: min(100% - 18px, 760px);
+      margin: 0 auto;
+      padding: 18px 0 40px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .logo-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 62px;
+      height: 62px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255, 254, 250, 0.98), rgba(243, 231, 215, 0.94));
+      border: 1px solid rgba(73, 53, 36, 0.12);
+      box-shadow: 0 14px 28px rgba(42, 28, 18, 0.1);
+      flex: none;
+    }
+
+    .logo-link img {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+    }
+
+    .brand h1 {
+      margin: 0;
+      color: #2b1e14;
+      font-size: clamp(1.45rem, 6vw, 2.2rem);
+      letter-spacing: -0.05em;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(113, 88, 60, 0.14);
+      background: rgba(255, 251, 245, 0.72);
+      color: #2c2016;
+      font-size: 0.92rem;
+      font-weight: 700;
+      white-space: nowrap;
+      box-shadow: 0 10px 22px rgba(32, 20, 13, 0.05);
+    }
+
+    .booking-card {
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      background:
+        linear-gradient(135deg, rgba(22, 15, 11, 0.96) 0%, rgba(37, 23, 16, 0.94) 45%, rgba(68, 24, 33, 0.92) 100%),
+        url("../assets/pattern.webp") center / 520px auto;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      backdrop-filter: blur(8px);
+    }
+
+    .booking-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at top left, rgba(212, 175, 55, 0.16), transparent 30%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)),
+        url("../assets/pattern.webp") center / 460px auto;
+      opacity: 0.24;
+      pointer-events: none;
+    }
+
+    .booking-form {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 16px;
+      padding: 18px;
+    }
+
+    .field-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    label {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: rgba(255, 248, 240, 0.92);
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 14px 15px;
+      border: 1px solid var(--paper-line);
+      border-radius: var(--radius-md);
+      background: rgba(255, 252, 247, 0.97);
+      color: #1f1712;
+      font: inherit;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    input:focus,
+    textarea:focus,
+    .picker-trigger:focus {
+      border-color: rgba(123, 31, 47, 0.38);
+      box-shadow: 0 0 0 4px rgba(123, 31, 47, 0.1);
+      background: #fff;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #897a6d;
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .picker-trigger {
+      width: 100%;
+      min-height: 53px;
+      padding: 14px 15px;
+      border: 1px solid var(--paper-line);
+      border-radius: var(--radius-md);
+      background: rgba(255, 252, 247, 0.97);
+      color: #1f1712;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+      outline: none;
+      position: relative;
+    }
+
+    .picker-trigger::after {
+      content: "";
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      width: 10px;
+      height: 10px;
+      border-right: 2px solid rgba(60, 44, 30, 0.7);
+      border-bottom: 2px solid rgba(60, 44, 30, 0.7);
+      transform: translateY(-60%) rotate(45deg);
+      pointer-events: none;
+    }
+
+    .date-grid {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .date-chip {
+      width: 100%;
+      min-height: 68px;
+      padding: 10px 8px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 252, 247, 0.96);
+      color: #1f1712;
+      font: inherit;
+      cursor: pointer;
+      text-align: center;
+      transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+    }
+
+    .date-chip span,
+    .date-chip strong {
+      display: block;
+    }
+
+    .date-chip span {
+      margin-bottom: 4px;
+      color: #7f7063;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+    }
+
+    .date-chip strong {
+      font-size: 0.94rem;
+    }
+
+    .date-chip.is-active {
+      border-color: rgba(255, 228, 155, 0.92);
+      background: linear-gradient(135deg, rgba(255, 229, 158, 0.92), rgba(255, 247, 227, 1));
+      box-shadow: 0 12px 22px rgba(17, 11, 8, 0.14);
+      transform: translateY(-1px);
+    }
+
+    .date-chip.more-chip {
+      background: rgba(255, 252, 247, 0.96);
+      color: #1f1712;
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .date-chip.more-chip span,
+    .date-chip.more-chip strong {
+      color: inherit;
+    }
+
+    .date-chip.more-chip.is-active {
+      border-color: rgba(255, 228, 155, 0.92);
+      background: linear-gradient(135deg, rgba(255, 229, 158, 0.92), rgba(255, 247, 227, 1));
+      box-shadow: 0 12px 22px rgba(17, 11, 8, 0.14);
+    }
+
+    .guest-custom-input {
+      display: none;
+    }
+
+    .guest-custom-input.is-open {
+      display: block;
+    }
+
+    .submit-btn {
+      width: 100%;
+      border: 0;
+      cursor: pointer;
+      min-height: 54px;
+      padding: 0 20px;
+      border-radius: 999px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--wine), #b9871f);
+      font: inherit;
+      font-weight: 800;
+      box-shadow: 0 18px 30px rgba(123, 31, 47, 0.22);
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-1px);
+      opacity: 0.97;
+    }
+
+    .modal-backdrop,
+    .sheet-backdrop {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(18, 12, 9, 0.56);
+      backdrop-filter: blur(6px);
+      z-index: 100;
+    }
+
+    .modal-backdrop.is-open {
+      display: flex;
+    }
+
+    .sheet-backdrop.is-open {
+      display: block;
+    }
+
+    .modal {
+      width: min(100%, 420px);
+      padding: 24px;
+      border-radius: 24px;
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(247, 239, 228, 0.98)),
+        url("../assets/pattern.webp") center / 400px auto;
+      border: 1px solid rgba(108, 85, 58, 0.14);
+      box-shadow: 0 28px 54px rgba(18, 12, 9, 0.2);
+    }
+
+    .modal h2 {
+      margin: 0 0 10px;
+      font-size: 1.4rem;
+      letter-spacing: -0.04em;
+    }
+
+    .modal p {
+      margin: 0 0 20px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .modal-btn {
+      width: 100%;
+      border: 0;
+      cursor: pointer;
+      min-height: 46px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--wine), #b9871f);
+      color: #fff;
+      font: inherit;
+      font-weight: 800;
+    }
+
+    .sheet-backdrop {
+      z-index: 110;
+    }
+
+    .picker-sheet {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: 0 auto;
+      width: min(100%, 760px);
+      max-height: min(72vh, 520px);
+      border-radius: 24px 24px 0 0;
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(247, 239, 228, 0.98)),
+        url("../assets/pattern.webp") center / 420px auto;
+      box-shadow: 0 -16px 48px rgba(17, 11, 8, 0.22);
+      overflow: hidden;
+    }
+
+    .sheet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px 18px 12px;
+    }
+
+    .sheet-header h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      letter-spacing: -0.04em;
+    }
+
+    .sheet-close {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .sheet-options {
+      display: grid;
+      gap: 10px;
+      padding: 0 18px 18px;
+      max-height: calc(min(72vh, 520px) - 72px);
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .sheet-option {
+      width: 100%;
+      min-height: 54px;
+      padding: 0 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(113, 88, 60, 0.14);
+      background: rgba(255, 255, 255, 0.76);
+      color: var(--ink);
+      font: inherit;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .sheet-option.is-active {
+      border-color: rgba(123, 31, 47, 0.34);
+      background: rgba(123, 31, 47, 0.08);
+    }
+
+    .sheet-option.is-custom {
+      border-style: dashed;
+      border-color: rgba(123, 31, 47, 0.28);
+      background: linear-gradient(135deg, rgba(123, 31, 47, 0.08), rgba(212, 175, 55, 0.08));
+      color: #6b2230;
+    }
+
+    .calendar-shell {
+      display: grid;
+      gap: 14px;
+      padding: 0 18px 18px;
+    }
+
+    .calendar-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .calendar-nav {
+      width: 40px;
+      height: 40px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(123, 31, 47, 0.08);
+      color: #6b2230;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .calendar-label {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #2e2016;
+      letter-spacing: -0.02em;
+    }
+
+    .calendar-weekdays,
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .calendar-weekdays span {
+      text-align: center;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: #8a7a6d;
+      text-transform: uppercase;
+    }
+
+    .calendar-day {
+      min-height: 48px;
+      border: 1px solid rgba(113, 88, 60, 0.12);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.78);
+      color: #2c2016;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .calendar-day.is-empty {
+      visibility: hidden;
+    }
+
+    .calendar-day.is-disabled {
+      opacity: 0.34;
+      cursor: default;
+    }
+
+    .calendar-day.is-selected {
+      border-color: rgba(255, 216, 110, 0.98);
+      background: linear-gradient(135deg, rgba(255, 225, 140, 0.98), rgba(255, 246, 220, 1));
+      box-shadow: 0 10px 18px rgba(17, 11, 8, 0.12);
+    }
+
+    @media (min-width: 720px) {
+      .shell {
+        width: min(100% - 28px, 960px);
+        padding-top: 24px;
+      }
+
+      .logo-link {
+        width: 72px;
+        height: 72px;
+      }
+
+      .logo-link img {
+        width: 50px;
+        height: 50px;
+      }
+
+      .booking-form {
+        padding: 26px;
+      }
+
+      .field-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .field.full {
+        grid-column: 1 / -1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <a class="logo-link" href="../index.html" aria-label="EHWA home">
+          <img src="../assets/logo-dark.webp" alt="EHWA logo" />
+        </a>
+        <h1>Reservation</h1>
+      </div>
+      <a class="back-link" href="./index.html">Menu</a>
+    </header>
+
+    <section class="booking-card">
+      <form class="booking-form" id="reservationForm" method="POST" action="https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3Iiujn95evZuFiyLNrJUo-_H6rKngdxt0EeBFVw/exec" target="reservationSubmitFrame">
+        <div class="field-grid">
+          <div class="field full">
+            <label for="date">Date</label>
+            <div class="date-grid" id="dateGrid"></div>
+            <input id="date" name="date" type="hidden" required />
+          </div>
+
+          <div class="field">
+            <label for="timeDisplay">Time</label>
+            <button class="picker-trigger" id="timeDisplay" type="button" data-picker="time">6:00 PM</button>
+            <input id="time" name="time" type="hidden" value="6:00 PM" />
+          </div>
+
+          <div class="field">
+            <label for="peopleDisplay">Guests</label>
+            <button class="picker-trigger" id="peopleDisplay" type="button" data-picker="people">4 guests</button>
+            <input id="peopleCustomInput" class="guest-custom-input" type="number" inputmode="numeric" min="2" placeholder="Enter guest count" />
+            <input id="people" name="people" type="hidden" value="4 guests" required />
+          </div>
+
+          <div class="field">
+            <label for="name">Name</label>
+            <input id="name" name="name" type="text" placeholder="Your name" enterkeyhint="next" required />
+          </div>
+
+          <div class="field">
+            <label for="phone">Phone</label>
+            <input id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" enterkeyhint="done" placeholder="Phone number" required />
+          </div>
+
+          <div class="field full">
+            <label for="notes">Notes</label>
+            <textarea id="notes" name="notes" enterkeyhint="done" placeholder="Add any request or occasion."></textarea>
+          </div>
+        </div>
+
+        <button class="submit-btn" type="submit">Request Reservation</button>
+      </form>
+    </section>
+  </div>
+
+  <iframe name="reservationSubmitFrame" hidden></iframe>
+
+  <div class="modal-backdrop" id="reservationModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="reservationModalTitle">
+      <h2 id="reservationModalTitle">Reservation request sent</h2>
+      <p>Your request has been submitted. We will contact you using the phone number you provided.</p>
+      <button class="modal-btn" type="button" id="reservationModalClose">Close</button>
+    </div>
+  </div>
+
+  <div class="sheet-backdrop" id="pickerSheet" aria-hidden="true">
+    <div class="picker-sheet" role="dialog" aria-modal="true" aria-labelledby="pickerTitle">
+      <div class="sheet-header">
+        <h2 id="pickerTitle">Select</h2>
+        <button class="sheet-close" id="pickerClose" type="button">Close</button>
+      </div>
+      <div class="sheet-options" id="pickerOptions"></div>
+      <div class="calendar-shell" id="calendarShell" hidden>
+        <div class="calendar-toolbar">
+          <button class="calendar-nav" id="calendarPrev" type="button" aria-label="Previous month">&lt;</button>
+          <div class="calendar-label" id="calendarLabel">Month</div>
+          <button class="calendar-nav" id="calendarNext" type="button" aria-label="Next month">&gt;</button>
+        </div>
+        <div class="calendar-weekdays">
+          <span>Sun</span>
+          <span>Mon</span>
+          <span>Tue</span>
+          <span>Wed</span>
+          <span>Thu</span>
+          <span>Fri</span>
+          <span>Sat</span>
+        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const form = document.getElementById("reservationForm");
+      const dateInput = document.getElementById("date");
+      const dateGrid = document.getElementById("dateGrid");
+      const timeInput = document.getElementById("time");
+      const peopleInput = document.getElementById("people");
+      const timeDisplay = document.getElementById("timeDisplay");
+      const peopleDisplay = document.getElementById("peopleDisplay");
+      const peopleCustomInput = document.getElementById("peopleCustomInput");
+      const nameInput = document.getElementById("name");
+      const phoneInput = document.getElementById("phone");
+      const notesInput = document.getElementById("notes");
+
+      const modal = document.getElementById("reservationModal");
+      const modalClose = document.getElementById("reservationModalClose");
+
+      const sheet = document.getElementById("pickerSheet");
+      const sheetTitle = document.getElementById("pickerTitle");
+      const sheetOptions = document.getElementById("pickerOptions");
+      const sheetClose = document.getElementById("pickerClose");
+      const calendarShell = document.getElementById("calendarShell");
+      const calendarGrid = document.getElementById("calendarGrid");
+      const calendarLabel = document.getElementById("calendarLabel");
+      const calendarPrev = document.getElementById("calendarPrev");
+      const calendarNext = document.getElementById("calendarNext");
+
+      const pickerConfig = {
+        time: {
+          title: "Select time",
+          input: timeInput,
+          display: timeDisplay,
+          options: [
+            "6:00 PM",
+            "6:30 PM",
+            "7:00 PM",
+            "7:30 PM",
+            "8:00 PM",
+            "8:30 PM",
+            "9:00 PM",
+            "9:30 PM",
+            "10:00 PM",
+            "10:30 PM",
+            "11:00 PM",
+            "11:30 PM",
+            "12:00 AM",
+            "12:30 AM",
+            "1:00 AM"
+          ]
+        },
+        people: {
+          title: "Select guests",
+          input: peopleInput,
+          display: peopleDisplay,
+          options: [
+            "Custom",
+            "2 guests",
+            "3 guests",
+            "4 guests",
+            "5 guests",
+            "6 guests",
+            "7 guests",
+            "8 guests"
+          ]
+        }
+      };
+
+      const pad = (num) => String(num).padStart(2, "0");
+      const formatInputDate = (date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+      const formatDisplayDate = (value) => {
+        if (!value) return "Not selected";
+        const date = new Date(value + "T00:00:00");
+        if (Number.isNaN(date.getTime())) return value;
+        return new Intl.DateTimeFormat("en-US", {
+          weekday: "short",
+          month: "short",
+          day: "numeric"
+        }).format(date);
+      };
+
+      const dateOptions = [];
+      const start = new Date();
+      start.setDate(start.getDate() + 1);
+      for (let i = 0; i < 10; i += 1) {
+        const optionDate = new Date(start);
+        optionDate.setDate(start.getDate() + i);
+        dateOptions.push(formatInputDate(optionDate));
+      }
+      let calendarCursor = new Date(start.getFullYear(), start.getMonth(), 1);
+
+      const renderDateGrid = () => {
+        dateGrid.innerHTML = "";
+        const visibleDates = dateOptions.slice(0, 5);
+
+        visibleDates.forEach((value) => {
+          const date = new Date(value + "T00:00:00");
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "date-chip";
+          if (dateInput.value === value) {
+            button.classList.add("is-active");
+          }
+          button.innerHTML = `<span>${new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date)}</span><strong>${new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date)}</strong>`;
+          button.addEventListener("click", () => {
+            dateInput.value = value;
+            syncDateState();
+          });
+          dateGrid.appendChild(button);
+        });
+
+        const moreButton = document.createElement("button");
+        moreButton.type = "button";
+        moreButton.className = "date-chip more-chip";
+        const selectedIsCustom = dateInput.value && !visibleDates.includes(dateInput.value);
+        moreButton.innerHTML = selectedIsCustom
+          ? `<span>Chosen</span><strong>${formatDisplayDate(dateInput.value)}</strong>`
+          : "<span>More</span><strong>Choose</strong>";
+        if (selectedIsCustom) {
+          moreButton.classList.add("is-active");
+        }
+        moreButton.addEventListener("click", () => {
+          openSheet("date");
+        });
+        dateGrid.appendChild(moreButton);
+      };
+
+      const syncDateState = () => {
+        renderDateGrid();
+      };
+
+      const openModal = () => {
+        modal.classList.add("is-open");
+        modal.setAttribute("aria-hidden", "false");
+      };
+
+      const closeModal = () => {
+        modal.classList.remove("is-open");
+        modal.setAttribute("aria-hidden", "true");
+      };
+
+      const closeSheet = () => {
+        sheet.classList.remove("is-open");
+        sheet.setAttribute("aria-hidden", "true");
+        sheetOptions.innerHTML = "";
+        calendarShell.hidden = true;
+      };
+
+      const openSheet = (key) => {
+        sheetOptions.innerHTML = "";
+        calendarShell.hidden = true;
+
+        if (key === "date") {
+          sheetTitle.textContent = "Choose date";
+          const selectedDate = dateInput.value ? new Date(dateInput.value + "T00:00:00") : new Date();
+          calendarCursor = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+          calendarShell.hidden = false;
+          renderCalendar();
+          sheet.classList.add("is-open");
+          sheet.setAttribute("aria-hidden", "false");
+          return;
+        }
+
+        const config = pickerConfig[key];
+        if (!config) return;
+
+        sheetTitle.textContent = config.title;
+
+        config.options.forEach((option) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "sheet-option";
+          if (key === "people" && option === "Custom") {
+            button.classList.add("is-custom");
+          }
+          button.textContent = option;
+          if (config.input.value === option) {
+            button.classList.add("is-active");
+          }
+          button.addEventListener("click", () => {
+            if (key === "people" && option === "Custom") {
+              closeSheet();
+              peopleDisplay.style.display = "none";
+              peopleCustomInput.classList.add("is-open");
+              peopleCustomInput.value = "";
+              window.setTimeout(() => peopleCustomInput.focus(), 30);
+              return;
+            }
+
+            config.input.value = option;
+            config.display.textContent = option;
+            closeSheet();
+          });
+          sheetOptions.appendChild(button);
+        });
+
+        sheet.classList.add("is-open");
+        sheet.setAttribute("aria-hidden", "false");
+      };
+
+      const applyCustomGuestValue = () => {
+        const count = Number.parseInt(peopleCustomInput.value, 10);
+        if (!Number.isFinite(count) || count < 2) {
+          return;
+        }
+        const value = `${count} guests`;
+        peopleInput.value = value;
+        peopleDisplay.textContent = value;
+        peopleCustomInput.classList.remove("is-open");
+        peopleDisplay.style.display = "";
+      };
+
+      document.querySelectorAll("[data-picker]").forEach((button) => {
+        button.addEventListener("click", () => {
+          openSheet(button.getAttribute("data-picker"));
+        });
+      });
+
+      peopleCustomInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          applyCustomGuestValue();
+        }
+      });
+
+      peopleCustomInput.addEventListener("blur", () => {
+        if (!peopleCustomInput.value.trim()) {
+          peopleCustomInput.classList.remove("is-open");
+          peopleDisplay.style.display = "";
+          return;
+        }
+        applyCustomGuestValue();
+      });
+
+      peopleDisplay.addEventListener("click", () => {
+        if (peopleCustomInput.classList.contains("is-open")) {
+          peopleCustomInput.classList.remove("is-open");
+          peopleDisplay.style.display = "";
+        }
+      });
+
+      const formatPhoneNumber = (value) => {
+        let digits = value.replace(/\D/g, "");
+        if (digits.startsWith("1")) {
+          digits = digits.slice(1);
+        }
+        digits = digits.slice(0, 10);
+        if (digits.length < 4) return digits;
+        if (digits.length < 7) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+        return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+      };
+
+      const isValidCanadianPhone = (value) => {
+        const digits = value.replace(/\D/g, "");
+        return digits.length === 10 || (digits.length === 11 && digits.startsWith("1"));
+      };
+
+      phoneInput.addEventListener("input", () => {
+        phoneInput.value = formatPhoneNumber(phoneInput.value);
+        phoneInput.setCustomValidity("");
+      });
+
+      nameInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          phoneInput.focus();
+        }
+      });
+
+      [phoneInput, notesInput].forEach((input) => {
+        input.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            input.blur();
+          }
+        });
+      });
+
+      form.addEventListener("submit", (event) => {
+        if (!isValidCanadianPhone(phoneInput.value)) {
+          event.preventDefault();
+          phoneInput.setCustomValidity("Please enter a valid Canadian phone number.");
+          phoneInput.reportValidity();
+          phoneInput.focus();
+          return;
+        }
+
+        phoneInput.setCustomValidity("");
+        window.setTimeout(openModal, 250);
+      });
+
+      modalClose.addEventListener("click", closeModal);
+      modal.addEventListener("click", (event) => {
+        if (event.target === modal) {
+          closeModal();
+        }
+      });
+
+      const renderCalendar = () => {
+        calendarGrid.innerHTML = "";
+        calendarLabel.textContent = new Intl.DateTimeFormat("en-US", {
+          month: "long",
+          year: "numeric"
+        }).format(calendarCursor);
+
+        const monthStart = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth(), 1);
+        const monthEnd = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() + 1, 0);
+        const firstWeekday = monthStart.getDay();
+        const todayFloor = new Date();
+        todayFloor.setHours(0, 0, 0, 0);
+        todayFloor.setDate(todayFloor.getDate() + 1);
+
+        for (let i = 0; i < firstWeekday; i += 1) {
+          const empty = document.createElement("div");
+          empty.className = "calendar-day is-empty";
+          calendarGrid.appendChild(empty);
+        }
+
+        for (let day = 1; day <= monthEnd.getDate(); day += 1) {
+          const date = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth(), day);
+          const value = formatInputDate(date);
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "calendar-day";
+          button.textContent = String(day);
+
+          if (date < todayFloor) {
+            button.classList.add("is-disabled");
+            button.disabled = true;
+          } else {
+            button.addEventListener("click", () => {
+              dateInput.value = value;
+              syncDateState();
+              closeSheet();
+            });
+          }
+
+          if (dateInput.value === value) {
+            button.classList.add("is-selected");
+          }
+
+          calendarGrid.appendChild(button);
+        }
+      };
+
+      calendarPrev.addEventListener("click", () => {
+        calendarCursor = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() - 1, 1);
+        renderCalendar();
+      });
+
+      calendarNext.addEventListener("click", () => {
+        calendarCursor = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() + 1, 1);
+        renderCalendar();
+      });
+
+      sheetClose.addEventListener("click", closeSheet);
+      sheet.addEventListener("click", (event) => {
+        if (event.target === sheet) {
+          closeSheet();
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          if (sheet.classList.contains("is-open")) {
+            closeSheet();
+          } else if (modal.classList.contains("is-open")) {
+            closeModal();
+          }
+        }
+      });
+
+      dateInput.value = dateOptions[0];
+      renderDateGrid();
+      syncDateState();
+    })();
+  </script>
+</body>
+</html>
