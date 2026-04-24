@@ -1087,7 +1087,6 @@
         <article class="reservation-card ${item.status === "removed" ? "is-removed" : ""}">
           <div class="reservation-top">
             <div>
-              <h4>${item.name || "Guest"}</h4>
               <p>${formatDateLabel(item.date)}</p>
             </div>
             <span class="status-badge ${status.className}">${status.label}</span>
@@ -1096,6 +1095,10 @@
             <div class="meta-box">
               <span>Time</span>
               <strong>${item.time || "-"}</strong>
+            </div>
+            <div class="meta-box">
+              <span>Name</span>
+              <strong>${item.name || "Guest"}</strong>
             </div>
             <div class="meta-box">
               <span>Guests</span>
