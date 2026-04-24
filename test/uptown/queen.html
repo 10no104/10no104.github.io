@@ -181,8 +181,11 @@
     .next-booking-card {
       padding: 16px;
       border-radius: 18px;
-      background: rgba(255, 250, 244, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background:
+        radial-gradient(circle at top left, rgba(255, 218, 120, 0.28), transparent 32%),
+        linear-gradient(135deg, rgba(123, 31, 47, 0.34), rgba(255, 206, 95, 0.18));
+      border: 1px solid rgba(255, 224, 154, 0.26);
+      box-shadow: inset 0 1px 0 rgba(255, 247, 228, 0.14), 0 18px 34px rgba(10, 7, 5, 0.16);
     }
 
     .next-booking-card span,
@@ -192,21 +195,98 @@
 
     .next-booking-card span {
       margin-bottom: 6px;
-      color: rgba(255, 248, 240, 0.68);
+      color: rgba(255, 239, 196, 0.88);
       font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
 
     .next-booking-card strong {
       margin-bottom: 6px;
-      font-size: 1.52rem;
-      line-height: 1.04;
+      font-size: 1.82rem;
+      line-height: 1;
+      color: #fffaf1;
+      text-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
     }
 
     .next-booking-card p {
       margin: 0;
-      color: rgba(255, 248, 240, 0.84);
-      font-size: 0.96rem;
+      color: rgba(255, 244, 222, 0.92);
+      font-size: 1rem;
       font-weight: 700;
+    }
+
+    .add-panel.is-collapsed .booking-form {
+      display: none;
+    }
+
+    .booking-summary {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255, 250, 244, 0.72);
+      border: 1px solid rgba(109, 86, 59, 0.1);
+    }
+
+    .booking-summary-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .booking-summary-head strong {
+      font-size: 0.92rem;
+      letter-spacing: -0.02em;
+    }
+
+    .booking-summary-head span {
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .booking-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .booking-summary-box {
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(109, 86, 59, 0.08);
+    }
+
+    .booking-summary-box span,
+    .booking-summary-box strong {
+      display: block;
+    }
+
+    .booking-summary-box span {
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .booking-summary-box strong {
+      font-size: 0.96rem;
+      letter-spacing: -0.02em;
+      word-break: break-word;
+    }
+
+    .booking-summary-note {
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.62);
+      color: #3d2c1f;
+      line-height: 1.55;
+      border: 1px solid rgba(109, 86, 59, 0.08);
     }
 
     .layout {
@@ -830,10 +910,10 @@
     </section>
 
     <main class="layout">
-      <section class="panel">
+      <section class="panel add-panel" id="quickAddPanel">
         <div class="panel-head">
           <h3>Add Reservation</h3>
-          <span>Admin input</span>
+          <button class="pill-btn" id="toggleQuickAdd" type="button" aria-expanded="true">Hide</button>
         </div>
 
         <form class="booking-form" id="quickAddForm">
@@ -841,6 +921,7 @@
           <input name="status" type="hidden" value="active" />
           <input name="sheetName" type="hidden" value="Uptown Reservation" />
           <div class="field-grid" id="quickAddFields"></div>
+          <div class="booking-summary" id="quickSummary"></div>
           <div class="form-actions">
             <button class="pill-btn primary" type="submit">Add Reservation</button>
           </div>
@@ -885,6 +966,7 @@
         <input id="editorSheetName" name="sheetName" type="hidden" value="Uptown Reservation" />
         <input id="editorStatus" name="status" type="hidden" value="active" />
         <div class="field-grid" id="editorFields"></div>
+        <div class="booking-summary" id="editorSummary"></div>
         <div class="form-actions">
           <button class="pill-btn" id="cancelEditor" type="button">Cancel</button>
           <button class="pill-btn primary" type="submit">Save Changes</button>
@@ -1249,6 +1331,7 @@
       const nameInput = document.getElementById(`${prefix}Name`);
       const phoneInput = document.getElementById(`${prefix}Phone`);
       const notesInput = document.getElementById(`${prefix}Notes`);
+      const summary = document.getElementById(`${prefix}Summary`);
 
       const dateOptions = [];
       const start = new Date();
@@ -1257,6 +1340,43 @@
         const optionDate = new Date(start);
         optionDate.setDate(start.getDate() + i);
         dateOptions.push(formatInputDate(optionDate));
+      }
+
+      function renderSummary() {
+        if (!summary) return;
+        summary.innerHTML = `
+          <div class="booking-summary-head">
+            <strong>Reservation Preview</strong>
+            <span>${prefix === "editor" ? "Editing live entry" : "Before you submit"}</span>
+          </div>
+          <div class="booking-summary-grid">
+            <div class="booking-summary-box">
+              <span>Date</span>
+              <strong>${dateInput.value ? formatDisplayDate(dateInput.value) : "-"}</strong>
+            </div>
+            <div class="booking-summary-box">
+              <span>Time</span>
+              <strong>${timeInput.value || "-"}</strong>
+            </div>
+            <div class="booking-summary-box">
+              <span>Guests</span>
+              <strong>${peopleInput.value || "-"}</strong>
+            </div>
+            <div class="booking-summary-box">
+              <span>Name</span>
+              <strong>${nameInput.value.trim() || "-"}</strong>
+            </div>
+            <div class="booking-summary-box">
+              <span>Phone</span>
+              <strong>${phoneInput.value.trim() || "-"}</strong>
+            </div>
+            <div class="booking-summary-box">
+              <span>Status</span>
+              <strong>${prefix === "editor" ? "Editing reservation" : "Ready to add"}</strong>
+            </div>
+          </div>
+          <div class="booking-summary-note">${notesInput.value.trim() || "No notes yet."}</div>
+        `;
       }
 
       function renderDateGrid() {
@@ -1273,6 +1393,7 @@
           button.addEventListener("click", () => {
             dateInput.value = value;
             renderDateGrid();
+            renderSummary();
           });
           dateGrid.appendChild(button);
         });
@@ -1295,6 +1416,7 @@
 
       phoneInput.addEventListener("input", () => {
         phoneInput.value = formatPhoneNumber(phoneInput.value);
+        renderSummary();
       });
 
       peopleCustomInput.addEventListener("keydown", (event) => {
@@ -1307,6 +1429,7 @@
           peopleDisplay.textContent = value;
           peopleCustomInput.classList.remove("is-open");
           peopleDisplay.style.display = "";
+          renderSummary();
         }
       });
 
@@ -1323,6 +1446,7 @@
         peopleDisplay.textContent = value;
         peopleCustomInput.classList.remove("is-open");
         peopleDisplay.style.display = "";
+        renderSummary();
       });
 
       timeDisplay.addEventListener("click", () => {
@@ -1339,8 +1463,12 @@
         openSheet("people");
       });
 
+      nameInput.addEventListener("input", renderSummary);
+      notesInput.addEventListener("input", renderSummary);
+
       dateInput.value = dateOptions[0];
       renderDateGrid();
+      renderSummary();
 
       return {
         prefix,
@@ -1353,7 +1481,8 @@
         nameInput,
         phoneInput,
         notesInput,
-        renderDateGrid
+        renderDateGrid,
+        renderSummary
       };
     }
 
@@ -1456,6 +1585,7 @@
             refs.peopleInput.value = option;
             refs.peopleDisplay.textContent = option;
           }
+          refs.renderSummary();
           closeSheet();
         });
         sheetOptions.appendChild(button);
@@ -1499,6 +1629,7 @@
           button.addEventListener("click", () => {
             refs.dateInput.value = value;
             refs.renderDateGrid();
+            refs.renderSummary();
             closeSheet();
           });
         }
@@ -1524,6 +1655,7 @@
       editorFields.peopleCustomInput.classList.remove("is-open");
       editorFields.peopleDisplay.style.display = "";
       editorFields.renderDateGrid();
+      editorFields.renderSummary();
       editorModal.classList.add("is-open");
       editorModal.setAttribute("aria-hidden", "false");
     }
@@ -1573,6 +1705,7 @@
           quickFormFields.phoneInput.value = "";
           quickFormFields.notesInput.value = "";
           quickFormFields.renderDateGrid();
+          quickFormFields.renderSummary();
           openFeedback("Reservation Added", "The new reservation has been submitted.");
         }
         refreshAfterMutation();
@@ -1602,9 +1735,18 @@
     const todayInput = formatInputDate(new Date());
     quickFormFields.dateInput.value = todayInput;
     quickFormFields.renderDateGrid();
+    quickFormFields.renderSummary();
 
     bindFormSubmission(document.getElementById("quickAddForm"));
     bindFormSubmission(editorForm);
+
+    const quickAddPanel = document.getElementById("quickAddPanel");
+    const toggleQuickAdd = document.getElementById("toggleQuickAdd");
+    toggleQuickAdd.addEventListener("click", () => {
+      const collapsed = quickAddPanel.classList.toggle("is-collapsed");
+      toggleQuickAdd.textContent = collapsed ? "Show" : "Hide";
+      toggleQuickAdd.setAttribute("aria-expanded", String(!collapsed));
+    });
 
     document.getElementById("closeEditorModal").addEventListener("click", closeEditor);
     document.getElementById("cancelEditor").addEventListener("click", closeEditor);
