@@ -240,13 +240,6 @@
       pointer-events: none;
     }
 
-    .hidden-native-date {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      pointer-events: none;
-    }
-
     .date-grid {
       position: relative;
       display: grid;
@@ -285,16 +278,16 @@
     }
 
     .date-chip.is-active {
-      border-color: rgba(212, 175, 55, 0.58);
-      background: linear-gradient(135deg, rgba(212, 175, 55, 0.24), rgba(255, 248, 232, 0.98));
-      box-shadow: 0 12px 22px rgba(17, 11, 8, 0.1);
+      border-color: rgba(255, 228, 155, 0.92);
+      background: linear-gradient(135deg, rgba(255, 229, 158, 0.92), rgba(255, 247, 227, 1));
+      box-shadow: 0 12px 22px rgba(17, 11, 8, 0.14);
       transform: translateY(-1px);
     }
 
     .date-chip.more-chip {
-      background: rgba(255, 248, 240, 0.12);
-      color: #fff8f0;
-      border-color: rgba(255, 255, 255, 0.14);
+      background: linear-gradient(135deg, rgba(255, 241, 209, 0.94), rgba(255, 250, 240, 0.98));
+      color: #3a281b;
+      border-color: rgba(245, 220, 154, 0.82);
     }
 
     .date-chip.more-chip span,
@@ -464,6 +457,79 @@
       color: #6b2230;
     }
 
+    .calendar-shell {
+      display: grid;
+      gap: 14px;
+      padding: 0 18px 18px;
+    }
+
+    .calendar-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .calendar-nav {
+      width: 40px;
+      height: 40px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(123, 31, 47, 0.08);
+      color: #6b2230;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .calendar-label {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #2e2016;
+      letter-spacing: -0.02em;
+    }
+
+    .calendar-weekdays,
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .calendar-weekdays span {
+      text-align: center;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: #8a7a6d;
+      text-transform: uppercase;
+    }
+
+    .calendar-day {
+      min-height: 48px;
+      border: 1px solid rgba(113, 88, 60, 0.12);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.78);
+      color: #2c2016;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .calendar-day.is-empty {
+      visibility: hidden;
+    }
+
+    .calendar-day.is-disabled {
+      opacity: 0.34;
+      cursor: default;
+    }
+
+    .calendar-day.is-selected {
+      border-color: rgba(255, 216, 110, 0.98);
+      background: linear-gradient(135deg, rgba(255, 225, 140, 0.98), rgba(255, 246, 220, 1));
+      box-shadow: 0 10px 18px rgba(17, 11, 8, 0.12);
+    }
+
     @media (min-width: 720px) {
       .shell {
         width: min(100% - 28px, 960px);
@@ -513,7 +579,6 @@
             <label for="date">Date</label>
             <div class="date-grid" id="dateGrid"></div>
             <input id="date" name="date" type="hidden" required />
-            <input id="nativeDatePicker" class="hidden-native-date" type="date" />
           </div>
 
           <div class="field">
@@ -567,6 +632,23 @@
         <button class="sheet-close" id="pickerClose" type="button">Close</button>
       </div>
       <div class="sheet-options" id="pickerOptions"></div>
+      <div class="calendar-shell" id="calendarShell" hidden>
+        <div class="calendar-toolbar">
+          <button class="calendar-nav" id="calendarPrev" type="button" aria-label="Previous month">&lt;</button>
+          <div class="calendar-label" id="calendarLabel">Month</div>
+          <button class="calendar-nav" id="calendarNext" type="button" aria-label="Next month">&gt;</button>
+        </div>
+        <div class="calendar-weekdays">
+          <span>Sun</span>
+          <span>Mon</span>
+          <span>Tue</span>
+          <span>Wed</span>
+          <span>Thu</span>
+          <span>Fri</span>
+          <span>Sat</span>
+        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+      </div>
     </div>
   </div>
 
@@ -575,7 +657,6 @@
       const form = document.getElementById("reservationForm");
       const dateInput = document.getElementById("date");
       const dateGrid = document.getElementById("dateGrid");
-      const nativeDatePicker = document.getElementById("nativeDatePicker");
       const timeInput = document.getElementById("time");
       const peopleInput = document.getElementById("people");
       const timeDisplay = document.getElementById("timeDisplay");
@@ -589,6 +670,11 @@
       const sheetTitle = document.getElementById("pickerTitle");
       const sheetOptions = document.getElementById("pickerOptions");
       const sheetClose = document.getElementById("pickerClose");
+      const calendarShell = document.getElementById("calendarShell");
+      const calendarGrid = document.getElementById("calendarGrid");
+      const calendarLabel = document.getElementById("calendarLabel");
+      const calendarPrev = document.getElementById("calendarPrev");
+      const calendarNext = document.getElementById("calendarNext");
 
       const pickerConfig = {
         time: {
@@ -618,14 +704,14 @@
           input: peopleInput,
           display: peopleDisplay,
           options: [
+            "Custom",
             "2 guests",
             "3 guests",
             "4 guests",
             "5 guests",
             "6 guests",
             "7 guests",
-            "8 guests",
-            "Custom"
+            "8 guests"
           ]
         }
       };
@@ -651,6 +737,7 @@
         optionDate.setDate(start.getDate() + i);
         dateOptions.push(formatInputDate(optionDate));
       }
+      let calendarCursor = new Date(start.getFullYear(), start.getMonth(), 1);
 
       const renderDateGrid = () => {
         dateGrid.innerHTML = "";
@@ -674,11 +761,7 @@
         moreButton.className = "date-chip more-chip";
         moreButton.innerHTML = "<span>More</span><strong>Choose</strong>";
         moreButton.addEventListener("click", () => {
-          if (typeof nativeDatePicker.showPicker === "function") {
-            nativeDatePicker.showPicker();
-          } else {
-            nativeDatePicker.click();
-          }
+          openSheet("date");
         });
         dateGrid.appendChild(moreButton);
       };
@@ -704,14 +787,26 @@
         sheet.classList.remove("is-open");
         sheet.setAttribute("aria-hidden", "true");
         sheetOptions.innerHTML = "";
+        calendarShell.hidden = true;
       };
 
       const openSheet = (key) => {
+        sheetOptions.innerHTML = "";
+        calendarShell.hidden = true;
+
+        if (key === "date") {
+          sheetTitle.textContent = "Choose date";
+          calendarShell.hidden = false;
+          renderCalendar();
+          sheet.classList.add("is-open");
+          sheet.setAttribute("aria-hidden", "false");
+          return;
+        }
+
         const config = pickerConfig[key];
         if (!config) return;
 
         sheetTitle.textContent = config.title;
-        sheetOptions.innerHTML = "";
 
         config.options.forEach((option) => {
           const button = document.createElement("button");
@@ -796,6 +891,63 @@
         if (event.target === modal) {
           closeModal();
         }
+      });
+
+      const renderCalendar = () => {
+        calendarGrid.innerHTML = "";
+        calendarLabel.textContent = new Intl.DateTimeFormat("en-US", {
+          month: "long",
+          year: "numeric"
+        }).format(calendarCursor);
+
+        const monthStart = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth(), 1);
+        const monthEnd = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() + 1, 0);
+        const firstWeekday = monthStart.getDay();
+        const todayFloor = new Date();
+        todayFloor.setHours(0, 0, 0, 0);
+        todayFloor.setDate(todayFloor.getDate() + 1);
+
+        for (let i = 0; i < firstWeekday; i += 1) {
+          const empty = document.createElement("div");
+          empty.className = "calendar-day is-empty";
+          calendarGrid.appendChild(empty);
+        }
+
+        for (let day = 1; day <= monthEnd.getDate(); day += 1) {
+          const date = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth(), day);
+          const value = formatInputDate(date);
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "calendar-day";
+          button.textContent = String(day);
+
+          if (date < todayFloor) {
+            button.classList.add("is-disabled");
+            button.disabled = true;
+          } else {
+            button.addEventListener("click", () => {
+              dateInput.value = value;
+              syncDateState();
+              closeSheet();
+            });
+          }
+
+          if (dateInput.value === value) {
+            button.classList.add("is-selected");
+          }
+
+          calendarGrid.appendChild(button);
+        }
+      };
+
+      calendarPrev.addEventListener("click", () => {
+        calendarCursor = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() - 1, 1);
+        renderCalendar();
+      });
+
+      calendarNext.addEventListener("click", () => {
+        calendarCursor = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() + 1, 1);
+        renderCalendar();
       });
 
       sheetClose.addEventListener("click", closeSheet);
