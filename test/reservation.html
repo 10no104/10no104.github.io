@@ -886,13 +886,20 @@
       });
 
       const formatPhoneNumber = (value) => {
-        const digits = value.replace(/\D/g, "").slice(0, 11);
+        let digits = value.replace(/\D/g, "");
+        if (digits.startsWith("1")) {
+          digits = digits.slice(1);
+        }
+        digits = digits.slice(0, 10);
         if (digits.length < 4) return digits;
-        if (digits.length < 8) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
-        return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+        if (digits.length < 7) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+        return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
       };
 
-      const isValidKoreanMobile = (value) => /^01[0-9]-\d{3,4}-\d{4}$/.test(value);
+      const isValidCanadianPhone = (value) => {
+        const digits = value.replace(/\D/g, "");
+        return digits.length === 10 || (digits.length === 11 && digits.startsWith("1"));
+      };
 
       phoneInput.addEventListener("input", () => {
         phoneInput.value = formatPhoneNumber(phoneInput.value);
@@ -915,9 +922,9 @@
       });
 
       form.addEventListener("submit", (event) => {
-        if (!isValidKoreanMobile(phoneInput.value)) {
+        if (!isValidCanadianPhone(phoneInput.value)) {
           event.preventDefault();
-          phoneInput.setCustomValidity("Please enter a valid mobile number.");
+          phoneInput.setCustomValidity("Please enter a valid Canadian phone number.");
           phoneInput.reportValidity();
           phoneInput.focus();
           return;
