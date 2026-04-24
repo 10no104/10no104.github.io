@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/global.css?v=20260423-9" />
+  <link rel="stylesheet" href="../css/global.css?v=20260423-10" />
   <style>
     :root {
       --ink: #211813;
@@ -15,16 +15,14 @@
       --wine: #7b1f2f;
       --gold: #d4af37;
       --line: rgba(109, 86, 59, 0.14);
-      --paper: rgba(255, 251, 245, 0.94);
+      --paper-line: rgba(113, 88, 60, 0.18);
       --shadow: 0 24px 52px rgba(29, 19, 12, 0.1);
       --radius-xl: 28px;
       --radius-lg: 20px;
       --radius-md: 14px;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -49,11 +47,8 @@
       z-index: -1;
     }
 
-    button,
-    input,
-    textarea {
-      font: inherit;
-    }
+    button, input, textarea { font: inherit; }
+    a { color: inherit; text-decoration: none; }
 
     .shell {
       width: min(100% - 18px, 1180px);
@@ -87,7 +82,6 @@
       border: 1px solid rgba(73, 53, 36, 0.12);
       box-shadow: 0 14px 28px rgba(42, 28, 18, 0.1);
       flex: none;
-      text-decoration: none;
     }
 
     .logo-link img {
@@ -111,13 +105,6 @@
       letter-spacing: -0.05em;
     }
 
-    .top-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
     .pill-btn {
       display: inline-flex;
       align-items: center;
@@ -133,7 +120,6 @@
       white-space: nowrap;
       box-shadow: 0 10px 22px rgba(32, 20, 13, 0.05);
       cursor: pointer;
-      text-decoration: none;
     }
 
     .pill-btn.primary {
@@ -177,9 +163,7 @@
     }
 
     .metric-card span,
-    .metric-card strong {
-      display: block;
-    }
+    .metric-card strong { display: block; }
 
     .metric-card span {
       margin-bottom: 6px;
@@ -187,9 +171,7 @@
       font-size: 0.82rem;
     }
 
-    .metric-card strong {
-      font-size: 1.2rem;
-    }
+    .metric-card strong { font-size: 1.2rem; }
 
     .layout {
       display: grid;
@@ -224,6 +206,143 @@
       color: var(--muted);
       font-size: 0.88rem;
       font-weight: 700;
+    }
+
+    .booking-form {
+      display: grid;
+      gap: 16px;
+      padding: 18px;
+    }
+
+    .field-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field label {
+      color: #2b1e14;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 14px 15px;
+      border: 1px solid var(--paper-line);
+      border-radius: var(--radius-md);
+      background: rgba(255, 252, 247, 0.97);
+      color: #1f1712;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    input:focus,
+    textarea:focus,
+    .picker-trigger:focus {
+      border-color: rgba(123, 31, 47, 0.38);
+      box-shadow: 0 0 0 4px rgba(123, 31, 47, 0.1);
+      background: #fff;
+    }
+
+    input::placeholder,
+    textarea::placeholder { color: #897a6d; }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .picker-trigger {
+      width: 100%;
+      min-height: 53px;
+      padding: 14px 15px;
+      border: 1px solid var(--paper-line);
+      border-radius: var(--radius-md);
+      background: rgba(255, 252, 247, 0.97);
+      color: #1f1712;
+      text-align: left;
+      cursor: pointer;
+      outline: none;
+      position: relative;
+    }
+
+    .picker-trigger::after {
+      content: "";
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      width: 10px;
+      height: 10px;
+      border-right: 2px solid rgba(60, 44, 30, 0.7);
+      border-bottom: 2px solid rgba(60, 44, 30, 0.7);
+      transform: translateY(-60%) rotate(45deg);
+      pointer-events: none;
+    }
+
+    .date-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .date-chip {
+      width: 100%;
+      min-height: 68px;
+      padding: 10px 8px;
+      border-radius: 18px;
+      border: 1px solid rgba(113, 88, 60, 0.14);
+      background: rgba(255, 252, 247, 0.96);
+      color: #1f1712;
+      cursor: pointer;
+      text-align: center;
+      transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+    }
+
+    .date-chip span,
+    .date-chip strong { display: block; }
+
+    .date-chip span {
+      margin-bottom: 4px;
+      color: #7f7063;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+    }
+
+    .date-chip strong { font-size: 0.94rem; }
+
+    .date-chip.is-active {
+      border-color: rgba(255, 228, 155, 0.92);
+      background: linear-gradient(135deg, rgba(255, 229, 158, 0.92), rgba(255, 247, 227, 1));
+      box-shadow: 0 12px 22px rgba(17, 11, 8, 0.14);
+      transform: translateY(-1px);
+    }
+
+    .date-chip.more-chip {
+      background: rgba(255, 252, 247, 0.96);
+      color: #1f1712;
+      border-color: rgba(113, 88, 60, 0.14);
+    }
+
+    .date-chip.more-chip.is-active {
+      border-color: rgba(255, 228, 155, 0.92);
+      background: linear-gradient(135deg, rgba(255, 229, 158, 0.92), rgba(255, 247, 227, 1));
+      box-shadow: 0 12px 22px rgba(17, 11, 8, 0.14);
+    }
+
+    .guest-custom-input { display: none; }
+    .guest-custom-input.is-open { display: block; }
+
+    .form-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
     }
 
     .control-row {
@@ -339,9 +458,7 @@
     }
 
     .meta-box span,
-    .meta-box strong {
-      display: block;
-    }
+    .meta-box strong { display: block; }
 
     .meta-box span {
       margin-bottom: 4px;
@@ -349,9 +466,7 @@
       font-size: 0.78rem;
     }
 
-    .meta-box strong {
-      font-size: 0.96rem;
-    }
+    .meta-box strong { font-size: 0.96rem; }
 
     .reservation-notes {
       padding: 12px 14px;
@@ -390,42 +505,14 @@
       border: 1px solid rgba(113, 88, 60, 0.1);
     }
 
-    .side-grid {
-      display: grid;
-      gap: 16px;
-    }
-
-    .staff-list {
-      display: grid;
-      gap: 10px;
-      padding: 18px;
-    }
-
-    .staff-item {
-      display: grid;
-      gap: 4px;
-      padding: 14px;
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.74);
-      border: 1px solid rgba(113, 88, 60, 0.08);
-    }
-
-    .staff-item strong {
-      font-size: 0.96rem;
-    }
-
-    .staff-item span {
-      color: var(--muted);
-      font-size: 0.88rem;
-    }
-
     .empty-state {
       padding: 18px;
       color: var(--muted);
       font-size: 0.96rem;
     }
 
-    .modal-backdrop {
+    .modal-backdrop,
+    .sheet-backdrop {
       position: fixed;
       inset: 0;
       display: none;
@@ -437,12 +524,11 @@
       z-index: 100;
     }
 
-    .modal-backdrop.is-open {
-      display: flex;
-    }
+    .modal-backdrop.is-open { display: flex; }
+    .sheet-backdrop.is-open { display: block; }
 
     .modal {
-      width: min(100%, 520px);
+      width: min(100%, 560px);
       padding: 22px;
       border-radius: 24px;
       background:
@@ -478,73 +564,159 @@
       cursor: pointer;
     }
 
-    .admin-form {
+    .picker-sheet {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: 0 auto;
+      width: min(100%, 760px);
+      max-height: min(72vh, 520px);
+      border-radius: 24px 24px 0 0;
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(247, 239, 228, 0.98)),
+        url("../assets/pattern.webp") center / 420px auto;
+      box-shadow: 0 -16px 48px rgba(17, 11, 8, 0.22);
+      overflow: hidden;
+    }
+
+    .sheet-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px 18px 12px;
+    }
+
+    .sheet-header h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      letter-spacing: -0.04em;
+    }
+
+    .sheet-close {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .sheet-options {
+      display: grid;
+      gap: 10px;
+      padding: 0 18px 18px;
+      max-height: calc(min(72vh, 520px) - 72px);
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .sheet-option {
+      width: 100%;
+      min-height: 54px;
+      padding: 0 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(113, 88, 60, 0.14);
+      background: rgba(255, 255, 255, 0.76);
+      color: var(--ink);
+      font: inherit;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .sheet-option.is-active {
+      border-color: rgba(123, 31, 47, 0.34);
+      background: rgba(123, 31, 47, 0.08);
+    }
+
+    .sheet-option.is-custom {
+      border-style: dashed;
+      border-color: rgba(123, 31, 47, 0.28);
+      background: linear-gradient(135deg, rgba(123, 31, 47, 0.08), rgba(212, 175, 55, 0.08));
+      color: #6b2230;
+    }
+
+    .calendar-shell {
       display: grid;
       gap: 14px;
+      padding: 0 18px 18px;
     }
 
-    .admin-grid {
-      display: grid;
-      gap: 12px;
-    }
-
-    .admin-field {
-      display: grid;
-      gap: 8px;
-    }
-
-    .admin-field label {
-      color: #2b1e14;
-      font-size: 0.9rem;
-      font-weight: 700;
-    }
-
-    .admin-field input,
-    .admin-field textarea {
-      width: 100%;
-      padding: 13px 14px;
-      border: 1px solid rgba(113, 88, 60, 0.18);
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.92);
-      color: #1f1712;
-      outline: none;
-    }
-
-    .admin-field textarea {
-      min-height: 110px;
-      resize: vertical;
-    }
-
-    .admin-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+    .calendar-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       gap: 10px;
     }
 
-    @media (min-width: 720px) {
-      .admin-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
+    .calendar-nav {
+      width: 40px;
+      height: 40px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(123, 31, 47, 0.08);
+      color: #6b2230;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
 
-      .admin-field.full {
-        grid-column: 1 / -1;
-      }
+    .calendar-label {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #2e2016;
+      letter-spacing: -0.02em;
+    }
+
+    .calendar-weekdays,
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .calendar-weekdays span {
+      text-align: center;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: #8a7a6d;
+      text-transform: uppercase;
+    }
+
+    .calendar-day {
+      min-height: 48px;
+      border: 1px solid rgba(113, 88, 60, 0.12);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.78);
+      color: #2c2016;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .calendar-day.is-empty { visibility: hidden; }
+    .calendar-day.is-disabled { opacity: 0.34; cursor: default; }
+    .calendar-day.is-selected {
+      border-color: rgba(255, 216, 110, 0.98);
+      background: linear-gradient(135deg, rgba(255, 225, 140, 0.98), rgba(255, 246, 220, 1));
+      box-shadow: 0 10px 18px rgba(17, 11, 8, 0.12);
+    }
+
+    @media (min-width: 720px) {
+      .field-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .field.full { grid-column: 1 / -1; }
+      .form-actions { grid-template-columns: 1fr 1fr; }
     }
 
     @media (min-width: 980px) {
       .layout {
-        grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+        grid-template-columns: minmax(360px, 0.92fr) minmax(0, 1.08fr);
         align-items: start;
       }
 
-      .side-grid {
-        position: sticky;
-        top: 18px;
-      }
-
-      .metric-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-      }
+      .metric-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     }
   </style>
 </head>
@@ -560,15 +732,11 @@
           <h1>Floor Dashboard</h1>
         </div>
       </div>
-      <div class="top-actions">
-        <button class="pill-btn primary" id="openAddModal" type="button">Add Reservation</button>
-        <a class="pill-btn" href="./reservation.html">Guest Form</a>
-      </div>
+      <a class="pill-btn" href="./reservation.html">Guest Form</a>
     </header>
 
     <section class="hero">
-      <h2>Manage today’s bookings in one glance.</h2>
-      <p>Today is the default view. Switch to weekly, monthly, or full history when you need a wider range.</p>
+      <h2 id="todayHeading">Today</h2>
       <div class="metric-grid">
         <div class="metric-card">
           <span>Total Covers</span>
@@ -592,6 +760,23 @@
     <main class="layout">
       <section class="panel">
         <div class="panel-head">
+          <h3>Add Reservation</h3>
+          <span>Admin input</span>
+        </div>
+
+        <form class="booking-form" id="quickAddForm">
+          <input name="action" type="hidden" value="create" />
+          <input name="status" type="hidden" value="active" />
+          <div class="field-grid" id="quickAddFields"></div>
+          <div class="form-actions">
+            <button class="pill-btn" id="openFullEditor" type="button">Open Full Editor</button>
+            <button class="pill-btn primary" type="submit">Add Reservation</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
           <h3>Reservations</h3>
           <span id="reservationDateLabel">Loading</span>
         </div>
@@ -611,49 +796,6 @@
 
         <div class="reservation-list" id="reservationList"></div>
       </section>
-
-      <aside class="side-grid">
-        <section class="panel">
-          <div class="panel-head">
-            <h3>Add Reservation</h3>
-            <span>Admin input</span>
-          </div>
-          <form class="admin-form" id="quickAddForm" style="padding:18px;">
-            <input name="action" type="hidden" value="create" />
-            <input name="status" type="hidden" value="active" />
-            <div class="admin-grid">
-              <div class="admin-field">
-                <label for="quickDate">Date</label>
-                <input id="quickDate" name="date" type="date" required />
-              </div>
-              <div class="admin-field">
-                <label for="quickTime">Time</label>
-                <input id="quickTime" name="time" type="text" placeholder="6:00 PM" required />
-              </div>
-              <div class="admin-field">
-                <label for="quickPeople">Guests</label>
-                <input id="quickPeople" name="people" type="text" placeholder="4 guests" required />
-              </div>
-              <div class="admin-field">
-                <label for="quickName">Name</label>
-                <input id="quickName" name="name" type="text" required />
-              </div>
-              <div class="admin-field">
-                <label for="quickPhone">Phone</label>
-                <input id="quickPhone" name="phone" type="text" required />
-              </div>
-              <div class="admin-field full">
-                <label for="quickNotes">Notes</label>
-                <textarea id="quickNotes" name="notes"></textarea>
-              </div>
-            </div>
-            <div class="admin-actions" style="margin-top:14px;">
-              <button class="pill-btn" id="openAddModal" type="button">Open Full Editor</button>
-              <button class="pill-btn primary" type="submit">Add Reservation</button>
-            </div>
-          </form>
-        </section>
-      </aside>
     </main>
   </div>
 
@@ -662,47 +804,40 @@
   <div class="modal-backdrop" id="editorModal" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="editorTitle">
       <div class="modal-head">
-        <h3 id="editorTitle">Add Reservation</h3>
+        <h3 id="editorTitle">Edit Reservation</h3>
         <button class="modal-close" id="closeEditorModal" type="button">×</button>
       </div>
-
-      <form class="admin-form" id="editorForm">
-        <input id="editorAction" name="action" type="hidden" value="create" />
+      <form class="booking-form" id="editorForm">
+        <input id="editorAction" name="action" type="hidden" value="update" />
         <input id="editorRowNumber" name="rowNumber" type="hidden" value="" />
         <input id="editorStatus" name="status" type="hidden" value="active" />
-
-        <div class="admin-grid">
-          <div class="admin-field">
-            <label for="editorDate">Date</label>
-            <input id="editorDate" name="date" type="date" required />
-          </div>
-          <div class="admin-field">
-            <label for="editorTime">Time</label>
-            <input id="editorTime" name="time" type="text" placeholder="6:00 PM" required />
-          </div>
-          <div class="admin-field">
-            <label for="editorPeople">Guests</label>
-            <input id="editorPeople" name="people" type="text" placeholder="4 guests" required />
-          </div>
-          <div class="admin-field">
-            <label for="editorName">Name</label>
-            <input id="editorName" name="name" type="text" required />
-          </div>
-          <div class="admin-field">
-            <label for="editorPhone">Phone</label>
-            <input id="editorPhone" name="phone" type="text" required />
-          </div>
-          <div class="admin-field full">
-            <label for="editorNotes">Notes</label>
-            <textarea id="editorNotes" name="notes"></textarea>
-          </div>
-        </div>
-
-        <div class="admin-actions">
+        <div class="field-grid" id="editorFields"></div>
+        <div class="form-actions">
           <button class="pill-btn" id="cancelEditor" type="button">Cancel</button>
-          <button class="pill-btn primary" type="submit">Save</button>
+          <button class="pill-btn primary" type="submit">Save Changes</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <div class="sheet-backdrop" id="pickerSheet" aria-hidden="true">
+    <div class="picker-sheet" role="dialog" aria-modal="true" aria-labelledby="pickerTitle">
+      <div class="sheet-header">
+        <h2 id="pickerTitle">Select</h2>
+        <button class="sheet-close" id="pickerClose" type="button">Close</button>
+      </div>
+      <div class="sheet-options" id="pickerOptions"></div>
+      <div class="calendar-shell" id="calendarShell" hidden>
+        <div class="calendar-toolbar">
+          <button class="calendar-nav" id="calendarPrev" type="button" aria-label="Previous month">&lt;</button>
+          <div class="calendar-label" id="calendarLabel">Month</div>
+          <button class="calendar-nav" id="calendarNext" type="button" aria-label="Next month">&gt;</button>
+        </div>
+        <div class="calendar-weekdays">
+          <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+      </div>
     </div>
   </div>
 
@@ -717,15 +852,14 @@
     const state = {
       reservations: [],
       range: "today",
-      showRemoved: false
+      showRemoved: false,
+      activeForm: "quick",
+      calendarCursor: null
     };
 
     function parseGvizText(text = "") {
       return JSON.parse(
-        text
-          .replace("/*O_o*/", "")
-          .replace("google.visualization.Query.setResponse(", "")
-          .slice(0, -2)
+        text.replace("/*O_o*/", "").replace("google.visualization.Query.setResponse(", "").slice(0, -2)
       );
     }
 
@@ -766,6 +900,17 @@
       return Number.isFinite(count) ? count : 0;
     }
 
+    function parseTimeForSort(value = "") {
+      const match = String(value).trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+      if (!match) return Number.MAX_SAFE_INTEGER;
+      let hour = Number(match[1]);
+      const minute = Number(match[2]);
+      const meridiem = match[3].toUpperCase();
+      if (meridiem === "PM" && hour !== 12) hour += 12;
+      if (meridiem === "AM" && hour === 12) hour = 0;
+      return hour * 60 + minute;
+    }
+
     async function fetchReservations() {
       const { sheetId, gid } = ADMIN_SHEET_CONFIG;
       const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?gid=${gid}&tqx=out:json`;
@@ -775,7 +920,17 @@
       return (data.table?.rows || [])
         .map((row) => row.c || [])
         .map((cells, index) => normalizeReservation(cells, index))
-        .filter((item) => item.timestamp || item.date || item.name);
+        .filter((item) => item.timestamp || item.date || item.name)
+        .sort((a, b) => {
+          const dateA = toSafeDate(a.date);
+          const dateB = toSafeDate(b.date);
+          const timeA = parseTimeForSort(a.time);
+          const timeB = parseTimeForSort(b.time);
+          if (dateA && dateB && dateA.getTime() !== dateB.getTime()) {
+            return dateA - dateB;
+          }
+          return timeA - timeB;
+        });
     }
 
     function formatDateLabel(value = "") {
@@ -848,15 +1003,11 @@
           <div class="reservation-top">
             <div>
               <h4>${item.name || "Guest"}</h4>
-              <p>${item.time || "Time not set"} arrival</p>
+              <p>${formatDateLabel(item.date)} · ${item.time || "Time not set"}</p>
             </div>
             <span class="status-badge ${status.className}">${status.label}</span>
           </div>
           <div class="reservation-meta">
-            <div class="meta-box">
-              <span>Date</span>
-              <strong>${formatDateLabel(item.date)}</strong>
-            </div>
             <div class="meta-box">
               <span>Guests</span>
               <strong>${item.people || "-"}</strong>
@@ -864,10 +1015,6 @@
             <div class="meta-box">
               <span>Phone</span>
               <strong>${item.phone || "-"}</strong>
-            </div>
-            <div class="meta-box">
-              <span>Row</span>
-              <strong>#${item.rowNumber}</strong>
             </div>
           </div>
           <div class="reservation-notes">${item.notes || "No notes"}</div>
@@ -941,39 +1088,319 @@
       }, 900);
     }
 
+    function formatPhoneNumber(value) {
+      let digits = String(value || "").replace(/\D/g, "");
+      if (digits.startsWith("1")) digits = digits.slice(1);
+      digits = digits.slice(0, 10);
+      if (digits.length < 4) return digits;
+      if (digits.length < 7) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+      return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+    }
+
+    function setupReservationForm(container, prefix) {
+      container.innerHTML = `
+        <div class="field full">
+          <label for="${prefix}Date">Date</label>
+          <div class="date-grid" id="${prefix}DateGrid"></div>
+          <input id="${prefix}Date" name="date" type="hidden" required />
+        </div>
+        <div class="field">
+          <label for="${prefix}TimeDisplay">Time</label>
+          <button class="picker-trigger" id="${prefix}TimeDisplay" type="button" data-picker="time" data-prefix="${prefix}">6:00 PM</button>
+          <input id="${prefix}Time" name="time" type="hidden" value="6:00 PM" />
+        </div>
+        <div class="field">
+          <label for="${prefix}PeopleDisplay">Guests</label>
+          <button class="picker-trigger" id="${prefix}PeopleDisplay" type="button" data-picker="people" data-prefix="${prefix}">4 guests</button>
+          <input id="${prefix}PeopleCustom" class="guest-custom-input" type="number" inputmode="numeric" min="2" placeholder="Enter guest count" />
+          <input id="${prefix}People" name="people" type="hidden" value="4 guests" required />
+        </div>
+        <div class="field">
+          <label for="${prefix}Name">Name</label>
+          <input id="${prefix}Name" name="name" type="text" placeholder="Your name" required />
+        </div>
+        <div class="field">
+          <label for="${prefix}Phone">Phone</label>
+          <input id="${prefix}Phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="Phone number" required />
+        </div>
+        <div class="field full">
+          <label for="${prefix}Notes">Notes</label>
+          <textarea id="${prefix}Notes" name="notes" placeholder="Add any request or occasion."></textarea>
+        </div>
+      `;
+
+      const dateInput = document.getElementById(`${prefix}Date`);
+      const dateGrid = document.getElementById(`${prefix}DateGrid`);
+      const timeInput = document.getElementById(`${prefix}Time`);
+      const peopleInput = document.getElementById(`${prefix}People`);
+      const timeDisplay = document.getElementById(`${prefix}TimeDisplay`);
+      const peopleDisplay = document.getElementById(`${prefix}PeopleDisplay`);
+      const peopleCustomInput = document.getElementById(`${prefix}PeopleCustom`);
+      const nameInput = document.getElementById(`${prefix}Name`);
+      const phoneInput = document.getElementById(`${prefix}Phone`);
+      const notesInput = document.getElementById(`${prefix}Notes`);
+
+      const dateOptions = [];
+      const start = new Date();
+      start.setDate(start.getDate() + 1);
+      for (let i = 0; i < 10; i += 1) {
+        const optionDate = new Date(start);
+        optionDate.setDate(start.getDate() + i);
+        dateOptions.push(formatInputDate(optionDate));
+      }
+
+      function renderDateGrid() {
+        dateGrid.innerHTML = "";
+        const visibleDates = dateOptions.slice(0, 5);
+
+        visibleDates.forEach((value) => {
+          const date = new Date(value + "T00:00:00");
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "date-chip";
+          if (dateInput.value === value) button.classList.add("is-active");
+          button.innerHTML = `<span>${new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date)}</span><strong>${new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date)}</strong>`;
+          button.addEventListener("click", () => {
+            dateInput.value = value;
+            renderDateGrid();
+          });
+          dateGrid.appendChild(button);
+        });
+
+        const moreButton = document.createElement("button");
+        moreButton.type = "button";
+        moreButton.className = "date-chip more-chip";
+        const selectedIsCustom = dateInput.value && !visibleDates.includes(dateInput.value);
+        moreButton.innerHTML = selectedIsCustom
+          ? `<span>Chosen</span><strong>${formatDisplayDate(dateInput.value)}</strong>`
+          : "<span>More</span><strong>Choose</strong>";
+        if (selectedIsCustom) moreButton.classList.add("is-active");
+        moreButton.addEventListener("click", () => {
+          state.activeForm = prefix;
+          state.calendarCursor = new Date((dateInput.value || dateOptions[0]) + "T00:00:00");
+          openSheet("date");
+        });
+        dateGrid.appendChild(moreButton);
+      }
+
+      phoneInput.addEventListener("input", () => {
+        phoneInput.value = formatPhoneNumber(phoneInput.value);
+      });
+
+      peopleCustomInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          const count = Number.parseInt(peopleCustomInput.value, 10);
+          if (!Number.isFinite(count) || count < 2) return;
+          const value = `${count} guests`;
+          peopleInput.value = value;
+          peopleDisplay.textContent = value;
+          peopleCustomInput.classList.remove("is-open");
+          peopleDisplay.style.display = "";
+        }
+      });
+
+      peopleCustomInput.addEventListener("blur", () => {
+        if (!peopleCustomInput.value.trim()) {
+          peopleCustomInput.classList.remove("is-open");
+          peopleDisplay.style.display = "";
+          return;
+        }
+        const count = Number.parseInt(peopleCustomInput.value, 10);
+        if (!Number.isFinite(count) || count < 2) return;
+        const value = `${count} guests`;
+        peopleInput.value = value;
+        peopleDisplay.textContent = value;
+        peopleCustomInput.classList.remove("is-open");
+        peopleDisplay.style.display = "";
+      });
+
+      timeDisplay.addEventListener("click", () => {
+        state.activeForm = prefix;
+        openSheet("time");
+      });
+
+      peopleDisplay.addEventListener("click", () => {
+        if (peopleCustomInput.classList.contains("is-open")) {
+          peopleCustomInput.classList.remove("is-open");
+          peopleDisplay.style.display = "";
+        }
+        state.activeForm = prefix;
+        openSheet("people");
+      });
+
+      dateInput.value = dateOptions[0];
+      renderDateGrid();
+
+      return {
+        prefix,
+        dateInput,
+        timeInput,
+        peopleInput,
+        timeDisplay,
+        peopleDisplay,
+        peopleCustomInput,
+        nameInput,
+        phoneInput,
+        notesInput,
+        renderDateGrid
+      };
+    }
+
+    function formatInputDate(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function formatDisplayDate(value = "") {
+      const date = toSafeDate(value);
+      if (!date) return "Not selected";
+      return new Intl.DateTimeFormat("en-US", {
+        weekday: "short",
+        month: "short",
+        day: "numeric"
+      }).format(date);
+    }
+
+    const quickFormFields = setupReservationForm(document.getElementById("quickAddFields"), "quick");
+
     const editorModal = document.getElementById("editorModal");
     const editorTitle = document.getElementById("editorTitle");
     const editorForm = document.getElementById("editorForm");
     const editorAction = document.getElementById("editorAction");
     const editorRowNumber = document.getElementById("editorRowNumber");
     const editorStatus = document.getElementById("editorStatus");
-    const editorDate = document.getElementById("editorDate");
-    const editorTime = document.getElementById("editorTime");
-    const editorPeople = document.getElementById("editorPeople");
-    const editorName = document.getElementById("editorName");
-    const editorPhone = document.getElementById("editorPhone");
-    const editorNotes = document.getElementById("editorNotes");
+    const editorFields = setupReservationForm(document.getElementById("editorFields"), "editor");
 
-    function openEditor(item = null) {
-      if (item) {
-        editorTitle.textContent = "Edit Reservation";
-        editorAction.value = "update";
-        editorRowNumber.value = String(item.rowNumber);
-        editorStatus.value = item.status || "active";
-        editorDate.value = item.date || "";
-        editorTime.value = item.time || "";
-        editorPeople.value = item.people || "";
-        editorName.value = item.name || "";
-        editorPhone.value = item.phone || "";
-        editorNotes.value = item.notes || "";
-      } else {
-        editorTitle.textContent = "Add Reservation";
-        editorAction.value = "create";
-        editorRowNumber.value = "";
-        editorStatus.value = "active";
-        editorForm.reset();
+    const sheet = document.getElementById("pickerSheet");
+    const sheetTitle = document.getElementById("pickerTitle");
+    const sheetOptions = document.getElementById("pickerOptions");
+    const sheetClose = document.getElementById("pickerClose");
+    const calendarShell = document.getElementById("calendarShell");
+    const calendarGrid = document.getElementById("calendarGrid");
+    const calendarLabel = document.getElementById("calendarLabel");
+    const calendarPrev = document.getElementById("calendarPrev");
+    const calendarNext = document.getElementById("calendarNext");
+
+    function getFormRefs(prefix) {
+      return prefix === "editor" ? editorFields : quickFormFields;
+    }
+
+    function closeSheet() {
+      sheet.classList.remove("is-open");
+      sheet.setAttribute("aria-hidden", "true");
+      sheetOptions.innerHTML = "";
+      calendarShell.hidden = true;
+    }
+
+    function openSheet(type) {
+      sheetOptions.innerHTML = "";
+      calendarShell.hidden = true;
+      const refs = getFormRefs(state.activeForm);
+
+      if (type === "date") {
+        sheetTitle.textContent = "Choose date";
+        state.calendarCursor = new Date((refs.dateInput.value || formatInputDate(new Date())) + "T00:00:00");
+        state.calendarCursor = new Date(state.calendarCursor.getFullYear(), state.calendarCursor.getMonth(), 1);
+        calendarShell.hidden = false;
+        renderCalendar();
+        sheet.classList.add("is-open");
+        sheet.setAttribute("aria-hidden", "false");
+        return;
       }
 
+      sheetTitle.textContent = type === "time" ? "Select time" : "Select guests";
+      const options = type === "time"
+        ? ["6:00 PM","6:30 PM","7:00 PM","7:30 PM","8:00 PM","8:30 PM","9:00 PM","9:30 PM","10:00 PM","10:30 PM","11:00 PM","11:30 PM","12:00 AM","12:30 AM","1:00 AM"]
+        : ["Custom","2 guests","3 guests","4 guests","5 guests","6 guests","7 guests","8 guests"];
+
+      options.forEach((option) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "sheet-option";
+        if (type === "people" && option === "Custom") button.classList.add("is-custom");
+        button.textContent = option;
+        const currentValue = type === "time" ? refs.timeInput.value : refs.peopleInput.value;
+        if (currentValue === option) button.classList.add("is-active");
+        button.addEventListener("click", () => {
+          if (type === "people" && option === "Custom") {
+            closeSheet();
+            refs.peopleDisplay.style.display = "none";
+            refs.peopleCustomInput.classList.add("is-open");
+            refs.peopleCustomInput.value = "";
+            window.setTimeout(() => refs.peopleCustomInput.focus(), 30);
+            return;
+          }
+
+          if (type === "time") {
+            refs.timeInput.value = option;
+            refs.timeDisplay.textContent = option;
+          } else {
+            refs.peopleInput.value = option;
+            refs.peopleDisplay.textContent = option;
+          }
+          closeSheet();
+        });
+        sheetOptions.appendChild(button);
+      });
+
+      sheet.classList.add("is-open");
+      sheet.setAttribute("aria-hidden", "false");
+    }
+
+    function renderCalendar() {
+      const refs = getFormRefs(state.activeForm);
+      calendarGrid.innerHTML = "";
+      calendarLabel.textContent = new Intl.DateTimeFormat("en-US", {
+        month: "long",
+        year: "numeric"
+      }).format(state.calendarCursor);
+
+      const monthStart = new Date(state.calendarCursor.getFullYear(), state.calendarCursor.getMonth(), 1);
+      const monthEnd = new Date(state.calendarCursor.getFullYear(), state.calendarCursor.getMonth() + 1, 0);
+      const firstWeekday = monthStart.getDay();
+
+      for (let i = 0; i < firstWeekday; i += 1) {
+        const empty = document.createElement("div");
+        empty.className = "calendar-day is-empty";
+        calendarGrid.appendChild(empty);
+      }
+
+      for (let day = 1; day <= monthEnd.getDate(); day += 1) {
+        const date = new Date(state.calendarCursor.getFullYear(), state.calendarCursor.getMonth(), day);
+        const value = formatInputDate(date);
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "calendar-day";
+        button.textContent = String(day);
+        if (refs.dateInput.value === value) button.classList.add("is-selected");
+        button.addEventListener("click", () => {
+          refs.dateInput.value = value;
+          refs.renderDateGrid();
+          closeSheet();
+        });
+        calendarGrid.appendChild(button);
+      }
+    }
+
+    function openEditor(item) {
+      editorTitle.textContent = "Edit Reservation";
+      editorAction.value = "update";
+      editorRowNumber.value = String(item.rowNumber);
+      editorStatus.value = item.status || "active";
+      editorFields.dateInput.value = item.date || formatInputDate(new Date());
+      editorFields.timeInput.value = item.time || "6:00 PM";
+      editorFields.timeDisplay.textContent = item.time || "6:00 PM";
+      editorFields.peopleInput.value = item.people || "4 guests";
+      editorFields.peopleDisplay.textContent = item.people || "4 guests";
+      editorFields.nameInput.value = item.name || "";
+      editorFields.phoneInput.value = item.phone || "";
+      editorFields.notesInput.value = item.notes || "";
+      editorFields.peopleCustomInput.classList.remove("is-open");
+      editorFields.peopleDisplay.style.display = "";
+      editorFields.renderDateGrid();
       editorModal.classList.add("is-open");
       editorModal.setAttribute("aria-hidden", "false");
     }
@@ -983,47 +1410,86 @@
       editorModal.setAttribute("aria-hidden", "true");
     }
 
-    async function bootstrapAdmin() {
-      try {
-        state.reservations = await fetchReservations();
-        renderReservations();
-      } catch (error) {
-        console.error(error);
-        document.getElementById("reservationList").innerHTML =
-          '<div class="empty-state">Could not load reservation data.</div>';
-      }
+    function serializeReservationForm(form) {
+      return Object.fromEntries(new FormData(form).entries());
     }
 
-    document.getElementById("openAddModal").addEventListener("click", () => openEditor());
+    function bindFormSubmission(form, extraFields = {}) {
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const payload = {
+          ...serializeReservationForm(form),
+          ...extraFields
+        };
+        buildMutationForm(payload);
+        if (form === editorForm) {
+          closeEditor();
+        } else {
+          form.reset();
+          quickFormFields.dateInput.value = formatInputDate(new Date());
+          quickFormFields.timeInput.value = "6:00 PM";
+          quickFormFields.timeDisplay.textContent = "6:00 PM";
+          quickFormFields.peopleInput.value = "4 guests";
+          quickFormFields.peopleDisplay.textContent = "4 guests";
+          quickFormFields.peopleCustomInput.classList.remove("is-open");
+          quickFormFields.peopleDisplay.style.display = "";
+          quickFormFields.renderDateGrid();
+        }
+        refreshAfterMutation();
+      });
+    }
+
+    function bootstrapAdmin() {
+      fetchReservations()
+        .then((reservations) => {
+          state.reservations = reservations;
+          renderReservations();
+        })
+        .catch((error) => {
+          console.error(error);
+          document.getElementById("reservationList").innerHTML =
+            '<div class="empty-state">Could not load reservation data.</div>';
+        });
+    }
+
+    document.getElementById("todayHeading").textContent = new Intl.DateTimeFormat("en-CA", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      year: "numeric"
+    }).format(new Date());
+
+    const todayInput = formatInputDate(new Date());
+    quickFormFields.dateInput.value = todayInput;
+    quickFormFields.renderDateGrid();
+
+    bindFormSubmission(document.getElementById("quickAddForm"));
+    bindFormSubmission(editorForm);
+
+    document.getElementById("openFullEditor").addEventListener("click", () => {
+      editorAction.value = "create";
+      editorRowNumber.value = "";
+      editorStatus.value = "active";
+      editorFields.dateInput.value = todayInput;
+      editorFields.timeInput.value = "6:00 PM";
+      editorFields.timeDisplay.textContent = "6:00 PM";
+      editorFields.peopleInput.value = "4 guests";
+      editorFields.peopleDisplay.textContent = "4 guests";
+      editorFields.nameInput.value = "";
+      editorFields.phoneInput.value = "";
+      editorFields.notesInput.value = "";
+      editorFields.peopleCustomInput.classList.remove("is-open");
+      editorFields.peopleDisplay.style.display = "";
+      editorTitle.textContent = "Add Reservation";
+      editorFields.renderDateGrid();
+      editorModal.classList.add("is-open");
+      editorModal.setAttribute("aria-hidden", "false");
+    });
+
     document.getElementById("closeEditorModal").addEventListener("click", closeEditor);
     document.getElementById("cancelEditor").addEventListener("click", closeEditor);
     editorModal.addEventListener("click", (event) => {
       if (event.target === editorModal) closeEditor();
-    });
-
-    editorForm.addEventListener("submit", (event) => {
-      event.preventDefault();
-      buildMutationForm({
-        action: editorAction.value,
-        rowNumber: editorRowNumber.value,
-        status: editorStatus.value,
-        date: editorDate.value,
-        time: editorTime.value,
-        people: editorPeople.value,
-        name: editorName.value,
-        phone: editorPhone.value,
-        notes: editorNotes.value
-      });
-      closeEditor();
-      refreshAfterMutation();
-    });
-
-    document.getElementById("quickAddForm").addEventListener("submit", (event) => {
-      event.preventDefault();
-      const formData = new FormData(event.currentTarget);
-      buildMutationForm(Object.fromEntries(formData.entries()));
-      event.currentTarget.reset();
-      refreshAfterMutation();
     });
 
     document.querySelectorAll("[data-range]").forEach((button) => {
@@ -1065,16 +1531,30 @@
       }
     });
 
-    document.querySelector(".hero h2").textContent = new Intl.DateTimeFormat("en-CA", {
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-      year: "numeric"
-    }).format(new Date());
+    sheetClose.addEventListener("click", closeSheet);
+    sheet.addEventListener("click", (event) => {
+      if (event.target === sheet) closeSheet();
+    });
 
-    const todayInput = new Date().toISOString().slice(0, 10);
-    document.getElementById("quickDate").value = todayInput;
-    editorDate.value = todayInput;
+    calendarPrev.addEventListener("click", () => {
+      state.calendarCursor = new Date(state.calendarCursor.getFullYear(), state.calendarCursor.getMonth() - 1, 1);
+      renderCalendar();
+    });
+
+    calendarNext.addEventListener("click", () => {
+      state.calendarCursor = new Date(state.calendarCursor.getFullYear(), state.calendarCursor.getMonth() + 1, 1);
+      renderCalendar();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        if (sheet.classList.contains("is-open")) {
+          closeSheet();
+        } else if (editorModal.classList.contains("is-open")) {
+          closeEditor();
+        }
+      }
+    });
 
     bootstrapAdmin();
   </script>
