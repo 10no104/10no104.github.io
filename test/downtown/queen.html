@@ -285,8 +285,11 @@
     }
 
     .add-panel.is-collapsed {
-      border-color: rgba(123, 31, 47, 0.24);
-      box-shadow: 0 26px 56px rgba(123, 31, 47, 0.12);
+      border-color: rgba(123, 31, 47, 0.28);
+      background:
+        linear-gradient(135deg, rgba(123, 31, 47, 0.12), rgba(255, 224, 150, 0.3)),
+        linear-gradient(180deg, rgba(255, 248, 238, 1), rgba(255, 251, 246, 0.98));
+      box-shadow: 0 28px 60px rgba(123, 31, 47, 0.16);
     }
 
     .booking-summary {
@@ -593,14 +596,18 @@
 
     .trash-toggle {
       width: fit-content;
-      justify-self: end;
-      margin-top: 2px;
+      margin-top: 0;
       padding: 0 16px;
-      background: rgba(255, 255, 255, 0.82);
+      min-height: 36px;
+      background: linear-gradient(135deg, rgba(123, 31, 47, 0.1), rgba(255, 255, 255, 0.92));
+      border-color: rgba(123, 31, 47, 0.18);
+      color: #7a2434;
     }
 
     .trash-toggle.is-active {
-      background: linear-gradient(135deg, rgba(123, 31, 47, 0.18), rgba(189, 128, 58, 0.18));
+      background: linear-gradient(135deg, rgba(123, 31, 47, 0.22), rgba(189, 128, 58, 0.24));
+      border-color: rgba(123, 31, 47, 0.26);
+      color: #5d1624;
     }
 
     .reservation-list {
@@ -1082,7 +1089,7 @@
     </section>
 
     <main class="layout">
-      <section class="panel add-panel" id="quickAddPanel">
+      <section class="panel add-panel is-collapsed" id="quickAddPanel">
         <div class="panel-head">
           <h3>Add Reservation</h3>
         </div>
@@ -1096,20 +1103,22 @@
             <button class="pill-btn primary" type="submit">Add Reservation</button>
           </div>
         </form>
-        <button class="add-toggle" id="toggleQuickAdd" type="button" aria-expanded="true">
-          <span>Hide Form</span>
+        <button class="add-toggle" id="toggleQuickAdd" type="button" aria-expanded="false">
+          <span>Show Form</span>
         </button>
       </section>
 
       <section class="panel">
         <div class="panel-head">
           <h3>Reservations</h3>
-          <span id="reservationDateLabel">Loading</span>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;">
+            <span id="reservationDateLabel">Loading</span>
+            <button class="chip-btn trash-toggle" id="trashToggle" type="button">&#128465; Trash</button>
+          </div>
         </div>
 
         <div class="control-row">
           <div class="range-chips" id="dateFilterChips"></div>
-          <button class="chip-btn trash-toggle" id="trashToggle" type="button">🗑 Trash</button>
         </div>
 
         <div class="reservation-list" id="reservationList"></div>
