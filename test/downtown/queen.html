@@ -1406,9 +1406,10 @@
       chipRow.innerHTML = allButton + dates.map((value) => {
         const date = toSafeDate(value);
         const isActive = state.selectedDate === value;
+        const weekdayLabel = value === dates[0] ? "Today" : new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date);
         return `
           <button class="chip-btn day-chip ${isActive ? "is-active" : ""}" data-date="${value}" type="button">
-            <strong>${new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date)}</strong>
+            <strong>${weekdayLabel}</strong>
             <span>${new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date)}</span>
           </button>
         `;
@@ -1561,7 +1562,8 @@
           button.type = "button";
           button.className = "date-chip";
           if (dateInput.value === value) button.classList.add("is-active");
-          button.innerHTML = `<strong>${new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date)}</strong><span>${new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date)}</span>`;
+          const weekdayLabel = value === visibleDates[0] ? "Today" : new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date);
+          button.innerHTML = `<strong>${weekdayLabel}</strong><span>${new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date)}</span>`;
           button.addEventListener("click", () => {
             dateInput.value = value;
             renderDateGrid();
