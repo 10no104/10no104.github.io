@@ -413,20 +413,14 @@
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    .reservation-modal p {
-      margin: 0 0 8px;
-      color: rgba(212, 175, 55, 0.92);
-      font-size: 0.82rem;
-      font-weight: 800;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-    }
-
     .reservation-modal h3 {
-      margin: 0 0 18px;
-      font-size: clamp(1.5rem, 6vw, 2rem);
-      letter-spacing: -0.05em;
-      line-height: 0.98;
+      margin: 0 0 20px;
+      color: rgba(212, 175, 55, 0.96);
+      font-size: clamp(2rem, 7vw, 2.8rem);
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      line-height: 0.92;
+      text-transform: uppercase;
     }
 
     .reservation-modal-links {
@@ -436,12 +430,12 @@
     }
 
     .reservation-choice {
-      display: flex;
+      display: grid;
+      grid-template-columns: minmax(112px, 0.9fr) minmax(0, 1.35fr);
       align-items: center;
-      justify-content: space-between;
       gap: 14px;
-      min-height: 62px;
-      padding: 0 18px;
+      min-height: 74px;
+      padding: 14px 20px;
       border-radius: 18px;
       background: rgba(255, 250, 244, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -460,6 +454,17 @@
       font-size: 0.88rem;
       font-weight: 600;
       text-align: right;
+      line-height: 1.35;
+      text-wrap: balance;
+    }
+
+    .reservation-choice--single {
+      grid-template-columns: 1fr;
+    }
+
+    .reservation-choice--single span {
+      margin-top: 4px;
+      text-align: left;
     }
 
     .reservation-close {
@@ -493,6 +498,14 @@
       .hub-hero-visual {
         min-height: 440px;
         padding-top: 0;
+      }
+
+      .reservation-choice {
+        grid-template-columns: 1fr;
+      }
+
+      .reservation-choice span {
+        text-align: left;
       }
 
     }
@@ -636,20 +649,19 @@
   </main>
   <div class="reservation-modal-backdrop" id="reservationModal" aria-hidden="true">
     <div class="reservation-modal" role="dialog" aria-modal="true" aria-labelledby="reservationModalTitle">
-      <p>Reservation</p>
-      <h3 id="reservationModalTitle">Choose your next step</h3>
+      <h3 id="reservationModalTitle">Reservation</h3>
       <div class="reservation-modal-links">
         <a class="reservation-choice" href="./downtown/reservation/reservation.html">
           <strong>Downtown</strong>
-          <span>Book Isabella St.</span>
+          <span>16 Isabella St, Toronto, ON M4Y 2A1</span>
         </a>
         <a class="reservation-choice" href="./uptown/reservation/reservation.html">
           <strong>Uptown</strong>
-          <span>Book Yonge St.</span>
+          <span>4866 Yonge St, North York, ON M2N 5N2</span>
         </a>
-        <a class="reservation-choice" href="./modify.html">
-          <strong>Modify Existing Reservation</strong>
-          <span>Open guest edit page</span>
+        <a class="reservation-choice reservation-choice--single" href="./modify.html">
+          <strong>Check or Update Reservation</strong>
+          <span>View your booking details or make changes.</span>
         </a>
       </div>
       <button class="hub-btn hub-btn-secondary reservation-close" id="closeReservationModal" type="button">Close</button>
