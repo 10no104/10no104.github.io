@@ -883,12 +883,14 @@
         url("../assets/pattern.webp") center / 360px auto;
       border: 1px solid rgba(108, 85, 58, 0.14);
       box-shadow: 0 24px 44px rgba(18, 12, 9, 0.18);
+      color: #25160f;
     }
 
     .feedback-modal h3 {
       margin: 0 0 8px;
       font-size: 1.22rem;
       letter-spacing: -0.03em;
+      color: #25160f;
     }
 
     .feedback-modal p {
@@ -1224,6 +1226,7 @@
       activeForm: "quick",
       calendarCursor: null,
       knownReservationKeys: new Set(),
+      knownReservationSnapshots: new Map(),
       suppressNewAlertUntil: 0,
       autoRefreshHandle: null
     };
@@ -1301,6 +1304,25 @@
       ].join("::");
     }
 
+    function getReservationIdentity(item) {
+      return [
+        item.sheetName || ADMIN_SHEET_CONFIG.sheetName,
+        item.rowNumber || ""
+      ].join("::");
+    }
+
+    function getReservationSnapshot(item) {
+      return JSON.stringify({
+        date: item.date || "",
+        time: item.time || "",
+        people: item.people || "",
+        name: item.name || "",
+        phone: item.phone || "",
+        notes: item.notes || "",
+        status: item.status || "active"
+      });
+    }
+
     function getActiveReservationKeys(reservations = []) {
       return new Set(
         reservations
@@ -1309,26 +1331,54 @@
       );
     }
 
+    function getReservationSnapshots(reservations = []) {
+      return new Map(
+        reservations.map((item) => [getReservationIdentity(item), getReservationSnapshot(item)])
+      );
+    }
+
     function syncReservations(reservations, { detectNew = false } = {}) {
       const shouldDetectNew = detectNew && Date.now() >= state.suppressNewAlertUntil;
       const newReservations = shouldDetectNew
         ? reservations.filter((item) => item.status !== "removed" && !state.knownReservationKeys.has(getReservationKey(item)))
         : [];
+      const updatedReservations = shouldDetectNew
+        ? reservations.filter((item) => {
+            if (item.status === "removed") return false;
+            const identity = getReservationIdentity(item);
+            const previousSnapshot = state.knownReservationSnapshots.get(identity);
+            if (!previousSnapshot) return false;
+            return previousSnapshot !== getReservationSnapshot(item);
+          })
+        : [];
 
       state.reservations = reservations;
       renderReservations();
       state.knownReservationKeys = getActiveReservationKeys(reservations);
+      state.knownReservationSnapshots = getReservationSnapshots(reservations);
 
-      if (!newReservations.length) return;
+      if (newReservations.length) {
+        const latestReservation = newReservations[0];
+        const newCount = newReservations.length;
+        openFeedback(
+          newCount === 1 ? "New Reservation" : "New Reservations",
+          newCount === 1
+            ? "A new booking just came in."
+            : `${newCount} new bookings just came in.`,
+          latestReservation
+        );
+        return;
+      }
 
-      const latestReservation = newReservations[0];
-      const newCount = newReservations.length;
+      if (!updatedReservations.length) return;
+
+      const latestUpdate = updatedReservations[0];
       openFeedback(
-        newCount === 1 ? "New Reservation" : "New Reservations",
-        newCount === 1
-          ? "A new booking just came in."
-          : `${newCount} new bookings just came in.`,
-        latestReservation
+        updatedReservations.length === 1 ? "Reservation Updated" : "Reservations Updated",
+        updatedReservations.length === 1
+          ? "A booking was just updated."
+          : `${updatedReservations.length} bookings were just updated.`,
+        latestUpdate
       );
     }
 
@@ -1378,7 +1428,7 @@
     }
 
     function filterReservations() {
-      return state.reservations.filter((item) => {
+      const filtered = state.reservations.filter((item) => {
         if (state.trashMode) return item.status === "removed";
         if (item.status === "removed") return false;
         if (!state.selectedDate) return true;
@@ -1386,6 +1436,7 @@
         if (!date) return false;
         return formatInputDate(date) === state.selectedDate;
       });
+      return state.trashMode ? filtered.slice().reverse() : filtered;
     }
 
     function getStatusBadge(item) {
