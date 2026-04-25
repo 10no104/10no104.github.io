@@ -78,9 +78,9 @@
       width: 62px;
       height: 62px;
       border-radius: 999px;
-      background: linear-gradient(180deg, rgba(255, 252, 247, 0.12), rgba(255, 243, 224, 0.08));
-      border: 1px solid rgba(73, 53, 36, 0.12);
-      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.18);
+      background: linear-gradient(180deg, rgba(255, 252, 247, 0.28), rgba(255, 243, 224, 0.18));
+      border: 1px solid rgba(255, 219, 154, 0.28);
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.24);
       flex: none;
     }
 
@@ -112,13 +112,13 @@
       min-height: 42px;
       padding: 0 14px;
       border-radius: 999px;
-      border: 1px solid rgba(255, 233, 194, 0.14);
-      background: rgba(255, 248, 238, 0.08);
-      color: #f6e7d4;
+      border: 1px solid rgba(255, 233, 194, 0.24);
+      background: rgba(255, 248, 238, 0.16);
+      color: #fff4e5;
       font-size: 0.92rem;
       font-weight: 700;
       white-space: nowrap;
-      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.14);
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.2);
       cursor: pointer;
     }
 
@@ -513,13 +513,16 @@
     .date-chip strong { display: block; }
 
     .date-chip span {
-      margin-bottom: 4px;
       color: #7f7063;
-      font-size: 0.76rem;
+      font-size: 0.74rem;
       text-transform: uppercase;
     }
 
-    .date-chip strong { font-size: 0.94rem; }
+    .date-chip strong {
+      margin-bottom: 4px;
+      font-size: 1rem;
+      letter-spacing: -0.03em;
+    }
 
     .date-chip.is-active {
       border-color: rgba(255, 228, 155, 0.92);
@@ -599,14 +602,14 @@
     }
 
     .chip-btn.day-chip span {
-      font-size: 0.72rem;
+      font-size: 0.74rem;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--muted);
     }
 
     .chip-btn.day-chip strong {
-      font-size: 1rem;
+      font-size: 1.08rem;
       letter-spacing: -0.03em;
     }
 
@@ -1101,8 +1104,8 @@
             <img src="../../assets/logo-dark.webp" alt="EHWA logo" />
         </a>
         <div class="brand-copy">
-          <p>Reservations Admin</p>
-          <h1>Floor Dashboard</h1>
+          <p>Reservations</p>
+          <h1>Downtown</h1>
         </div>
       </div>
         <a class="pill-btn" href="./reservation/">Guest Form</a>
@@ -1322,6 +1325,7 @@
       const date = toSafeDate(value);
       if (!date) return value || "No date";
       return new Intl.DateTimeFormat("en-US", {
+        weekday: "short",
         month: "long",
         day: "numeric",
         year: "numeric"
@@ -1398,16 +1402,17 @@
     function renderDateFilters() {
       const chipRow = document.getElementById("dateFilterChips");
       const dates = getFilterDates();
-      chipRow.innerHTML = dates.map((value) => {
+      const allButton = `<button class="chip-btn ${!state.selectedDate ? "is-active" : ""}" data-date="" type="button">All</button>`;
+      chipRow.innerHTML = allButton + dates.map((value) => {
         const date = toSafeDate(value);
         const isActive = state.selectedDate === value;
         return `
           <button class="chip-btn day-chip ${isActive ? "is-active" : ""}" data-date="${value}" type="button">
-            <span>${new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date)}</span>
-            <strong>${new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date)}</strong>
+            <strong>${new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date)}</strong>
+            <span>${new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date)}</span>
           </button>
         `;
-      }).join("") + `<button class="chip-btn" data-date="" type="button">All</button>`;
+      }).join("");
     }
 
     function renderMetrics(reservations) {
@@ -1556,7 +1561,7 @@
           button.type = "button";
           button.className = "date-chip";
           if (dateInput.value === value) button.classList.add("is-active");
-          button.innerHTML = `<span>${new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date)}</span><strong>${new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date)}</strong>`;
+          button.innerHTML = `<strong>${new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date)}</strong><span>${new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date)}</span>`;
           button.addEventListener("click", () => {
             dateInput.value = value;
             renderDateGrid();

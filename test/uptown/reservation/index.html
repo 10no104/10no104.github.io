@@ -267,14 +267,15 @@
     }
 
     .date-chip span {
-      margin-bottom: 4px;
       color: #7f7063;
-      font-size: 0.76rem;
+      font-size: 0.74rem;
       text-transform: uppercase;
     }
 
     .date-chip strong {
-      font-size: 0.94rem;
+      margin-bottom: 4px;
+      font-size: 1rem;
+      letter-spacing: -0.03em;
     }
 
     .date-chip.is-active {
@@ -769,7 +770,7 @@
           if (dateInput.value === value) {
             button.classList.add("is-active");
           }
-          button.innerHTML = `<span>${new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date)}</span><strong>${new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date)}</strong>`;
+          button.innerHTML = `<strong>${new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date)}</strong><span>${new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date)}</span>`;
           button.addEventListener("click", () => {
             dateInput.value = value;
             syncDateState();
