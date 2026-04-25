@@ -238,8 +238,8 @@
       }
 
     .add-panel .panel-head h3 {
-      color: #fff3e1;
-      text-shadow: 0 8px 20px rgba(0, 0, 0, 0.34);
+      color: #3b2418;
+      text-shadow: none;
     }
 
     .add-toggle {
@@ -409,8 +409,8 @@
       margin: 0;
       font-size: 1.14rem;
       letter-spacing: -0.03em;
-      color: #fff6ec;
-      text-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+      color: #3b2418;
+      text-shadow: none;
     }
 
     .panel-head span {
@@ -420,7 +420,7 @@
     }
 
     .panel-head #reservationDateLabel {
-      color: rgba(255, 236, 214, 0.92);
+      color: #8d735d;
     }
 
     .booking-form {
@@ -898,16 +898,20 @@
     }
 
     .feedback-modal h3 {
-      margin: 0 0 8px;
-      font-size: 1.22rem;
-      letter-spacing: -0.03em;
+      margin: 0;
+      font-size: 1.86rem;
+      letter-spacing: -0.04em;
       color: #25160f;
     }
 
     .feedback-modal p {
-      margin: 0 0 18px;
+      margin: 10px 0 0;
       color: var(--muted);
       line-height: 1.6;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 0.74rem;
+      font-weight: 700;
     }
 
     .feedback-details {
@@ -1965,49 +1969,9 @@
       editorModal.setAttribute("aria-hidden", "true");
     }
 
-    function renderFeedbackDetails(data) {
-      if (!data) {
-        feedbackDetails.hidden = true;
-        feedbackDetails.innerHTML = "";
-        return;
-      }
-
-      feedbackDetails.hidden = false;
-      feedbackDetails.innerHTML = `
-        <div class="booking-summary">
-          <div class="booking-summary-head">
-            <strong>Reservation Details</strong>
-            <span>${ADMIN_SHEET_CONFIG.branchLabel}</span>
-          </div>
-          <div class="booking-summary-grid">
-            <div class="booking-summary-box">
-              <span>Date</span>
-              <strong>${data.date ? formatDisplayDate(data.date) : "-"}</strong>
-            </div>
-            <div class="booking-summary-box">
-              <span>Time</span>
-              <strong>${data.time || "-"}</strong>
-            </div>
-            <div class="booking-summary-box">
-              <span>Guests</span>
-              <strong>${data.people || "-"}</strong>
-            </div>
-            <div class="booking-summary-box">
-              <span>Name</span>
-              <strong>${(data.name || "").trim() || "Guest"}</strong>
-            </div>
-            <div class="booking-summary-box">
-              <span>Phone</span>
-              <strong>${(data.phone || "").trim() || "-"}</strong>
-            </div>
-            <div class="booking-summary-box">
-              <span>Status</span>
-              <strong>${data.status === "removed" ? "Removed" : "Active"}</strong>
-            </div>
-          </div>
-          <div class="booking-summary-note">${(data.notes || "").trim() || "No notes."}</div>
-        </div>
-      `;
+    function renderFeedbackDetails() {
+      feedbackDetails.hidden = true;
+      feedbackDetails.innerHTML = "";
     }
 
     function openFeedback(title, message, details = null) {
