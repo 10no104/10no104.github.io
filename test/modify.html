@@ -319,6 +319,21 @@
     .section-block {
       display: grid;
       gap: 12px;
+      padding: 18px;
+      border-radius: 24px;
+      border: 1px solid rgba(109, 86, 59, 0.1);
+    }
+
+    .section-block.current-section {
+      background:
+        linear-gradient(180deg, rgba(255, 249, 239, 0.96), rgba(255, 243, 224, 0.92));
+      box-shadow: 0 22px 42px rgba(123, 31, 47, 0.08);
+    }
+
+    .section-block.past-section {
+      background:
+        linear-gradient(180deg, rgba(239, 233, 225, 0.92), rgba(229, 221, 211, 0.9));
+      border-style: dashed;
     }
 
     .section-head {
@@ -332,6 +347,14 @@
       margin: 0;
       font-size: 1rem;
       letter-spacing: -0.02em;
+    }
+
+    .current-section .section-head h4 {
+      color: #54202a;
+    }
+
+    .past-section .section-head h4 {
+      color: #5d4a38;
     }
 
     .section-head span {
@@ -350,13 +373,22 @@
       border-radius: 20px;
       background: rgba(255, 251, 245, 0.84);
       border: 1px solid rgba(109, 86, 59, 0.12);
+      box-shadow: 0 14px 28px rgba(44, 28, 18, 0.08);
+    }
+
+    .reservation-card.is-current {
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(255, 244, 226, 0.96));
+      border-color: rgba(185, 135, 31, 0.22);
+      box-shadow: 0 18px 34px rgba(123, 31, 47, 0.12);
     }
 
     .reservation-card.is-past {
       background:
         linear-gradient(180deg, rgba(240, 234, 227, 0.92), rgba(232, 225, 216, 0.94));
       border-style: dashed;
-      opacity: 0.92;
+      opacity: 0.9;
+      box-shadow: none;
     }
 
     .reservation-top {
@@ -402,9 +434,19 @@
       background: linear-gradient(135deg, rgba(123, 31, 47, 0.96), rgba(185, 135, 31, 0.9));
     }
 
+    .badge.current {
+      color: #fff8ee;
+      background: linear-gradient(135deg, rgba(123, 31, 47, 0.96), rgba(215, 156, 53, 0.94));
+    }
+
     .badge.past {
       color: #5b4a3a;
       background: rgba(204, 190, 176, 0.76);
+    }
+
+    .badge.removed {
+      color: #fff3f4;
+      background: linear-gradient(135deg, rgba(123, 31, 47, 0.96), rgba(83, 18, 30, 0.96));
     }
 
     .reservation-meta {
@@ -468,6 +510,11 @@
     .action-btn.primary {
       color: #fff;
       background: linear-gradient(135deg, var(--wine), #b9871f);
+    }
+
+    .action-btn.danger {
+      color: #fff5f5;
+      background: linear-gradient(135deg, #7b1f2f, #a74246);
     }
 
     .empty-state {
@@ -745,14 +792,14 @@
           <span id="resultLabel">No search yet</span>
         </div>
         <div class="results" id="resultsPanel" hidden>
-          <section class="section-block">
+          <section class="section-block current-section">
             <div class="section-head">
               <h4>Upcoming Reservations</h4>
               <span id="upcomingCount">0 found</span>
             </div>
             <div class="reservation-list" id="upcomingList"></div>
           </section>
-          <section class="section-block">
+          <section class="section-block past-section">
             <div class="section-head">
               <h4>Past Reservations</h4>
               <span id="pastCount">0 found</span>
@@ -816,6 +863,17 @@
     </div>
   </div>
 
+  <div class="feedback-backdrop" id="cancelConfirmModal" aria-hidden="true">
+    <div class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="cancelConfirmTitle">
+      <h3 id="cancelConfirmTitle">Cancel Reservation?</h3>
+      <p id="cancelConfirmMessage">This will cancel your current booking and notify the restaurant.</p>
+      <div class="form-actions">
+        <button class="pill-btn primary" id="confirmCancelReservation" type="button">Yes, Cancel</button>
+        <button class="pill-btn" id="dismissCancelReservation" type="button">Keep Reservation</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const SHEET_ID = "1xa9OZbctYnlbaAL8lKIgmefM5hvSw0Plk01lxp5G2fc";
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3Iiujn95evZuFiyLNrJUo-_H6rKngdxt0EeBFVw/exec";
@@ -829,7 +887,8 @@
       matches: [],
       lastSearchDigits: "",
       activeForm: "editor",
-      calendarCursor: null
+      calendarCursor: null,
+      pendingCancelReservation: null
     };
 
     function parseGvizText(text = "") {
@@ -977,8 +1036,9 @@
 
     function renderReservationCard(item) {
       const past = isPastReservation(item);
+      const isRemoved = item.status === "removed";
       return `
-        <article class="reservation-card ${past ? "is-past" : ""}">
+        <article class="reservation-card ${past ? "is-past" : "is-current"}">
           <div class="reservation-top">
             <div>
               <h4>${item.name || "Guest"}</h4>
@@ -986,7 +1046,7 @@
             </div>
             <div class="badge-row">
               <span class="badge branch">${item.branch}</span>
-              ${past ? `<span class="badge past">${item.status === "removed" ? "Removed" : "Past"}</span>` : ""}
+              <span class="badge ${past ? (isRemoved ? "removed" : "past") : "current"}">${past ? (isRemoved ? "Canceled" : "Past") : "Current"}</span>
             </div>
           </div>
           <div class="reservation-meta">
@@ -1008,9 +1068,11 @@
             </div>
           </div>
           <div class="reservation-notes">${item.notes || "No notes"}</div>
+          ${past ? "" : `
           <div class="reservation-actions">
             <button class="action-btn primary" type="button" data-action="edit" data-sheet="${item.sheetName}" data-row="${item.rowNumber}">Edit Reservation</button>
-          </div>
+            <button class="action-btn danger" type="button" data-action="cancel" data-sheet="${item.sheetName}" data-row="${item.rowNumber}">Cancel Reservation</button>
+          </div>`}
         </article>
       `;
     }
@@ -1039,11 +1101,11 @@
 
       upcomingList.innerHTML = upcoming.length
         ? upcoming.map(renderReservationCard).join("")
-        : '<div class="empty-state">No upcoming reservations for this phone number.</div>';
+        : '<div class="empty-state">No current reservations for this phone number.</div>';
 
       pastList.innerHTML = past.length
         ? past.map(renderReservationCard).join("")
-        : '<div class="empty-state">No past reservations for this phone number.</div>';
+        : '<div class="empty-state">No past or canceled reservations for this phone number.</div>';
 
       upcomingCount.textContent = `${upcoming.length} found`;
       pastCount.textContent = `${past.length} found`;
@@ -1136,6 +1198,18 @@
     function closeFeedback() {
       feedbackModal.classList.remove("is-open");
       feedbackModal.setAttribute("aria-hidden", "true");
+    }
+
+    function openCancelConfirm(item) {
+      state.pendingCancelReservation = item;
+      cancelConfirmModal.classList.add("is-open");
+      cancelConfirmModal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeCancelConfirm() {
+      state.pendingCancelReservation = null;
+      cancelConfirmModal.classList.remove("is-open");
+      cancelConfirmModal.setAttribute("aria-hidden", "true");
     }
 
     function openEditor(item) {
@@ -1333,6 +1407,9 @@
     const feedbackMessage = document.getElementById("feedbackMessage");
     const feedbackDetails = document.getElementById("feedbackDetails");
     const closeFeedbackModal = document.getElementById("closeFeedbackModal");
+    const cancelConfirmModal = document.getElementById("cancelConfirmModal");
+    const confirmCancelReservation = document.getElementById("confirmCancelReservation");
+    const dismissCancelReservation = document.getElementById("dismissCancelReservation");
     const sheet = document.getElementById("pickerSheet");
     const sheetTitle = document.getElementById("pickerTitle");
     const sheetOptions = document.getElementById("pickerOptions");
@@ -1516,14 +1593,39 @@
     feedbackModal.addEventListener("click", (event) => {
       if (event.target === feedbackModal) closeFeedback();
     });
+    confirmCancelReservation.addEventListener("click", () => {
+      const reservation = state.pendingCancelReservation;
+      if (!reservation) {
+        closeCancelConfirm();
+        return;
+      }
+
+      buildMutationForm({
+        action: "status",
+        sheetName: reservation.sheetName,
+        rowNumber: String(reservation.rowNumber),
+        status: "removed"
+      });
+      closeCancelConfirm();
+      openFeedback("Reservation Canceled", "Your reservation has been canceled.", reservation);
+      refreshAfterMutation();
+    });
+    dismissCancelReservation.addEventListener("click", closeCancelConfirm);
+    cancelConfirmModal.addEventListener("click", (event) => {
+      if (event.target === cancelConfirmModal) closeCancelConfirm();
+    });
 
     document.body.addEventListener("click", (event) => {
-      const button = event.target.closest("[data-action='edit']");
+      const button = event.target.closest("[data-action]");
       if (!button) return;
       const rowNumber = Number(button.dataset.row);
       const sheetName = button.dataset.sheet;
       const reservation = state.matches.find((item) => item.rowNumber === rowNumber && item.sheetName === sheetName);
       if (!reservation) return;
+      if (button.dataset.action === "cancel") {
+        openCancelConfirm(reservation);
+        return;
+      }
       openEditor(reservation);
     });
 
@@ -1546,6 +1648,8 @@
       if (event.key === "Escape") {
         if (sheet.classList.contains("is-open")) {
           closeSheet();
+        } else if (cancelConfirmModal.classList.contains("is-open")) {
+          closeCancelConfirm();
         } else if (feedbackModal.classList.contains("is-open")) {
           closeFeedback();
         } else if (editorModal.classList.contains("is-open")) {

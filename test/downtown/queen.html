@@ -1361,10 +1361,27 @@
       );
     }
 
+    function getSnapshotStatus(snapshot) {
+      if (!snapshot) return "";
+      try {
+        return JSON.parse(snapshot).status || "";
+      } catch {
+        return "";
+      }
+    }
+
     function syncReservations(reservations, { detectNew = false } = {}) {
       const shouldDetectNew = detectNew && Date.now() >= state.suppressNewAlertUntil;
       const newReservations = shouldDetectNew
         ? reservations.filter((item) => item.status !== "removed" && !state.knownReservationKeys.has(getReservationKey(item)))
+        : [];
+      const canceledReservations = shouldDetectNew
+        ? reservations.filter((item) => {
+            if (item.status !== "removed") return false;
+            const identity = getReservationIdentity(item);
+            const previousSnapshot = state.knownReservationSnapshots.get(identity);
+            return previousSnapshot && getSnapshotStatus(previousSnapshot) !== "removed";
+          })
         : [];
       const updatedReservations = shouldDetectNew
         ? reservations.filter((item) => {
@@ -1380,6 +1397,18 @@
       renderReservations();
       state.knownReservationKeys = getActiveReservationKeys(reservations);
       state.knownReservationSnapshots = getReservationSnapshots(reservations);
+
+      if (canceledReservations.length) {
+        const latestCanceled = canceledReservations[0];
+        openFeedback(
+          canceledReservations.length === 1 ? "Reservation Canceled" : "Reservations Canceled",
+          canceledReservations.length === 1
+            ? "A reservation was just canceled."
+            : `${canceledReservations.length} reservations were just canceled.`,
+          latestCanceled
+        );
+        return;
+      }
 
       if (newReservations.length) {
         const latestReservation = newReservations[0];
