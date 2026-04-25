@@ -1987,9 +1987,49 @@
       editorModal.setAttribute("aria-hidden", "true");
     }
 
-    function renderFeedbackDetails() {
-      feedbackDetails.hidden = true;
-      feedbackDetails.innerHTML = "";
+    function renderFeedbackDetails(data) {
+      if (!data) {
+        feedbackDetails.hidden = true;
+        feedbackDetails.innerHTML = "";
+        return;
+      }
+
+      feedbackDetails.hidden = false;
+      feedbackDetails.innerHTML = `
+        <div class="booking-summary">
+          <div class="booking-summary-head">
+            <strong>Reservation Details</strong>
+            <span>${ADMIN_SHEET_CONFIG.branchLabel}</span>
+          </div>
+          <div class="booking-summary-grid">
+            <div class="booking-summary-box">
+              <span>Date</span>
+              <strong>${data.date ? formatDisplayDate(data.date) : "-"}</strong>
+            </div>
+            <div class="booking-summary-box">
+              <span>Time</span>
+              <strong>${data.time || "-"}</strong>
+            </div>
+            <div class="booking-summary-box">
+              <span>Guests</span>
+              <strong>${data.people || "-"}</strong>
+            </div>
+            <div class="booking-summary-box">
+              <span>Name</span>
+              <strong>${(data.name || "").trim() || "Guest"}</strong>
+            </div>
+            <div class="booking-summary-box">
+              <span>Phone</span>
+              <strong>${(data.phone || "").trim() || "-"}</strong>
+            </div>
+            <div class="booking-summary-box">
+              <span>Status</span>
+              <strong>${data.status === "removed" ? "Removed" : "Active"}</strong>
+            </div>
+          </div>
+          <div class="booking-summary-note">${(data.notes || "").trim() || "No notes."}</div>
+        </div>
+      `;
     }
 
     function openFeedback(title, message, details = null) {
