@@ -1228,13 +1228,17 @@
     };
 
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3Iiujn95evZuFiyLNrJUo-_H6rKngdxt0EeBFVw/exec";
+    const AUTO_REFRESH_MS = 10000;
 
     const state = {
       reservations: [],
       selectedDate: "",
       trashMode: false,
       activeForm: "quick",
-      calendarCursor: null
+      calendarCursor: null,
+      knownReservationKeys: new Set(),
+      suppressNewAlertUntil: 0,
+      autoRefreshHandle: null
     };
 
     function parseGvizText(text = "") {
@@ -1297,6 +1301,48 @@
       if (meridiem === "PM" && hour !== 12) hour += 12;
       if (meridiem === "AM" && hour === 12) hour = 0;
       return hour * 60 + minute;
+    }
+
+    function getReservationKey(item) {
+      return [
+        item.sheetName || ADMIN_SHEET_CONFIG.sheetName,
+        item.rowNumber || "",
+        item.timestamp || "",
+        item.date || "",
+        item.time || "",
+        item.name || ""
+      ].join("::");
+    }
+
+    function getActiveReservationKeys(reservations = []) {
+      return new Set(
+        reservations
+          .filter((item) => item.status !== "removed")
+          .map((item) => getReservationKey(item))
+      );
+    }
+
+    function syncReservations(reservations, { detectNew = false } = {}) {
+      const shouldDetectNew = detectNew && Date.now() >= state.suppressNewAlertUntil;
+      const newReservations = shouldDetectNew
+        ? reservations.filter((item) => item.status !== "removed" && !state.knownReservationKeys.has(getReservationKey(item)))
+        : [];
+
+      state.reservations = reservations;
+      renderReservations();
+      state.knownReservationKeys = getActiveReservationKeys(reservations);
+
+      if (!newReservations.length) return;
+
+      const latestReservation = newReservations[0];
+      const newCount = newReservations.length;
+      openFeedback(
+        newCount === 1 ? "New Reservation" : "New Reservations",
+        newCount === 1
+          ? "A new booking just came in."
+          : `${newCount} new bookings just came in.`,
+        latestReservation
+      );
     }
 
     async function fetchReservations() {
@@ -1481,9 +1527,10 @@
     }
 
     function refreshAfterMutation() {
+      state.suppressNewAlertUntil = Date.now() + 15000;
       window.setTimeout(async () => {
-        state.reservations = await fetchReservations();
-        renderReservations();
+        const reservations = await fetchReservations();
+        syncReservations(reservations);
       }, 900);
     }
 
@@ -1937,14 +1984,23 @@
     function bootstrapAdmin() {
       fetchReservations()
         .then((reservations) => {
-          state.reservations = reservations;
-          renderReservations();
+          syncReservations(reservations);
         })
         .catch((error) => {
           console.error(error);
           document.getElementById("reservationList").innerHTML =
             '<div class="empty-state">Could not load reservation data.</div>';
         });
+    }
+
+    async function performAutoRefresh() {
+      if (document.hidden) return;
+      try {
+        const reservations = await fetchReservations();
+        syncReservations(reservations, { detectNew: true });
+      } catch (error) {
+        console.error("Auto refresh failed", error);
+      }
     }
 
     document.getElementById("todayHeading").textContent = new Intl.DateTimeFormat("en-CA", {
@@ -2057,6 +2113,11 @@
           closeEditor();
         }
       }
+    });
+
+    state.autoRefreshHandle = window.setInterval(performAutoRefresh, AUTO_REFRESH_MS);
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) performAutoRefresh();
     });
 
     bootstrapAdmin();
