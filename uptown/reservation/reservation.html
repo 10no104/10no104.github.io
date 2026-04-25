@@ -577,7 +577,7 @@
           <a class="logo-link" href="../../index.html" aria-label="EHWA test home">
             <img src="../../assets/logo-dark.webp" alt="EHWA logo" />
         </a>
-        <h1>Reservation</h1>
+        <h1>Uptown Reservation</h1>
       </div>
           <a class="back-link" href="../../menu/uptown/index.html">Menu</a>
     </header>
@@ -632,8 +632,7 @@
 
   <div class="modal-backdrop" id="reservationModal" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="reservationModalTitle">
-      <h2 id="reservationModalTitle">Reservation request sent</h2>
-      <p>Your request has been submitted. We will contact you using the phone number you provided.</p>
+      <h2 id="reservationModalTitle">Reservation Confirmed</h2>
       <div class="modal-details" id="reservationModalDetails" hidden></div>
       <button class="modal-btn" type="button" id="reservationModalClose">Close</button>
     </div>
@@ -679,6 +678,7 @@
       const nameInput = document.getElementById("name");
       const phoneInput = document.getElementById("phone");
       const notesInput = document.getElementById("notes");
+      const branchLabel = "Uptown";
 
       const modal = document.getElementById("reservationModal");
       const modalClose = document.getElementById("reservationModalClose");
@@ -803,6 +803,10 @@
           <div class="booking-summary">
             <div class="booking-summary-grid">
               <div class="booking-summary-box">
+                <span>Location</span>
+                <strong>${branchLabel}</strong>
+              </div>
+              <div class="booking-summary-box">
                 <span>Date</span>
                 <strong>${dateInput.value ? formatDisplayDate(dateInput.value) : "-"}</strong>
               </div>
@@ -823,7 +827,7 @@
                 <strong>${phoneInput.value.trim() || "-"}</strong>
               </div>
             </div>
-            <div class="booking-summary-note">${notesInput.value.trim() || "No notes."}</div>
+            <div class="booking-summary-note">${notesInput.value.trim() || "-"}</div>
           </div>
         `;
       };
