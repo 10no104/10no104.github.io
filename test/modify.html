@@ -130,7 +130,6 @@
       box-shadow: 0 18px 30px rgba(123, 31, 47, 0.18);
     }
 
-    .hero,
     .panel,
     .editor-modal,
     .feedback-modal,
@@ -141,26 +140,6 @@
         linear-gradient(180deg, rgba(255, 252, 247, 0.97), rgba(248, 241, 231, 0.96)),
         url("../assets/pattern.webp") center / 420px auto;
       box-shadow: var(--shadow);
-    }
-
-    .hero {
-      padding: 22px;
-      margin-bottom: 16px;
-    }
-
-    .hero p {
-      display: none;
-    }
-
-    .hero h2 {
-      margin: 0;
-      font-size: clamp(1.9rem, 6vw, 3rem);
-      letter-spacing: -0.05em;
-      line-height: 0.95;
-    }
-
-    .hero span {
-      display: none;
     }
 
     .layout {
@@ -552,6 +531,12 @@
       padding: 22px;
     }
 
+    .editor-modal {
+      max-height: min(88vh, 860px);
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
     .feedback-modal {
       width: min(100%, 380px);
       text-align: center;
@@ -602,6 +587,15 @@
 
     .form-actions .pill-btn {
       width: 100%;
+    }
+
+    .editor-form .form-actions {
+      position: sticky;
+      bottom: -22px;
+      margin: 0 -22px -22px;
+      padding: 14px 22px 22px;
+      background: linear-gradient(180deg, rgba(248, 241, 231, 0), rgba(248, 241, 231, 0.96) 26%, rgba(248, 241, 231, 0.99));
+      border-top: 1px solid rgba(109, 86, 59, 0.08);
     }
 
     .sheet-panel {
@@ -741,6 +735,32 @@
     }
 
     @media (max-width: 719px) {
+      .shell {
+        width: min(100% - 14px, 1020px);
+        padding-top: 14px;
+      }
+
+      .topbar {
+        margin-bottom: 12px;
+      }
+
+      .editor-modal {
+        width: min(100%, 100vw - 12px);
+        max-height: 90vh;
+        padding: 18px;
+      }
+
+      .editor-form {
+        gap: 14px;
+        padding: 14px 0 0;
+      }
+
+      .editor-form .form-actions {
+        bottom: -18px;
+        margin: 0 -18px -18px;
+        padding: 12px 18px 18px;
+      }
+
       .reservation-top {
         flex-direction: column;
       }
@@ -761,10 +781,6 @@
       </div>
       <a class="back-link" href="./index.html">Back</a>
     </header>
-
-    <section class="hero">
-      <h2>Find Your Booking</h2>
-    </section>
 
     <div class="layout">
       <section class="panel">
@@ -1046,7 +1062,6 @@
             </div>
             <div class="badge-row">
               <span class="badge branch">${item.branch}</span>
-              <span class="badge ${past ? (isRemoved ? "removed" : "past") : "current"}">${past ? (isRemoved ? "Canceled" : "Past") : "Current"}</span>
             </div>
           </div>
           <div class="reservation-meta">
