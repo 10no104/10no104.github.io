@@ -531,9 +531,9 @@
   <div class="shell">
     <header class="topbar">
       <div class="brand">
-        <span>Temporary Layout Study</span>
+        <span>Actual Store Layout Study</span>
         <h1>Uptown Table Map</h1>
-        <p>Indoor hall and patio views rebuilt from the latest store photos and POS reference screens.</p>
+        <p>Indoor hall and patio views rebuilt around the real seating flow shown in the latest store photos.</p>
       </div>
       <div class="branch-switch" aria-label="Choose area">
         <button class="is-active" type="button" data-space="hall">Hall</button>
@@ -546,9 +546,9 @@
         <div class="panel-head">
           <div>
             <h2 id="mapTitle">Uptown Hall</h2>
-            <span id="mapHint">Indoor floor based on the POS hall screen and current dining-room photos.</span>
+            <span id="mapHint">Indoor floor rebuilt from the actual dining-room photos.</span>
           </div>
-          <span id="tableCount">0 positions</span>
+          <span id="tableCount">0 tables</span>
         </div>
         <div class="floor-wrap">
           <div class="floor is-hall" id="floorMap" aria-label="Table map">
@@ -558,7 +558,6 @@
         <div class="legend">
           <span>Reservable</span>
           <span class="selected">Selected</span>
-          <span class="service">Service / utility</span>
         </div>
       </section>
 
@@ -602,84 +601,67 @@
       hall: {
         label: "Uptown Hall",
         shortLabel: "Hall",
-        hint: "Indoor floor based on the POS hall screen and current dining-room photos.",
+        hint: "Indoor floor rebuilt from the actual dining-room photos.",
         className: "is-hall",
         ratio: "10 / 7",
         minWidth: "760px",
         zones: [
-          { label: "Blue Booth", className: "left-booth", x: 2, y: 7, w: 18, h: 70 },
-          { label: "Front Window", className: "window", x: 47, y: 5, w: 39, h: 18 },
-          { label: "Red Banquette", className: "right-banquette", x: 74, y: 30, w: 16, h: 46 },
-          { label: "Bar", className: "bar", x: 74, y: 4, w: 18, h: 16 },
-          { label: "Patio Strip", className: "patio-strip", x: 4, y: 84, w: 83, h: 10 },
-          { label: "Entry", className: "entry", x: 61, y: 35, w: 12, h: 10 }
+          { label: "Blue Booth Wall", className: "left-booth", x: 2, y: 21, w: 20, h: 60 },
+          { label: "Mural / Window", className: "window", x: 20, y: 4, w: 42, h: 18 },
+          { label: "Red Banquette", className: "right-banquette", x: 74, y: 18, w: 16, h: 50 },
+          { label: "Bar Counter", className: "bar", x: 60, y: 74, w: 33, h: 18 },
+          { label: "Main Aisle", className: "lane", x: 28, y: 19, w: 42, h: 58 },
+          { label: "Entry", className: "entry", x: 43, y: 3, w: 14, h: 9 }
         ],
         tables: [
-          { id: "A1", seats: 4, x: 4, y: 8, w: 8.5, h: 8.5, shape: "booth" },
-          { id: "A2", seats: 4, x: 15, y: 8, w: 8.5, h: 8.5, shape: "booth" },
-          { id: "A3", seats: 4, x: 26, y: 8, w: 8.5, h: 8.5, shape: "booth" },
-          { id: "A4", seats: 4, x: 37, y: 8, w: 8.5, h: 8.5, shape: "booth" },
-          { id: "A5", seats: 4, x: 49, y: 8, w: 8.5, h: 8.5, shape: "booth" },
-          { id: "A6", seats: 4, x: 60, y: 8, w: 8.5, h: 8.5, shape: "booth" },
-          { id: "A7", seats: 4, x: 71, y: 8, w: 8.5, h: 8.5, shape: "booth" },
-          { id: "A8", seats: 4, x: 51, y: 21, w: 8.5, h: 8.5, shape: "booth" },
-          { id: "A9", seats: 4, x: 62, y: 21, w: 8.5, h: 8.5, shape: "booth" },
-          { id: "A10", seats: 4, x: 73, y: 21, w: 8.5, h: 8.5, shape: "booth" },
-          { id: "B3", seats: 2, x: 6, y: 37, w: 8.5, h: 8.5 },
-          { id: "B6", seats: 2, x: 17, y: 37, w: 8.5, h: 8.5 },
-          { id: "B9", seats: 2, x: 28, y: 37, w: 8.5, h: 8.5 },
-          { id: "B2", seats: 2, x: 6, y: 50, w: 8.5, h: 8.5 },
-          { id: "B5", seats: 2, x: 17, y: 50, w: 8.5, h: 8.5 },
-          { id: "B8", seats: 2, x: 28, y: 50, w: 8.5, h: 8.5 },
-          { id: "B1", seats: 2, x: 6, y: 63, w: 8.5, h: 8.5 },
-          { id: "B4", seats: 2, x: 17, y: 63, w: 8.5, h: 8.5 },
-          { id: "B7", seats: 2, x: 28, y: 63, w: 8.5, h: 8.5 },
-          { id: "BAR1", seats: 2, x: 64, y: 52, w: 9, h: 8.5, shape: "round", kind: "bar-seat" },
-          { id: "BAR2", seats: 2, x: 76, y: 52, w: 9, h: 8.5, shape: "round", kind: "bar-seat" },
-          { id: "takeout", seats: 0, x: 63, y: 64.5, w: 10, h: 10, kind: "utility", note: "service" },
-          { id: "takeout2", seats: 0, x: 75, y: 64.5, w: 10, h: 10, kind: "utility", note: "service" },
-          { id: "C1", seats: 4, x: 6, y: 78, w: 8.5, h: 8.5, shape: "banquette" },
-          { id: "C2", seats: 4, x: 17, y: 78, w: 8.5, h: 8.5, shape: "banquette" },
-          { id: "C3", seats: 4, x: 28, y: 78, w: 8.5, h: 8.5, shape: "banquette" },
-          { id: "C4", seats: 4, x: 39, y: 78, w: 8.5, h: 8.5, shape: "banquette" },
-          { id: "C5", seats: 4, x: 50, y: 78, w: 8.5, h: 8.5, shape: "banquette" },
-          { id: "C6", seats: 4, x: 61, y: 78, w: 8.5, h: 8.5, shape: "banquette" }
+          { id: "L1", seats: 4, x: 6, y: 29, w: 14, h: 8, shape: "booth" },
+          { id: "L2", seats: 4, x: 6, y: 40.5, w: 14, h: 8, shape: "booth" },
+          { id: "L3", seats: 4, x: 6, y: 52, w: 14, h: 8, shape: "booth" },
+          { id: "L4", seats: 4, x: 6, y: 63.5, w: 14, h: 8, shape: "booth" },
+          { id: "F1", seats: 4, x: 24, y: 18, w: 10.5, h: 10.5, shape: "round" },
+          { id: "F2", seats: 4, x: 53, y: 22, w: 12, h: 9.5 },
+          { id: "C1", seats: 4, x: 38, y: 33, w: 11.5, h: 9.5 },
+          { id: "C2", seats: 4, x: 51, y: 44.5, w: 11.5, h: 9.5 },
+          { id: "C3", seats: 4, x: 39, y: 56.5, w: 11.5, h: 9.5 },
+          { id: "C4", seats: 4, x: 53, y: 33.5, w: 11.5, h: 9.5 },
+          { id: "R1", seats: 4, x: 73, y: 24, w: 13, h: 7.5, shape: "banquette" },
+          { id: "R2", seats: 4, x: 73, y: 35.5, w: 13, h: 7.5, shape: "banquette" },
+          { id: "R3", seats: 4, x: 73, y: 47, w: 13, h: 7.5, shape: "banquette" },
+          { id: "R4", seats: 4, x: 73, y: 58.5, w: 13, h: 7.5, shape: "banquette" },
+          { id: "B1", seats: 4, x: 30, y: 74, w: 14, h: 10 },
+          { id: "B2", seats: 4, x: 47, y: 74, w: 14, h: 10 },
+          { id: "B3", seats: 4, x: 64, y: 74, w: 14, h: 10 }
         ]
       },
       patio: {
         label: "Uptown Patio",
         shortLabel: "Patio",
-        hint: "Outdoor deck view based on the patio photos and the separate patio POS screen.",
+        hint: "Outdoor deck rebuilt from the real patio seating photos.",
         className: "is-patio",
         ratio: "11 / 6",
         minWidth: "860px",
         zones: [
-          { label: "West Bench", className: "left-bench", x: 3, y: 11, w: 18, h: 76 },
-          { label: "East Bench", className: "right-bench", x: 79, y: 11, w: 18, h: 76 },
-          { label: "North Bench", className: "north-bench", x: 24, y: 3, w: 52, h: 12 },
-          { label: "Walkway", className: "lane", x: 32, y: 13, w: 36, h: 74 },
-          { label: "Heater", className: "heater", x: 45, y: 40, w: 10, h: 12 },
-          { label: "Gate", className: "gate", x: 43, y: 87, w: 14, h: 8 }
+          { label: "Street Bench", className: "left-bench", x: 4, y: 10, w: 16, h: 76 },
+          { label: "Building Bench", className: "right-bench", x: 80, y: 10, w: 16, h: 76 },
+          { label: "Back Bench", className: "north-bench", x: 26, y: 4, w: 50, h: 10 },
+          { label: "Main Walkway", className: "lane", x: 31, y: 14, w: 38, h: 70 },
+          { label: "Heater", className: "heater", x: 47, y: 39, w: 8, h: 12 },
+          { label: "Chair Stack / Gate", className: "gate", x: 3, y: 86, w: 20, h: 10 }
         ],
         tables: [
-          { id: "P11", seats: 4, x: 7, y: 14, w: 8.5, h: 8.5, kind: "patio-seat" },
-          { id: "P12", seats: 4, x: 7, y: 24.5, w: 8.5, h: 8.5, kind: "patio-seat" },
-          { id: "P13", seats: 4, x: 7, y: 35, w: 8.5, h: 8.5, kind: "patio-seat" },
-          { id: "P14", seats: 4, x: 7, y: 45.5, w: 8.5, h: 8.5, kind: "patio-seat" },
-          { id: "P15", seats: 4, x: 7, y: 56, w: 8.5, h: 8.5, kind: "patio-seat" },
-          { id: "P16", seats: 4, x: 7, y: 66.5, w: 8.5, h: 8.5, kind: "patio-seat" },
-          { id: "P17", seats: 4, x: 7, y: 77, w: 8.5, h: 8.5, kind: "patio-seat" },
-          { id: "P18", seats: 4, x: 7, y: 87.5, w: 8.5, h: 8.5, kind: "patio-seat" },
-          { id: "P9", seats: 4, x: 33.5, y: 5.5, w: 8.5, h: 8.5, kind: "patio-seat" },
-          { id: "P10", seats: 4, x: 49, y: 5.5, w: 8.5, h: 8.5, kind: "patio-seat" },
-          { id: "P8", seats: 4, x: 84, y: 14, w: 8.5, h: 8.5, kind: "patio-seat" },
-          { id: "P7", seats: 4, x: 84, y: 24.5, w: 8.5, h: 8.5, kind: "patio-seat" },
-          { id: "P6", seats: 4, x: 84, y: 35, w: 8.5, h: 8.5, kind: "patio-seat" },
-          { id: "P5", seats: 4, x: 84, y: 45.5, w: 8.5, h: 8.5, kind: "patio-seat" },
-          { id: "P4", seats: 4, x: 84, y: 56, w: 8.5, h: 8.5, kind: "patio-seat" },
-          { id: "P3", seats: 4, x: 84, y: 66.5, w: 8.5, h: 8.5, kind: "patio-seat" },
-          { id: "P2", seats: 4, x: 84, y: 77, w: 8.5, h: 8.5, kind: "patio-seat" },
-          { id: "P1", seats: 4, x: 84, y: 87.5, w: 8.5, h: 8.5, kind: "patio-seat" }
+          { id: "P1", seats: 4, x: 36, y: 12, w: 9, h: 8.5, kind: "patio-seat" },
+          { id: "P2", seats: 4, x: 53, y: 12, w: 9, h: 8.5, kind: "patio-seat" },
+          { id: "P3", seats: 4, x: 8, y: 20, w: 9, h: 8.5, kind: "patio-seat" },
+          { id: "P4", seats: 4, x: 8, y: 32.5, w: 9, h: 8.5, kind: "patio-seat" },
+          { id: "P5", seats: 4, x: 8, y: 45, w: 9, h: 8.5, kind: "patio-seat" },
+          { id: "P6", seats: 4, x: 8, y: 57.5, w: 9, h: 8.5, kind: "patio-seat" },
+          { id: "P7", seats: 4, x: 8, y: 70, w: 9, h: 8.5, kind: "patio-seat" },
+          { id: "P8", seats: 4, x: 83, y: 18, w: 9, h: 8.5, kind: "patio-seat" },
+          { id: "P9", seats: 4, x: 83, y: 30.5, w: 9, h: 8.5, kind: "patio-seat" },
+          { id: "P10", seats: 4, x: 83, y: 43, w: 9, h: 8.5, kind: "patio-seat" },
+          { id: "P11", seats: 4, x: 83, y: 55.5, w: 9, h: 8.5, kind: "patio-seat" },
+          { id: "P12", seats: 4, x: 83, y: 68, w: 9, h: 8.5, kind: "patio-seat" },
+          { id: "P13", seats: 4, x: 83, y: 80.5, w: 9, h: 8.5, kind: "patio-seat" }
         ]
       }
     };
@@ -759,7 +741,7 @@
 
       mapTitle.textContent = space.label;
       mapHint.textContent = space.hint;
-      tableCount.textContent = `${getTables().length} positions`;
+      tableCount.textContent = `${getTables().length} tables`;
       selectedArea.textContent = space.shortLabel;
       renderSelection();
     }
