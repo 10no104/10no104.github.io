@@ -214,13 +214,13 @@
       position: relative;
       padding-inline: 42px;
       background:
-        linear-gradient(135deg, rgba(49, 112, 190, 0.18), rgba(130, 201, 255, 0.3)),
-        #f3fbff;
-      border-color: rgba(61, 127, 199, 0.4);
-      color: #1d5f9f;
+        linear-gradient(135deg, rgba(90, 17, 34, 0.08), rgba(212, 175, 55, 0.22)),
+        #fff9f1;
+      border-color: rgba(140, 101, 36, 0.34);
+      color: #6b1b31;
       font-weight: 800;
       box-shadow:
-        0 10px 24px rgba(47, 115, 187, 0.18),
+        0 10px 24px rgba(90, 17, 34, 0.12),
         inset 0 1px 0 rgba(255, 255, 255, 0.72);
       transform: translateY(-1px) scale(1.03);
     }
@@ -587,6 +587,16 @@
       return [...drinkCategories, ...otherCategories];
     }
 
+    function prioritizeDrinkSubcategories(subcategories = []) {
+      const preferredOrder = ["soju", "makguli", "beer", "shot"];
+      const unique = [...new Set(subcategories)];
+      const matched = preferredOrder
+        .map((name) => unique.find((sub) => String(sub).trim().toLowerCase() === name))
+        .filter(Boolean);
+      const remainder = unique.filter((sub) => !preferredOrder.includes(String(sub).trim().toLowerCase()));
+      return [...matched, ...remainder];
+    }
+
     function getCategories(menuItems) {
       const unique = [...new Set(menuItems.map((item) => item.category).filter(Boolean))];
       const base = ["All", ...unique];
@@ -686,7 +696,13 @@
         .map((item) => getSubcategoryValue(item))
         .filter(Boolean);
 
-      return [...new Set(options)];
+      const uniqueOptions = [...new Set(options)];
+      return isDrinkCategory(category) ? prioritizeDrinkSubcategories(uniqueOptions) : uniqueOptions;
+    }
+
+    function formatCategoryLabel(category) {
+      if (isDrinkCategory(category)) return `${category} 🍺`;
+      return category;
     }
 
     function matchesAllowedIngredients(item, selectedTags) {
@@ -745,7 +761,7 @@
         .map((category) => {
           const activeClass = category === selectedCategory ? "active" : "";
           const drinkClass = isDrinkCategory(category) ? "tab-drink" : "";
-          return `<button class="tab ${drinkClass} ${activeClass}" data-category="${escapeHtml(category)}" type="button">${escapeHtml(category)}</button>`;
+          return `<button class="tab ${drinkClass} ${activeClass}" data-category="${escapeHtml(category)}" type="button">${escapeHtml(formatCategoryLabel(category))}</button>`;
         })
         .join("");
 
