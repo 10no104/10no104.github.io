@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EHWA Table Map Prototype</title>
+  <title>EHWA Uptown Table Map</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet" />
@@ -36,7 +36,7 @@
     }
 
     .shell {
-      width: min(100% - 24px, 1180px);
+      width: min(100% - 24px, 1220px);
       margin: 0 auto;
       padding: 22px 0 44px;
     }
@@ -70,6 +70,13 @@
       line-height: 1;
     }
 
+    .brand p {
+      margin: 8px 0 0;
+      color: rgba(255, 242, 223, 0.78);
+      font-size: 0.96rem;
+      line-height: 1.5;
+    }
+
     .branch-switch {
       display: inline-grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -82,7 +89,7 @@
 
     .branch-switch button {
       min-height: 38px;
-      padding: 0 14px;
+      padding: 0 16px;
       border: 0;
       border-radius: 999px;
       color: rgba(255, 247, 235, 0.78);
@@ -143,19 +150,84 @@
 
     .floor {
       position: relative;
-      width: min(100%, 900px);
-      min-width: 680px;
-      aspect-ratio: 9 / 6;
+      width: min(100%, 980px);
+      min-width: 760px;
+      aspect-ratio: 10 / 7;
       margin: 0 auto;
       border: 2px solid rgba(86, 62, 42, 0.22);
-      border-radius: 18px;
-      background:
-        linear-gradient(90deg, rgba(82, 62, 40, 0.08) 1px, transparent 1px),
-        linear-gradient(180deg, rgba(82, 62, 40, 0.08) 1px, transparent 1px),
-        linear-gradient(180deg, #fffaf2, #f3e6d4);
-      background-size: 36px 36px, 36px 36px, auto;
+      border-radius: 22px;
       touch-action: none;
       user-select: none;
+      overflow: hidden;
+    }
+
+    .floor::before,
+    .floor::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .floor.is-hall {
+      background:
+        linear-gradient(180deg, rgba(255, 211, 116, 0.18), transparent 24%),
+        linear-gradient(125deg, rgba(34, 107, 255, 0.12), transparent 38%),
+        linear-gradient(55deg, rgba(255, 42, 91, 0.14), transparent 52%),
+        repeating-linear-gradient(
+          135deg,
+          #7a5b45 0 22px,
+          #86654b 22px 44px
+        );
+    }
+
+    .floor.is-hall::before {
+      background:
+        linear-gradient(90deg, rgba(36, 31, 61, 0.9) 0 18%, transparent 18% 72%, rgba(115, 19, 43, 0.82) 72% 100%);
+      opacity: 0.22;
+    }
+
+    .floor.is-hall::after {
+      inset: 9% 38% 7% 37%;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255, 246, 224, 0.34), rgba(255, 246, 224, 0.08));
+      filter: blur(2px);
+      opacity: 0.42;
+    }
+
+    .floor.is-patio {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0 18%, rgba(255, 255, 255, 0.46) 18% 100%),
+        repeating-linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.1) 0 1px,
+          transparent 1px 17%
+        ),
+        repeating-linear-gradient(
+          0deg,
+          #5f4835 0 18px,
+          #705741 18px 36px
+        );
+    }
+
+    .floor.is-patio::before {
+      inset: 8% 6% 8% 6%;
+      background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.12) 0 22%, transparent 22% 78%, rgba(255, 255, 255, 0.12) 78% 100%);
+      border-radius: 18px;
+      opacity: 0.32;
+    }
+
+    .floor.is-patio::after {
+      inset: 0;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          transparent 0 14.2%,
+          rgba(59, 37, 18, 0.34) 14.2% 14.8%,
+          transparent 14.8% 28.4%
+        );
+      opacity: 0.26;
     }
 
     .zone {
@@ -164,18 +236,54 @@
       align-items: center;
       justify-content: center;
       border: 1px dashed rgba(83, 62, 42, 0.22);
-      border-radius: 14px;
-      color: rgba(63, 44, 30, 0.52);
-      font-size: 0.72rem;
+      border-radius: 16px;
+      color: rgba(63, 44, 30, 0.62);
+      font-size: 0.68rem;
       font-weight: 800;
       letter-spacing: 0.12em;
       text-transform: uppercase;
       pointer-events: none;
+      text-align: center;
+      padding: 4px;
     }
 
-    .zone.bar { left: 3%; top: 6%; width: 16%; height: 88%; }
-    .zone.entry { right: 3%; bottom: 5%; width: 18%; height: 18%; }
-    .zone.window { left: 24%; top: 5%; width: 48%; height: 12%; }
+    .zone.left-booth,
+    .zone.right-banquette {
+      border-style: solid;
+      color: rgba(255, 248, 239, 0.82);
+    }
+
+    .zone.left-booth {
+      background: linear-gradient(180deg, rgba(35, 57, 132, 0.28), rgba(28, 31, 74, 0.4));
+    }
+
+    .zone.right-banquette {
+      background: linear-gradient(180deg, rgba(142, 20, 50, 0.28), rgba(86, 18, 37, 0.4));
+    }
+
+    .zone.window,
+    .zone.entry,
+    .zone.gate {
+      background: rgba(255, 255, 255, 0.42);
+    }
+
+    .zone.bar,
+    .zone.heater {
+      background: rgba(123, 31, 47, 0.12);
+      border-style: solid;
+    }
+
+    .zone.patio-strip,
+    .zone.left-bench,
+    .zone.right-bench,
+    .zone.north-bench {
+      background: rgba(91, 65, 44, 0.18);
+      border-style: solid;
+    }
+
+    .zone.lane {
+      background: rgba(255, 255, 255, 0.1);
+    }
 
     .table {
       position: absolute;
@@ -192,10 +300,11 @@
       box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.8),
         0 12px 22px rgba(58, 38, 21, 0.12);
-      font-size: clamp(0.74rem, 1.2vw, 0.98rem);
+      font-size: clamp(0.72rem, 1.15vw, 0.96rem);
       font-weight: 900;
       cursor: pointer;
       transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease, box-shadow 0.12s ease;
+      z-index: 1;
     }
 
     .table.round {
@@ -204,7 +313,27 @@
 
     .table.booth {
       border-radius: 18px;
-      background: linear-gradient(180deg, #fff7e5, #e7c47a);
+      background: linear-gradient(180deg, #fff6e6, #f0c87a);
+    }
+
+    .table.banquette {
+      background: linear-gradient(180deg, #fff7f6, #efcfcb);
+    }
+
+    .table.bar-seat {
+      background: linear-gradient(180deg, #fff6ed, #f3d9bc);
+    }
+
+    .table.patio-seat {
+      background: linear-gradient(180deg, #ffffff, #e5ded2);
+    }
+
+    .table.utility {
+      border-style: dashed;
+      color: #66584b;
+      background: linear-gradient(180deg, #f5efe5, #dfd4c6);
+      box-shadow: none;
+      cursor: not-allowed;
     }
 
     .table.is-selected {
@@ -216,7 +345,7 @@
       transform: translateY(-2px);
     }
 
-    .table.is-drag-hit:not(.is-selected) {
+    .table.is-drag-hit:not(.is-selected):not(.utility) {
       border-color: rgba(212, 175, 55, 0.86);
       background: linear-gradient(180deg, #fff5d1, #efcf78);
     }
@@ -224,9 +353,10 @@
     .table small {
       display: block;
       margin-top: 2px;
-      font-size: 0.62rem;
+      font-size: 0.58rem;
       font-weight: 800;
-      opacity: 0.68;
+      opacity: 0.72;
+      line-height: 1.2;
     }
 
     .selection-box {
@@ -269,6 +399,11 @@
       background: linear-gradient(135deg, #7b1f2f, #c7982d);
     }
 
+    .legend .service::before {
+      border-style: dashed;
+      background: linear-gradient(180deg, #f5efe5, #dfd4c6);
+    }
+
     .side-panel {
       display: grid;
       align-content: start;
@@ -298,8 +433,8 @@
     }
 
     .summary-box strong {
-      font-size: 1.6rem;
-      line-height: 1;
+      font-size: 1.24rem;
+      line-height: 1.2;
     }
 
     .selected-list {
@@ -365,7 +500,7 @@
       white-space: pre-wrap;
     }
 
-    @media (max-width: 720px) {
+    @media (max-width: 760px) {
       .topbar {
         align-items: flex-start;
         flex-direction: column;
@@ -380,7 +515,7 @@
       }
 
       .floor {
-        min-width: 620px;
+        min-width: 660px;
       }
     }
 
@@ -396,12 +531,13 @@
   <div class="shell">
     <header class="topbar">
       <div class="brand">
-        <span>Reservation Tool Prototype</span>
-        <h1>Table Map</h1>
+        <span>Temporary Layout Study</span>
+        <h1>Uptown Table Map</h1>
+        <p>Indoor hall and patio views rebuilt from the latest store photos and POS reference screens.</p>
       </div>
-      <div class="branch-switch" aria-label="Choose branch">
-        <button class="is-active" type="button" data-branch="uptown">Uptown</button>
-        <button type="button" data-branch="downtown">Downtown</button>
+      <div class="branch-switch" aria-label="Choose area">
+        <button class="is-active" type="button" data-space="hall">Hall</button>
+        <button type="button" data-space="patio">Patio</button>
       </div>
     </header>
 
@@ -409,22 +545,20 @@
       <section class="map-panel">
         <div class="panel-head">
           <div>
-            <h2 id="mapTitle">Uptown Floor</h2>
-            <span>Click tables, or drag across the floor to select a group.</span>
+            <h2 id="mapTitle">Uptown Hall</h2>
+            <span id="mapHint">Indoor floor based on the POS hall screen and current dining-room photos.</span>
           </div>
-          <span id="tableCount">0 tables</span>
+          <span id="tableCount">0 positions</span>
         </div>
         <div class="floor-wrap">
-          <div class="floor" id="floorMap" aria-label="Table map">
-            <div class="zone bar">Bar</div>
-            <div class="zone window">Window</div>
-            <div class="zone entry">Entry</div>
+          <div class="floor is-hall" id="floorMap" aria-label="Table map">
             <div class="selection-box" id="selectionBox"></div>
           </div>
         </div>
         <div class="legend">
-          <span>Available</span>
+          <span>Reservable</span>
           <span class="selected">Selected</span>
+          <span class="service">Service / utility</span>
         </div>
       </section>
 
@@ -434,6 +568,10 @@
           <span id="selectionCount">0 selected</span>
         </div>
         <div class="selection-summary">
+          <div class="summary-box">
+            <span>Area</span>
+            <strong id="selectedArea">Hall</strong>
+          </div>
           <div class="summary-box">
             <span>Tables</span>
             <strong id="selectedNames">-</strong>
@@ -449,45 +587,105 @@
             <button class="action light" id="clearSelection" type="button">Clear</button>
             <button class="action primary" id="mockAssign" type="button">Mock Assign</button>
           </div>
-          <pre class="payload" id="payloadPreview">tables: []</pre>
+          <pre class="payload" id="payloadPreview">{
+  "area": "hall",
+  "tables": [],
+  "seats": 0
+}</pre>
         </div>
       </aside>
     </main>
   </div>
 
   <script>
-    const maps = {
-      uptown: [
-        { id: "B1", seats: 2, x: 5, y: 14, w: 10, h: 9, shape: "booth" },
-        { id: "B2", seats: 2, x: 5, y: 29, w: 10, h: 9, shape: "booth" },
-        { id: "B3", seats: 2, x: 5, y: 44, w: 10, h: 9, shape: "booth" },
-        { id: "B4", seats: 2, x: 5, y: 59, w: 10, h: 9, shape: "booth" },
-        { id: "T1", seats: 4, x: 25, y: 23, w: 11, h: 11, shape: "round" },
-        { id: "T2", seats: 4, x: 42, y: 23, w: 11, h: 11, shape: "round" },
-        { id: "T3", seats: 4, x: 59, y: 23, w: 11, h: 11, shape: "round" },
-        { id: "T4", seats: 4, x: 25, y: 46, w: 12, h: 10 },
-        { id: "T5", seats: 4, x: 44, y: 46, w: 12, h: 10 },
-        { id: "T6", seats: 6, x: 63, y: 44, w: 15, h: 12 },
-        { id: "P1", seats: 6, x: 27, y: 72, w: 16, h: 11 },
-        { id: "P2", seats: 8, x: 52, y: 70, w: 19, h: 12 }
-      ],
-      downtown: [
-        { id: "A1", seats: 2, x: 6, y: 16, w: 10, h: 9, shape: "booth" },
-        { id: "A2", seats: 2, x: 6, y: 31, w: 10, h: 9, shape: "booth" },
-        { id: "A3", seats: 2, x: 6, y: 46, w: 10, h: 9, shape: "booth" },
-        { id: "T1", seats: 4, x: 25, y: 18, w: 12, h: 10 },
-        { id: "T2", seats: 4, x: 43, y: 18, w: 12, h: 10 },
-        { id: "T3", seats: 4, x: 61, y: 18, w: 12, h: 10 },
-        { id: "T4", seats: 4, x: 25, y: 41, w: 11, h: 11, shape: "round" },
-        { id: "T5", seats: 4, x: 43, y: 41, w: 11, h: 11, shape: "round" },
-        { id: "T6", seats: 4, x: 61, y: 41, w: 11, h: 11, shape: "round" },
-        { id: "G1", seats: 8, x: 28, y: 70, w: 20, h: 12 },
-        { id: "G2", seats: 10, x: 56, y: 68, w: 23, h: 13 }
-      ]
+    const spaces = {
+      hall: {
+        label: "Uptown Hall",
+        shortLabel: "Hall",
+        hint: "Indoor floor based on the POS hall screen and current dining-room photos.",
+        className: "is-hall",
+        ratio: "10 / 7",
+        minWidth: "760px",
+        zones: [
+          { label: "Blue Booth", className: "left-booth", x: 2, y: 7, w: 18, h: 70 },
+          { label: "Front Window", className: "window", x: 47, y: 5, w: 39, h: 18 },
+          { label: "Red Banquette", className: "right-banquette", x: 74, y: 30, w: 16, h: 46 },
+          { label: "Bar", className: "bar", x: 74, y: 4, w: 18, h: 16 },
+          { label: "Patio Strip", className: "patio-strip", x: 4, y: 84, w: 83, h: 10 },
+          { label: "Entry", className: "entry", x: 61, y: 35, w: 12, h: 10 }
+        ],
+        tables: [
+          { id: "A1", seats: 4, x: 4, y: 8, w: 8.5, h: 8.5, shape: "booth" },
+          { id: "A2", seats: 4, x: 15, y: 8, w: 8.5, h: 8.5, shape: "booth" },
+          { id: "A3", seats: 4, x: 26, y: 8, w: 8.5, h: 8.5, shape: "booth" },
+          { id: "A4", seats: 4, x: 37, y: 8, w: 8.5, h: 8.5, shape: "booth" },
+          { id: "A5", seats: 4, x: 49, y: 8, w: 8.5, h: 8.5, shape: "booth" },
+          { id: "A6", seats: 4, x: 60, y: 8, w: 8.5, h: 8.5, shape: "booth" },
+          { id: "A7", seats: 4, x: 71, y: 8, w: 8.5, h: 8.5, shape: "booth" },
+          { id: "A8", seats: 4, x: 51, y: 21, w: 8.5, h: 8.5, shape: "booth" },
+          { id: "A9", seats: 4, x: 62, y: 21, w: 8.5, h: 8.5, shape: "booth" },
+          { id: "A10", seats: 4, x: 73, y: 21, w: 8.5, h: 8.5, shape: "booth" },
+          { id: "B3", seats: 2, x: 6, y: 37, w: 8.5, h: 8.5 },
+          { id: "B6", seats: 2, x: 17, y: 37, w: 8.5, h: 8.5 },
+          { id: "B9", seats: 2, x: 28, y: 37, w: 8.5, h: 8.5 },
+          { id: "B2", seats: 2, x: 6, y: 50, w: 8.5, h: 8.5 },
+          { id: "B5", seats: 2, x: 17, y: 50, w: 8.5, h: 8.5 },
+          { id: "B8", seats: 2, x: 28, y: 50, w: 8.5, h: 8.5 },
+          { id: "B1", seats: 2, x: 6, y: 63, w: 8.5, h: 8.5 },
+          { id: "B4", seats: 2, x: 17, y: 63, w: 8.5, h: 8.5 },
+          { id: "B7", seats: 2, x: 28, y: 63, w: 8.5, h: 8.5 },
+          { id: "BAR1", seats: 2, x: 64, y: 52, w: 9, h: 8.5, shape: "round", kind: "bar-seat" },
+          { id: "BAR2", seats: 2, x: 76, y: 52, w: 9, h: 8.5, shape: "round", kind: "bar-seat" },
+          { id: "takeout", seats: 0, x: 63, y: 64.5, w: 10, h: 10, kind: "utility", note: "service" },
+          { id: "takeout2", seats: 0, x: 75, y: 64.5, w: 10, h: 10, kind: "utility", note: "service" },
+          { id: "C1", seats: 4, x: 6, y: 78, w: 8.5, h: 8.5, shape: "banquette" },
+          { id: "C2", seats: 4, x: 17, y: 78, w: 8.5, h: 8.5, shape: "banquette" },
+          { id: "C3", seats: 4, x: 28, y: 78, w: 8.5, h: 8.5, shape: "banquette" },
+          { id: "C4", seats: 4, x: 39, y: 78, w: 8.5, h: 8.5, shape: "banquette" },
+          { id: "C5", seats: 4, x: 50, y: 78, w: 8.5, h: 8.5, shape: "banquette" },
+          { id: "C6", seats: 4, x: 61, y: 78, w: 8.5, h: 8.5, shape: "banquette" }
+        ]
+      },
+      patio: {
+        label: "Uptown Patio",
+        shortLabel: "Patio",
+        hint: "Outdoor deck view based on the patio photos and the separate patio POS screen.",
+        className: "is-patio",
+        ratio: "11 / 6",
+        minWidth: "860px",
+        zones: [
+          { label: "West Bench", className: "left-bench", x: 3, y: 11, w: 18, h: 76 },
+          { label: "East Bench", className: "right-bench", x: 79, y: 11, w: 18, h: 76 },
+          { label: "North Bench", className: "north-bench", x: 24, y: 3, w: 52, h: 12 },
+          { label: "Walkway", className: "lane", x: 32, y: 13, w: 36, h: 74 },
+          { label: "Heater", className: "heater", x: 45, y: 40, w: 10, h: 12 },
+          { label: "Gate", className: "gate", x: 43, y: 87, w: 14, h: 8 }
+        ],
+        tables: [
+          { id: "P11", seats: 4, x: 7, y: 14, w: 8.5, h: 8.5, kind: "patio-seat" },
+          { id: "P12", seats: 4, x: 7, y: 24.5, w: 8.5, h: 8.5, kind: "patio-seat" },
+          { id: "P13", seats: 4, x: 7, y: 35, w: 8.5, h: 8.5, kind: "patio-seat" },
+          { id: "P14", seats: 4, x: 7, y: 45.5, w: 8.5, h: 8.5, kind: "patio-seat" },
+          { id: "P15", seats: 4, x: 7, y: 56, w: 8.5, h: 8.5, kind: "patio-seat" },
+          { id: "P16", seats: 4, x: 7, y: 66.5, w: 8.5, h: 8.5, kind: "patio-seat" },
+          { id: "P17", seats: 4, x: 7, y: 77, w: 8.5, h: 8.5, kind: "patio-seat" },
+          { id: "P18", seats: 4, x: 7, y: 87.5, w: 8.5, h: 8.5, kind: "patio-seat" },
+          { id: "P9", seats: 4, x: 33.5, y: 5.5, w: 8.5, h: 8.5, kind: "patio-seat" },
+          { id: "P10", seats: 4, x: 49, y: 5.5, w: 8.5, h: 8.5, kind: "patio-seat" },
+          { id: "P8", seats: 4, x: 84, y: 14, w: 8.5, h: 8.5, kind: "patio-seat" },
+          { id: "P7", seats: 4, x: 84, y: 24.5, w: 8.5, h: 8.5, kind: "patio-seat" },
+          { id: "P6", seats: 4, x: 84, y: 35, w: 8.5, h: 8.5, kind: "patio-seat" },
+          { id: "P5", seats: 4, x: 84, y: 45.5, w: 8.5, h: 8.5, kind: "patio-seat" },
+          { id: "P4", seats: 4, x: 84, y: 56, w: 8.5, h: 8.5, kind: "patio-seat" },
+          { id: "P3", seats: 4, x: 84, y: 66.5, w: 8.5, h: 8.5, kind: "patio-seat" },
+          { id: "P2", seats: 4, x: 84, y: 77, w: 8.5, h: 8.5, kind: "patio-seat" },
+          { id: "P1", seats: 4, x: 84, y: 87.5, w: 8.5, h: 8.5, kind: "patio-seat" }
+        ]
+      }
     };
 
     const state = {
-      branch: "uptown",
+      space: "hall",
       selected: new Set(),
       drag: null
     };
@@ -496,37 +694,73 @@
     const selectionBox = document.getElementById("selectionBox");
     const tableCount = document.getElementById("tableCount");
     const mapTitle = document.getElementById("mapTitle");
+    const mapHint = document.getElementById("mapHint");
     const selectionCount = document.getElementById("selectionCount");
+    const selectedArea = document.getElementById("selectedArea");
     const selectedNames = document.getElementById("selectedNames");
     const selectedSeats = document.getElementById("selectedSeats");
     const selectedList = document.getElementById("selectedList");
     const payloadPreview = document.getElementById("payloadPreview");
 
+    function getSpace() {
+      return spaces[state.space] || spaces.hall;
+    }
+
     function getTables() {
-      return maps[state.branch] || [];
+      return getSpace().tables || [];
     }
 
     function renderMap() {
-      floorMap.querySelectorAll(".table").forEach((node) => node.remove());
+      const space = getSpace();
+
+      floorMap.className = `floor ${space.className}`.trim();
+      floorMap.style.aspectRatio = space.ratio;
+      floorMap.style.minWidth = space.minWidth;
+
+      floorMap.querySelectorAll(".zone, .table").forEach((node) => node.remove());
+
+      (space.zones || []).forEach((zone) => {
+        const node = document.createElement("div");
+        node.className = `zone ${zone.className || ""}`.trim();
+        node.style.left = `${zone.x}%`;
+        node.style.top = `${zone.y}%`;
+        node.style.width = `${zone.w}%`;
+        node.style.height = `${zone.h}%`;
+        node.textContent = zone.label;
+        floorMap.insertBefore(node, selectionBox);
+      });
+
       getTables().forEach((table) => {
         const button = document.createElement("button");
+        const kindClass = table.kind ? ` ${table.kind}` : "";
         button.type = "button";
-        button.className = `table ${table.shape || ""}`.trim();
+        button.className = `table ${table.shape || ""}${kindClass}`.trim();
         button.dataset.tableId = table.id;
+        if (table.kind === "utility") {
+          button.dataset.disabled = "true";
+          button.setAttribute("aria-disabled", "true");
+        }
         button.style.setProperty("--x", `${table.x}%`);
         button.style.setProperty("--y", `${table.y}%`);
         button.style.setProperty("--w", `${table.w}%`);
         button.style.setProperty("--h", `${table.h}%`);
-        button.innerHTML = `${table.id}<small>${table.seats} seats</small>`;
+        button.innerHTML = table.kind === "utility"
+          ? `${table.id}<small>${table.note || "service"}</small>`
+          : `${table.id}<small>${table.seats} seats</small>`;
+
         button.addEventListener("click", (event) => {
-          if (state.drag?.moved) return;
+          if (state.drag?.moved || table.kind === "utility") return;
           event.stopPropagation();
           toggleTable(table.id);
         });
-        floorMap.appendChild(button);
+
+        floorMap.insertBefore(button, selectionBox);
       });
-      mapTitle.textContent = `${state.branch === "uptown" ? "Uptown" : "Downtown"} Floor`;
-      tableCount.textContent = `${getTables().length} tables`;
+
+      mapTitle.textContent = space.label;
+      mapHint.textContent = space.hint;
+      tableCount.textContent = `${getTables().length} positions`;
+      selectedArea.textContent = space.shortLabel;
       renderSelection();
     }
 
@@ -534,7 +768,7 @@
       const tables = getTables();
       const selectedTables = tables.filter((table) => state.selected.has(table.id));
       const selectedIds = selectedTables.map((table) => table.id);
-      const seats = selectedTables.reduce((total, table) => total + table.seats, 0);
+      const seats = selectedTables.reduce((total, table) => total + (Number(table.seats) || 0), 0);
 
       document.querySelectorAll(".table").forEach((node) => {
         node.classList.toggle("is-selected", state.selected.has(node.dataset.tableId));
@@ -547,7 +781,7 @@
         ? selectedIds.map((id) => `<span class="selected-chip">${id}</span>`).join("")
         : '<div class="empty">No tables selected</div>';
       payloadPreview.textContent = JSON.stringify({
-        branch: state.branch,
+        area: state.space,
         tables: selectedIds,
         seats
       }, null, 2);
@@ -585,6 +819,10 @@
     function updateDragHits(box) {
       const floorRect = floorMap.getBoundingClientRect();
       document.querySelectorAll(".table").forEach((node) => {
+        if (node.dataset.disabled === "true") {
+          node.classList.remove("is-drag-hit");
+          return;
+        }
         const rect = node.getBoundingClientRect();
         const localRect = {
           left: rect.left - floorRect.left,
@@ -626,7 +864,9 @@
       const box = normalizeBox(state.drag.start, state.drag.current);
       if (state.drag.moved) {
         document.querySelectorAll(".table.is-drag-hit").forEach((node) => {
-          state.selected.add(node.dataset.tableId);
+          if (node.dataset.disabled !== "true") {
+            state.selected.add(node.dataset.tableId);
+          }
         });
       }
       document.querySelectorAll(".table.is-drag-hit").forEach((node) => {
@@ -645,11 +885,11 @@
       state.drag = null;
     });
 
-    document.querySelectorAll("[data-branch]").forEach((button) => {
+    document.querySelectorAll("[data-space]").forEach((button) => {
       button.addEventListener("click", () => {
-        state.branch = button.dataset.branch;
+        state.space = button.dataset.space;
         state.selected.clear();
-        document.querySelectorAll("[data-branch]").forEach((item) => {
+        document.querySelectorAll("[data-space]").forEach((item) => {
           item.classList.toggle("is-active", item === button);
         });
         renderMap();
