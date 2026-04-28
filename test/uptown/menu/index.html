@@ -918,15 +918,16 @@
     .menu-page .tabs .tab-drink {
       position: relative;
       padding-inline: 42px;
-      background:
-        linear-gradient(135deg, rgba(90, 17, 34, 0.08), rgba(212, 175, 55, 0.22)),
-        #fff9f1;
-      border-color: rgba(140, 101, 36, 0.34);
-      color: #6b1b31;
+      white-space: nowrap;
+      min-width: max-content;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, #5a1122 0%, #a32147 45%, #d4af37 100%);
+      border-color: rgba(90, 17, 34, 0.82);
+      color: #fffaf3;
       font-weight: 800;
       box-shadow:
-        0 10px 24px rgba(90, 17, 34, 0.12),
-        inset 0 1px 0 rgba(255, 255, 255, 0.72);
+        0 10px 24px rgba(90, 17, 34, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.16);
       transform: translateY(-1px) scale(1.03);
     }
 
@@ -1505,9 +1506,13 @@
     }
 
     function prioritizeDrinkCategory(categories = []) {
+      const allCategories = categories.filter((category) => String(category).trim().toLowerCase() === "all");
       const drinkCategories = categories.filter((category) => isDrinkCategory(category));
-      const otherCategories = categories.filter((category) => !isDrinkCategory(category));
-      return [...drinkCategories, ...otherCategories];
+      const otherCategories = categories.filter((category) => {
+        const normalized = String(category).trim().toLowerCase();
+        return normalized !== "all" && !isDrinkCategory(category);
+      });
+      return [...allCategories, ...drinkCategories, ...otherCategories];
     }
 
     function prioritizeDrinkSubcategories(subcategories = []) {
