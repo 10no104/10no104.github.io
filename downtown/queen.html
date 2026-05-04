@@ -1353,6 +1353,7 @@
       suppressNewAlertUntil: 0,
       autoRefreshHandle: null,
       autoRemovingReservationIds: new Set(),
+      confirmingAlertIds: new Set(),
       feedbackQueue: [],
       feedbackTransitionLocked: false
     };
@@ -1387,7 +1388,9 @@
         name: values[4] || "",
         phone: values[5] || "",
         notes: values[6] || "",
-        status: values[7] || "active"
+        status: values[7] || "active",
+        alertStatus: values[8] || ((values[7] || "").trim().toLowerCase() === "pending" ? "pending" : "confirmed"),
+        alertType: values[9] || ""
       };
     }
 
@@ -1446,6 +1449,38 @@
       ].join("::");
     }
 
+    function getAlertQueueKey(item) {
+      return getReservationIdentity(item);
+    }
+
+    function isPendingAlert(item) {
+      return item?.alertStatus === "pending";
+    }
+
+    function getAlertTitle(item) {
+      switch (item?.alertType) {
+        case "new":
+          return "New Reservation";
+        case "updated":
+          return "Reservation Updated";
+        case "canceled":
+          return "Reservation Canceled";
+        default:
+          return item?.status === "removed" ? "Reservation Canceled" : "Reservation Needs Confirmation";
+      }
+    }
+
+    function createPendingFeedbackItem(item) {
+      return {
+        title: getAlertTitle(item),
+        message: "",
+        details: item,
+        persistent: true,
+        requiresConfirmation: true,
+        key: getAlertQueueKey(item)
+      };
+    }
+
     function shouldAutoRemoveReservation(item, now = new Date()) {
       if (!item || item.status === "removed") return false;
       const reservationDateTime = getReservationDateTime(item);
@@ -1461,7 +1496,9 @@
         name: item.name || "",
         phone: item.phone || "",
         notes: item.notes || "",
-        status: item.status || "active"
+        status: item.status || "active",
+        alertStatus: item.alertStatus || "confirmed",
+        alertType: item.alertType || ""
       });
     }
 
@@ -1491,10 +1528,11 @@
     function syncReservations(reservations, { detectNew = false } = {}) {
       const shouldDetectNew = detectNew && Date.now() >= state.suppressNewAlertUntil;
       const newReservations = shouldDetectNew
-        ? reservations.filter((item) => item.status !== "removed" && !state.knownReservationKeys.has(getReservationKey(item)))
+        ? reservations.filter((item) => item.status !== "removed" && item.alertStatus !== "pending" && !state.knownReservationKeys.has(getReservationKey(item)))
         : [];
       const canceledReservations = shouldDetectNew
         ? reservations.filter((item) => {
+            if (item.alertStatus === "pending") return false;
             if (item.status !== "removed") return false;
             const identity = getReservationIdentity(item);
             const previousSnapshot = state.knownReservationSnapshots.get(identity);
@@ -1503,6 +1541,7 @@
         : [];
       const updatedReservations = shouldDetectNew
         ? reservations.filter((item) => {
+            if (item.alertStatus === "pending") return false;
             if (item.status === "removed") return false;
             const identity = getReservationIdentity(item);
             const previousSnapshot = state.knownReservationSnapshots.get(identity);
@@ -1535,6 +1574,40 @@
       updatedReservations.forEach((item) => {
         openFeedback("Reservation Updated", "", item);
       });
+    }
+
+    function syncPendingFeedbackQueue(reservations = []) {
+      const pendingByKey = new Map(
+        reservations
+          .filter((item) => isPendingAlert(item))
+          .filter((item) => !state.confirmingAlertIds.has(getAlertQueueKey(item)))
+          .map((item) => [getAlertQueueKey(item), item])
+      );
+      const nextQueue = [];
+      const seenKeys = new Set();
+
+      state.feedbackQueue.forEach((entry) => {
+        if (!entry.persistent) {
+          nextQueue.push(entry);
+          return;
+        }
+        const pendingItem = pendingByKey.get(entry.key);
+        if (!pendingItem) return;
+        nextQueue.push({
+          ...entry,
+          title: getAlertTitle(pendingItem),
+          details: pendingItem
+        });
+        seenKeys.add(entry.key);
+      });
+
+      pendingByKey.forEach((item, key) => {
+        if (seenKeys.has(key)) return;
+        nextQueue.push(createPendingFeedbackItem(item));
+      });
+
+      state.feedbackQueue = nextQueue;
+      renderFeedbackQueue();
     }
 
     async function fetchReservations() {
@@ -1596,6 +1669,7 @@
 
     function getStatusBadge(item) {
       if (item.status === "removed") return { label: "Removed", className: "removed" };
+      if (item.status === "pending") return { label: "Pending", className: "active" };
       if (parseGuestCount(item.people) >= 8) return { label: "Large Party", className: "large" };
       return { label: "Active", className: "active" };
     }
@@ -1724,6 +1798,8 @@
       window.setTimeout(async () => {
         const reservations = await fetchReservations();
         syncReservations(reservations);
+        syncPendingFeedbackQueue(reservations);
+        autoRemoveExpiredReservations(reservations);
       }, 900);
     }
 
@@ -1744,7 +1820,9 @@
             action: "status",
             sheetName: item.sheetName || ADMIN_SHEET_CONFIG.sheetName,
             rowNumber: String(item.rowNumber),
-            status: "removed"
+            status: "removed",
+            alertStatus: "confirmed",
+            alertType: ""
           });
         }, index * AUTO_REMOVE_MUTATION_SPACING_MS);
       });
@@ -1754,6 +1832,7 @@
         try {
           const refreshedReservations = await fetchReservations();
           syncReservations(refreshedReservations);
+          syncPendingFeedbackQueue(refreshedReservations);
         } catch (error) {
           console.error("Auto remove refresh failed", error);
         } finally {
@@ -2097,7 +2176,7 @@
       editorAction.value = "update";
       editorRowNumber.value = String(item.rowNumber);
       editorSheetName.value = item.sheetName || ADMIN_SHEET_CONFIG.sheetName;
-      editorStatus.value = item.status || "active";
+      editorStatus.value = item.status === "removed" ? "removed" : "active";
       editorFields.dateInput.value = item.date || formatInputDate(new Date());
       editorFields.timeInput.value = item.time || "6:00 PM";
       editorFields.timeDisplay.textContent = item.time || "6:00 PM";
@@ -2156,7 +2235,7 @@
             </div>
             <div class="booking-summary-box">
               <span>Status</span>
-              <strong>${data.status === "removed" ? "Removed" : "Active"}</strong>
+              <strong>${data.status === "removed" ? "Removed" : (data.status === "pending" ? "Pending" : "Active")}</strong>
             </div>
           </div>
           <div class="booking-summary-note">${(data.notes || "").trim() || "No notes."}</div>
@@ -2230,13 +2309,38 @@
       feedbackModal.setAttribute("aria-hidden", "false");
     }
 
-    function openFeedback(title, message = "", details = null) {
-      state.feedbackQueue.push({ title, message, details });
+    function openFeedback(title, message = "", details = null, options = {}) {
+      state.feedbackQueue.push({
+        title,
+        message,
+        details,
+        persistent: false,
+        requiresConfirmation: false,
+        key: "",
+        ...options
+      });
       renderFeedbackQueue();
     }
 
     function closeFeedback() {
       if (state.feedbackTransitionLocked || !state.feedbackQueue.length) return;
+      const current = state.feedbackQueue[0];
+      if (current?.requiresConfirmation && current?.details) {
+        const alertKey = current.key || getAlertQueueKey(current.details);
+        state.confirmingAlertIds.add(alertKey);
+        buildMutationForm({
+          action: "alertStatus",
+          sheetName: current.details.sheetName || ADMIN_SHEET_CONFIG.sheetName,
+          rowNumber: String(current.details.rowNumber),
+          status: current.details.status === "pending" ? "active" : current.details.status,
+          alertStatus: "confirmed",
+          alertType: ""
+        });
+        refreshAfterMutation();
+        window.setTimeout(() => {
+          state.confirmingAlertIds.delete(alertKey);
+        }, 2500);
+      }
       state.feedbackTransitionLocked = true;
       state.feedbackQueue.shift();
       window.setTimeout(() => {
@@ -2257,6 +2361,9 @@
           ...extraFields
         };
         const feedbackPayload = { ...payload };
+        payload.alertStatus = "confirmed";
+        payload.alertType = "";
+        if (payload.status !== "removed") payload.status = "active";
         buildMutationForm(payload);
         if (form === editorForm) {
           closeEditor();
@@ -2285,6 +2392,7 @@
       fetchReservations()
         .then((reservations) => {
           syncReservations(reservations);
+          syncPendingFeedbackQueue(reservations);
           autoRemoveExpiredReservations(reservations);
         })
         .catch((error) => {
@@ -2299,6 +2407,7 @@
       try {
         const reservations = await fetchReservations();
         syncReservations(reservations, { detectNew: true });
+        syncPendingFeedbackQueue(reservations);
         autoRemoveExpiredReservations(reservations);
       } catch (error) {
         console.error("Auto refresh failed", error);
@@ -2374,7 +2483,9 @@
           action: "status",
           sheetName,
           rowNumber: String(rowNumber),
-          status: isRestore ? "active" : "removed"
+          status: isRestore ? "active" : "removed",
+          alertStatus: "confirmed",
+          alertType: ""
         });
         openFeedback(
           isRestore ? "Reservation Restored" : "Reservation Removed",

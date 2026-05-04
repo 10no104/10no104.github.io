@@ -621,7 +621,9 @@
     <section class="booking-card">
       <form class="booking-form" id="reservationForm" method="POST" action="https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3Iiujn95evZuFiyLNrJUo-_H6rKngdxt0EeBFVw/exec" target="reservationSubmitFrame">
         <input name="action" type="hidden" value="create" />
-        <input name="status" type="hidden" value="active" />
+        <input name="status" type="hidden" value="pending" />
+        <input name="alertStatus" type="hidden" value="pending" />
+        <input name="alertType" type="hidden" value="new" />
         <input name="sheetName" type="hidden" value="Uptown Reservation" />
         <div class="field-grid">
           <div class="field full">
@@ -668,7 +670,7 @@
 
   <div class="modal-backdrop" id="reservationModal" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="reservationModalTitle">
-      <h2 id="reservationModalTitle">Reservation Confirmed</h2>
+      <h2 id="reservationModalTitle">Reservation Request Received</h2>
       <div class="modal-details" id="reservationModalDetails" hidden></div>
       <button class="modal-btn" type="button" id="reservationModalClose">Close</button>
     </div>

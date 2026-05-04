@@ -990,7 +990,9 @@
         name: values[4] || "",
         phone: values[5] || "",
         notes: values[6] || "",
-        status: values[7] || "active"
+        status: values[7] || "active",
+        alertStatus: values[8] || ((values[7] || "").trim().toLowerCase() === "pending" ? "pending" : "confirmed"),
+        alertType: values[9] || ""
       };
     }
 
@@ -1104,6 +1106,7 @@
 
     function getStatusBadge(item) {
       if (item.status === "removed") return { label: "Removed", className: "removed" };
+      if (item.status === "pending") return { label: "Pending", className: "active" };
       if (parseGuestCount(item.people) >= 8) return { label: "Large Party", className: "large" };
       return { label: "Active", className: "active" };
     }
@@ -1540,7 +1543,7 @@
       editorAction.value = "update";
       editorRowNumber.value = String(item.rowNumber);
       editorSheetName.value = item.sheetName || "";
-      editorStatus.value = item.status || "active";
+      editorStatus.value = item.status === "removed" ? "removed" : "active";
       editorFields.dateInput.value = item.date || formatInputDate(new Date());
       editorFields.timeInput.value = item.time || "6:00 PM";
       editorFields.timeDisplay.textContent = item.time || "6:00 PM";
@@ -1584,6 +1587,9 @@
           ...serializeReservationForm(form),
           ...extraFields
         };
+        payload.alertStatus = "confirmed";
+        payload.alertType = "";
+        if (payload.status !== "removed") payload.status = "active";
         buildMutationForm(payload);
         if (form === editorForm) {
           closeEditor();
@@ -1680,7 +1686,9 @@
           action: "status",
           sheetName,
           rowNumber: String(rowNumber),
-          status: isRestore ? "active" : "removed"
+          status: isRestore ? "active" : "removed",
+          alertStatus: "confirmed",
+          alertType: ""
         });
         openFeedback(
           isRestore ? "Reservation Restored" : "Reservation Removed",

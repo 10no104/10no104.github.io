@@ -846,6 +846,8 @@
         <input id="editorRowNumber" name="rowNumber" type="hidden" value="" />
         <input id="editorSheetName" name="sheetName" type="hidden" value="" />
         <input id="editorStatus" name="status" type="hidden" value="active" />
+        <input id="editorAlertStatus" name="alertStatus" type="hidden" value="confirmed" />
+        <input id="editorAlertType" name="alertType" type="hidden" value="" />
         <div class="field-grid" id="editorFields"></div>
         <div class="form-actions">
           <button class="pill-btn primary" type="submit">Save Changes</button>
@@ -950,7 +952,9 @@
         name: values[4] || "",
         phone: values[5] || "",
         notes: values[6] || "",
-        status: values[7] || "active"
+        status: values[7] || "active",
+        alertStatus: values[8] || ((values[7] || "").trim().toLowerCase() === "pending" ? "pending" : "confirmed"),
+        alertType: values[9] || ""
       };
     }
 
@@ -1240,6 +1244,8 @@
       editorRowNumber.value = String(item.rowNumber);
       editorSheetName.value = item.sheetName;
       editorStatus.value = item.status || "active";
+      editorAlertStatus.value = item.alertStatus || "confirmed";
+      editorAlertType.value = item.alertType || "";
       editorFields.dateInput.value = item.date || formatInputDate(new Date());
       editorFields.timeInput.value = item.time || "6:00 PM";
       editorFields.timeDisplay.textContent = item.time || "6:00 PM";
@@ -1424,6 +1430,8 @@
     const editorRowNumber = document.getElementById("editorRowNumber");
     const editorSheetName = document.getElementById("editorSheetName");
     const editorStatus = document.getElementById("editorStatus");
+    const editorAlertStatus = document.getElementById("editorAlertStatus");
+    const editorAlertType = document.getElementById("editorAlertType");
     const editorFields = setupReservationForm(document.getElementById("editorFields"), "editor");
     const feedbackModal = document.getElementById("feedbackModal");
     const feedbackTitle = document.getElementById("feedbackTitle");
@@ -1596,13 +1604,16 @@
 
       const payload = serializeReservationForm(editorForm);
       payload.phone = formatPhoneNumber(payload.phone);
+      payload.status = "pending";
+      payload.alertStatus = "pending";
+      payload.alertType = "updated";
       const feedbackPayload = {
         ...payload,
         branch: RESERVATION_SHEETS.find((sheetInfo) => sheetInfo.name === payload.sheetName)?.label || ""
       };
       buildMutationForm(payload);
       closeEditor();
-      openFeedback("Reservation Updated", "Your booking changes have been saved.", feedbackPayload);
+      openFeedback("Reservation Update Sent", "Your booking changes have been sent for confirmation.", feedbackPayload);
       refreshAfterMutation();
     });
 
@@ -1627,10 +1638,12 @@
         action: "status",
         sheetName: reservation.sheetName,
         rowNumber: String(reservation.rowNumber),
-        status: "removed"
+        status: "removed",
+        alertStatus: "pending",
+        alertType: "canceled"
       });
       closeCancelConfirm();
-      openFeedback("Reservation Canceled", "Your reservation has been canceled.", reservation);
+      openFeedback("Cancellation Request Sent", "Your cancellation request has been sent for confirmation.", reservation);
       refreshAfterMutation();
     });
     dismissCancelReservation.addEventListener("click", closeCancelConfirm);
