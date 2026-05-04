@@ -78,9 +78,8 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      flex-wrap: wrap;
       gap: 12px;
-      margin-bottom: 16px;
+      margin-bottom: 10px;
     }
 
     .brand {
@@ -133,16 +132,18 @@
     }
 
     .topbar-actions {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      justify-content: flex-start;
-      flex-wrap: wrap;
-      gap: 8px;
-      width: 100%;
+      justify-content: flex-end;
     }
 
     .menu-link {
       background: rgba(255, 251, 245, 0.84);
+    }
+
+    .manage-link-row {
+      display: flex;
+      margin-bottom: 16px;
     }
 
     .manage-link {
@@ -152,6 +153,7 @@
       background: linear-gradient(135deg, rgba(123, 31, 47, 0.98), rgba(212, 175, 55, 0.96));
       color: #fff9f2;
       box-shadow: 0 16px 30px rgba(123, 31, 47, 0.22);
+      width: 100%;
     }
 
     .manage-link:hover {
@@ -575,15 +577,6 @@
         padding-top: 24px;
       }
 
-      .topbar {
-        flex-wrap: nowrap;
-      }
-
-      .topbar-actions {
-        width: auto;
-        justify-content: flex-end;
-      }
-
       .logo-link {
         width: 72px;
         height: 72px;
@@ -619,9 +612,11 @@
       </div>
       <div class="topbar-actions">
         <a class="back-link menu-link" href="../../uptown/menu/index.html">Menu</a>
-        <a class="back-link manage-link" href="../../modify.html">View or Edit Reservation</a>
       </div>
     </header>
+    <div class="manage-link-row">
+      <a class="back-link manage-link" href="../../modify.html">View or Edit Reservation</a>
+    </div>
 
     <section class="booking-card">
       <form class="booking-form" id="reservationForm" method="POST" action="https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3Iiujn95evZuFiyLNrJUo-_H6rKngdxt0EeBFVw/exec" target="reservationSubmitFrame">
