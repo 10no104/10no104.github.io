@@ -131,6 +131,14 @@
       box-shadow: 0 10px 22px rgba(32, 20, 13, 0.05);
     }
 
+    .topbar-actions {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
     .booking-card {
       position: relative;
       border: 1px solid var(--line);
@@ -580,7 +588,10 @@
         </a>
         <h1>Uptown Reservation</h1>
       </div>
-          <a class="back-link" href="../../uptown/menu/index.html">Menu</a>
+      <div class="topbar-actions">
+        <a class="back-link" href="../../uptown/menu/index.html">Menu</a>
+        <a class="back-link" href="../../modify.html">Existing Reservation</a>
+      </div>
     </header>
 
     <section class="booking-card">
@@ -669,6 +680,7 @@
   <script>
     (function () {
       const form = document.getElementById("reservationForm");
+      const submitButton = form.querySelector(".submit-btn");
       const dateInput = document.getElementById("date");
       const dateGrid = document.getElementById("dateGrid");
       const timeInput = document.getElementById("time");
@@ -757,6 +769,7 @@
         dateOptions.push(formatInputDate(optionDate));
       }
       let calendarCursor = new Date(start.getFullYear(), start.getMonth(), 1);
+      let submittedReservation = null;
 
       const renderDateGrid = () => {
         dateGrid.innerHTML = "";
@@ -799,37 +812,66 @@
         renderDateGrid();
       };
 
+      const getReservationSnapshot = () => ({
+        branch: branchLabel,
+        date: dateInput.value,
+        time: timeInput.value,
+        people: peopleInput.value,
+        name: nameInput.value.trim() || "Guest",
+        phone: phoneInput.value.trim() || "-",
+        notes: notesInput.value.trim() || "-"
+      });
+
+      const resetReservationForm = () => {
+        form.reset();
+        dateInput.value = dateOptions[0];
+        timeInput.value = "6:00 PM";
+        timeDisplay.textContent = "6:00 PM";
+        peopleInput.value = "4 guests";
+        peopleDisplay.textContent = "4 guests";
+        peopleDisplay.style.display = "";
+        peopleCustomInput.value = "";
+        peopleCustomInput.classList.remove("is-open");
+        nameInput.value = "";
+        phoneInput.value = "";
+        phoneInput.setCustomValidity("");
+        notesInput.value = "";
+        closeSheet();
+        syncDateState();
+      };
+
       const renderModalDetails = () => {
+        const reservation = submittedReservation || getReservationSnapshot();
         modalDetails.hidden = false;
         modalDetails.innerHTML = `
           <div class="booking-summary">
             <div class="booking-summary-grid">
               <div class="booking-summary-box">
                 <span>Location</span>
-                <strong>${branchLabel}</strong>
+                <strong>${reservation.branch}</strong>
               </div>
               <div class="booking-summary-box">
                 <span>Date</span>
-                <strong>${dateInput.value ? formatDisplayDate(dateInput.value) : "-"}</strong>
+                <strong>${reservation.date ? formatDisplayDate(reservation.date) : "-"}</strong>
               </div>
               <div class="booking-summary-box">
                 <span>Time</span>
-                <strong>${timeInput.value || "-"}</strong>
+                <strong>${reservation.time || "-"}</strong>
               </div>
               <div class="booking-summary-box">
                 <span>Guests</span>
-                <strong>${peopleInput.value || "-"}</strong>
+                <strong>${reservation.people || "-"}</strong>
               </div>
               <div class="booking-summary-box">
                 <span>Name</span>
-                <strong>${nameInput.value.trim() || "Guest"}</strong>
+                <strong>${reservation.name}</strong>
               </div>
               <div class="booking-summary-box">
                 <span>Phone</span>
-                <strong>${phoneInput.value.trim() || "-"}</strong>
+                <strong>${reservation.phone}</strong>
               </div>
             </div>
-            <div class="booking-summary-note">${notesInput.value.trim() || "-"}</div>
+            <div class="booking-summary-note">${reservation.notes}</div>
           </div>
         `;
       };
@@ -991,7 +1033,15 @@
         }
 
         phoneInput.setCustomValidity("");
-        window.setTimeout(openModal, 250);
+        submittedReservation = getReservationSnapshot();
+        submitButton.disabled = true;
+        window.setTimeout(() => {
+          openModal();
+          resetReservationForm();
+        }, 250);
+        window.setTimeout(() => {
+          submitButton.disabled = false;
+        }, 1200);
       });
 
       modalClose.addEventListener("click", closeModal);
