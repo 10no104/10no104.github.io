@@ -1423,6 +1423,15 @@
       return formatInputDate(baseDate);
     }
 
+    function getReservationServiceDateValue(item) {
+      const date = toSafeDate(item?.date);
+      if (!date) return "";
+      if (!isNextDayReservationTime(item?.time)) return formatInputDate(date);
+      const serviceDate = new Date(date);
+      serviceDate.setDate(serviceDate.getDate() - 1);
+      return formatInputDate(serviceDate);
+    }
+
     function getReservationDateTime(item) {
       const date = toSafeDate(item?.date);
       const minutes = parseTimeForSort(item?.time);
@@ -1661,9 +1670,7 @@
         if (state.trashMode) return item.status === "removed";
         if (item.status === "removed") return false;
         if (!state.selectedDate) return true;
-        const date = toSafeDate(item.date);
-        if (!date) return false;
-        return formatInputDate(date) === state.selectedDate;
+        return getReservationServiceDateValue(item) === state.selectedDate;
       });
       return state.trashMode ? filtered.slice().reverse() : filtered;
     }
