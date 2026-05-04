@@ -1339,6 +1339,8 @@
 
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3Iiujn95evZuFiyLNrJUo-_H6rKngdxt0EeBFVw/exec";
     const AUTO_REFRESH_MS = 10000;
+    const AUTO_REMOVE_AFTER_MS = 60 * 60 * 1000;
+    const AUTO_REMOVE_MUTATION_SPACING_MS = 200;
 
     const state = {
       reservations: [],
@@ -1350,6 +1352,7 @@
       knownReservationSnapshots: new Map(),
       suppressNewAlertUntil: 0,
       autoRefreshHandle: null,
+      autoRemovingReservationIds: new Set(),
       feedbackQueue: [],
       feedbackTransitionLocked: false
     };
@@ -1416,6 +1419,15 @@
       return hour * 60 + minute;
     }
 
+    function getReservationDateTime(item) {
+      const date = toSafeDate(item?.date);
+      const minutes = parseTimeForSort(item?.time);
+      if (!date || minutes === Number.MAX_SAFE_INTEGER) return null;
+      const withTime = new Date(date);
+      withTime.setHours(Math.floor(minutes / 60), minutes % 60, 0, 0);
+      return withTime;
+    }
+
     function getReservationKey(item) {
       return [
         item.sheetName || ADMIN_SHEET_CONFIG.sheetName,
@@ -1432,6 +1444,13 @@
         item.sheetName || ADMIN_SHEET_CONFIG.sheetName,
         item.rowNumber || ""
       ].join("::");
+    }
+
+    function shouldAutoRemoveReservation(item, now = new Date()) {
+      if (!item || item.status === "removed") return false;
+      const reservationDateTime = getReservationDateTime(item);
+      if (!reservationDateTime) return false;
+      return now.getTime() - reservationDateTime.getTime() >= AUTO_REMOVE_AFTER_MS;
     }
 
     function getReservationSnapshot(item) {
@@ -1706,6 +1725,43 @@
         const reservations = await fetchReservations();
         syncReservations(reservations);
       }, 900);
+    }
+
+    function autoRemoveExpiredReservations(reservations = []) {
+      const now = new Date();
+      const expiredReservations = reservations
+        .filter((item) => shouldAutoRemoveReservation(item, now))
+        .filter((item) => !state.autoRemovingReservationIds.has(getReservationIdentity(item)));
+
+      if (!expiredReservations.length) return;
+
+      state.suppressNewAlertUntil = Date.now() + 15000;
+      expiredReservations.forEach((item, index) => {
+        const identity = getReservationIdentity(item);
+        state.autoRemovingReservationIds.add(identity);
+        window.setTimeout(() => {
+          buildMutationForm({
+            action: "status",
+            sheetName: item.sheetName || ADMIN_SHEET_CONFIG.sheetName,
+            rowNumber: String(item.rowNumber),
+            status: "removed"
+          });
+        }, index * AUTO_REMOVE_MUTATION_SPACING_MS);
+      });
+
+      const refreshDelay = ((expiredReservations.length - 1) * AUTO_REMOVE_MUTATION_SPACING_MS) + 1400;
+      window.setTimeout(async () => {
+        try {
+          const refreshedReservations = await fetchReservations();
+          syncReservations(refreshedReservations);
+        } catch (error) {
+          console.error("Auto remove refresh failed", error);
+        } finally {
+          expiredReservations.forEach((item) => {
+            state.autoRemovingReservationIds.delete(getReservationIdentity(item));
+          });
+        }
+      }, refreshDelay);
     }
 
     function formatPhoneNumber(value) {
@@ -2229,6 +2285,7 @@
       fetchReservations()
         .then((reservations) => {
           syncReservations(reservations);
+          autoRemoveExpiredReservations(reservations);
         })
         .catch((error) => {
           console.error(error);
@@ -2242,6 +2299,7 @@
       try {
         const reservations = await fetchReservations();
         syncReservations(reservations, { detectNew: true });
+        autoRemoveExpiredReservations(reservations);
       } catch (error) {
         console.error("Auto refresh failed", error);
       }
