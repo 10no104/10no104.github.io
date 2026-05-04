@@ -838,9 +838,23 @@
         renderDateGrid();
       };
 
+      const isNextDayReservationTime = (value) => {
+        return ["12:00 AM", "12:30 AM", "1:00 AM"].includes(String(value).trim().toUpperCase());
+      };
+
+      const getEffectiveReservationDate = (dateValue, timeValue) => {
+        const normalizedDate = String(dateValue || "").trim();
+        if (!normalizedDate) return "";
+        if (!isNextDayReservationTime(timeValue)) return normalizedDate;
+        const baseDate = new Date(`${normalizedDate}T00:00:00`);
+        if (Number.isNaN(baseDate.getTime())) return normalizedDate;
+        baseDate.setDate(baseDate.getDate() + 1);
+        return `${baseDate.getFullYear()}-${String(baseDate.getMonth() + 1).padStart(2, "0")}-${String(baseDate.getDate()).padStart(2, "0")}`;
+      };
+
       const getReservationSnapshot = () => ({
         branch: branchLabel,
-        date: dateInput.value,
+        date: getEffectiveReservationDate(dateInput.value, timeInput.value),
         time: timeInput.value,
         people: peopleInput.value,
         name: nameInput.value.trim() || "Guest",
@@ -1059,6 +1073,7 @@
         }
 
         phoneInput.setCustomValidity("");
+        dateInput.value = getEffectiveReservationDate(dateInput.value, timeInput.value);
         submittedReservation = getReservationSnapshot();
         submitButton.disabled = true;
         window.setTimeout(() => {

@@ -942,7 +942,7 @@
     function normalizeReservation(cells = [], index = 0, sheetConfig) {
       const values = cells.map((cell) => getCellText(cell));
       return {
-        rowNumber: index + 1,
+        rowNumber: index + 2,
         sheetName: sheetConfig.name,
         branch: sheetConfig.label,
         timestamp: values[0] || "",
@@ -1019,6 +1019,20 @@
         month: "short",
         day: "numeric"
       }).format(date);
+    }
+
+    function isNextDayReservationTime(value = "") {
+      return ["12:00 AM", "12:30 AM", "1:00 AM"].includes(String(value).trim().toUpperCase());
+    }
+
+    function getEffectiveReservationDate(dateValue = "", timeValue = "") {
+      const normalizedDate = String(dateValue || "").trim();
+      if (!normalizedDate) return "";
+      if (!isNextDayReservationTime(timeValue)) return normalizedDate;
+      const baseDate = new Date(`${normalizedDate}T00:00:00`);
+      if (Number.isNaN(baseDate.getTime())) return normalizedDate;
+      baseDate.setDate(baseDate.getDate() + 1);
+      return formatInputDate(baseDate);
     }
 
     function getReservationDateTime(item) {
@@ -1603,6 +1617,7 @@
       }
 
       const payload = serializeReservationForm(editorForm);
+      payload.date = getEffectiveReservationDate(payload.date, payload.time);
       payload.phone = formatPhoneNumber(payload.phone);
       payload.status = "pending";
       payload.alertStatus = "pending";
