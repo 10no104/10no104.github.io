@@ -841,8 +841,9 @@
     }
 
     .action-btn.primary {
-      background: linear-gradient(135deg, var(--wine), #b9871f);
-      color: #fff;
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.18), rgba(123, 31, 47, 0.12));
+      color: #6b3127;
+      border: 1px solid rgba(123, 31, 47, 0.12);
     }
 
     .action-btn.light {
@@ -852,9 +853,9 @@
     }
 
     .action-btn.table-btn {
-      background: linear-gradient(135deg, rgba(212, 175, 55, 0.18), rgba(123, 31, 47, 0.12));
-      color: #6b3127;
-      border: 1px solid rgba(123, 31, 47, 0.12);
+      background: linear-gradient(135deg, var(--wine), #b9871f);
+      color: #fff;
+      border: 0;
     }
 
     .table-backdrop {
@@ -1472,6 +1473,18 @@
     </div>
   </div>
 
+  <div class="feedback-backdrop" id="removeConfirmModal" aria-hidden="true">
+    <div class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="removeConfirmTitle">
+      <h3 id="removeConfirmTitle">Remove Reservation?</h3>
+      <p id="removeConfirmMessage">This will move the booking out of the active list.</p>
+      <div class="feedback-details" id="removeConfirmDetails" hidden></div>
+      <div class="form-actions">
+        <button class="pill-btn primary" id="confirmRemoveReservation" type="button">Yes, Remove</button>
+        <button class="pill-btn" id="dismissRemoveReservation" type="button">Keep Reservation</button>
+      </div>
+    </div>
+  </div>
+
   <div class="feedback-backdrop" id="feedbackModal" aria-hidden="true">
     <div class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
       <div class="feedback-stack" id="feedbackStack" aria-hidden="true"></div>
@@ -1513,7 +1526,8 @@
       feedbackTransitionLocked: false,
       tableOptions: [],
       activeTableReservation: null,
-      selectedTableAssignments: []
+      selectedTableAssignments: [],
+      pendingRemoveReservation: null
     };
 
     function parseGvizText(text = "") {
@@ -2275,6 +2289,10 @@
     const cancelTableAssignment = document.getElementById("cancelTableAssignment");
     const clearTableAssignment = document.getElementById("clearTableAssignment");
     const saveTableAssignment = document.getElementById("saveTableAssignment");
+    const removeConfirmModal = document.getElementById("removeConfirmModal");
+    const removeConfirmDetails = document.getElementById("removeConfirmDetails");
+    const confirmRemoveReservation = document.getElementById("confirmRemoveReservation");
+    const dismissRemoveReservation = document.getElementById("dismissRemoveReservation");
 
     const sheet = document.getElementById("pickerSheet");
     const sheetTitle = document.getElementById("pickerTitle");
@@ -2476,6 +2494,69 @@
         tableAssignment: state.selectedTableAssignments.join(", ")
       });
       closeTableAssignmentPicker();
+      refreshAfterMutation();
+    }
+
+    function openRemoveConfirm(item) {
+      state.pendingRemoveReservation = item;
+      removeConfirmDetails.hidden = false;
+      removeConfirmDetails.innerHTML = `
+        <div class="booking-summary">
+          <div class="booking-summary-head">
+            <strong>Reservation Details</strong>
+            <span>${ADMIN_SHEET_CONFIG.branchLabel}</span>
+          </div>
+          <div class="booking-summary-grid">
+            <div class="booking-summary-box">
+              <span>Date</span>
+              <strong>${item.date ? formatDisplayDate(item.date) : "-"}</strong>
+            </div>
+            <div class="booking-summary-box">
+              <span>Time</span>
+              <strong>${item.time || "-"}</strong>
+            </div>
+            <div class="booking-summary-box">
+              <span>Guests</span>
+              <strong>${item.people || "-"}</strong>
+            </div>
+            <div class="booking-summary-box">
+              <span>Name</span>
+              <strong>${item.name || "Guest"}</strong>
+            </div>
+          </div>
+        </div>
+      `;
+      removeConfirmModal.classList.add("is-open");
+      removeConfirmModal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeRemoveConfirm() {
+      state.pendingRemoveReservation = null;
+      removeConfirmDetails.hidden = true;
+      removeConfirmDetails.innerHTML = "";
+      removeConfirmModal.classList.remove("is-open");
+      removeConfirmModal.setAttribute("aria-hidden", "true");
+    }
+
+    function submitReservationRemoval() {
+      const reservation = state.pendingRemoveReservation;
+      if (!reservation) {
+        closeRemoveConfirm();
+        return;
+      }
+      buildMutationForm({
+        action: "status",
+        sheetName: reservation.sheetName || ADMIN_SHEET_CONFIG.sheetName,
+        rowNumber: String(reservation.rowNumber),
+        status: "removed",
+        alertStatus: "confirmed",
+        alertType: ""
+      });
+      closeRemoveConfirm();
+      openFeedback("Reservation Removed", "This booking has been moved out of the active list.", {
+        ...reservation,
+        status: "removed"
+      });
       refreshAfterMutation();
     }
 
@@ -2745,6 +2826,11 @@
     tableAssignmentModal.addEventListener("click", (event) => {
       if (event.target === tableAssignmentModal) closeTableAssignmentPicker();
     });
+    confirmRemoveReservation.addEventListener("click", submitReservationRemoval);
+    dismissRemoveReservation.addEventListener("click", closeRemoveConfirm);
+    removeConfirmModal.addEventListener("click", (event) => {
+      if (event.target === removeConfirmModal) closeRemoveConfirm();
+    });
     closeFeedbackModal.addEventListener("click", closeFeedback);
     feedbackModal.addEventListener("click", (event) => {
       if (event.target === feedbackModal) closeFeedback();
@@ -2786,6 +2872,10 @@
 
       if (button.dataset.action === "remove" || button.dataset.action === "restore") {
         const isRestore = button.dataset.action === "restore";
+        if (!isRestore) {
+          openRemoveConfirm(reservation);
+          return;
+        }
         buildMutationForm({
           action: "status",
           sheetName,
@@ -2825,6 +2915,8 @@
       if (event.key === "Escape") {
         if (sheet.classList.contains("is-open")) {
           closeSheet();
+        } else if (removeConfirmModal.classList.contains("is-open")) {
+          closeRemoveConfirm();
         } else if (feedbackModal.classList.contains("is-open")) {
           closeFeedback();
         } else if (editorModal.classList.contains("is-open")) {

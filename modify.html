@@ -546,6 +546,7 @@
     .feedback-modal {
       width: min(100%, 380px);
       text-align: center;
+      color: #25160f;
     }
 
     .feedback-modal h3 {
@@ -555,8 +556,16 @@
 
     .feedback-modal p {
       margin: 0 0 18px;
-      color: var(--muted);
+      color: #5b4a3f;
       line-height: 1.6;
+    }
+
+    #feedbackMessage,
+    #cancelConfirmMessage {
+      color: #4a382d;
+      font-size: 0.96rem;
+      font-weight: 600;
+      line-height: 1.65;
     }
 
     .feedback-details {
@@ -583,6 +592,9 @@
       border-radius: 999px;
       border: 1px solid rgba(109, 86, 59, 0.14);
       background: rgba(255, 251, 245, 0.82);
+      color: #5c4c41;
+      font: inherit;
+      font-weight: 800;
       cursor: pointer;
     }
 
