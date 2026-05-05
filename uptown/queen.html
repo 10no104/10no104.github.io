@@ -919,10 +919,15 @@
     }
 
     .table-option-grid {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .table-option-row {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-bottom: 18px;
     }
 
     .table-option-btn {
@@ -1577,6 +1582,12 @@
     function formatTableAssignments(value = "") {
       const items = Array.isArray(value) ? value : parseTableAssignments(value);
       return items.join(" + ");
+    }
+
+    function getTableGroupKey(option = "") {
+      const normalized = String(option || "").trim().toUpperCase();
+      const match = normalized.match(/^(\d*[A-Z]+)/);
+      return match ? match[1] : normalized;
     }
 
     function toSafeDate(dateString = "") {
@@ -2447,21 +2458,35 @@
       tableSelectionSummary.textContent = selectedLabel || "No tables selected";
       tableOptionGrid.innerHTML = "";
       tableOptionEmpty.hidden = state.tableOptions.length > 0;
+      const groupedOptions = new Map();
 
       state.tableOptions.forEach((option) => {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = `table-option-btn ${selected.has(option) ? "is-selected" : ""}`;
-        button.textContent = option;
-        button.addEventListener("click", () => {
-          if (selected.has(option)) {
-            state.selectedTableAssignments = state.selectedTableAssignments.filter((item) => item !== option);
-          } else {
-            state.selectedTableAssignments = [...state.selectedTableAssignments, option];
-          }
-          renderTableAssignmentOptions();
+        const key = getTableGroupKey(option);
+        if (!groupedOptions.has(key)) groupedOptions.set(key, []);
+        groupedOptions.get(key).push(option);
+      });
+
+      groupedOptions.forEach((options) => {
+        const row = document.createElement("div");
+        row.className = "table-option-row";
+
+        options.forEach((option) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = `table-option-btn ${selected.has(option) ? "is-selected" : ""}`;
+          button.textContent = option;
+          button.addEventListener("click", () => {
+            if (selected.has(option)) {
+              state.selectedTableAssignments = state.selectedTableAssignments.filter((item) => item !== option);
+            } else {
+              state.selectedTableAssignments = [...state.selectedTableAssignments, option];
+            }
+            renderTableAssignmentOptions();
+          });
+          row.appendChild(button);
         });
-        tableOptionGrid.appendChild(button);
+
+        tableOptionGrid.appendChild(row);
       });
     }
 
