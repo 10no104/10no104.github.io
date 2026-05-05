@@ -10,7 +10,8 @@ const COLUMN = {
   notes: 7,
   status: 8,
   alertStatus: 9,
-  alertType: 10
+  alertType: 10,
+  tableAssignment: 11
 };
 
 function doPost(e) {
@@ -51,6 +52,7 @@ function handleCreate_(params) {
   row[COLUMN.status - 1] = getText_(params.status || "active");
   row[COLUMN.alertStatus - 1] = getText_(params.alertStatus || "confirmed");
   row[COLUMN.alertType - 1] = getText_(params.alertType);
+  row[COLUMN.tableAssignment - 1] = getText_(params.tableAssignment);
   sheet.appendRow(row);
 
   return {
@@ -76,6 +78,7 @@ function handleUpdate_(params) {
   if ("status" in params) values[COLUMN.status - 1] = getText_(params.status);
   if ("alertStatus" in params) values[COLUMN.alertStatus - 1] = getText_(params.alertStatus);
   if ("alertType" in params) values[COLUMN.alertType - 1] = getText_(params.alertType);
+  if ("tableAssignment" in params) values[COLUMN.tableAssignment - 1] = getText_(params.tableAssignment);
 
   writeRowValues_(sheet, rowNumber, values);
 
@@ -152,13 +155,13 @@ function getRowNumber_(value) {
 }
 
 function getRowValues_(sheet, rowNumber) {
-  const values = sheet.getRange(rowNumber, 1, 1, COLUMN.alertType).getValues()[0];
-  return ensureWidth_(values, COLUMN.alertType);
+  const values = sheet.getRange(rowNumber, 1, 1, COLUMN.tableAssignment).getValues()[0];
+  return ensureWidth_(values, COLUMN.tableAssignment);
 }
 
 function writeRowValues_(sheet, rowNumber, values) {
-  const row = ensureWidth_(values, COLUMN.alertType);
-  sheet.getRange(rowNumber, 1, 1, COLUMN.alertType).setValues([row]);
+  const row = ensureWidth_(values, COLUMN.tableAssignment);
+  sheet.getRange(rowNumber, 1, 1, COLUMN.tableAssignment).setValues([row]);
 }
 
 function ensureWidth_(values, width) {
