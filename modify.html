@@ -1132,6 +1132,16 @@
       return formatInputDate(baseDate);
     }
 
+    function getReservationServiceDateValue(dateValue = "", timeValue = "") {
+      const normalizedDate = String(dateValue || "").trim();
+      if (!normalizedDate) return "";
+      if (!isNextDayReservationTime(timeValue)) return normalizedDate;
+      const baseDate = new Date(`${normalizedDate}T00:00:00`);
+      if (Number.isNaN(baseDate.getTime())) return normalizedDate;
+      baseDate.setDate(baseDate.getDate() - 1);
+      return formatInputDate(baseDate);
+    }
+
     function getReservationDateTime(item) {
       const date = toSafeDate(item.date);
       const minutes = parseTimeForSort(item.time);
@@ -1357,7 +1367,7 @@
       editorStatus.value = item.status || "active";
       editorAlertStatus.value = item.alertStatus || "confirmed";
       editorAlertType.value = item.alertType || "";
-      editorFields.dateInput.value = item.date || formatInputDate(new Date());
+      editorFields.dateInput.value = getReservationServiceDateValue(item.date, item.time) || formatInputDate(new Date());
       editorFields.timeInput.value = item.time || "6:00 PM";
       editorFields.timeDisplay.textContent = item.time || "6:00 PM";
       editorFields.peopleInput.value = item.people || "4 guests";

@@ -1858,6 +1858,10 @@
       return formatInputDate(baseDate);
     }
 
+    function getReservationEditorDateValue(item) {
+      return getReservationServiceDateValue(item) || formatInputDate(new Date());
+    }
+
     function getReservationServiceDateValue(item) {
       const date = toSafeDate(item?.date);
       if (!date) return "";
@@ -2657,7 +2661,7 @@
       editorRowNumber.value = String(item.rowNumber);
       editorSheetName.value = item.sheetName || ADMIN_SHEET_CONFIG.sheetName;
       editorStatus.value = item.status === "removed" ? "removed" : "active";
-      editorFields.dateInput.value = item.date || formatInputDate(new Date());
+      editorFields.dateInput.value = getReservationEditorDateValue(item);
       editorFields.timeInput.value = item.time || "6:00 PM";
       editorFields.timeDisplay.textContent = item.time || "6:00 PM";
       editorFields.peopleInput.value = item.people || "4 guests";
