@@ -1032,6 +1032,37 @@
       box-shadow: 0 28px 54px rgba(18, 12, 9, 0.2);
     }
 
+    #editorModal .modal {
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.992), rgba(247, 239, 228, 0.988)),
+        url("../assets/pattern.webp") center / 420px auto;
+      color: #241812;
+    }
+
+    #editorModal .field label,
+    #editorModal .modal-head h3 {
+      color: #241812;
+    }
+
+    #editorModal input,
+    #editorModal textarea,
+    #editorModal .picker-trigger,
+    #editorModal .date-chip {
+      background: rgba(255, 255, 255, 0.94);
+      border-color: rgba(113, 88, 60, 0.18);
+      box-shadow: 0 6px 14px rgba(24, 16, 12, 0.05);
+    }
+
+    #editorModal .date-chip.is-active,
+    #editorModal .date-chip.more-chip.is-active {
+      box-shadow: 0 12px 22px rgba(17, 11, 8, 0.14);
+    }
+
+    #editorModal .calendar-day,
+    #editorModal .sheet-option {
+      background: rgba(255, 255, 255, 0.92);
+    }
+
     .feedback-backdrop {
       position: fixed;
       inset: 0;
@@ -1133,6 +1164,25 @@
       text-transform: none;
     }
 
+    #removeConfirmMessage {
+      margin: 12px 0 16px;
+      color: #4a382d;
+      font-size: 0.96rem;
+      font-weight: 600;
+      letter-spacing: 0;
+      line-height: 1.65;
+      text-transform: none;
+    }
+
+    #removeConfirmModal .booking-summary {
+      background: rgba(255, 252, 247, 0.92);
+      border-color: rgba(109, 86, 59, 0.12);
+    }
+
+    #removeConfirmModal .booking-summary-box {
+      background: rgba(255, 255, 255, 0.9);
+    }
+
     .feedback-modal p[hidden] {
       display: none;
     }
@@ -1146,7 +1196,8 @@
       bottom: -22px;
       margin: 0 -22px -22px;
       padding: 14px 22px 22px;
-      background: linear-gradient(180deg, rgba(247, 239, 228, 0), rgba(247, 239, 228, 0.94) 24%, rgba(247, 239, 228, 0.99));
+      background: linear-gradient(180deg, rgba(247, 239, 228, 0), rgba(247, 239, 228, 0.97) 24%, rgba(247, 239, 228, 1));
+      border-top: 1px solid rgba(109, 86, 59, 0.08);
     }
 
     .modal-head {
