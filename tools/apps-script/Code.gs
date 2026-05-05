@@ -68,12 +68,12 @@ function handleUpdate_(params) {
   const rowNumber = getRowNumber_(params.rowNumber);
   const values = getRowValues_(sheet, rowNumber);
 
-  values[COLUMN.date - 1] = getText_(params.date || values[COLUMN.date - 1]);
-  values[COLUMN.time - 1] = getText_(params.time || values[COLUMN.time - 1]);
-  values[COLUMN.people - 1] = getText_(params.people || values[COLUMN.people - 1]);
-  values[COLUMN.name - 1] = getText_(params.name || values[COLUMN.name - 1]);
-  values[COLUMN.phone - 1] = getText_(params.phone || values[COLUMN.phone - 1]);
-  values[COLUMN.notes - 1] = getText_(params.notes || values[COLUMN.notes - 1]);
+  if ("date" in params) values[COLUMN.date - 1] = getText_(params.date);
+  if ("time" in params) values[COLUMN.time - 1] = getText_(params.time);
+  if ("people" in params) values[COLUMN.people - 1] = getText_(params.people);
+  if ("name" in params) values[COLUMN.name - 1] = getText_(params.name);
+  if ("phone" in params) values[COLUMN.phone - 1] = getText_(params.phone);
+  if ("notes" in params) values[COLUMN.notes - 1] = getText_(params.notes);
 
   if ("status" in params) values[COLUMN.status - 1] = getText_(params.status);
   if ("alertStatus" in params) values[COLUMN.alertStatus - 1] = getText_(params.alertStatus);
