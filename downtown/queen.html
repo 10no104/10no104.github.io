@@ -893,9 +893,12 @@
       width: min(560px, 100%);
       border-radius: 28px;
       padding: 24px;
-      background: linear-gradient(180deg, rgba(255, 252, 246, 0.98), rgba(255, 246, 236, 0.96));
+      background:
+        linear-gradient(180deg, rgba(255, 252, 246, 0.985), rgba(255, 246, 236, 0.98)),
+        url("../assets/pattern.webp") center / 320px auto;
       border: 1px solid rgba(113, 88, 60, 0.16);
       box-shadow: 0 28px 60px rgba(24, 16, 12, 0.2);
+      color: #241812;
     }
 
     .table-modal-top {
@@ -964,6 +967,27 @@
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
+    }
+
+    .table-modal .pill-btn {
+      min-height: 46px;
+      border-color: rgba(113, 88, 60, 0.14);
+      background: rgba(255, 255, 255, 0.92);
+      color: #37271f;
+      box-shadow: 0 8px 18px rgba(24, 16, 12, 0.08);
+    }
+
+    .table-modal .pill-btn.primary {
+      color: #fff;
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--wine), #b9871f);
+      box-shadow: 0 14px 24px rgba(123, 31, 47, 0.18);
+    }
+
+    .table-modal .pill-btn.table-clear-btn {
+      background: rgba(244, 233, 221, 0.96);
+      color: #6b3127;
+      border-color: rgba(123, 31, 47, 0.12);
     }
 
     .empty-state {
@@ -1091,6 +1115,16 @@
     .feedback-queue-note {
       color: #8f2636;
       font-size: 0.8rem;
+    }
+
+    #feedbackMessage {
+      margin: 12px 0 16px;
+      color: #4a382d;
+      font-size: 0.96rem;
+      font-weight: 600;
+      letter-spacing: 0;
+      line-height: 1.65;
+      text-transform: none;
     }
 
     .feedback-modal p[hidden] {
@@ -1438,15 +1472,15 @@
           <h3 id="tableAssignmentTitle">Assign Tables</h3>
           <p id="tableAssignmentMeta">Choose one or more tables for this booking.</p>
         </div>
-        <button class="modal-close" id="closeTableAssignmentModal" type="button">Ã—</button>
+        <button class="modal-close" id="closeTableAssignmentModal" type="button">×</button>
       </div>
       <div class="table-selection-summary" id="tableSelectionSummary">No tables selected</div>
       <div class="table-option-grid" id="tableOptionGrid"></div>
       <p class="table-option-empty" id="tableOptionEmpty" hidden>No table options found in the Table sheet.</p>
       <div class="table-modal-actions">
-        <button class="pill-btn" id="clearTableAssignment" type="button">Clear</button>
-        <button class="pill-btn" id="cancelTableAssignment" type="button">Cancel</button>
-        <button class="pill-btn primary" id="saveTableAssignment" type="button">Save</button>
+        <button class="pill-btn table-clear-btn" id="clearTableAssignment" type="button">Reset Tables</button>
+        <button class="pill-btn" id="cancelTableAssignment" type="button">Close</button>
+        <button class="pill-btn primary" id="saveTableAssignment" type="button">Save Tables</button>
       </div>
     </div>
   </div>
@@ -1900,8 +1934,8 @@
           <div class="reservation-notes">${item.notes || "No notes"}</div>
           <div class="reservation-actions">
             <button class="action-btn primary" type="button" data-action="${primaryAction}" data-sheet="${item.sheetName}" data-row="${item.rowNumber}">${primaryLabel}</button>
-            <button class="action-btn table-btn" type="button" data-action="tables" data-sheet="${item.sheetName}" data-row="${item.rowNumber}">Tables</button>
             <button class="action-btn light" type="button" data-action="edit" data-sheet="${item.sheetName}" data-row="${item.rowNumber}">Edit</button>
+            <button class="action-btn table-btn" type="button" data-action="tables" data-sheet="${item.sheetName}" data-row="${item.rowNumber}">Tables</button>
           </div>
         </article>
       `;
