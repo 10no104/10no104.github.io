@@ -918,7 +918,7 @@
 
     .table-option-grid {
       display: grid;
-      gap: 10px;
+      gap: 14px;
       margin-bottom: 18px;
     }
 
@@ -926,6 +926,26 @@
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
+      padding-top: 14px;
+      position: relative;
+    }
+
+    .table-option-row::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(113, 88, 60, 0), rgba(113, 88, 60, 0.18), rgba(113, 88, 60, 0));
+    }
+
+    .table-option-row:first-child {
+      padding-top: 0;
+    }
+
+    .table-option-row:first-child::before {
+      display: none;
     }
 
     .table-option-btn {
