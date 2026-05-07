@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/global.css?v=20260423-10" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
       --ink: #211813;
@@ -213,6 +214,39 @@
       display: grid;
       gap: 16px;
     }
+
+    .admin-tabs {
+      display: flex;
+      gap: 10px;
+      margin: 0 0 16px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .admin-tab {
+      min-height: 44px;
+      padding: 0 16px;
+      border: 1px solid rgba(113, 88, 60, 0.14);
+      border-radius: 999px;
+      background: rgba(255, 251, 245, 0.78);
+      color: #2c2016;
+      font: inherit;
+      font-weight: 800;
+      white-space: nowrap;
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(32, 20, 13, 0.05);
+    }
+
+    .admin-tab.is-active {
+      color: #fff;
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--wine), #b9871f);
+      box-shadow: 0 18px 30px rgba(123, 31, 47, 0.18);
+    }
+
+    .admin-section { display: none; }
+    .admin-section.is-active { display: block; }
+    .admin-section.layout.is-active { display: grid; }
 
     .panel {
       border: 1px solid var(--line);
@@ -431,6 +465,107 @@
       display: grid;
       gap: 12px;
       padding: 18px;
+    }
+
+    .menu-admin-toolbar {
+      display: grid;
+      gap: 10px;
+      padding: 14px 18px 0;
+    }
+
+    .menu-admin-toolbar .field-grid {
+      gap: 10px;
+    }
+
+    .menu-auth-card {
+      display: grid;
+      gap: 14px;
+      padding: 18px;
+    }
+
+    .menu-auth-status,
+    .menu-save-status {
+      min-height: 22px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .menu-auth-status.is-error,
+    .menu-save-status.is-error { color: #9c2038; }
+
+    .menu-auth-status.is-success,
+    .menu-save-status.is-success { color: #2f6f38; }
+
+    .menu-admin-list {
+      display: grid;
+      gap: 12px;
+      padding: 18px;
+    }
+
+    .menu-admin-card {
+      display: grid;
+      gap: 14px;
+      padding: 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(113, 88, 60, 0.12);
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .menu-admin-card.is-hidden {
+      opacity: 0.68;
+      background: rgba(241, 235, 228, 0.84);
+    }
+
+    .menu-admin-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .menu-admin-title h4 {
+      margin: 0 0 4px;
+      font-size: 1.08rem;
+      letter-spacing: -0.03em;
+    }
+
+    .menu-admin-title p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .menu-admin-fields {
+      display: grid;
+      gap: 10px;
+    }
+
+    .menu-admin-card input[type="checkbox"] {
+      width: auto;
+      min-width: 20px;
+      height: 20px;
+      padding: 0;
+      appearance: auto;
+      -webkit-appearance: checkbox;
+    }
+
+    .toggle-field {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 53px;
+      padding: 0 4px;
+      color: #2b1e14;
+      font-weight: 800;
+    }
+
+    .menu-empty-state {
+      padding: 24px;
+      color: var(--muted);
+      text-align: center;
+      font-weight: 800;
     }
 
     .reservation-card {
@@ -796,6 +931,7 @@
       .field-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .field.full { grid-column: 1 / -1; }
       .form-actions { grid-template-columns: 1fr 1fr; }
+      .menu-admin-fields { grid-template-columns: 0.7fr 0.9fr 0.8fr 0.8fr auto; align-items: end; }
     }
 
     @media (min-width: 980px) {
@@ -816,8 +952,8 @@
             <img src="assets/logo-dark.webp" alt="EHWA logo" />
         </a>
         <div class="brand-copy">
-          <p>Reservations Overview</p>
-          <h1>Downtown + Uptown</h1>
+          <p>EHWA Admin</p>
+          <h1>Reservations + Menu</h1>
         </div>
       </div>
       <a class="pill-btn" href="./modify.html">Modify / Cancel</a>
@@ -842,7 +978,12 @@
       </div>
     </section>
 
-    <main class="layout">
+    <nav class="admin-tabs" aria-label="Admin sections">
+      <button class="admin-tab is-active" data-admin-tab="reservations" type="button">Reservations</button>
+      <button class="admin-tab" data-admin-tab="menu" type="button">Menu</button>
+    </nav>
+
+    <main class="layout admin-section is-active" id="reservationsAdminPanel">
       <section class="panel">
         <div class="panel-head">
           <h3>Add Reservation</h3>
@@ -886,6 +1027,58 @@
         </div>
 
         <div class="reservation-list" id="reservationList"></div>
+      </section>
+    </main>
+
+    <main class="admin-section" id="menuAdminPanel">
+      <section class="panel">
+        <div class="panel-head">
+          <h3>Menu Manager</h3>
+          <span id="menuSessionLabel">Sign in required</span>
+        </div>
+
+        <div class="menu-auth-card" id="menuAuthCard">
+          <div class="field-grid">
+            <div class="field">
+              <label for="menuAdminEmail">Email</label>
+              <input id="menuAdminEmail" type="email" autocomplete="email" placeholder="Admin email" />
+            </div>
+            <div class="field">
+              <label for="menuAdminPassword">Password</label>
+              <input id="menuAdminPassword" type="password" autocomplete="current-password" placeholder="Password" />
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="pill-btn primary" id="menuSignInBtn" type="button">Sign In</button>
+          </div>
+          <div class="menu-auth-status" id="menuAuthStatus">Use your Supabase admin user.</div>
+        </div>
+
+        <div id="menuAdminWorkspace" hidden>
+          <div class="menu-admin-toolbar">
+            <div class="field-grid">
+              <div class="field">
+                <label for="menuSearchInput">Search</label>
+                <input id="menuSearchInput" type="search" placeholder="Menu name, category, label" />
+              </div>
+              <div class="field">
+                <label for="menuBranchFilter">Branch</label>
+                <select id="menuBranchFilter">
+                  <option value="all">All branches</option>
+                  <option value="both">Both</option>
+                  <option value="downtown">Downtown</option>
+                  <option value="uptown">Uptown</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button class="pill-btn" id="menuRefreshBtn" type="button">Refresh</button>
+              <button class="pill-btn" id="menuSignOutBtn" type="button">Sign Out</button>
+            </div>
+            <div class="menu-save-status" id="menuSaveStatus"></div>
+          </div>
+          <div class="menu-admin-list" id="menuAdminList"></div>
+        </div>
       </section>
     </main>
   </div>
@@ -951,14 +1144,33 @@
     };
 
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3Iiujn95evZuFiyLNrJUo-_H6rKngdxt0EeBFVw/exec";
+    const SUPABASE_CONFIG = {
+      url: "https://pzhzdjsjfdzbzkhnaxmc.supabase.co",
+      anonKey: "sb_publishable_3Ox2JIQXVLwusT-xzIMJ4g_YXTR5q8e"
+    };
+    const supabaseClient = window.supabase?.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
 
     const state = {
       reservations: [],
+      menuItems: [],
+      menuSession: null,
+      activeAdminTab: "reservations",
+      menuSearch: "",
+      menuBranchFilter: "all",
       range: "today",
       showRemoved: false,
       activeForm: "quick",
       calendarCursor: null
     };
+
+    function escapeAdminHtml(value = "") {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
 
     function parseGvizText(text = "") {
       return JSON.parse(
@@ -1214,6 +1426,215 @@
         const isMatch = button.dataset.range === value || button.dataset.removed === value;
         button.classList.toggle("is-active", isMatch);
       });
+    }
+
+    function setAdminTab(tabName) {
+      state.activeAdminTab = tabName;
+      document.querySelectorAll("[data-admin-tab]").forEach((button) => {
+        button.classList.toggle("is-active", button.dataset.adminTab === tabName);
+      });
+      document.getElementById("reservationsAdminPanel").classList.toggle("is-active", tabName === "reservations");
+      document.getElementById("menuAdminPanel").classList.toggle("is-active", tabName === "menu");
+      if (tabName === "menu") {
+        void refreshMenuSession();
+      }
+    }
+
+    function setMenuStatus(message = "", type = "") {
+      const status = document.getElementById("menuSaveStatus");
+      status.textContent = message;
+      status.className = `menu-save-status${type ? ` is-${type}` : ""}`;
+    }
+
+    function setMenuAuthStatus(message = "", type = "") {
+      const status = document.getElementById("menuAuthStatus");
+      status.textContent = message;
+      status.className = `menu-auth-status${type ? ` is-${type}` : ""}`;
+    }
+
+    function updateMenuAuthView() {
+      const isSignedIn = Boolean(state.menuSession?.access_token);
+      document.getElementById("menuAuthCard").hidden = isSignedIn;
+      document.getElementById("menuAdminWorkspace").hidden = !isSignedIn;
+      document.getElementById("menuSessionLabel").textContent = isSignedIn
+        ? state.menuSession.user?.email || "Signed in"
+        : "Sign in required";
+    }
+
+    async function refreshMenuSession() {
+      if (!supabaseClient) {
+        setMenuAuthStatus("Supabase client could not load.", "error");
+        return;
+      }
+      const { data, error } = await supabaseClient.auth.getSession();
+      if (error) {
+        setMenuAuthStatus(error.message, "error");
+        return;
+      }
+      state.menuSession = data.session;
+      updateMenuAuthView();
+      if (state.menuSession && !state.menuItems.length) {
+        await fetchMenuItems();
+      }
+    }
+
+    async function signInMenuAdmin() {
+      if (!supabaseClient) {
+        setMenuAuthStatus("Supabase client could not load.", "error");
+        return;
+      }
+      const email = document.getElementById("menuAdminEmail").value.trim();
+      const password = document.getElementById("menuAdminPassword").value;
+      if (!email || !password) {
+        setMenuAuthStatus("Enter email and password.", "error");
+        return;
+      }
+
+      setMenuAuthStatus("Signing in...");
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (error) {
+        setMenuAuthStatus(error.message, "error");
+        return;
+      }
+
+      state.menuSession = data.session;
+      document.getElementById("menuAdminPassword").value = "";
+      setMenuAuthStatus("Signed in.", "success");
+      updateMenuAuthView();
+      await fetchMenuItems();
+    }
+
+    async function signOutMenuAdmin() {
+      if (!supabaseClient) return;
+      await supabaseClient.auth.signOut();
+      state.menuSession = null;
+      state.menuItems = [];
+      document.getElementById("menuAdminList").innerHTML = "";
+      setMenuStatus("");
+      updateMenuAuthView();
+      setMenuAuthStatus("Signed out.");
+    }
+
+    async function fetchMenuItems() {
+      if (!supabaseClient) return;
+      setMenuStatus("Loading menu...");
+      const { data, error } = await supabaseClient
+        .from("menu_items")
+        .select("id,branches,sort_order,category,label,name_ko,name_en,price,is_available")
+        .order("category", { ascending: true })
+        .order("sort_order", { ascending: true, nullsFirst: false })
+        .order("id", { ascending: true });
+
+      if (error) {
+        setMenuStatus(error.message, "error");
+        return;
+      }
+
+      state.menuItems = data || [];
+      renderMenuAdmin();
+      setMenuStatus(`Loaded ${state.menuItems.length} menu items.`, "success");
+    }
+
+    function getFilteredMenuItems() {
+      const query = state.menuSearch.trim().toLowerCase();
+      return state.menuItems.filter((item) => {
+        const matchesBranch = state.menuBranchFilter === "all" || item.branches === state.menuBranchFilter;
+        if (!matchesBranch) return false;
+        if (!query) return true;
+        return [item.category, item.label, item.name_ko, item.name_en, item.branches]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(query));
+      });
+    }
+
+    function renderMenuAdmin() {
+      const list = document.getElementById("menuAdminList");
+      const items = getFilteredMenuItems();
+      if (!items.length) {
+        list.innerHTML = '<div class="menu-empty-state">No menu items match this view.</div>';
+        return;
+      }
+
+      list.innerHTML = items.map((item) => `
+        <article class="menu-admin-card ${item.is_available === false ? "is-hidden" : ""}" data-menu-id="${item.id}">
+          <div class="menu-admin-top">
+            <div class="menu-admin-title">
+              <h4>${escapeAdminHtml(item.name_ko || item.name_en || "Untitled")}</h4>
+              <p>${escapeAdminHtml(item.name_en || "")}</p>
+            </div>
+            <div class="badge-row">
+              <span class="status-badge branch">${escapeAdminHtml(item.category || "Category")}</span>
+              ${item.label ? `<span class="status-badge active">${escapeAdminHtml(item.label)}</span>` : ""}
+            </div>
+          </div>
+          <div class="menu-admin-fields">
+            <div class="field">
+              <label for="menuSort${item.id}">Sort</label>
+              <input id="menuSort${item.id}" data-menu-field="sort_order" type="number" inputmode="numeric" value="${item.sort_order ?? ""}" placeholder="blank" />
+            </div>
+            <div class="field">
+              <label for="menuBranch${item.id}">Branch</label>
+              <select id="menuBranch${item.id}" data-menu-field="branches">
+                <option value="both" ${item.branches === "both" ? "selected" : ""}>Both</option>
+                <option value="downtown" ${item.branches === "downtown" ? "selected" : ""}>Downtown</option>
+                <option value="uptown" ${item.branches === "uptown" ? "selected" : ""}>Uptown</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="menuPrice${item.id}">Price</label>
+              <input id="menuPrice${item.id}" data-menu-field="price" type="number" min="0" step="0.01" inputmode="decimal" value="${item.price ?? ""}" />
+            </div>
+            <label class="toggle-field" for="menuAvailable${item.id}">
+              <input id="menuAvailable${item.id}" data-menu-field="is_available" type="checkbox" ${item.is_available !== false ? "checked" : ""} />
+              Available
+            </label>
+            <button class="pill-btn primary" data-menu-action="save" data-menu-id="${item.id}" type="button">Save</button>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function getMenuCardPayload(card) {
+      const sortValue = card.querySelector('[data-menu-field="sort_order"]').value.trim();
+      const priceValue = card.querySelector('[data-menu-field="price"]').value.trim();
+      const priceNumber = Number.parseFloat(priceValue);
+      return {
+        sort_order: sortValue ? Number.parseInt(sortValue, 10) : null,
+        branches: card.querySelector('[data-menu-field="branches"]').value,
+        price: Number.isFinite(priceNumber) ? priceNumber : null,
+        is_available: card.querySelector('[data-menu-field="is_available"]').checked
+      };
+    }
+
+    async function saveMenuItem(id) {
+      if (!supabaseClient || !state.menuSession) {
+        setMenuStatus("Sign in before saving.", "error");
+        return;
+      }
+      const card = document.querySelector(`[data-menu-id="${id}"]`);
+      if (!card) return;
+      const payload = getMenuCardPayload(card);
+      if (!["both", "downtown", "uptown"].includes(payload.branches)) {
+        setMenuStatus("Invalid branch value.", "error");
+        return;
+      }
+
+      setMenuStatus("Saving...");
+      const { data, error } = await supabaseClient
+        .from("menu_items")
+        .update(payload)
+        .eq("id", id)
+        .select("id,branches,sort_order,category,label,name_ko,name_en,price,is_available")
+        .single();
+
+      if (error) {
+        setMenuStatus(error.message, "error");
+        return;
+      }
+
+      state.menuItems = state.menuItems.map((item) => String(item.id) === String(id) ? data : item);
+      renderMenuAdmin();
+      setMenuStatus("Saved.", "success");
     }
 
     function buildMutationForm(fields) {
@@ -1654,6 +2075,59 @@
 
     bindFormSubmission(document.getElementById("quickAddForm"));
     bindFormSubmission(editorForm);
+
+    document.querySelectorAll("[data-admin-tab]").forEach((button) => {
+      button.addEventListener("click", () => {
+        setAdminTab(button.dataset.adminTab || "reservations");
+      });
+    });
+
+    document.getElementById("menuSignInBtn").addEventListener("click", () => {
+      void signInMenuAdmin();
+    });
+
+    document.getElementById("menuAdminPassword").addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        void signInMenuAdmin();
+      }
+    });
+
+    document.getElementById("menuSignOutBtn").addEventListener("click", () => {
+      void signOutMenuAdmin();
+    });
+
+    document.getElementById("menuRefreshBtn").addEventListener("click", () => {
+      void fetchMenuItems();
+    });
+
+    document.getElementById("menuSearchInput").addEventListener("input", (event) => {
+      state.menuSearch = event.target.value;
+      renderMenuAdmin();
+    });
+
+    document.getElementById("menuBranchFilter").addEventListener("change", (event) => {
+      state.menuBranchFilter = event.target.value;
+      renderMenuAdmin();
+    });
+
+    document.getElementById("menuAdminList").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-menu-action]");
+      if (!button) return;
+      if (button.dataset.menuAction === "save") {
+        void saveMenuItem(Number(button.dataset.menuId));
+      }
+    });
+
+    if (supabaseClient) {
+      supabaseClient.auth.onAuthStateChange((_event, session) => {
+        state.menuSession = session;
+        updateMenuAuthView();
+      });
+      void refreshMenuSession();
+    } else {
+      setMenuAuthStatus("Supabase client could not load.", "error");
+    }
 
     document.getElementById("closeEditorModal").addEventListener("click", closeEditor);
     document.getElementById("cancelEditor").addEventListener("click", closeEditor);
