@@ -26,6 +26,7 @@
         linear-gradient(180deg, rgba(251, 247, 241, 0.96) 0%, rgba(245, 239, 228, 0.98) 100%);
       color: var(--menu-bg-ink);
       overflow-x: hidden;
+      overflow-anchor: none;
     }
 
     body.menu-page::before {
@@ -83,10 +84,12 @@
       transform: translateZ(0);
       transition: padding 0.22s ease, box-shadow 0.22s ease;
       will-change: padding;
+      overflow-anchor: none;
     }
 
     .menu-sticky-spacer {
       height: 0;
+      overflow-anchor: none;
     }
 
     .menu-sticky-inner {
@@ -904,6 +907,7 @@
       let frameId = 0;
       let expandedHeaderHeight = Math.ceil(stickyShell.getBoundingClientRect().height);
       let spacerHeight = "";
+      let lastScrollY = null;
 
       const syncHeaderHeight = () => {
         const currentHeight = Math.ceil(stickyShell.getBoundingClientRect().height);
@@ -922,11 +926,24 @@
 
       const readStickyState = () => {
         frameId = 0;
-        const enterThreshold = mobileQuery.matches ? 88 : 16;
-        const exitThreshold = mobileQuery.matches ? 4 : 0;
-        const shouldStick = isSticky
-          ? window.scrollY > exitThreshold
-          : window.scrollY > enterThreshold;
+        const currentScrollY = window.scrollY;
+        const isFirstSync = lastScrollY === null;
+        const scrollingDown = isFirstSync ? currentScrollY > 0 : currentScrollY > lastScrollY;
+        const scrollingUp = !isFirstSync && currentScrollY < lastScrollY;
+        const enterThreshold = mobileQuery.matches ? 12 : 16;
+        const exitThreshold = mobileQuery.matches
+          ? Math.max(120, Math.min(expandedHeaderHeight - 96, window.innerHeight * 0.48))
+          : 0;
+        let shouldStick = isSticky;
+
+        if (isSticky) {
+          shouldStick = currentScrollY > 0;
+          if (mobileQuery.matches && scrollingUp && currentScrollY <= exitThreshold) {
+            shouldStick = false;
+          }
+        } else {
+          shouldStick = currentScrollY > enterThreshold && (!mobileQuery.matches || scrollingDown || isFirstSync);
+        }
 
         if (shouldStick !== isSticky) {
           if (shouldStick) {
@@ -943,10 +960,12 @@
               page.classList.remove("is-sticky-resetting");
             }
           });
+          lastScrollY = currentScrollY;
           return;
         }
 
         syncHeaderHeight();
+        lastScrollY = currentScrollY;
       };
 
       const syncStickyState = () => {
