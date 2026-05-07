@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reservations Admin | EHWA</title>
+  <title>Reservations Overview | EHWA</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet" />
@@ -812,15 +812,15 @@
   <div class="shell">
     <header class="topbar">
       <div class="brand">
-          <a class="logo-link" href="./index.html" aria-label="EHWA test home">
+          <a class="logo-link" href="./index.html" aria-label="EHWA home">
             <img src="../assets/logo-dark.webp" alt="EHWA logo" />
         </a>
         <div class="brand-copy">
-          <p>Reservations Admin</p>
-          <h1>Floor Dashboard</h1>
+          <p>Reservations Overview</p>
+          <h1>Downtown + Uptown</h1>
         </div>
       </div>
-      <a class="pill-btn" href="./downtown/reservation/">Guest Form</a>
+      <a class="pill-btn" href="./modify.html">Modify / Cancel</a>
     </header>
 
     <section class="hero">
@@ -980,7 +980,7 @@
     function normalizeReservation(cells = [], index = 0, sheetConfig) {
       const values = cells.map((cell) => getCellText(cell));
       return {
-        rowNumber: index + 1,
+        rowNumber: index + 2,
         sheetName: sheetConfig.name,
         branch: sheetConfig.label,
         timestamp: values[0] || "",
@@ -990,7 +990,9 @@
         name: values[4] || "",
         phone: values[5] || "",
         notes: values[6] || "",
-        status: values[7] || "active"
+        status: values[7] || "active",
+        alertStatus: values[8] || ((values[7] || "").trim().toLowerCase() === "pending" ? "pending" : "confirmed"),
+        alertType: values[9] || ""
       };
     }
 
@@ -1058,6 +1060,20 @@
       }).format(date);
     }
 
+    function isNextDayReservationTime(value = "") {
+      return ["12:00 AM", "12:30 AM", "1:00 AM"].includes(String(value).trim().toUpperCase());
+    }
+
+    function getEffectiveReservationDate(value = "", timeValue = "") {
+      const normalizedDate = String(value || "").trim();
+      if (!normalizedDate) return "";
+      if (!isNextDayReservationTime(timeValue)) return normalizedDate;
+      const baseDate = new Date(`${normalizedDate}T00:00:00`);
+      if (Number.isNaN(baseDate.getTime())) return normalizedDate;
+      baseDate.setDate(baseDate.getDate() + 1);
+      return formatInputDate(baseDate);
+    }
+
     function getDateBounds(range) {
       const now = new Date();
       const start = new Date(now);
@@ -1104,6 +1120,7 @@
 
     function getStatusBadge(item) {
       if (item.status === "removed") return { label: "Removed", className: "removed" };
+      if (item.status === "pending") return { label: "Pending", className: "active" };
       if (parseGuestCount(item.people) >= 8) return { label: "Large Party", className: "large" };
       return { label: "Active", className: "active" };
     }
@@ -1540,7 +1557,7 @@
       editorAction.value = "update";
       editorRowNumber.value = String(item.rowNumber);
       editorSheetName.value = item.sheetName || "";
-      editorStatus.value = item.status || "active";
+      editorStatus.value = item.status === "removed" ? "removed" : "active";
       editorFields.dateInput.value = item.date || formatInputDate(new Date());
       editorFields.timeInput.value = item.time || "6:00 PM";
       editorFields.timeDisplay.textContent = item.time || "6:00 PM";
@@ -1584,6 +1601,10 @@
           ...serializeReservationForm(form),
           ...extraFields
         };
+        payload.date = getEffectiveReservationDate(payload.date, payload.time);
+        payload.alertStatus = "confirmed";
+        payload.alertType = "";
+        if (payload.status !== "removed") payload.status = "active";
         buildMutationForm(payload);
         if (form === editorForm) {
           closeEditor();
@@ -1680,7 +1701,9 @@
           action: "status",
           sheetName,
           rowNumber: String(rowNumber),
-          status: isRestore ? "active" : "removed"
+          status: isRestore ? "active" : "removed",
+          alertStatus: "confirmed",
+          alertType: ""
         });
         openFeedback(
           isRestore ? "Reservation Restored" : "Reservation Removed",

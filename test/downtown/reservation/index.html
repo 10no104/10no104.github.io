@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -79,7 +79,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 16px;
+      margin-bottom: 10px;
     }
 
     .brand {
@@ -129,6 +129,36 @@
       font-weight: 700;
       white-space: nowrap;
       box-shadow: 0 10px 22px rgba(32, 20, 13, 0.05);
+    }
+
+    .topbar-actions {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .menu-link {
+      background: rgba(255, 251, 245, 0.84);
+    }
+
+    .manage-link-row {
+      display: flex;
+      margin-bottom: 16px;
+    }
+
+    .manage-link {
+      min-height: 48px;
+      padding: 0 18px;
+      border-color: rgba(123, 31, 47, 0.16);
+      background: linear-gradient(135deg, rgba(123, 31, 47, 0.98), rgba(212, 175, 55, 0.96));
+      color: #fff9f2;
+      box-shadow: 0 16px 30px rgba(123, 31, 47, 0.22);
+      width: 100%;
+    }
+
+    .manage-link:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 34px rgba(123, 31, 47, 0.26);
     }
 
     .booking-card {
@@ -578,15 +608,22 @@
           <a class="logo-link" href="../../index.html" aria-label="EHWA test home">
             <img src="../../../assets/logo-dark.webp" alt="EHWA logo" />
         </a>
-        <h1>Reservation</h1>
+        <h1>Downtown Reservation</h1>
       </div>
-          <a class="back-link" href="../menu/index.html">Menu</a>
+      <div class="topbar-actions">
+        <a class="back-link menu-link" href="../../downtown/menu/index.html">Menu</a>
+      </div>
     </header>
+    <div class="manage-link-row">
+      <a class="back-link manage-link" href="../../modify.html">View or Edit Reservation</a>
+    </div>
 
     <section class="booking-card">
       <form class="booking-form" id="reservationForm" method="POST" action="https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3Iiujn95evZuFiyLNrJUo-_H6rKngdxt0EeBFVw/exec" target="reservationSubmitFrame">
         <input name="action" type="hidden" value="create" />
-        <input name="status" type="hidden" value="active" />
+        <input name="status" type="hidden" value="pending" />
+        <input name="alertStatus" type="hidden" value="pending" />
+        <input name="alertType" type="hidden" value="new" />
         <input name="sheetName" type="hidden" value="Downtown Reservation" />
         <div class="field-grid">
           <div class="field full">
@@ -633,8 +670,7 @@
 
   <div class="modal-backdrop" id="reservationModal" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="reservationModalTitle">
-      <h2 id="reservationModalTitle">Reservation request sent</h2>
-      <p>Your request has been submitted. We will contact you using the phone number you provided.</p>
+      <h2 id="reservationModalTitle">Reservation Request Received</h2>
       <div class="modal-details" id="reservationModalDetails" hidden></div>
       <button class="modal-btn" type="button" id="reservationModalClose">Close</button>
     </div>
@@ -670,6 +706,7 @@
   <script>
     (function () {
       const form = document.getElementById("reservationForm");
+      const submitButton = form.querySelector(".submit-btn");
       const dateInput = document.getElementById("date");
       const dateGrid = document.getElementById("dateGrid");
       const timeInput = document.getElementById("time");
@@ -680,6 +717,7 @@
       const nameInput = document.getElementById("name");
       const phoneInput = document.getElementById("phone");
       const notesInput = document.getElementById("notes");
+      const branchLabel = "Downtown";
 
       const modal = document.getElementById("reservationModal");
       const modalClose = document.getElementById("reservationModalClose");
@@ -757,6 +795,7 @@
         dateOptions.push(formatInputDate(optionDate));
       }
       let calendarCursor = new Date(start.getFullYear(), start.getMonth(), 1);
+      let submittedReservation = null;
 
       const renderDateGrid = () => {
         dateGrid.innerHTML = "";
@@ -799,33 +838,80 @@
         renderDateGrid();
       };
 
+      const isNextDayReservationTime = (value) => {
+        return ["12:00 AM", "12:30 AM", "1:00 AM"].includes(String(value).trim().toUpperCase());
+      };
+
+      const getEffectiveReservationDate = (dateValue, timeValue) => {
+        const normalizedDate = String(dateValue || "").trim();
+        if (!normalizedDate) return "";
+        if (!isNextDayReservationTime(timeValue)) return normalizedDate;
+        const baseDate = new Date(`${normalizedDate}T00:00:00`);
+        if (Number.isNaN(baseDate.getTime())) return normalizedDate;
+        baseDate.setDate(baseDate.getDate() + 1);
+        return `${baseDate.getFullYear()}-${String(baseDate.getMonth() + 1).padStart(2, "0")}-${String(baseDate.getDate()).padStart(2, "0")}`;
+      };
+
+      const getReservationSnapshot = () => ({
+        branch: branchLabel,
+        date: getEffectiveReservationDate(dateInput.value, timeInput.value),
+        time: timeInput.value,
+        people: peopleInput.value,
+        name: nameInput.value.trim() || "Guest",
+        phone: phoneInput.value.trim() || "-",
+        notes: notesInput.value.trim() || "-"
+      });
+
+      const resetReservationForm = () => {
+        form.reset();
+        dateInput.value = dateOptions[0];
+        timeInput.value = "6:00 PM";
+        timeDisplay.textContent = "6:00 PM";
+        peopleInput.value = "4 guests";
+        peopleDisplay.textContent = "4 guests";
+        peopleDisplay.style.display = "";
+        peopleCustomInput.value = "";
+        peopleCustomInput.classList.remove("is-open");
+        nameInput.value = "";
+        phoneInput.value = "";
+        phoneInput.setCustomValidity("");
+        notesInput.value = "";
+        closeSheet();
+        syncDateState();
+      };
+
       const renderModalDetails = () => {
+        const reservation = submittedReservation || getReservationSnapshot();
         modalDetails.hidden = false;
         modalDetails.innerHTML = `
           <div class="booking-summary">
             <div class="booking-summary-grid">
               <div class="booking-summary-box">
+                <span>Location</span>
+                <strong>${reservation.branch}</strong>
+              </div>
+              <div class="booking-summary-box">
                 <span>Date</span>
-                <strong>${dateInput.value ? formatDisplayDate(dateInput.value) : "-"}</strong>
+                <strong>${reservation.date ? formatDisplayDate(reservation.date) : "-"}</strong>
               </div>
               <div class="booking-summary-box">
                 <span>Time</span>
-                <strong>${timeInput.value || "-"}</strong>
+                <strong>${reservation.time || "-"}</strong>
               </div>
               <div class="booking-summary-box">
                 <span>Guests</span>
-                <strong>${peopleInput.value || "-"}</strong>
+                <strong>${reservation.people || "-"}</strong>
               </div>
               <div class="booking-summary-box">
                 <span>Name</span>
-                <strong>${nameInput.value.trim() || "Guest"}</strong>
+                <strong>${reservation.name}</strong>
               </div>
               <div class="booking-summary-box">
                 <span>Phone</span>
-                <strong>${phoneInput.value.trim() || "-"}</strong>
+                <strong>${reservation.phone}</strong>
               </div>
             </div>
-            <div class="booking-summary-note">${notesInput.value.trim() || "No notes."}</div>
+            <div class="booking-summary-note">${reservation.notes}</div>
           </div>
         `;
       };
@@ -987,7 +1073,16 @@
         }
 
         phoneInput.setCustomValidity("");
-        window.setTimeout(openModal, 250);
+        dateInput.value = getEffectiveReservationDate(dateInput.value, timeInput.value);
+        submittedReservation = getReservationSnapshot();
+        submitButton.disabled = true;
+        window.setTimeout(() => {
+          openModal();
+          resetReservationForm();
+        }, 250);
+        window.setTimeout(() => {
+          submitButton.disabled = false;
+        }, 1200);
       });
 
       modalClose.addEventListener("click", closeModal);
@@ -1077,3 +1172,4 @@
   </script>
 </body>
 </html>
+

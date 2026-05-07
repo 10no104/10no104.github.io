@@ -323,8 +323,8 @@
       gap: 10px;
       padding: 14px;
       border-radius: 18px;
-      background: rgba(255, 250, 244, 0.72);
-      border: 1px solid rgba(109, 86, 59, 0.1);
+      background: rgba(255, 252, 248, 0.94);
+      border: 1px solid rgba(109, 86, 59, 0.12);
     }
 
     .booking-summary-head {
@@ -354,8 +354,8 @@
     .booking-summary-box {
       padding: 12px;
       border-radius: 14px;
-      background: rgba(255, 255, 255, 0.7);
-      border: 1px solid rgba(109, 86, 59, 0.08);
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(109, 86, 59, 0.1);
     }
 
     .booking-summary-box span,
@@ -381,10 +381,10 @@
     .booking-summary-note {
       padding: 12px;
       border-radius: 14px;
-      background: rgba(255, 255, 255, 0.62);
+      background: rgba(255, 255, 255, 0.9);
       color: #3d2c1f;
       line-height: 1.55;
-      border: 1px solid rgba(109, 86, 59, 0.08);
+      border: 1px solid rgba(109, 86, 59, 0.1);
     }
 
     .layout {
@@ -761,6 +761,16 @@
       color: #58473d;
     }
 
+    .status-badge.table {
+      background: linear-gradient(135deg, rgba(123, 31, 47, 0.16), rgba(212, 175, 55, 0.22));
+      color: #5f2330;
+      white-space: normal;
+      text-align: center;
+      max-width: 170px;
+      line-height: 1.2;
+      padding: 8px 12px;
+    }
+
     .reservation-meta {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -816,7 +826,7 @@
 
     .reservation-actions {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
       margin-top: 12px;
     }
@@ -831,14 +841,168 @@
     }
 
     .action-btn.primary {
-      background: linear-gradient(135deg, var(--wine), #b9871f);
-      color: #fff;
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.18), rgba(123, 31, 47, 0.12));
+      color: #6b3127;
+      border: 1px solid rgba(123, 31, 47, 0.12);
     }
 
     .action-btn.light {
       background: rgba(255, 255, 255, 0.82);
       color: #2a1d14;
       border: 1px solid rgba(113, 88, 60, 0.1);
+    }
+
+    .action-btn.table-btn {
+      background: linear-gradient(135deg, var(--wine), #b9871f);
+      color: #fff;
+      border: 0;
+    }
+
+    .table-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 120;
+      display: grid;
+      place-items: center;
+      padding: 22px;
+      background: rgba(24, 15, 10, 0.38);
+      backdrop-filter: blur(14px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease;
+    }
+
+    .table-backdrop.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .table-modal {
+      width: min(560px, 100%);
+      border-radius: 28px;
+      padding: 24px;
+      background: linear-gradient(180deg, rgba(255, 253, 249, 0.998), rgba(246, 238, 228, 0.995));
+      border: 1px solid rgba(113, 88, 60, 0.16);
+      box-shadow: 0 28px 60px rgba(24, 16, 12, 0.2);
+      color: #241812;
+      max-height: min(88vh, 760px);
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .table-modal-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .table-modal-top h3 {
+      margin: 0 0 4px;
+      font-size: 1.1rem;
+    }
+
+    .table-modal-top p {
+      margin: 0;
+      color: #7b6756;
+      font-size: 0.92rem;
+    }
+
+    .table-selection-summary {
+      margin-bottom: 16px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(113, 88, 60, 0.12);
+      color: #4a3a30;
+      font-weight: 700;
+    }
+
+    .table-option-grid {
+      display: grid;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .table-option-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-top: 14px;
+      position: relative;
+    }
+
+    .table-option-row::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(113, 88, 60, 0), rgba(113, 88, 60, 0.18), rgba(113, 88, 60, 0));
+    }
+
+    .table-option-row:first-child {
+      padding-top: 0;
+    }
+
+    .table-option-row:first-child::before {
+      display: none;
+    }
+
+    .table-option-btn {
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(113, 88, 60, 0.16);
+      background: rgba(255, 255, 255, 0.92);
+      color: #4d3a2e;
+      font-size: 0.92rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.16s ease, background 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+    }
+
+    .table-option-btn.is-selected {
+      background: linear-gradient(135deg, #7b1f2f, #b98249);
+      color: #fff9f4;
+      border-color: transparent;
+      transform: translateY(-1px);
+    }
+
+    .table-option-empty {
+      margin: 0 0 18px;
+      color: #7b6756;
+      font-size: 0.92rem;
+    }
+
+    .table-modal-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .table-modal .pill-btn {
+      min-height: 46px;
+      border-color: rgba(113, 88, 60, 0.14);
+      background: rgba(255, 255, 255, 0.92);
+      color: #37271f;
+      box-shadow: 0 8px 18px rgba(24, 16, 12, 0.08);
+    }
+
+    .table-modal .pill-btn.primary {
+      color: #fff;
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--wine), #b9871f);
+      box-shadow: 0 14px 24px rgba(123, 31, 47, 0.18);
+    }
+
+    .table-modal .pill-btn.table-clear-btn {
+      background: rgba(244, 233, 221, 0.96);
+      color: #6b3127;
+      border-color: rgba(123, 31, 47, 0.12);
     }
 
     .empty-state {
@@ -870,11 +1034,38 @@
       overflow: auto;
       -webkit-overflow-scrolling: touch;
       border-radius: 24px;
-      background:
-        linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(247, 239, 228, 0.98)),
-        url("../../assets/pattern.webp") center / 400px auto;
+      background: linear-gradient(180deg, rgba(255, 253, 249, 0.998), rgba(246, 238, 228, 0.994));
       border: 1px solid rgba(108, 85, 58, 0.14);
       box-shadow: 0 28px 54px rgba(18, 12, 9, 0.2);
+    }
+
+    #editorModal .modal {
+      background: linear-gradient(180deg, rgba(255, 253, 249, 0.999), rgba(245, 236, 225, 0.996));
+      color: #241812;
+    }
+
+    #editorModal .field label,
+    #editorModal .modal-head h3 {
+      color: #241812;
+    }
+
+    #editorModal input,
+    #editorModal textarea,
+    #editorModal .picker-trigger,
+    #editorModal .date-chip {
+      background: rgba(255, 255, 255, 0.94);
+      border-color: rgba(113, 88, 60, 0.18);
+      box-shadow: 0 6px 14px rgba(24, 16, 12, 0.05);
+    }
+
+    #editorModal .date-chip.is-active,
+    #editorModal .date-chip.more-chip.is-active {
+      box-shadow: 0 12px 22px rgba(17, 11, 8, 0.14);
+    }
+
+    #editorModal .calendar-day,
+    #editorModal .sheet-option {
+      background: rgba(255, 255, 255, 0.92);
     }
 
     .feedback-backdrop {
@@ -897,14 +1088,15 @@
       width: min(100%, 380px);
       padding: 22px;
       border-radius: 22px;
-      background:
-        linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(247, 239, 228, 0.98)),
-        url("../../assets/pattern.webp") center / 360px auto;
+      background: linear-gradient(180deg, rgba(255, 253, 249, 0.998), rgba(245, 236, 225, 0.996));
       border: 1px solid rgba(108, 85, 58, 0.14);
       box-shadow: 0 24px 44px rgba(18, 12, 9, 0.18);
       color: #25160f;
       position: relative;
-      overflow: visible;
+      max-height: min(88vh, 720px);
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
     }
 
     .feedback-stack {
@@ -919,9 +1111,7 @@
       inset: 0;
       border-radius: 22px;
       border: 1px solid rgba(108, 85, 58, 0.12);
-      background:
-        linear-gradient(180deg, rgba(255, 252, 247, 0.96), rgba(247, 239, 228, 0.96)),
-        url("../../assets/pattern.webp") center / 360px auto;
+      background: linear-gradient(180deg, rgba(255, 253, 249, 0.985), rgba(245, 236, 225, 0.982));
       box-shadow: 0 20px 36px rgba(18, 12, 9, 0.1);
       padding: 18px 20px;
       display: flex;
@@ -968,6 +1158,35 @@
       font-size: 0.8rem;
     }
 
+    #feedbackMessage {
+      margin: 12px 0 16px;
+      color: #4a382d;
+      font-size: 0.96rem;
+      font-weight: 600;
+      letter-spacing: 0;
+      line-height: 1.65;
+      text-transform: none;
+    }
+
+    #removeConfirmMessage {
+      margin: 12px 0 16px;
+      color: #4a382d;
+      font-size: 0.96rem;
+      font-weight: 600;
+      letter-spacing: 0;
+      line-height: 1.65;
+      text-transform: none;
+    }
+
+    #removeConfirmModal .booking-summary {
+      background: rgba(255, 252, 247, 0.92);
+      border-color: rgba(109, 86, 59, 0.12);
+    }
+
+    #removeConfirmModal .booking-summary-box {
+      background: rgba(255, 255, 255, 0.9);
+    }
+
     .feedback-modal p[hidden] {
       display: none;
     }
@@ -976,12 +1195,29 @@
       margin: 0 0 18px;
     }
 
+    .modal .pill-btn,
+    .feedback-modal .pill-btn {
+      border-color: rgba(113, 88, 60, 0.16);
+      background: rgba(255, 255, 255, 0.96);
+      color: #37271f;
+      box-shadow: 0 10px 22px rgba(24, 16, 12, 0.08);
+    }
+
+    .modal .pill-btn.primary,
+    .feedback-modal .pill-btn.primary {
+      color: #fff;
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--wine), #b9871f);
+      box-shadow: 0 16px 28px rgba(123, 31, 47, 0.18);
+    }
+
     #editorForm .form-actions {
       position: sticky;
       bottom: -22px;
       margin: 0 -22px -22px;
       padding: 14px 22px 22px;
-      background: linear-gradient(180deg, rgba(247, 239, 228, 0), rgba(247, 239, 228, 0.94) 24%, rgba(247, 239, 228, 0.99));
+      background: linear-gradient(180deg, rgba(247, 239, 228, 0), rgba(247, 239, 228, 0.97) 24%, rgba(247, 239, 228, 1));
+      border-top: 1px solid rgba(109, 86, 59, 0.08);
     }
 
     .modal-head {
@@ -1019,9 +1255,7 @@
       width: min(100%, 760px);
       max-height: min(72vh, 520px);
       border-radius: 24px 24px 0 0;
-      background:
-        linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(247, 239, 228, 0.98)),
-        url("../../assets/pattern.webp") center / 420px auto;
+      background: linear-gradient(180deg, rgba(255, 253, 249, 0.998), rgba(245, 236, 225, 0.996));
       box-shadow: 0 -16px 48px rgba(17, 11, 8, 0.22);
       overflow: hidden;
     }
@@ -1195,7 +1429,7 @@
   <div class="shell">
     <header class="topbar">
       <div class="brand">
-          <a class="logo-link" href="../index.html" aria-label="EHWA test home">
+          <a class="logo-link" href="../index.html" aria-label="EHWA home">
             <img src="../../assets/logo-dark.webp" alt="EHWA logo" />
         </a>
         <div class="brand-copy">
@@ -1306,6 +1540,38 @@
     </div>
   </div>
 
+  <div class="table-backdrop" id="tableAssignmentModal" aria-hidden="true">
+    <div class="table-modal" role="dialog" aria-modal="true" aria-labelledby="tableAssignmentTitle">
+      <div class="table-modal-top">
+        <div>
+          <h3 id="tableAssignmentTitle">Assign Tables</h3>
+          <p id="tableAssignmentMeta">Choose one or more tables for this booking.</p>
+        </div>
+        <button class="modal-close" id="closeTableAssignmentModal" type="button">×</button>
+      </div>
+      <div class="table-selection-summary" id="tableSelectionSummary">No tables selected</div>
+      <div class="table-option-grid" id="tableOptionGrid"></div>
+      <p class="table-option-empty" id="tableOptionEmpty" hidden>No table options found in the Table sheet.</p>
+      <div class="table-modal-actions">
+        <button class="pill-btn table-clear-btn" id="clearTableAssignment" type="button">Reset Tables</button>
+        <button class="pill-btn" id="cancelTableAssignment" type="button">Close</button>
+        <button class="pill-btn primary" id="saveTableAssignment" type="button">Save Tables</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="feedback-backdrop" id="removeConfirmModal" aria-hidden="true">
+    <div class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="removeConfirmTitle">
+      <h3 id="removeConfirmTitle">Remove Reservation?</h3>
+      <p id="removeConfirmMessage">This will move the booking out of the active list.</p>
+      <div class="feedback-details" id="removeConfirmDetails" hidden></div>
+      <div class="form-actions">
+        <button class="pill-btn primary" id="confirmRemoveReservation" type="button">Yes, Remove</button>
+        <button class="pill-btn" id="dismissRemoveReservation" type="button">Keep Reservation</button>
+      </div>
+    </div>
+  </div>
+
   <div class="feedback-backdrop" id="feedbackModal" aria-hidden="true">
     <div class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
       <div class="feedback-stack" id="feedbackStack" aria-hidden="true"></div>
@@ -1321,11 +1587,15 @@
     const ADMIN_SHEET_CONFIG = {
       sheetId: "1xa9OZbctYnlbaAL8lKIgmefM5hvSw0Plk01lxp5G2fc",
       sheetName: "Uptown Reservation",
-      branchLabel: "Uptown"
+      branchLabel: "Uptown",
+      tableSheetName: "Table",
+      tableOptionColumnIndex: 1
     };
 
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3Iiujn95evZuFiyLNrJUo-_H6rKngdxt0EeBFVw/exec";
     const AUTO_REFRESH_MS = 10000;
+    const AUTO_REMOVE_AFTER_MS = 60 * 60 * 1000;
+    const AUTO_REMOVE_MUTATION_SPACING_MS = 200;
 
     const state = {
       reservations: [],
@@ -1337,8 +1607,14 @@
       knownReservationSnapshots: new Map(),
       suppressNewAlertUntil: 0,
       autoRefreshHandle: null,
+      autoRemovingReservationIds: new Set(),
+      confirmingAlertIds: new Set(),
       feedbackQueue: [],
-      feedbackTransitionLocked: false
+      feedbackTransitionLocked: false,
+      tableOptions: [],
+      activeTableReservation: null,
+      selectedTableAssignments: [],
+      pendingRemoveReservation: null
     };
 
     function parseGvizText(text = "") {
@@ -1361,7 +1637,7 @@
     function normalizeReservation(cells = [], index = 0) {
       const values = cells.map((cell) => getCellText(cell));
       return {
-        rowNumber: index + 1,
+        rowNumber: index + 2,
         sheetName: ADMIN_SHEET_CONFIG.sheetName,
         branch: ADMIN_SHEET_CONFIG.branchLabel,
         timestamp: values[0] || "",
@@ -1371,8 +1647,29 @@
         name: values[4] || "",
         phone: values[5] || "",
         notes: values[6] || "",
-        status: values[7] || "active"
+        status: values[7] || "active",
+        alertStatus: values[8] || ((values[7] || "").trim().toLowerCase() === "pending" ? "pending" : "confirmed"),
+        alertType: values[9] || "",
+        tableAssignment: values[10] || ""
       };
+    }
+
+    function parseTableAssignments(value = "") {
+      return String(value || "")
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+
+    function formatTableAssignments(value = "") {
+      const items = Array.isArray(value) ? value : parseTableAssignments(value);
+      return items.join(" + ");
+    }
+
+    function getTableGroupKey(option = "") {
+      const normalized = String(option || "").trim().toUpperCase();
+      const match = normalized.match(/^(\d*[A-Z]+)/);
+      return match ? match[1] : normalized;
     }
 
     function toSafeDate(dateString = "") {
@@ -1403,6 +1700,42 @@
       return hour * 60 + minute;
     }
 
+    function isNextDayReservationTime(value = "") {
+      return ["12:00 AM", "12:30 AM", "1:00 AM"].includes(String(value).trim().toUpperCase());
+    }
+
+    function getEffectiveReservationDate(value = "", timeValue = "") {
+      const normalizedDate = String(value || "").trim();
+      if (!normalizedDate) return "";
+      if (!isNextDayReservationTime(timeValue)) return normalizedDate;
+      const baseDate = new Date(`${normalizedDate}T00:00:00`);
+      if (Number.isNaN(baseDate.getTime())) return normalizedDate;
+      baseDate.setDate(baseDate.getDate() + 1);
+      return formatInputDate(baseDate);
+    }
+
+    function getReservationEditorDateValue(item) {
+      return getReservationServiceDateValue(item) || formatInputDate(new Date());
+    }
+
+    function getReservationServiceDateValue(item) {
+      const date = toSafeDate(item?.date);
+      if (!date) return "";
+      if (!isNextDayReservationTime(item?.time)) return formatInputDate(date);
+      const serviceDate = new Date(date);
+      serviceDate.setDate(serviceDate.getDate() - 1);
+      return formatInputDate(serviceDate);
+    }
+
+    function getReservationDateTime(item) {
+      const date = toSafeDate(item?.date);
+      const minutes = parseTimeForSort(item?.time);
+      if (!date || minutes === Number.MAX_SAFE_INTEGER) return null;
+      const withTime = new Date(date);
+      withTime.setHours(Math.floor(minutes / 60), minutes % 60, 0, 0);
+      return withTime;
+    }
+
     function getReservationKey(item) {
       return [
         item.sheetName || ADMIN_SHEET_CONFIG.sheetName,
@@ -1421,6 +1754,45 @@
       ].join("::");
     }
 
+    function getAlertQueueKey(item) {
+      return getReservationIdentity(item);
+    }
+
+    function isPendingAlert(item) {
+      return item?.alertStatus === "pending";
+    }
+
+    function getAlertTitle(item) {
+      switch (item?.alertType) {
+        case "new":
+          return "New Reservation";
+        case "updated":
+          return "Reservation Updated";
+        case "canceled":
+          return "Reservation Canceled";
+        default:
+          return item?.status === "removed" ? "Reservation Canceled" : "Reservation Needs Confirmation";
+      }
+    }
+
+    function createPendingFeedbackItem(item) {
+      return {
+        title: getAlertTitle(item),
+        message: "",
+        details: item,
+        persistent: true,
+        requiresConfirmation: true,
+        key: getAlertQueueKey(item)
+      };
+    }
+
+    function shouldAutoRemoveReservation(item, now = new Date()) {
+      if (!item || item.status === "removed") return false;
+      const reservationDateTime = getReservationDateTime(item);
+      if (!reservationDateTime) return false;
+      return now.getTime() - reservationDateTime.getTime() >= AUTO_REMOVE_AFTER_MS;
+    }
+
     function getReservationSnapshot(item) {
       return JSON.stringify({
         date: item.date || "",
@@ -1429,7 +1801,9 @@
         name: item.name || "",
         phone: item.phone || "",
         notes: item.notes || "",
-        status: item.status || "active"
+        status: item.status || "active",
+        alertStatus: item.alertStatus || "confirmed",
+        alertType: item.alertType || ""
       });
     }
 
@@ -1459,10 +1833,11 @@
     function syncReservations(reservations, { detectNew = false } = {}) {
       const shouldDetectNew = detectNew && Date.now() >= state.suppressNewAlertUntil;
       const newReservations = shouldDetectNew
-        ? reservations.filter((item) => item.status !== "removed" && !state.knownReservationKeys.has(getReservationKey(item)))
+        ? reservations.filter((item) => item.status !== "removed" && item.alertStatus !== "pending" && !state.knownReservationKeys.has(getReservationKey(item)))
         : [];
       const canceledReservations = shouldDetectNew
         ? reservations.filter((item) => {
+            if (item.alertStatus === "pending") return false;
             if (item.status !== "removed") return false;
             const identity = getReservationIdentity(item);
             const previousSnapshot = state.knownReservationSnapshots.get(identity);
@@ -1471,6 +1846,7 @@
         : [];
       const updatedReservations = shouldDetectNew
         ? reservations.filter((item) => {
+            if (item.alertStatus === "pending") return false;
             if (item.status === "removed") return false;
             const identity = getReservationIdentity(item);
             const previousSnapshot = state.knownReservationSnapshots.get(identity);
@@ -1505,6 +1881,40 @@
       });
     }
 
+    function syncPendingFeedbackQueue(reservations = []) {
+      const pendingByKey = new Map(
+        reservations
+          .filter((item) => isPendingAlert(item))
+          .filter((item) => !state.confirmingAlertIds.has(getAlertQueueKey(item)))
+          .map((item) => [getAlertQueueKey(item), item])
+      );
+      const nextQueue = [];
+      const seenKeys = new Set();
+
+      state.feedbackQueue.forEach((entry) => {
+        if (!entry.persistent) {
+          nextQueue.push(entry);
+          return;
+        }
+        const pendingItem = pendingByKey.get(entry.key);
+        if (!pendingItem) return;
+        nextQueue.push({
+          ...entry,
+          title: getAlertTitle(pendingItem),
+          details: pendingItem
+        });
+        seenKeys.add(entry.key);
+      });
+
+      pendingByKey.forEach((item, key) => {
+        if (seenKeys.has(key)) return;
+        nextQueue.push(createPendingFeedbackItem(item));
+      });
+
+      state.feedbackQueue = nextQueue;
+      renderFeedbackQueue();
+    }
+
     async function fetchReservations() {
       const { sheetId, sheetName } = ADMIN_SHEET_CONFIG;
       const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&tqx=out:json`;
@@ -1525,6 +1935,19 @@
           }
           return timeA - timeB;
         });
+    }
+
+    async function fetchTableOptions() {
+      const { sheetId, tableSheetName, tableOptionColumnIndex } = ADMIN_SHEET_CONFIG;
+      const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?sheet=${encodeURIComponent(tableSheetName)}&tqx=out:json`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Failed to fetch table options");
+      const data = parseGvizText(await response.text());
+      const rows = (data.table?.rows || []).map((row) => row.c || []);
+      return rows
+        .slice(1)
+        .map((cells) => getCellText(cells[tableOptionColumnIndex]))
+        .filter(Boolean);
     }
 
     function formatDateLabel(value = "") {
@@ -1555,21 +1978,30 @@
         if (state.trashMode) return item.status === "removed";
         if (item.status === "removed") return false;
         if (!state.selectedDate) return true;
-        const date = toSafeDate(item.date);
-        if (!date) return false;
-        return formatInputDate(date) === state.selectedDate;
+        return getReservationServiceDateValue(item) === state.selectedDate;
       });
       return state.trashMode ? filtered.slice().reverse() : filtered;
     }
 
     function getStatusBadge(item) {
       if (item.status === "removed") return { label: "Removed", className: "removed" };
+      if (item.status === "pending") return { label: "Pending", className: "active" };
       if (parseGuestCount(item.people) >= 8) return { label: "Large Party", className: "large" };
       return { label: "Active", className: "active" };
     }
 
+    function getReservationBadge(item) {
+      if (item.status !== "removed") {
+        const tableLabel = formatTableAssignments(item.tableAssignment);
+        if (tableLabel) {
+          return { label: tableLabel, className: "table" };
+        }
+      }
+      return getStatusBadge(item);
+    }
+
     function renderReservationCard(item) {
-      const status = getStatusBadge(item);
+      const status = getReservationBadge(item);
       const primaryLabel = item.status === "removed" ? "Restore" : "Remove";
       const primaryAction = item.status === "removed" ? "restore" : "remove";
 
@@ -1601,6 +2033,7 @@
           <div class="reservation-actions">
             <button class="action-btn primary" type="button" data-action="${primaryAction}" data-sheet="${item.sheetName}" data-row="${item.rowNumber}">${primaryLabel}</button>
             <button class="action-btn light" type="button" data-action="edit" data-sheet="${item.sheetName}" data-row="${item.rowNumber}">Edit</button>
+            <button class="action-btn table-btn" type="button" data-action="tables" data-sheet="${item.sheetName}" data-row="${item.rowNumber}">Tables</button>
           </div>
         </article>
       `;
@@ -1692,7 +2125,49 @@
       window.setTimeout(async () => {
         const reservations = await fetchReservations();
         syncReservations(reservations);
+        syncPendingFeedbackQueue(reservations);
+        autoRemoveExpiredReservations(reservations);
       }, 900);
+    }
+
+    function autoRemoveExpiredReservations(reservations = []) {
+      const now = new Date();
+      const expiredReservations = reservations
+        .filter((item) => shouldAutoRemoveReservation(item, now))
+        .filter((item) => !state.autoRemovingReservationIds.has(getReservationIdentity(item)));
+
+      if (!expiredReservations.length) return;
+
+      state.suppressNewAlertUntil = Date.now() + 15000;
+      expiredReservations.forEach((item, index) => {
+        const identity = getReservationIdentity(item);
+        state.autoRemovingReservationIds.add(identity);
+        window.setTimeout(() => {
+          buildMutationForm({
+            action: "status",
+            sheetName: item.sheetName || ADMIN_SHEET_CONFIG.sheetName,
+            rowNumber: String(item.rowNumber),
+            status: "removed",
+            alertStatus: "confirmed",
+            alertType: ""
+          });
+        }, index * AUTO_REMOVE_MUTATION_SPACING_MS);
+      });
+
+      const refreshDelay = ((expiredReservations.length - 1) * AUTO_REMOVE_MUTATION_SPACING_MS) + 1400;
+      window.setTimeout(async () => {
+        try {
+          const refreshedReservations = await fetchReservations();
+          syncReservations(refreshedReservations);
+          syncPendingFeedbackQueue(refreshedReservations);
+        } catch (error) {
+          console.error("Auto remove refresh failed", error);
+        } finally {
+          expiredReservations.forEach((item) => {
+            state.autoRemovingReservationIds.delete(getReservationIdentity(item));
+          });
+        }
+      }, refreshDelay);
     }
 
     function formatPhoneNumber(value) {
@@ -1902,6 +2377,19 @@
     const feedbackDetails = document.getElementById("feedbackDetails");
     const feedbackStack = document.getElementById("feedbackStack");
     const closeFeedbackModal = document.getElementById("closeFeedbackModal");
+    const tableAssignmentModal = document.getElementById("tableAssignmentModal");
+    const tableAssignmentMeta = document.getElementById("tableAssignmentMeta");
+    const tableSelectionSummary = document.getElementById("tableSelectionSummary");
+    const tableOptionGrid = document.getElementById("tableOptionGrid");
+    const tableOptionEmpty = document.getElementById("tableOptionEmpty");
+    const closeTableAssignmentModal = document.getElementById("closeTableAssignmentModal");
+    const cancelTableAssignment = document.getElementById("cancelTableAssignment");
+    const clearTableAssignment = document.getElementById("clearTableAssignment");
+    const saveTableAssignment = document.getElementById("saveTableAssignment");
+    const removeConfirmModal = document.getElementById("removeConfirmModal");
+    const removeConfirmDetails = document.getElementById("removeConfirmDetails");
+    const confirmRemoveReservation = document.getElementById("confirmRemoveReservation");
+    const dismissRemoveReservation = document.getElementById("dismissRemoveReservation");
 
     const sheet = document.getElementById("pickerSheet");
     const sheetTitle = document.getElementById("pickerTitle");
@@ -2028,8 +2516,8 @@
       editorAction.value = "update";
       editorRowNumber.value = String(item.rowNumber);
       editorSheetName.value = item.sheetName || ADMIN_SHEET_CONFIG.sheetName;
-      editorStatus.value = item.status || "active";
-      editorFields.dateInput.value = item.date || formatInputDate(new Date());
+      editorStatus.value = item.status === "removed" ? "removed" : "active";
+      editorFields.dateInput.value = getReservationEditorDateValue(item);
       editorFields.timeInput.value = item.time || "6:00 PM";
       editorFields.timeDisplay.textContent = item.time || "6:00 PM";
       editorFields.peopleInput.value = item.people || "4 guests";
@@ -2048,6 +2536,139 @@
     function closeEditor() {
       editorModal.classList.remove("is-open");
       editorModal.setAttribute("aria-hidden", "true");
+    }
+
+    function renderTableAssignmentOptions() {
+      const selected = new Set(state.selectedTableAssignments);
+      const selectedLabel = formatTableAssignments(state.selectedTableAssignments);
+      tableSelectionSummary.textContent = selectedLabel || "No tables selected";
+      tableOptionGrid.innerHTML = "";
+      tableOptionEmpty.hidden = state.tableOptions.length > 0;
+      const groupedOptions = new Map();
+
+      state.tableOptions.forEach((option) => {
+        const key = getTableGroupKey(option);
+        if (!groupedOptions.has(key)) groupedOptions.set(key, []);
+        groupedOptions.get(key).push(option);
+      });
+
+      groupedOptions.forEach((options) => {
+        const row = document.createElement("div");
+        row.className = "table-option-row";
+
+        options.forEach((option) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = `table-option-btn ${selected.has(option) ? "is-selected" : ""}`;
+          button.textContent = option;
+          button.addEventListener("click", () => {
+            if (selected.has(option)) {
+              state.selectedTableAssignments = state.selectedTableAssignments.filter((item) => item !== option);
+            } else {
+              state.selectedTableAssignments = [...state.selectedTableAssignments, option];
+            }
+            renderTableAssignmentOptions();
+          });
+          row.appendChild(button);
+        });
+
+        tableOptionGrid.appendChild(row);
+      });
+    }
+
+    function openTableAssignmentModal(item) {
+      state.activeTableReservation = item;
+      state.selectedTableAssignments = parseTableAssignments(item.tableAssignment);
+      tableAssignmentMeta.textContent = `${item.name || "Guest"} · ${item.time || "-"} · ${formatDateLabel(getReservationServiceDateValue(item) || item.date)}`;
+      renderTableAssignmentOptions();
+      tableAssignmentModal.classList.add("is-open");
+      tableAssignmentModal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeTableAssignmentPicker() {
+      tableAssignmentModal.classList.remove("is-open");
+      tableAssignmentModal.setAttribute("aria-hidden", "true");
+      state.activeTableReservation = null;
+      state.selectedTableAssignments = [];
+    }
+
+    function saveTableAssignmentSelection() {
+      const reservation = state.activeTableReservation;
+      if (!reservation) {
+        closeTableAssignmentPicker();
+        return;
+      }
+      buildMutationForm({
+        action: "update",
+        sheetName: reservation.sheetName || ADMIN_SHEET_CONFIG.sheetName,
+        rowNumber: String(reservation.rowNumber),
+        tableAssignment: state.selectedTableAssignments.join(", ")
+      });
+      closeTableAssignmentPicker();
+      refreshAfterMutation();
+    }
+
+    function openRemoveConfirm(item) {
+      state.pendingRemoveReservation = item;
+      removeConfirmDetails.hidden = false;
+      removeConfirmDetails.innerHTML = `
+        <div class="booking-summary">
+          <div class="booking-summary-head">
+            <strong>Reservation Details</strong>
+            <span>${ADMIN_SHEET_CONFIG.branchLabel}</span>
+          </div>
+          <div class="booking-summary-grid">
+            <div class="booking-summary-box">
+              <span>Date</span>
+              <strong>${item.date ? formatDisplayDate(item.date) : "-"}</strong>
+            </div>
+            <div class="booking-summary-box">
+              <span>Time</span>
+              <strong>${item.time || "-"}</strong>
+            </div>
+            <div class="booking-summary-box">
+              <span>Guests</span>
+              <strong>${item.people || "-"}</strong>
+            </div>
+            <div class="booking-summary-box">
+              <span>Name</span>
+              <strong>${item.name || "Guest"}</strong>
+            </div>
+          </div>
+        </div>
+      `;
+      removeConfirmModal.classList.add("is-open");
+      removeConfirmModal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeRemoveConfirm() {
+      state.pendingRemoveReservation = null;
+      removeConfirmDetails.hidden = true;
+      removeConfirmDetails.innerHTML = "";
+      removeConfirmModal.classList.remove("is-open");
+      removeConfirmModal.setAttribute("aria-hidden", "true");
+    }
+
+    function submitReservationRemoval() {
+      const reservation = state.pendingRemoveReservation;
+      if (!reservation) {
+        closeRemoveConfirm();
+        return;
+      }
+      buildMutationForm({
+        action: "status",
+        sheetName: reservation.sheetName || ADMIN_SHEET_CONFIG.sheetName,
+        rowNumber: String(reservation.rowNumber),
+        status: "removed",
+        alertStatus: "confirmed",
+        alertType: ""
+      });
+      closeRemoveConfirm();
+      openFeedback("Reservation Removed", "This booking has been moved out of the active list.", {
+        ...reservation,
+        status: "removed"
+      });
+      refreshAfterMutation();
     }
 
     function renderFeedbackDetails(data) {
@@ -2087,7 +2708,7 @@
             </div>
             <div class="booking-summary-box">
               <span>Status</span>
-              <strong>${data.status === "removed" ? "Removed" : "Active"}</strong>
+              <strong>${data.status === "removed" ? "Removed" : (data.status === "pending" ? "Pending" : "Active")}</strong>
             </div>
           </div>
           <div class="booking-summary-note">${(data.notes || "").trim() || "No notes."}</div>
@@ -2161,13 +2782,41 @@
       feedbackModal.setAttribute("aria-hidden", "false");
     }
 
-    function openFeedback(title, message = "", details = null) {
-      state.feedbackQueue.push({ title, message, details });
+    function openFeedback(title, message = "", details = null, options = {}) {
+      state.feedbackQueue.push({
+        title,
+        message,
+        details,
+        persistent: false,
+        requiresConfirmation: false,
+        key: "",
+        ...options
+      });
       renderFeedbackQueue();
     }
 
     function closeFeedback() {
       if (state.feedbackTransitionLocked || !state.feedbackQueue.length) return;
+      const current = state.feedbackQueue[0];
+      if (current?.requiresConfirmation && current?.details) {
+        const alertKey = current.key || getAlertQueueKey(current.details);
+        const confirmedStatus = shouldAutoRemoveReservation(current.details)
+          ? "removed"
+          : (current.details.status === "pending" ? "active" : current.details.status);
+        state.confirmingAlertIds.add(alertKey);
+        buildMutationForm({
+          action: "alertStatus",
+          sheetName: current.details.sheetName || ADMIN_SHEET_CONFIG.sheetName,
+          rowNumber: String(current.details.rowNumber),
+          status: confirmedStatus,
+          alertStatus: "confirmed",
+          alertType: ""
+        });
+        refreshAfterMutation();
+        window.setTimeout(() => {
+          state.confirmingAlertIds.delete(alertKey);
+        }, 2500);
+      }
       state.feedbackTransitionLocked = true;
       state.feedbackQueue.shift();
       window.setTimeout(() => {
@@ -2187,7 +2836,11 @@
           ...serializeReservationForm(form),
           ...extraFields
         };
+        payload.date = getEffectiveReservationDate(payload.date, payload.time);
         const feedbackPayload = { ...payload };
+        payload.alertStatus = "confirmed";
+        payload.alertType = "";
+        if (payload.status !== "removed") payload.status = "active";
         buildMutationForm(payload);
         if (form === editorForm) {
           closeEditor();
@@ -2213,9 +2866,18 @@
     }
 
     function bootstrapAdmin() {
-      fetchReservations()
-        .then((reservations) => {
+      Promise.all([
+        fetchReservations(),
+        fetchTableOptions().catch((error) => {
+          console.error("Table options load failed", error);
+          return [];
+        })
+      ])
+        .then(([reservations, tableOptions]) => {
+          state.tableOptions = tableOptions;
           syncReservations(reservations);
+          syncPendingFeedbackQueue(reservations);
+          autoRemoveExpiredReservations(reservations);
         })
         .catch((error) => {
           console.error(error);
@@ -2229,6 +2891,8 @@
       try {
         const reservations = await fetchReservations();
         syncReservations(reservations, { detectNew: true });
+        syncPendingFeedbackQueue(reservations);
+        autoRemoveExpiredReservations(reservations);
       } catch (error) {
         console.error("Auto refresh failed", error);
       }
@@ -2263,6 +2927,21 @@
     editorModal.addEventListener("click", (event) => {
       if (event.target === editorModal) closeEditor();
     });
+    closeTableAssignmentModal.addEventListener("click", closeTableAssignmentPicker);
+    cancelTableAssignment.addEventListener("click", closeTableAssignmentPicker);
+    clearTableAssignment.addEventListener("click", () => {
+      state.selectedTableAssignments = [];
+      renderTableAssignmentOptions();
+    });
+    saveTableAssignment.addEventListener("click", saveTableAssignmentSelection);
+    tableAssignmentModal.addEventListener("click", (event) => {
+      if (event.target === tableAssignmentModal) closeTableAssignmentPicker();
+    });
+    confirmRemoveReservation.addEventListener("click", submitReservationRemoval);
+    dismissRemoveReservation.addEventListener("click", closeRemoveConfirm);
+    removeConfirmModal.addEventListener("click", (event) => {
+      if (event.target === removeConfirmModal) closeRemoveConfirm();
+    });
     closeFeedbackModal.addEventListener("click", closeFeedback);
     feedbackModal.addEventListener("click", (event) => {
       if (event.target === feedbackModal) closeFeedback();
@@ -2292,6 +2971,11 @@
       const reservation = state.reservations.find((item) => item.rowNumber === rowNumber && item.sheetName === sheetName);
       if (!reservation) return;
 
+      if (button.dataset.action === "tables") {
+        openTableAssignmentModal(reservation);
+        return;
+      }
+
       if (button.dataset.action === "edit") {
         openEditor(reservation);
         return;
@@ -2299,11 +2983,17 @@
 
       if (button.dataset.action === "remove" || button.dataset.action === "restore") {
         const isRestore = button.dataset.action === "restore";
+        if (!isRestore) {
+          openRemoveConfirm(reservation);
+          return;
+        }
         buildMutationForm({
           action: "status",
           sheetName,
           rowNumber: String(rowNumber),
-          status: isRestore ? "active" : "removed"
+          status: isRestore ? "active" : "removed",
+          alertStatus: "confirmed",
+          alertType: ""
         });
         openFeedback(
           isRestore ? "Reservation Restored" : "Reservation Removed",
@@ -2336,6 +3026,8 @@
       if (event.key === "Escape") {
         if (sheet.classList.contains("is-open")) {
           closeSheet();
+        } else if (removeConfirmModal.classList.contains("is-open")) {
+          closeRemoveConfirm();
         } else if (feedbackModal.classList.contains("is-open")) {
           closeFeedback();
         } else if (editorModal.classList.contains("is-open")) {
@@ -2353,3 +3045,5 @@
   </script>
 </body>
 </html>
+
+

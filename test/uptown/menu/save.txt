@@ -5,9 +5,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Menu Test</title>
-  <link rel="stylesheet" href="../css/global.css?v=20260419-1" />
-  <link rel="stylesheet" href="../css/layout.css?v=20260419-1" />
-  <link rel="stylesheet" href="../css/components.css?v=20260419-1" />
+  <link rel="stylesheet" href="../../../css/global.css?v=20260419-1" />
+  <link rel="stylesheet" href="../../../css/layout.css?v=20260419-1" />
+  <link rel="stylesheet" href="../../../css/components.css?v=20260419-1" />
   <style>
     :root {
       --menu-bg-cream: #f5efe4;
@@ -34,7 +34,7 @@
       inset: 0;
       background:
         linear-gradient(180deg, rgba(17, 12, 10, 0.48), rgba(17, 12, 10, 0.12)),
-        url("../assets/background수묵.webp") center top / cover no-repeat;
+        url("../../../assets/background수묵.webp") center top / cover no-repeat;
       opacity: 0.14;
       pointer-events: none;
       z-index: -2;
@@ -67,7 +67,7 @@
       border-radius: 36px;
       background:
         linear-gradient(180deg, rgba(255, 251, 244, 0.76), rgba(255, 249, 240, 0.58)),
-        url("../assets/pattern.webp") center / 520px auto;
+        url("../../../assets/pattern.webp") center / 520px auto;
       opacity: 0.28;
       box-shadow: 0 24px 60px rgba(34, 24, 17, 0.08);
       pointer-events: none;
@@ -95,7 +95,7 @@
       border-radius: 22px;
       background:
         linear-gradient(180deg, rgba(255, 252, 247, 0.94), rgba(251, 246, 238, 0.88)),
-        url("../assets/pattern.webp") center / 440px auto;
+        url("../../../assets/pattern.webp") center / 440px auto;
       border: 1px solid rgba(120, 103, 77, 0.14);
       box-shadow: var(--menu-shell-shadow);
       transition: gap 0.24s ease;
@@ -143,7 +143,7 @@
       gap: 12px;
       background:
         linear-gradient(180deg, rgba(255, 252, 247, 0.97), rgba(251, 246, 238, 0.95)),
-        url("../assets/pattern.webp") center / 420px auto;
+        url("../../../assets/pattern.webp") center / 420px auto;
       border-color: rgba(120, 103, 77, 0.16);
       box-shadow: 0 12px 32px rgba(28, 35, 48, 0.12);
     }
@@ -209,7 +209,7 @@
     .menu-page .menu-card {
       background:
         linear-gradient(180deg, rgba(255, 252, 247, 0.94), rgba(249, 243, 233, 0.94)),
-        url("../assets/pattern.webp") center / 460px auto;
+        url("../../../assets/pattern.webp") center / 460px auto;
       border: 1px solid rgba(125, 98, 63, 0.14);
       box-shadow: 0 20px 36px rgba(45, 30, 17, 0.08);
     }
@@ -357,7 +357,7 @@
     .order-card {
       background:
         linear-gradient(180deg, rgba(255, 252, 247, 0.96), rgba(249, 243, 233, 0.94)),
-        url("../assets/pattern.webp") center / 420px auto;
+        url("../../../assets/pattern.webp") center / 420px auto;
       border: 1px solid rgba(125, 98, 63, 0.14);
       border-radius: 28px;
       box-shadow: 0 22px 40px rgba(45, 30, 17, 0.1);
@@ -610,7 +610,7 @@
       padding: 18px 16px 30px;
       background:
         linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(249, 243, 233, 0.98)),
-        url("../assets/pattern.webp") center / 420px auto;
+        url("../../../assets/pattern.webp") center / 420px auto;
       transform: translateY(100%);
       transition: transform 0.26s ease;
       border: 1px solid rgba(125, 98, 63, 0.18);
@@ -668,7 +668,7 @@
       padding: 24px 22px;
       background:
         linear-gradient(180deg, rgba(255, 253, 249, 0.96), rgba(248, 240, 228, 0.94)),
-        url("../assets/pattern.webp") center / 420px auto;
+        url("../../../assets/pattern.webp") center / 420px auto;
       box-shadow:
         0 14px 28px rgba(45, 30, 17, 0.08),
         inset 0 1px 0 rgba(255, 255, 255, 0.76);
@@ -792,7 +792,7 @@
       border-radius: 28px;
       background:
         linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(249, 243, 233, 0.98)),
-        url("../assets/pattern.webp") center / 420px auto;
+        url("../../../assets/pattern.webp") center / 420px auto;
       border: 1px solid rgba(125, 98, 63, 0.16);
       box-shadow:
         0 26px 52px rgba(23, 15, 11, 0.22),
@@ -1179,7 +1179,7 @@
     <div class="menu-sticky-inner">
       <div class="menu-homebar">
         <a class="menu-home-link" href="../index.html" aria-label="Go to main page">
-          <img class="menu-home-logo" src="../assets/logo-dark.webp" alt="EHWA home" />
+          <img class="menu-home-logo" src="../../../assets/logo-dark.webp" alt="EHWA home" />
         </a>
       </div>
       <section class="tabs" aria-label="Categories" id="tabs"></section>

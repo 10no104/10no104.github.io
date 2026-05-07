@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -491,6 +491,12 @@
       background: linear-gradient(135deg, var(--wine), #b9871f);
     }
 
+    .action-btn.secondary {
+      color: #5b4030;
+      background: rgba(255, 255, 255, 0.76);
+      border: 1px solid rgba(109, 86, 59, 0.14);
+    }
+
     .action-btn.danger {
       color: #fff5f5;
       background: linear-gradient(135deg, #7b1f2f, #a74246);
@@ -540,6 +546,17 @@
     .feedback-modal {
       width: min(100%, 380px);
       text-align: center;
+      color: #25160f;
+      max-height: min(88vh, 720px);
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .editor-modal,
+    .feedback-modal,
+    .sheet-panel {
+      background: linear-gradient(180deg, rgba(255, 253, 249, 0.998), rgba(245, 236, 225, 0.996));
     }
 
     .feedback-modal h3 {
@@ -549,8 +566,43 @@
 
     .feedback-modal p {
       margin: 0 0 18px;
-      color: var(--muted);
+      color: #5b4a3f;
       line-height: 1.6;
+    }
+
+    #feedbackMessage,
+    #cancelConfirmMessage {
+      color: #4a382d;
+      font-size: 0.96rem;
+      font-weight: 600;
+      line-height: 1.65;
+    }
+
+    .editor-modal .field input,
+    .editor-modal .field textarea,
+    .editor-modal .picker-trigger,
+    .editor-modal .date-chip,
+    .sheet-panel .sheet-option,
+    .sheet-panel .calendar-day,
+    .sheet-panel .calendar-nav button {
+      background: rgba(255, 255, 255, 0.94);
+      border-color: rgba(109, 86, 59, 0.14);
+    }
+
+    .editor-modal .pill-btn,
+    .feedback-modal .pill-btn {
+      border-color: rgba(109, 86, 59, 0.16);
+      background: rgba(255, 255, 255, 0.96);
+      color: #37271f;
+      box-shadow: 0 10px 22px rgba(24, 16, 12, 0.08);
+    }
+
+    .editor-modal .pill-btn.primary,
+    .feedback-modal .pill-btn.primary {
+      color: #fff;
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--wine), #b9871f);
+      box-shadow: 0 16px 28px rgba(123, 31, 47, 0.18);
     }
 
     .feedback-details {
@@ -577,6 +629,9 @@
       border-radius: 999px;
       border: 1px solid rgba(109, 86, 59, 0.14);
       background: rgba(255, 251, 245, 0.82);
+      color: #5c4c41;
+      font: inherit;
+      font-weight: 800;
       cursor: pointer;
     }
 
@@ -761,9 +816,6 @@
         padding: 12px 18px 18px;
       }
 
-      .reservation-top {
-        flex-direction: column;
-      }
     }
   </style>
 </head>
@@ -771,7 +823,7 @@
   <main class="shell">
     <header class="topbar">
       <div class="brand">
-        <a class="logo-link" href="./index.html" aria-label="EHWA test home">
+        <a class="logo-link" href="index.html" aria-label="EHWA test home">
           <img src="../assets/logo-dark.webp" alt="EHWA logo" />
         </a>
         <div class="brand-copy">
@@ -779,7 +831,7 @@
           <h1>Find Your Booking</h1>
         </div>
       </div>
-      <a class="back-link" href="./index.html">Back</a>
+      <a class="back-link" href="index.html">Back</a>
     </header>
 
     <div class="layout">
@@ -840,12 +892,25 @@
         <input id="editorRowNumber" name="rowNumber" type="hidden" value="" />
         <input id="editorSheetName" name="sheetName" type="hidden" value="" />
         <input id="editorStatus" name="status" type="hidden" value="active" />
+        <input id="editorAlertStatus" name="alertStatus" type="hidden" value="confirmed" />
+        <input id="editorAlertType" name="alertType" type="hidden" value="" />
         <div class="field-grid" id="editorFields"></div>
         <div class="form-actions">
           <button class="pill-btn primary" type="submit">Save Changes</button>
           <button class="pill-btn" id="cancelEditor" type="button">Cancel</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <div class="feedback-backdrop" id="cancelConfirmModal" aria-hidden="true">
+    <div class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="cancelConfirmTitle">
+      <h3 id="cancelConfirmTitle">Cancel Reservation?</h3>
+      <p id="cancelConfirmMessage">This will cancel your current booking and notify the restaurant.</p>
+      <div class="form-actions">
+        <button class="pill-btn primary" id="confirmCancelReservation" type="button">Yes, Cancel</button>
+        <button class="pill-btn" id="dismissCancelReservation" type="button">Keep Reservation</button>
+      </div>
     </div>
   </div>
 
@@ -876,17 +941,6 @@
       <p id="feedbackMessage">Reservation updated.</p>
       <div class="feedback-details" id="feedbackDetails" hidden></div>
       <button class="pill-btn primary" id="closeFeedbackModal" type="button" style="width:100%;">Close</button>
-    </div>
-  </div>
-
-  <div class="feedback-backdrop" id="cancelConfirmModal" aria-hidden="true">
-    <div class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="cancelConfirmTitle">
-      <h3 id="cancelConfirmTitle">Cancel Reservation?</h3>
-      <p id="cancelConfirmMessage">This will cancel your current booking and notify the restaurant.</p>
-      <div class="form-actions">
-        <button class="pill-btn primary" id="confirmCancelReservation" type="button">Yes, Cancel</button>
-        <button class="pill-btn" id="dismissCancelReservation" type="button">Keep Reservation</button>
-      </div>
     </div>
   </div>
 
@@ -934,7 +988,7 @@
     function normalizeReservation(cells = [], index = 0, sheetConfig) {
       const values = cells.map((cell) => getCellText(cell));
       return {
-        rowNumber: index + 1,
+        rowNumber: index + 2,
         sheetName: sheetConfig.name,
         branch: sheetConfig.label,
         timestamp: values[0] || "",
@@ -944,7 +998,9 @@
         name: values[4] || "",
         phone: values[5] || "",
         notes: values[6] || "",
-        status: values[7] || "active"
+        status: values[7] || "active",
+        alertStatus: values[8] || ((values[7] || "").trim().toLowerCase() === "pending" ? "pending" : "confirmed"),
+        alertType: values[9] || ""
       };
     }
 
@@ -1009,6 +1065,30 @@
         month: "short",
         day: "numeric"
       }).format(date);
+    }
+
+    function isNextDayReservationTime(value = "") {
+      return ["12:00 AM", "12:30 AM", "1:00 AM"].includes(String(value).trim().toUpperCase());
+    }
+
+    function getEffectiveReservationDate(dateValue = "", timeValue = "") {
+      const normalizedDate = String(dateValue || "").trim();
+      if (!normalizedDate) return "";
+      if (!isNextDayReservationTime(timeValue)) return normalizedDate;
+      const baseDate = new Date(`${normalizedDate}T00:00:00`);
+      if (Number.isNaN(baseDate.getTime())) return normalizedDate;
+      baseDate.setDate(baseDate.getDate() + 1);
+      return formatInputDate(baseDate);
+    }
+
+    function getReservationServiceDateValue(dateValue = "", timeValue = "") {
+      const normalizedDate = String(dateValue || "").trim();
+      if (!normalizedDate) return "";
+      if (!isNextDayReservationTime(timeValue)) return normalizedDate;
+      const baseDate = new Date(`${normalizedDate}T00:00:00`);
+      if (Number.isNaN(baseDate.getTime())) return normalizedDate;
+      baseDate.setDate(baseDate.getDate() - 1);
+      return formatInputDate(baseDate);
     }
 
     function getReservationDateTime(item) {
@@ -1125,6 +1205,8 @@
       upcomingCount.textContent = `${upcoming.length} found`;
       pastCount.textContent = `${past.length} found`;
       resultLabel.textContent = `${state.matches.length} total matches`;
+      resultsPanel.querySelectorAll(".section-block")[0]?.classList.add("current-section");
+      resultsPanel.querySelectorAll(".section-block")[1]?.classList.add("past-section");
     }
 
     function buildMutationForm(fields) {
@@ -1232,7 +1314,9 @@
       editorRowNumber.value = String(item.rowNumber);
       editorSheetName.value = item.sheetName;
       editorStatus.value = item.status || "active";
-      editorFields.dateInput.value = item.date || formatInputDate(new Date());
+      editorAlertStatus.value = item.alertStatus || "confirmed";
+      editorAlertType.value = item.alertType || "";
+      editorFields.dateInput.value = getReservationServiceDateValue(item.date, item.time) || formatInputDate(new Date());
       editorFields.timeInput.value = item.time || "6:00 PM";
       editorFields.timeDisplay.textContent = item.time || "6:00 PM";
       editorFields.peopleInput.value = item.people || "4 guests";
@@ -1416,6 +1500,8 @@
     const editorRowNumber = document.getElementById("editorRowNumber");
     const editorSheetName = document.getElementById("editorSheetName");
     const editorStatus = document.getElementById("editorStatus");
+    const editorAlertStatus = document.getElementById("editorAlertStatus");
+    const editorAlertType = document.getElementById("editorAlertType");
     const editorFields = setupReservationForm(document.getElementById("editorFields"), "editor");
     const feedbackModal = document.getElementById("feedbackModal");
     const feedbackTitle = document.getElementById("feedbackTitle");
@@ -1587,14 +1673,18 @@
       }
 
       const payload = serializeReservationForm(editorForm);
+      payload.date = getEffectiveReservationDate(payload.date, payload.time);
       payload.phone = formatPhoneNumber(payload.phone);
+      payload.status = "pending";
+      payload.alertStatus = "pending";
+      payload.alertType = "updated";
       const feedbackPayload = {
         ...payload,
         branch: RESERVATION_SHEETS.find((sheetInfo) => sheetInfo.name === payload.sheetName)?.label || ""
       };
       buildMutationForm(payload);
       closeEditor();
-      openFeedback("Reservation Updated", "Your booking changes have been saved.", feedbackPayload);
+      openFeedback("Reservation Update Sent", "Your booking changes have been sent for confirmation.", feedbackPayload);
       refreshAfterMutation();
     });
 
@@ -1619,10 +1709,12 @@
         action: "status",
         sheetName: reservation.sheetName,
         rowNumber: String(reservation.rowNumber),
-        status: "removed"
+        status: "removed",
+        alertStatus: "pending",
+        alertType: "canceled"
       });
       closeCancelConfirm();
-      openFeedback("Reservation Canceled", "Your reservation has been canceled.", reservation);
+      openFeedback("Cancellation Request Sent", "Your cancellation request has been sent for confirmation.", reservation);
       refreshAfterMutation();
     });
     dismissCancelReservation.addEventListener("click", closeCancelConfirm);
@@ -1675,3 +1767,4 @@
   </script>
 </body>
 </html>
+
