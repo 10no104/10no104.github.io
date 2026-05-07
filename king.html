@@ -3,24 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reservations Overview | EHWA</title>
+  <title>EHWA Admin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/global.css?v=20260423-10" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <style>
     :root {
       --ink: #211813;
-      --muted: #74665a;
+      --muted: #726355;
       --wine: #7b1f2f;
       --gold: #d4af37;
-      --line: rgba(109, 86, 59, 0.14);
-      --paper-line: rgba(113, 88, 60, 0.18);
-      --shadow: 0 24px 52px rgba(29, 19, 12, 0.1);
-      --radius-xl: 28px;
-      --radius-lg: 20px;
-      --radius-md: 14px;
+      --paper: rgba(255, 252, 247, 0.94);
+      --paper-strong: rgba(255, 252, 247, 0.98);
+      --line: rgba(112, 86, 58, 0.16);
+      --shadow: 0 22px 48px rgba(29, 19, 12, 0.1);
+      --radius-xl: 26px;
+      --radius-lg: 18px;
+      --radius-md: 13px;
     }
 
     * { box-sizing: border-box; }
@@ -41,20 +43,26 @@
       position: fixed;
       inset: 0;
       background:
-        linear-gradient(180deg, rgba(255, 252, 247, 0.18), rgba(255, 252, 247, 0.06)),
+        linear-gradient(180deg, rgba(255, 252, 247, 0.2), rgba(255, 252, 247, 0.08)),
         url("assets/pattern.webp") center / 760px auto;
-      opacity: 0.14;
+      opacity: 0.16;
       pointer-events: none;
       z-index: -1;
     }
 
-    button, input, textarea { font: inherit; }
+    button,
+    input,
+    select,
+    textarea { font: inherit; }
+
+    button { cursor: pointer; }
     a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
 
     .shell {
-      width: min(100% - 18px, 1180px);
+      width: min(100% - 18px, 1240px);
       margin: 0 auto;
-      padding: 18px 0 40px;
+      padding: 16px 0 44px;
     }
 
     .topbar {
@@ -62,7 +70,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .brand {
@@ -76,8 +84,8 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 62px;
-      height: 62px;
+      width: 58px;
+      height: 58px;
       border-radius: 999px;
       background: linear-gradient(180deg, rgba(255, 254, 250, 0.98), rgba(243, 231, 215, 0.94));
       border: 1px solid rgba(73, 53, 36, 0.12);
@@ -86,15 +94,15 @@
     }
 
     .logo-link img {
-      width: 42px;
-      height: 42px;
+      width: 40px;
+      height: 40px;
       object-fit: contain;
     }
 
     .brand-copy p {
-      margin: 0 0 4px;
+      margin: 0 0 3px;
       color: var(--wine);
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 800;
       letter-spacing: 0.14em;
       text-transform: uppercase;
@@ -102,32 +110,45 @@
 
     .brand-copy h1 {
       margin: 0;
-      font-size: clamp(1.45rem, 5vw, 2.3rem);
+      font-size: clamp(1.36rem, 4.8vw, 2.35rem);
       letter-spacing: -0.05em;
+      line-height: 1;
     }
 
-    .pill-btn {
+    .pill-btn,
+    .icon-btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       min-height: 42px;
       padding: 0 14px;
       border-radius: 999px;
-      border: 1px solid rgba(113, 88, 60, 0.14);
-      background: rgba(255, 251, 245, 0.72);
+      border: 1px solid rgba(113, 88, 60, 0.16);
+      background: rgba(255, 251, 245, 0.82);
       color: #2c2016;
       font-size: 0.92rem;
-      font-weight: 700;
+      font-weight: 800;
       white-space: nowrap;
       box-shadow: 0 10px 22px rgba(32, 20, 13, 0.05);
-      cursor: pointer;
     }
 
-    .pill-btn.primary {
+    .pill-btn.primary,
+    .icon-btn.primary {
       color: #fff;
       border-color: transparent;
       background: linear-gradient(135deg, var(--wine), #b9871f);
       box-shadow: 0 18px 30px rgba(123, 31, 47, 0.18);
+    }
+
+    .pill-btn.danger {
+      color: #fff;
+      border-color: transparent;
+      background: linear-gradient(135deg, #8b1e2e, #c24646);
+    }
+
+    .icon-btn {
+      width: 42px;
+      padding: 0;
     }
 
     .hero {
@@ -145,9 +166,9 @@
 
     .hero h2 {
       margin: 0;
-      font-size: clamp(1.7rem, 5vw, 3rem);
+      font-size: clamp(1.65rem, 5vw, 3rem);
       letter-spacing: -0.05em;
-      line-height: 0.95;
+      line-height: 0.98;
     }
 
     .metric-grid {
@@ -170,49 +191,12 @@
       margin-bottom: 6px;
       color: rgba(255, 248, 240, 0.68);
       font-size: 0.82rem;
-    }
-
-    .metric-card strong { font-size: 1.2rem; }
-
-    .metric-card strong.large {
-      font-size: 1.5rem;
-      line-height: 1.05;
-    }
-
-    .next-booking-card {
-      padding: 16px;
-      border-radius: 18px;
-      background: rgba(255, 250, 244, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .next-booking-card span,
-    .next-booking-card strong {
-      display: block;
-    }
-
-    .next-booking-card span {
-      margin-bottom: 6px;
-      color: rgba(255, 248, 240, 0.68);
-      font-size: 0.82rem;
-    }
-
-    .next-booking-card strong {
-      margin-bottom: 6px;
-      font-size: 1.52rem;
-      line-height: 1.04;
-    }
-
-    .next-booking-card p {
-      margin: 0;
-      color: rgba(255, 248, 240, 0.84);
-      font-size: 0.96rem;
       font-weight: 700;
     }
 
-    .layout {
-      display: grid;
-      gap: 16px;
+    .metric-card strong {
+      font-size: 1.35rem;
+      line-height: 1.05;
     }
 
     .admin-tabs {
@@ -224,16 +208,15 @@
     }
 
     .admin-tab {
-      min-height: 44px;
-      padding: 0 16px;
-      border: 1px solid rgba(113, 88, 60, 0.14);
+      min-height: 46px;
+      padding: 0 18px;
+      border: 1px solid rgba(113, 88, 60, 0.16);
       border-radius: 999px;
-      background: rgba(255, 251, 245, 0.78);
+      background: rgba(255, 251, 245, 0.86);
       color: #2c2016;
       font: inherit;
       font-weight: 800;
       white-space: nowrap;
-      cursor: pointer;
       box-shadow: 0 10px 22px rgba(32, 20, 13, 0.05);
     }
 
@@ -246,7 +229,11 @@
 
     .admin-section { display: none; }
     .admin-section.is-active { display: block; }
-    .admin-section.layout.is-active { display: grid; }
+
+    .dashboard-grid {
+      display: grid;
+      gap: 16px;
+    }
 
     .panel {
       border: 1px solid var(--line);
@@ -268,25 +255,25 @@
 
     .panel-head h3 {
       margin: 0;
-      font-size: 1.14rem;
+      font-size: 1.16rem;
       letter-spacing: -0.03em;
     }
 
     .panel-head span {
       color: var(--muted);
       font-size: 0.88rem;
-      font-weight: 700;
+      font-weight: 800;
     }
 
-    .booking-form {
+    .toolbar {
       display: grid;
-      gap: 16px;
-      padding: 18px;
+      gap: 12px;
+      padding: 16px 18px 0;
     }
 
     .field-grid {
       display: grid;
-      gap: 14px;
+      gap: 12px;
     }
 
     .field {
@@ -297,650 +284,371 @@
     .field label {
       color: #2b1e14;
       font-size: 0.9rem;
-      font-weight: 700;
+      font-weight: 800;
     }
 
     input,
     select,
     textarea {
       width: 100%;
-      padding: 14px 15px;
-      border: 1px solid var(--paper-line);
+      padding: 13px 14px;
+      border: 1px solid var(--line);
       border-radius: var(--radius-md);
-      background: rgba(255, 252, 247, 0.97);
+      background: var(--paper-strong);
       color: #1f1712;
       outline: none;
       appearance: none;
       -webkit-appearance: none;
     }
 
+    textarea {
+      min-height: 112px;
+      resize: vertical;
+    }
+
     input:focus,
     select:focus,
-    textarea:focus,
-    .picker-trigger:focus {
+    textarea:focus {
       border-color: rgba(123, 31, 47, 0.38);
       box-shadow: 0 0 0 4px rgba(123, 31, 47, 0.1);
       background: #fff;
     }
 
-    input::placeholder,
-    textarea::placeholder { color: #897a6d; }
-
-    .badge-row {
-      display: inline-flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .status-badge.branch {
-      background: rgba(44, 33, 22, 0.1);
-      color: #4f3823;
-    }
-
-    textarea {
-      min-height: 110px;
-      resize: vertical;
-    }
-
-    .picker-trigger {
-      width: 100%;
-      min-height: 53px;
-      padding: 14px 15px;
-      border: 1px solid var(--paper-line);
-      border-radius: var(--radius-md);
-      background: rgba(255, 252, 247, 0.97);
-      color: #1f1712;
-      text-align: left;
-      cursor: pointer;
-      outline: none;
-      position: relative;
-    }
-
-    .picker-trigger::after {
-      content: "";
-      position: absolute;
-      right: 16px;
-      top: 50%;
-      width: 10px;
-      height: 10px;
-      border-right: 2px solid rgba(60, 44, 30, 0.7);
-      border-bottom: 2px solid rgba(60, 44, 30, 0.7);
-      transform: translateY(-60%) rotate(45deg);
-      pointer-events: none;
-    }
-
-    .date-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-    }
-
-    .date-chip {
-      width: 100%;
-      min-height: 68px;
-      padding: 10px 8px;
-      border-radius: 18px;
-      border: 1px solid rgba(113, 88, 60, 0.14);
-      background: rgba(255, 252, 247, 0.96);
-      color: #1f1712;
-      cursor: pointer;
-      text-align: center;
-      transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
-    }
-
-    .date-chip span,
-    .date-chip strong { display: block; }
-
-    .date-chip span {
-      margin-bottom: 4px;
-      color: #7f7063;
-      font-size: 0.76rem;
-      text-transform: uppercase;
-    }
-
-    .date-chip strong { font-size: 0.94rem; }
-
-    .date-chip.is-active {
-      border-color: rgba(255, 228, 155, 0.92);
-      background: linear-gradient(135deg, rgba(255, 229, 158, 0.92), rgba(255, 247, 227, 1));
-      box-shadow: 0 12px 22px rgba(17, 11, 8, 0.14);
-      transform: translateY(-1px);
-    }
-
-    .date-chip.more-chip {
-      background: rgba(255, 252, 247, 0.96);
-      color: #1f1712;
-      border-color: rgba(113, 88, 60, 0.14);
-    }
-
-    .date-chip.more-chip.is-active {
-      border-color: rgba(255, 228, 155, 0.92);
-      background: linear-gradient(135deg, rgba(255, 229, 158, 0.92), rgba(255, 247, 227, 1));
-      box-shadow: 0 12px 22px rgba(17, 11, 8, 0.14);
-    }
-
-    .guest-custom-input { display: none; }
-    .guest-custom-input.is-open { display: block; }
-
-    .form-actions { display: grid; gap: 10px; }
-
-    #quickAddForm .form-actions {
-      grid-template-columns: 1fr;
-    }
-
-    .control-row {
-      display: grid;
-      gap: 10px;
-      padding: 14px 18px 0;
-    }
-
-    .range-chips,
-    .option-chips {
-      display: flex;
-      gap: 10px;
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .chip-btn {
-      min-height: 40px;
-      padding: 0 14px;
-      border: 1px solid rgba(113, 88, 60, 0.14);
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.76);
-      color: #2a1d14;
-      font: inherit;
-      font-weight: 700;
-      white-space: nowrap;
-      cursor: pointer;
-    }
-
-    .chip-btn.is-active {
-      background: linear-gradient(135deg, rgba(123, 31, 47, 0.12), rgba(212, 175, 55, 0.12));
-      border-color: rgba(123, 31, 47, 0.28);
-      color: #6b2230;
-    }
-
-    .reservation-list {
-      display: grid;
-      gap: 12px;
-      padding: 18px;
-    }
-
-    .menu-admin-toolbar {
-      display: grid;
-      gap: 10px;
-      padding: 14px 18px 0;
-    }
-
-    .menu-admin-toolbar .field-grid {
-      gap: 10px;
-    }
-
-    .menu-auth-card {
-      display: grid;
-      gap: 14px;
-      padding: 18px;
-    }
-
-    .menu-auth-status,
-    .menu-save-status {
-      min-height: 22px;
-      color: var(--muted);
-      font-size: 0.9rem;
-      font-weight: 700;
-    }
-
-    .menu-auth-status.is-error,
-    .menu-save-status.is-error { color: #9c2038; }
-
-    .menu-auth-status.is-success,
-    .menu-save-status.is-success { color: #2f6f38; }
-
-    .menu-admin-list {
-      display: grid;
-      gap: 12px;
-      padding: 18px;
-    }
-
-    .menu-admin-card {
-      display: grid;
-      gap: 14px;
-      padding: 16px;
-      border-radius: 20px;
-      border: 1px solid rgba(113, 88, 60, 0.12);
-      background: rgba(255, 255, 255, 0.72);
-    }
-
-    .menu-admin-card.is-hidden {
-      opacity: 0.68;
-      background: rgba(241, 235, 228, 0.84);
-    }
-
-    .menu-admin-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .menu-admin-title h4 {
-      margin: 0 0 4px;
-      font-size: 1.08rem;
-      letter-spacing: -0.03em;
-    }
-
-    .menu-admin-title p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.9rem;
-      font-weight: 700;
-    }
-
-    .menu-admin-fields {
-      display: grid;
-      gap: 10px;
-    }
-
-    .menu-admin-card input[type="checkbox"] {
-      width: auto;
-      min-width: 20px;
+    input[type="checkbox"] {
+      width: 20px;
       height: 20px;
       padding: 0;
       appearance: auto;
       -webkit-appearance: checkbox;
     }
 
-    .toggle-field {
+    .segmented {
       display: flex;
-      align-items: center;
-      gap: 10px;
-      min-height: 53px;
-      padding: 0 4px;
-      color: #2b1e14;
+      gap: 8px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .chip-btn {
+      min-height: 40px;
+      padding: 0 14px;
+      border: 1px solid rgba(113, 88, 60, 0.16);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.8);
+      color: #2a1d14;
+      font: inherit;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .chip-btn.is-active {
+      background: linear-gradient(135deg, rgba(123, 31, 47, 0.14), rgba(212, 175, 55, 0.16));
+      border-color: rgba(123, 31, 47, 0.3);
+      color: #6b2230;
+    }
+
+    .status-line {
+      min-height: 22px;
+      color: var(--muted);
+      font-size: 0.9rem;
       font-weight: 800;
     }
 
-    .menu-empty-state {
-      padding: 24px;
-      color: var(--muted);
-      text-align: center;
-      font-weight: 800;
+    .status-line.is-error { color: #a01f38; }
+    .status-line.is-success { color: #2f6f38; }
+
+    .reservation-list,
+    .menu-list,
+    .sort-list {
+      display: grid;
+      gap: 12px;
+      padding: 18px;
+    }
+
+    .reservation-card,
+    .menu-card,
+    .sort-row {
+      border: 1px solid rgba(113, 88, 60, 0.13);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 8px 20px rgba(32, 20, 13, 0.04);
     }
 
     .reservation-card {
+      display: grid;
+      gap: 12px;
       padding: 16px;
-      border-radius: 20px;
-      background: rgba(255, 255, 255, 0.72);
-      border: 1px solid rgba(113, 88, 60, 0.12);
     }
 
-    .reservation-card.is-removed {
-      opacity: 0.7;
-      background: rgba(241, 235, 228, 0.84);
-    }
-
-    .reservation-top {
+    .reservation-top,
+    .menu-card-top {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 12px;
     }
 
-    .reservation-top h4 {
+    .reservation-top h4,
+    .menu-title h4 {
       margin: 0 0 4px;
-      font-size: 1.14rem;
+      font-size: 1.12rem;
       letter-spacing: -0.03em;
     }
 
-    .reservation-top p {
+    .reservation-top p,
+    .menu-title p {
       margin: 0;
       color: var(--muted);
-      font-size: 0.9rem;
+      font-size: 0.92rem;
+      font-weight: 800;
+    }
+
+    .badge-row {
+      display: inline-flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
     }
 
     .status-badge {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      min-height: 32px;
-      padding: 0 12px;
+      min-height: 28px;
+      padding: 0 10px;
       border-radius: 999px;
-      font-size: 0.8rem;
-      font-weight: 800;
+      background: rgba(44, 33, 22, 0.1);
+      color: #4f3823;
+      font-size: 0.78rem;
+      font-weight: 900;
       white-space: nowrap;
     }
 
-    .status-badge.active {
-      background: rgba(47, 135, 87, 0.14);
-      color: #236240;
-    }
-
-    .status-badge.large {
-      background: rgba(212, 175, 55, 0.18);
-      color: #7a5a07;
-    }
-
-    .status-badge.removed {
-      background: rgba(123, 31, 47, 0.12);
-      color: #6b2230;
-    }
+    .status-badge.downtown { background: rgba(123, 31, 47, 0.12); color: #792133; }
+    .status-badge.uptown { background: rgba(47, 115, 187, 0.12); color: #255b94; }
+    .status-badge.active { background: rgba(84, 139, 42, 0.14); color: #3d6f21; }
+    .status-badge.hidden { background: rgba(120, 113, 108, 0.14); color: #5b514b; }
 
     .reservation-meta {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
-      margin-bottom: 12px;
     }
 
     .meta-box {
+      min-width: 0;
       padding: 12px;
-      border-radius: 16px;
-      background: rgba(249, 243, 233, 0.92);
-      border: 1px solid rgba(113, 88, 60, 0.08);
+      border-radius: 14px;
+      background: rgba(248, 242, 234, 0.74);
+      border: 1px solid rgba(113, 88, 60, 0.1);
     }
 
     .meta-box span,
     .meta-box strong { display: block; }
 
     .meta-box span {
-      margin-bottom: 4px;
+      margin-bottom: 3px;
       color: var(--muted);
       font-size: 0.78rem;
+      font-weight: 800;
     }
 
-    .meta-box strong { font-size: 0.96rem; }
+    .meta-box strong {
+      overflow-wrap: anywhere;
+      font-size: 0.98rem;
+    }
 
     .reservation-notes {
-      padding: 12px 14px;
-      border-radius: 16px;
-      background: rgba(255, 251, 245, 0.84);
-      border: 1px solid rgba(113, 88, 60, 0.08);
-      color: #4e4137;
-      line-height: 1.5;
-      font-size: 0.9rem;
-    }
-
-    .reservation-actions {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    .action-btn {
-      min-height: 42px;
-      border: 0;
-      border-radius: 14px;
-      font: inherit;
+      color: #3d2f24;
+      font-size: 0.94rem;
       font-weight: 700;
-      cursor: pointer;
+      line-height: 1.45;
     }
 
-    .action-btn.primary {
-      background: linear-gradient(135deg, var(--wine), #b9871f);
-      color: #fff;
+    .menu-card {
+      display: grid;
+      gap: 14px;
+      padding: 14px;
     }
 
-    .action-btn.light {
-      background: rgba(255, 255, 255, 0.82);
-      color: #2a1d14;
-      border: 1px solid rgba(113, 88, 60, 0.1);
+    .menu-card.is-hidden { opacity: 0.66; }
+
+    .menu-card-body {
+      display: grid;
+      grid-template-columns: 82px minmax(0, 1fr);
+      gap: 12px;
+      align-items: center;
+    }
+
+    .menu-thumb {
+      width: 82px;
+      height: 82px;
+      border-radius: 16px;
+      object-fit: cover;
+      background: rgba(222, 214, 204, 0.9);
+      border: 1px solid rgba(113, 88, 60, 0.12);
+    }
+
+    .menu-detail {
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .menu-detail p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .menu-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .sort-row {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+    }
+
+    .sort-handle {
+      min-width: 48px;
+      min-height: 48px;
+      border-radius: 14px;
+      border: 1px solid rgba(113, 88, 60, 0.14);
+      background: rgba(255, 251, 245, 0.88);
+      color: #4b3828;
+      font-weight: 900;
+      touch-action: none;
+    }
+
+    .sort-row-title {
+      min-width: 0;
+    }
+
+    .sort-row-title strong,
+    .sort-row-title span { display: block; }
+
+    .sort-row-title strong {
+      overflow-wrap: anywhere;
+      font-size: 0.98rem;
+    }
+
+    .sort-row-title span {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .sort-actions {
+      display: flex;
+      gap: 6px;
     }
 
     .empty-state {
-      padding: 18px;
+      padding: 28px 18px;
       color: var(--muted);
-      font-size: 0.96rem;
+      text-align: center;
+      font-weight: 900;
     }
 
-    .modal-backdrop,
-    .sheet-backdrop {
+    .auth-card {
+      display: grid;
+      gap: 14px;
+      padding: 18px;
+    }
+
+    .workspace[hidden],
+    .auth-card[hidden] { display: none; }
+
+    .modal-backdrop {
       position: fixed;
       inset: 0;
+      z-index: 80;
       display: none;
-      align-items: center;
+      align-items: flex-end;
       justify-content: center;
-      padding: 18px;
-      background: rgba(18, 12, 9, 0.56);
-      backdrop-filter: blur(6px);
-      z-index: 100;
+      padding: 18px 10px;
+      background: rgba(18, 12, 8, 0.52);
     }
 
     .modal-backdrop.is-open { display: flex; }
-    .sheet-backdrop.is-open { display: block; }
 
     .modal {
-      width: min(100%, 560px);
-      padding: 22px;
+      width: min(100%, 940px);
+      max-height: min(92vh, 980px);
+      overflow: auto;
       border-radius: 24px;
       background:
-        linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(247, 239, 228, 0.98)),
-        url("assets/pattern.webp") center / 400px auto;
-      border: 1px solid rgba(108, 85, 58, 0.14);
-      box-shadow: 0 28px 54px rgba(18, 12, 9, 0.2);
-    }
-
-    .feedback-backdrop {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-      background: rgba(18, 12, 9, 0.42);
-      backdrop-filter: blur(4px);
-      z-index: 120;
-    }
-
-    .feedback-backdrop.is-open {
-      display: flex;
-    }
-
-    .feedback-modal {
-      width: min(100%, 380px);
-      padding: 22px;
-      border-radius: 22px;
-      background:
-        linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(247, 239, 228, 0.98)),
-        url("assets/pattern.webp") center / 360px auto;
-      border: 1px solid rgba(108, 85, 58, 0.14);
-      box-shadow: 0 24px 44px rgba(18, 12, 9, 0.18);
-    }
-
-    .feedback-modal h3 {
-      margin: 0 0 8px;
-      font-size: 1.22rem;
-      letter-spacing: -0.03em;
-    }
-
-    .feedback-modal p {
-      margin: 0 0 18px;
-      color: var(--muted);
-      line-height: 1.6;
+        linear-gradient(180deg, rgba(255, 252, 247, 0.99), rgba(248, 241, 231, 0.98)),
+        url("assets/pattern.webp") center / 440px auto;
+      box-shadow: 0 32px 72px rgba(11, 7, 5, 0.32);
     }
 
     .modal-head {
+      position: sticky;
+      top: 0;
+      z-index: 2;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 16px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 252, 247, 0.96);
+      backdrop-filter: blur(8px);
     }
 
     .modal-head h3 {
       margin: 0;
-      font-size: 1.28rem;
-      letter-spacing: -0.03em;
+      font-size: 1.15rem;
     }
 
-    .modal-close {
-      width: 38px;
-      height: 38px;
-      border: 0;
-      border-radius: 999px;
-      background: rgba(113, 88, 60, 0.1);
-      color: #5c4c41;
-      font: inherit;
-      font-weight: 800;
-      cursor: pointer;
+    .modal-form {
+      display: grid;
+      gap: 16px;
+      padding: 18px;
     }
 
-    .picker-sheet {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      margin: 0 auto;
-      width: min(100%, 760px);
-      max-height: min(72vh, 520px);
-      border-radius: 24px 24px 0 0;
-      background:
-        linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(247, 239, 228, 0.98)),
-        url("assets/pattern.webp") center / 420px auto;
-      box-shadow: 0 -16px 48px rgba(17, 11, 8, 0.22);
-      overflow: hidden;
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
-    .sheet-header {
+    .toggle-field {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 18px 18px 12px;
-    }
-
-    .sheet-header h2 {
-      margin: 0;
-      font-size: 1.2rem;
-      letter-spacing: -0.04em;
-    }
-
-    .sheet-close {
-      border: 0;
-      background: transparent;
-      color: var(--muted);
-      font: inherit;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .sheet-options {
-      display: grid;
       gap: 10px;
-      padding: 0 18px 18px;
-      max-height: calc(min(72vh, 520px) - 72px);
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .sheet-option {
-      width: 100%;
-      min-height: 54px;
-      padding: 0 16px;
-      border-radius: 16px;
-      border: 1px solid rgba(113, 88, 60, 0.14);
-      background: rgba(255, 255, 255, 0.76);
-      color: var(--ink);
-      font: inherit;
-      font-weight: 700;
-      text-align: left;
-      cursor: pointer;
-    }
-
-    .sheet-option.is-active {
-      border-color: rgba(123, 31, 47, 0.34);
-      background: rgba(123, 31, 47, 0.08);
-    }
-
-    .sheet-option.is-custom {
-      border-style: dashed;
-      border-color: rgba(123, 31, 47, 0.28);
-      background: linear-gradient(135deg, rgba(123, 31, 47, 0.08), rgba(212, 175, 55, 0.08));
-      color: #6b2230;
-    }
-
-    .calendar-shell {
-      display: grid;
-      gap: 14px;
-      padding: 0 18px 18px;
-    }
-
-    .calendar-toolbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    .calendar-nav {
-      width: 40px;
-      height: 40px;
-      border: 0;
-      border-radius: 999px;
-      background: rgba(123, 31, 47, 0.08);
-      color: #6b2230;
-      font: inherit;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .calendar-label {
-      font-size: 1rem;
-      font-weight: 800;
-      color: #2e2016;
-      letter-spacing: -0.02em;
-    }
-
-    .calendar-weekdays,
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(7, minmax(0, 1fr));
-      gap: 8px;
-    }
-
-    .calendar-weekdays span {
-      text-align: center;
-      font-size: 0.76rem;
-      font-weight: 700;
-      color: #8a7a6d;
-      text-transform: uppercase;
-    }
-
-    .calendar-day {
       min-height: 48px;
-      border: 1px solid rgba(113, 88, 60, 0.12);
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.78);
-      color: #2c2016;
-      font: inherit;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .calendar-day.is-empty { visibility: hidden; }
-    .calendar-day.is-disabled { opacity: 0.34; cursor: default; }
-    .calendar-day.is-selected {
-      border-color: rgba(255, 216, 110, 0.98);
-      background: linear-gradient(135deg, rgba(255, 225, 140, 0.98), rgba(255, 246, 220, 1));
-      box-shadow: 0 10px 18px rgba(17, 11, 8, 0.12);
+      color: #2b1e14;
+      font-weight: 900;
     }
 
     @media (min-width: 720px) {
       .field-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .field.full { grid-column: 1 / -1; }
-      .form-actions { grid-template-columns: 1fr 1fr; }
-      .menu-admin-fields { grid-template-columns: 0.7fr 0.9fr 0.8fr 0.8fr auto; align-items: end; }
+      .menu-card {
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+      }
+      .menu-card-body { grid-template-columns: 96px minmax(0, 1fr); }
+      .menu-thumb { width: 96px; height: 96px; }
+      .reservation-meta { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .modal-backdrop { align-items: center; }
     }
 
     @media (min-width: 980px) {
-      .layout {
-        grid-template-columns: minmax(360px, 0.92fr) minmax(0, 1.08fr);
-        align-items: start;
-      }
-
-      .metric-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+      .dashboard-grid { grid-template-columns: 0.88fr 1.12fr; align-items: start; }
+      .metric-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .toolbar .field-grid { grid-template-columns: 1.2fr 0.8fr 0.8fr; }
     }
   </style>
 </head>
@@ -948,96 +656,52 @@
   <div class="shell">
     <header class="topbar">
       <div class="brand">
-          <a class="logo-link" href="./index.html" aria-label="EHWA home">
-            <img src="assets/logo-dark.webp" alt="EHWA logo" />
+        <a class="logo-link" href="./index.html" aria-label="EHWA home">
+          <img src="assets/logo-dark.webp" alt="EHWA logo" />
         </a>
         <div class="brand-copy">
           <p>EHWA Admin</p>
-          <h1>Reservations + Menu</h1>
+          <h1>Operations</h1>
         </div>
       </div>
-      <a class="pill-btn" href="./modify.html">Modify / Cancel</a>
+      <a class="pill-btn" href="./modify.html">Modify</a>
     </header>
 
     <section class="hero">
       <h2 id="todayHeading">Today</h2>
       <div class="metric-grid">
         <div class="metric-card">
-          <span>Total Reservations</span>
+          <span>Selected Day</span>
+          <strong id="metricSelectedDate">-</strong>
+        </div>
+        <div class="metric-card">
+          <span>Reservations</span>
           <strong id="metricReservations">0</strong>
         </div>
         <div class="metric-card">
-          <span>Large Parties</span>
-          <strong id="metricLargeParties">0</strong>
+          <span>Downtown</span>
+          <strong id="metricDowntown">0</strong>
         </div>
-      </div>
-      <div class="next-booking-card">
-        <span>Next Booking</span>
-        <strong id="metricNextName">-</strong>
-        <p id="metricNextMeta">No upcoming reservation</p>
+        <div class="metric-card">
+          <span>Uptown</span>
+          <strong id="metricUptown">0</strong>
+        </div>
       </div>
     </section>
 
     <nav class="admin-tabs" aria-label="Admin sections">
-      <button class="admin-tab is-active" data-admin-tab="reservations" type="button">Reservations</button>
-      <button class="admin-tab" data-admin-tab="menu" type="button">Menu</button>
+      <button class="admin-tab is-active" data-admin-tab="menu" type="button">Menu Manager</button>
+      <button class="admin-tab" data-admin-tab="reservations" type="button">Reservations</button>
     </nav>
 
-    <main class="layout admin-section is-active" id="reservationsAdminPanel">
-      <section class="panel">
-        <div class="panel-head">
-          <h3>Add Reservation</h3>
-          <span>Admin input</span>
-        </div>
-
-        <form class="booking-form" id="quickAddForm">
-          <input name="action" type="hidden" value="create" />
-          <input name="status" type="hidden" value="active" />
-          <div class="field">
-            <label for="quickSheetName">Location</label>
-            <select id="quickSheetName" name="sheetName">
-              <option value="Downtown Reservation">Downtown</option>
-              <option value="Uptown Reservation">Uptown</option>
-            </select>
-          </div>
-          <div class="field-grid" id="quickAddFields"></div>
-          <div class="form-actions">
-            <button class="pill-btn primary" type="submit">Add Reservation</button>
-          </div>
-        </form>
-      </section>
-
-      <section class="panel">
-        <div class="panel-head">
-          <h3>Reservations</h3>
-          <span id="reservationDateLabel">Loading</span>
-        </div>
-
-        <div class="control-row">
-          <div class="range-chips">
-            <button class="chip-btn is-active" data-range="today" type="button">Today</button>
-            <button class="chip-btn" data-range="week" type="button">This Week</button>
-            <button class="chip-btn" data-range="month" type="button">This Month</button>
-            <button class="chip-btn" data-range="all" type="button">All Reservations</button>
-          </div>
-          <div class="option-chips">
-            <button class="chip-btn is-active" data-removed="hide" type="button">Hide Removed</button>
-            <button class="chip-btn" data-removed="show" type="button">Show Removed</button>
-          </div>
-        </div>
-
-        <div class="reservation-list" id="reservationList"></div>
-      </section>
-    </main>
-
-    <main class="admin-section" id="menuAdminPanel">
+    <main class="admin-section is-active" id="menuAdminPanel">
       <section class="panel">
         <div class="panel-head">
           <h3>Menu Manager</h3>
           <span id="menuSessionLabel">Sign in required</span>
         </div>
 
-        <div class="menu-auth-card" id="menuAuthCard">
+        <div class="auth-card" id="menuAuthCard">
           <div class="field-grid">
             <div class="field">
               <label for="menuAdminEmail">Email</label>
@@ -1051,15 +715,19 @@
           <div class="form-actions">
             <button class="pill-btn primary" id="menuSignInBtn" type="button">Sign In</button>
           </div>
-          <div class="menu-auth-status" id="menuAuthStatus">Use your Supabase admin user.</div>
+          <div class="status-line" id="menuAuthStatus">Use your Supabase admin user.</div>
         </div>
 
-        <div id="menuAdminWorkspace" hidden>
-          <div class="menu-admin-toolbar">
+        <div class="workspace" id="menuWorkspace" hidden>
+          <div class="toolbar">
             <div class="field-grid">
               <div class="field">
                 <label for="menuSearchInput">Search</label>
-                <input id="menuSearchInput" type="search" placeholder="Menu name, category, label" />
+                <input id="menuSearchInput" type="search" placeholder="Name, category, tag, ingredient" />
+              </div>
+              <div class="field">
+                <label for="menuCategoryFilter">Category</label>
+                <select id="menuCategoryFilter"></select>
               </div>
               <div class="field">
                 <label for="menuBranchFilter">Branch</label>
@@ -1071,99 +739,238 @@
                 </select>
               </div>
             </div>
-            <div class="form-actions">
-              <button class="pill-btn" id="menuRefreshBtn" type="button">Refresh</button>
-              <button class="pill-btn" id="menuSignOutBtn" type="button">Sign Out</button>
+            <div class="segmented">
+              <button class="chip-btn" id="menuRefreshBtn" type="button">Refresh</button>
+              <button class="chip-btn" id="menuAddBtn" type="button">Add Menu</button>
+              <button class="chip-btn" id="menuSortModeBtn" type="button">Sort Mode</button>
+              <button class="chip-btn" id="menuSaveSortBtn" type="button" hidden>Save Sort</button>
+              <button class="chip-btn" id="menuSignOutBtn" type="button">Sign Out</button>
             </div>
-            <div class="menu-save-status" id="menuSaveStatus"></div>
+            <div class="status-line" id="menuStatus"></div>
           </div>
-          <div class="menu-admin-list" id="menuAdminList"></div>
+          <div class="menu-list" id="menuList"></div>
         </div>
+      </section>
+    </main>
+
+    <main class="admin-section" id="reservationsAdminPanel">
+      <section class="panel">
+        <div class="panel-head">
+          <h3>Reservations</h3>
+          <span id="reservationDateLabel">Loading</span>
+        </div>
+        <div class="toolbar">
+          <div class="segmented" id="reservationDayChips"></div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="reservationSearchInput">Search</label>
+              <input id="reservationSearchInput" type="search" placeholder="Name, phone, notes" />
+            </div>
+            <div class="field">
+              <label for="reservationBranchFilter">Branch</label>
+              <select id="reservationBranchFilter">
+                <option value="all">Downtown + Uptown</option>
+                <option value="downtown">Downtown</option>
+                <option value="uptown">Uptown</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>&nbsp;</label>
+              <button class="pill-btn" id="reservationRefreshBtn" type="button">Refresh Reservations</button>
+            </div>
+          </div>
+          <div class="status-line" id="reservationStatus"></div>
+        </div>
+        <div class="reservation-list" id="reservationList"></div>
       </section>
     </main>
   </div>
 
-  <iframe name="adminMutationFrame" hidden></iframe>
-
-  <div class="modal-backdrop" id="editorModal" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="editorTitle">
+  <div class="modal-backdrop" id="menuEditorModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="menuEditorTitle">
       <div class="modal-head">
-        <h3 id="editorTitle">Edit Reservation</h3>
-        <button class="modal-close" id="closeEditorModal" type="button">×</button>
+        <h3 id="menuEditorTitle">Edit Menu</h3>
+        <button class="icon-btn" id="menuEditorClose" type="button" aria-label="Close">X</button>
       </div>
-      <form class="booking-form" id="editorForm">
-        <input id="editorAction" name="action" type="hidden" value="update" />
-        <input id="editorRowNumber" name="rowNumber" type="hidden" value="" />
-        <input id="editorSheetName" name="sheetName" type="hidden" value="" />
-        <input id="editorStatus" name="status" type="hidden" value="active" />
-        <div class="field-grid" id="editorFields"></div>
+      <form class="modal-form" id="menuEditorForm">
+        <input id="menuEditId" type="hidden" />
+        <div class="field-grid">
+          <div class="field">
+            <label for="menuEditNameKo">Korean Name</label>
+            <input id="menuEditNameKo" name="name_ko" type="text" />
+          </div>
+          <div class="field">
+            <label for="menuEditNameEn">English Name</label>
+            <input id="menuEditNameEn" name="name_en" type="text" />
+          </div>
+          <div class="field">
+            <label for="menuEditRomanizedName">Romanized Name</label>
+            <input id="menuEditRomanizedName" name="romanized_name" type="text" />
+          </div>
+          <div class="field">
+            <label for="menuEditPrice">Price</label>
+            <input id="menuEditPrice" name="price" type="number" min="0" step="0.01" inputmode="decimal" />
+          </div>
+          <div class="field">
+            <label for="menuEditCategory">Category</label>
+            <input id="menuEditCategory" name="category" type="text" list="menuCategoryOptions" />
+          </div>
+          <div class="field">
+            <label for="menuEditLabel">Label</label>
+            <input id="menuEditLabel" name="label" type="text" />
+          </div>
+          <div class="field">
+            <label for="menuEditBranch">Branch</label>
+            <select id="menuEditBranch" name="branches">
+              <option value="both">Both</option>
+              <option value="downtown">Downtown</option>
+              <option value="uptown">Uptown</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="menuEditSortOrder">Sort Order</label>
+            <input id="menuEditSortOrder" name="sort_order" type="number" inputmode="numeric" />
+          </div>
+          <div class="field full">
+            <label for="menuEditDescription">Description</label>
+            <textarea id="menuEditDescription" name="description"></textarea>
+          </div>
+          <div class="field full">
+            <label for="menuEditImageUrl">Image URL</label>
+            <input id="menuEditImageUrl" name="image_url" type="url" />
+          </div>
+          <div class="field">
+            <label for="menuEditTags">Tags</label>
+            <input id="menuEditTags" name="tags" type="text" placeholder="Popular, Spicy2" />
+          </div>
+          <div class="field">
+            <label for="menuEditIngredient">Ingredient</label>
+            <input id="menuEditIngredient" name="ingredient" type="text" placeholder="Pork, Seafood" />
+          </div>
+          <label class="toggle-field" for="menuEditAvailable">
+            <input id="menuEditAvailable" name="is_available" type="checkbox" />
+            Available on menu
+          </label>
+        </div>
+        <datalist id="menuCategoryOptions"></datalist>
         <div class="form-actions">
-          <button class="pill-btn" id="cancelEditor" type="button">Cancel</button>
-          <button class="pill-btn primary" type="submit">Save Changes</button>
+          <button class="pill-btn danger" id="menuDeleteBtn" type="button">Delete</button>
+          <button class="pill-btn" id="menuEditorCancel" type="button">Cancel</button>
+          <button class="pill-btn primary" type="submit">Save Menu</button>
         </div>
       </form>
     </div>
   </div>
 
-  <div class="sheet-backdrop" id="pickerSheet" aria-hidden="true">
-    <div class="picker-sheet" role="dialog" aria-modal="true" aria-labelledby="pickerTitle">
-      <div class="sheet-header">
-        <h2 id="pickerTitle">Select</h2>
-        <button class="sheet-close" id="pickerClose" type="button">Close</button>
-      </div>
-      <div class="sheet-options" id="pickerOptions"></div>
-      <div class="calendar-shell" id="calendarShell" hidden>
-        <div class="calendar-toolbar">
-          <button class="calendar-nav" id="calendarPrev" type="button" aria-label="Previous month">&lt;</button>
-          <div class="calendar-label" id="calendarLabel">Month</div>
-          <button class="calendar-nav" id="calendarNext" type="button" aria-label="Next month">&gt;</button>
-        </div>
-        <div class="calendar-weekdays">
-          <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
-        </div>
-        <div class="calendar-grid" id="calendarGrid"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="feedback-backdrop" id="feedbackModal" aria-hidden="true">
-    <div class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
-      <h3 id="feedbackTitle">Updated</h3>
-      <p id="feedbackMessage">Reservation updated.</p>
-      <button class="pill-btn primary" id="closeFeedbackModal" type="button" style="width:100%;">Close</button>
-    </div>
-  </div>
-
   <script>
-    const ADMIN_SHEET_CONFIG = {
-      sheetId: "1xa9OZbctYnlbaAL8lKIgmefM5hvSw0Plk01lxp5G2fc",
-      sheets: [
-        { name: "Downtown Reservation", label: "Downtown" },
-        { name: "Uptown Reservation", label: "Uptown" }
-      ]
-    };
-
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3Iiujn95evZuFiyLNrJUo-_H6rKngdxt0EeBFVw/exec";
     const SUPABASE_CONFIG = {
       url: "https://pzhzdjsjfdzbzkhnaxmc.supabase.co",
       anonKey: "sb_publishable_3Ox2JIQXVLwusT-xzIMJ4g_YXTR5q8e"
     };
+
+    const ADMIN_SHEET_CONFIG = {
+      sheetId: "1xa9OZbctYnlbaAL8lKIgmefM5hvSw0Plk01lxp5G2fc",
+      sheets: [
+        { name: "Downtown Reservation", label: "Downtown", key: "downtown" },
+        { name: "Uptown Reservation", label: "Uptown", key: "uptown" }
+      ]
+    };
+
+    const CATEGORY_ORDER = [
+      "Tteokbokki",
+      "Soup",
+      "Pasta",
+      "Pancakes",
+      "Meal",
+      "Main Dish",
+      "Light Dish",
+      "Fried-Chicken",
+      "Dessert",
+      "Vegan",
+      "Spicy",
+      "Popular",
+      "Drink"
+    ];
+
+    const MENU_SELECT = [
+      "id",
+      "branches",
+      "sort_order",
+      "category",
+      "label",
+      "name_ko",
+      "romanized_name",
+      "name_en",
+      "description",
+      "price",
+      "image_url",
+      "tags",
+      "ingredient",
+      "is_available"
+    ].join(",");
+
     const supabaseClient = window.supabase?.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
 
     const state = {
-      reservations: [],
-      menuItems: [],
+      activeTab: "menu",
       menuSession: null,
-      activeAdminTab: "reservations",
+      menuItems: [],
+      menuCategory: "all",
+      menuBranch: "all",
       menuSearch: "",
-      menuBranchFilter: "all",
-      range: "today",
-      showRemoved: false,
-      activeForm: "quick",
-      calendarCursor: null
+      menuSortMode: false,
+      sortable: null,
+      reservations: [],
+      reservationDate: formatInputDate(new Date()),
+      reservationBranch: "all",
+      reservationSearch: ""
     };
 
-    function escapeAdminHtml(value = "") {
+    const refs = {};
+
+    function cacheRefs() {
+      [
+        "todayHeading",
+        "metricSelectedDate",
+        "metricReservations",
+        "metricDowntown",
+        "metricUptown",
+        "menuSessionLabel",
+        "menuAuthCard",
+        "menuWorkspace",
+        "menuAdminEmail",
+        "menuAdminPassword",
+        "menuSignInBtn",
+        "menuSignOutBtn",
+        "menuAuthStatus",
+        "menuStatus",
+        "menuSearchInput",
+        "menuCategoryFilter",
+        "menuBranchFilter",
+        "menuRefreshBtn",
+        "menuAddBtn",
+        "menuSortModeBtn",
+        "menuSaveSortBtn",
+        "menuList",
+        "reservationDateLabel",
+        "reservationDayChips",
+        "reservationSearchInput",
+        "reservationBranchFilter",
+        "reservationRefreshBtn",
+        "reservationStatus",
+        "reservationList",
+        "menuEditorModal",
+        "menuEditorTitle",
+        "menuEditorForm",
+        "menuEditorClose",
+        "menuEditorCancel",
+        "menuDeleteBtn"
+      ].forEach((id) => {
+        refs[id] = document.getElementById(id);
+      });
+    }
+
+    function escapeHtml(value = "") {
       return String(value)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
@@ -1172,57 +979,32 @@
         .replace(/'/g, "&#39;");
     }
 
-    function parseGvizText(text = "") {
-      return JSON.parse(
-        text.replace("/*O_o*/", "").replace("google.visualization.Query.setResponse(", "").slice(0, -2)
-      );
-    }
-
-    function getCellText(cell) {
-      if (!cell) return "";
-      if (typeof cell.f === "string" && cell.f.trim()) return cell.f.trim();
-      const value = cell.v;
-      if (value instanceof Date) return formatInputDate(value);
-      if (value && typeof value === "object" && typeof value.getMonth === "function") {
-        return formatInputDate(new Date(value));
-      }
-      return (value ?? "").toString().trim();
-    }
-
-    function normalizeReservation(cells = [], index = 0, sheetConfig) {
-      const values = cells.map((cell) => getCellText(cell));
-      return {
-        rowNumber: index + 2,
-        sheetName: sheetConfig.name,
-        branch: sheetConfig.label,
-        timestamp: values[0] || "",
-        date: values[1] || "",
-        time: values[2] || "",
-        people: values[3] || "",
-        name: values[4] || "",
-        phone: values[5] || "",
-        notes: values[6] || "",
-        status: values[7] || "active",
-        alertStatus: values[8] || ((values[7] || "").trim().toLowerCase() === "pending" ? "pending" : "confirmed"),
-        alertType: values[9] || ""
-      };
+    function formatInputDate(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
     }
 
     function toSafeDate(dateString = "") {
-      const normalized = String(dateString).trim();
-      if (!normalized) return null;
-      const match = normalized.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      const match = String(dateString).trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
       if (match) {
         const [, year, month, day] = match;
         return new Date(Number(year), Number(month) - 1, Number(day));
       }
-      const date = new Date(normalized);
-      return Number.isNaN(date.getTime()) ? null : date;
+      const parsed = new Date(dateString);
+      return Number.isNaN(parsed.getTime()) ? null : parsed;
     }
 
-    function parseGuestCount(value = "") {
-      const count = Number.parseInt(String(value).replace(/\D/g, ""), 10);
-      return Number.isFinite(count) ? count : 0;
+    function formatDateLabel(value = "") {
+      if (value === "all") return "All Days";
+      const date = toSafeDate(value);
+      if (!date) return value || "No date";
+      return new Intl.DateTimeFormat("en-US", {
+        weekday: "short",
+        month: "short",
+        day: "numeric"
+      }).format(date);
     }
 
     function parseTimeForSort(value = "") {
@@ -1236,7 +1018,43 @@
       return hour * 60 + minute;
     }
 
+    function parseGuestCount(value = "") {
+      const count = Number.parseInt(String(value).replace(/\D/g, ""), 10);
+      return Number.isFinite(count) ? count : 0;
+    }
+
+    function getCellText(cell) {
+      if (!cell) return "";
+      if (typeof cell.f === "string" && cell.f.trim()) return cell.f.trim();
+      return (cell.v ?? "").toString().trim();
+    }
+
+    function parseGvizText(text = "") {
+      return JSON.parse(
+        text.replace("/*O_o*/", "").replace("google.visualization.Query.setResponse(", "").slice(0, -2)
+      );
+    }
+
+    function normalizeReservation(cells = [], index = 0, sheetConfig) {
+      const values = cells.map((cell) => getCellText(cell));
+      return {
+        rowNumber: index + 2,
+        sheetName: sheetConfig.name,
+        branch: sheetConfig.label,
+        branchKey: sheetConfig.key,
+        timestamp: values[0] || "",
+        date: values[1] || "",
+        time: values[2] || "",
+        people: values[3] || "",
+        name: values[4] || "",
+        phone: values[5] || "",
+        notes: values[6] || "",
+        status: values[7] || "active"
+      };
+    }
+
     async function fetchReservations() {
+      setReservationStatus("Loading reservations...");
       const groups = await Promise.all(
         ADMIN_SHEET_CONFIG.sheets.map(async (sheetConfig) => {
           const url = `https://docs.google.com/spreadsheets/d/${ADMIN_SHEET_CONFIG.sheetId}/gviz/tq?sheet=${encodeURIComponent(sheetConfig.name)}&tqx=out:json`;
@@ -1250,215 +1068,258 @@
         })
       );
 
-      return groups.flat().sort((a, b) => {
+      state.reservations = groups.flat().sort((a, b) => {
         const dateA = toSafeDate(a.date);
         const dateB = toSafeDate(b.date);
-        const timeA = parseTimeForSort(a.time);
-        const timeB = parseTimeForSort(b.time);
-        if (dateA && dateB && dateA.getTime() !== dateB.getTime()) {
-          return dateA - dateB;
-        }
-        return timeA - timeB;
+        if (dateA && dateB && dateA.getTime() !== dateB.getTime()) return dateA - dateB;
+        return parseTimeForSort(a.time) - parseTimeForSort(b.time);
       });
+      renderReservations();
+      setReservationStatus(`Loaded ${state.reservations.length} reservations.`, "success");
     }
 
-    function formatDateLabel(value = "") {
-      const date = toSafeDate(value);
-      if (!date) return value || "No date";
-      return new Intl.DateTimeFormat("en-US", {
-        month: "long",
-        day: "numeric",
-        year: "numeric"
-      }).format(date);
-    }
-
-    function isNextDayReservationTime(value = "") {
-      return ["12:00 AM", "12:30 AM", "1:00 AM"].includes(String(value).trim().toUpperCase());
-    }
-
-    function getEffectiveReservationDate(value = "", timeValue = "") {
-      const normalizedDate = String(value || "").trim();
-      if (!normalizedDate) return "";
-      if (!isNextDayReservationTime(timeValue)) return normalizedDate;
-      const baseDate = new Date(`${normalizedDate}T00:00:00`);
-      if (Number.isNaN(baseDate.getTime())) return normalizedDate;
-      baseDate.setDate(baseDate.getDate() + 1);
-      return formatInputDate(baseDate);
-    }
-
-    function getDateBounds(range) {
-      const now = new Date();
-      const start = new Date(now);
-      start.setHours(0, 0, 0, 0);
-      const end = new Date(start);
-
-      if (range === "today") {
-        end.setDate(end.getDate() + 1);
-        return { start, end, label: formatDateLabel(formatInputDate(start)) };
+    function getReservationDays() {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const days = [];
+      for (let index = 0; index < 10; index += 1) {
+        const date = new Date(today);
+        date.setDate(today.getDate() + index);
+        days.push(formatInputDate(date));
       }
-
-      if (range === "week") {
-        const day = start.getDay();
-        start.setDate(start.getDate() - day);
-        end.setTime(start.getTime());
-        end.setDate(end.getDate() + 7);
-        return { start, end, label: "This Week" };
-      }
-
-      if (range === "month") {
-        start.setDate(1);
-        end.setTime(start.getTime());
-        end.setMonth(end.getMonth() + 1);
-        return {
-          start,
-          end,
-          label: new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" }).format(start)
-        };
-      }
-
-      return { start: null, end: null, label: "All Reservations" };
+      return days;
     }
 
-    function filterReservations() {
-      const { start, end } = getDateBounds(state.range);
+    function renderReservationDayChips() {
+      const days = getReservationDays();
+      refs.reservationDayChips.innerHTML = [
+        ...days.map((value) => {
+          const date = toSafeDate(value);
+          const label = new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date);
+          const day = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date);
+          return `<button class="chip-btn ${state.reservationDate === value ? "is-active" : ""}" data-reservation-date="${value}" type="button">${label} ${day}</button>`;
+        }),
+        `<button class="chip-btn ${state.reservationDate === "all" ? "is-active" : ""}" data-reservation-date="all" type="button">All Days</button>`
+      ].join("");
+    }
+
+    function getVisibleReservations() {
+      const query = state.reservationSearch.trim().toLowerCase();
       return state.reservations.filter((item) => {
-        if (!state.showRemoved && item.status === "removed") return false;
-        if (!start || !end) return true;
-        const date = toSafeDate(item.date);
-        if (!date) return false;
-        return date >= start && date < end;
+        if (item.status === "removed") return false;
+        if (state.reservationDate !== "all" && item.date !== state.reservationDate) return false;
+        if (state.reservationBranch !== "all" && item.branchKey !== state.reservationBranch) return false;
+        if (!query) return true;
+        return [item.name, item.phone, item.notes, item.time, item.people, item.branch]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(query));
       });
     }
 
-    function getStatusBadge(item) {
-      if (item.status === "removed") return { label: "Removed", className: "removed" };
-      if (item.status === "pending") return { label: "Pending", className: "active" };
-      if (parseGuestCount(item.people) >= 8) return { label: "Large Party", className: "large" };
-      return { label: "Active", className: "active" };
+    function renderReservationMetrics(items) {
+      const downtown = items.filter((item) => item.branchKey === "downtown").length;
+      const uptown = items.filter((item) => item.branchKey === "uptown").length;
+      refs.metricSelectedDate.textContent = formatDateLabel(state.reservationDate);
+      refs.metricReservations.textContent = String(items.length);
+      refs.metricDowntown.textContent = String(downtown);
+      refs.metricUptown.textContent = String(uptown);
+      refs.reservationDateLabel.textContent = `${formatDateLabel(state.reservationDate)} / ${state.reservationBranch === "all" ? "All branches" : state.reservationBranch}`;
     }
 
     function renderReservationCard(item) {
-      const status = getStatusBadge(item);
-      const primaryLabel = item.status === "removed" ? "Restore" : "Remove";
-      const primaryAction = item.status === "removed" ? "restore" : "remove";
-
+      const large = parseGuestCount(item.people) >= 8;
       return `
-        <article class="reservation-card ${item.status === "removed" ? "is-removed" : ""}">
+        <article class="reservation-card">
           <div class="reservation-top">
             <div>
-              <p>${formatDateLabel(item.date)}</p>
+              <h4>${escapeHtml(item.name || "Guest")}</h4>
+              <p>${escapeHtml(formatDateLabel(item.date))} / ${escapeHtml(item.time || "-")}</p>
             </div>
             <div class="badge-row">
-              <span class="status-badge branch">${item.branch || "Location"}</span>
-              <span class="status-badge ${status.className}">${status.label}</span>
+              <span class="status-badge ${escapeHtml(item.branchKey)}">${escapeHtml(item.branch)}</span>
+              ${large ? '<span class="status-badge active">Large Party</span>' : ""}
             </div>
           </div>
           <div class="reservation-meta">
-            <div class="meta-box">
-              <span>Time</span>
-              <strong>${item.time || "-"}</strong>
-            </div>
-            <div class="meta-box">
-              <span>Name</span>
-              <strong>${item.name || "Guest"}</strong>
-            </div>
-            <div class="meta-box">
-              <span>Guests</span>
-              <strong>${item.people || "-"}</strong>
-            </div>
-            <div class="meta-box">
-              <span>Phone</span>
-              <strong>${item.phone || "-"}</strong>
+            <div class="meta-box"><span>Guests</span><strong>${escapeHtml(item.people || "-")}</strong></div>
+            <div class="meta-box"><span>Phone</span><strong>${escapeHtml(item.phone || "-")}</strong></div>
+            <div class="meta-box"><span>Sheet</span><strong>${escapeHtml(item.sheetName || "-")}</strong></div>
+            <div class="meta-box"><span>Row</span><strong>${escapeHtml(item.rowNumber || "-")}</strong></div>
+          </div>
+          <div class="reservation-notes">${escapeHtml(item.notes || "No notes")}</div>
+        </article>
+      `;
+    }
+
+    function renderReservations() {
+      renderReservationDayChips();
+      const items = getVisibleReservations();
+      renderReservationMetrics(items);
+      refs.reservationList.innerHTML = items.length
+        ? items.map(renderReservationCard).join("")
+        : '<div class="empty-state">No reservations in this view.</div>';
+    }
+
+    function setReservationStatus(message = "", type = "") {
+      refs.reservationStatus.textContent = message;
+      refs.reservationStatus.className = `status-line${type ? ` is-${type}` : ""}`;
+    }
+
+    function getCategoryOrder(category) {
+      const index = CATEGORY_ORDER.indexOf(category);
+      return index === -1 ? CATEGORY_ORDER.length + 1 : index;
+    }
+
+    function getCategories() {
+      const set = new Set(state.menuItems.map((item) => item.category).filter(Boolean));
+      return [...set].sort((a, b) => getCategoryOrder(a) - getCategoryOrder(b) || a.localeCompare(b));
+    }
+
+    function refreshCategoryControls() {
+      const current = state.menuCategory;
+      const categories = getCategories();
+      const options = ['<option value="all">All categories</option>']
+        .concat(categories.map((category) => `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`));
+      refs.menuCategoryFilter.innerHTML = options.join("");
+      refs.menuCategoryFilter.value = categories.includes(current) ? current : "all";
+      state.menuCategory = refs.menuCategoryFilter.value;
+      document.getElementById("menuCategoryOptions").innerHTML = categories
+        .map((category) => `<option value="${escapeHtml(category)}"></option>`)
+        .join("");
+    }
+
+    function compareMenuItems(a, b) {
+      if ((a.sort_order ?? Number.MAX_SAFE_INTEGER) !== (b.sort_order ?? Number.MAX_SAFE_INTEGER)) {
+        return (a.sort_order ?? Number.MAX_SAFE_INTEGER) - (b.sort_order ?? Number.MAX_SAFE_INTEGER);
+      }
+      return Number(a.id || 0) - Number(b.id || 0);
+    }
+
+    function getVisibleMenuItems() {
+      const query = state.menuSearch.trim().toLowerCase();
+      return state.menuItems
+        .filter((item) => {
+          if (state.menuCategory !== "all" && item.category !== state.menuCategory) return false;
+          if (state.menuBranch !== "all" && item.branches !== state.menuBranch) return false;
+          if (!query) return true;
+          return [
+            item.category,
+            item.label,
+            item.name_ko,
+            item.romanized_name,
+            item.name_en,
+            item.description,
+            item.tags,
+            item.ingredient,
+            item.branches
+          ].filter(Boolean).some((value) => String(value).toLowerCase().includes(query));
+        })
+        .sort((a, b) => {
+          if (state.menuCategory === "all") {
+            const categoryCompare = getCategoryOrder(a.category) - getCategoryOrder(b.category) || String(a.category || "").localeCompare(String(b.category || ""));
+            if (categoryCompare) return categoryCompare;
+          }
+          return compareMenuItems(a, b);
+        });
+    }
+
+    function renderMenuCard(item) {
+      return `
+        <article class="menu-card ${item.is_available === false ? "is-hidden" : ""}">
+          <div class="menu-card-body">
+            <img class="menu-thumb" src="${escapeHtml(item.image_url || "assets/edited/ehwa.png")}" alt="${escapeHtml(item.name_en || item.name_ko || "Menu image")}" loading="lazy" />
+            <div class="menu-detail">
+              <div class="menu-card-top">
+                <div class="menu-title">
+                  <h4>${escapeHtml(item.name_ko || item.name_en || "Untitled")}</h4>
+                  <p>${escapeHtml(item.name_en || item.romanized_name || "")}</p>
+                </div>
+                <div class="badge-row">
+                  <span class="status-badge">${escapeHtml(item.category || "No category")}</span>
+                  <span class="status-badge ${item.is_available === false ? "hidden" : "active"}">${item.is_available === false ? "Hidden" : "Available"}</span>
+                </div>
+              </div>
+              <p>${escapeHtml(item.description || "No description")}</p>
+              <p>${escapeHtml(item.branches || "both")} / ${escapeHtml(item.label || "No label")} / sort ${escapeHtml(item.sort_order ?? "-")} / $${escapeHtml(item.price ?? "-")}</p>
             </div>
           </div>
-          <div class="reservation-notes">${item.notes || "No notes"}</div>
-          <div class="reservation-actions">
-            <button class="action-btn primary" type="button" data-action="${primaryAction}" data-sheet="${item.sheetName}" data-row="${item.rowNumber}">${primaryLabel}</button>
-            <button class="action-btn light" type="button" data-action="edit" data-sheet="${item.sheetName}" data-row="${item.rowNumber}">Edit</button>
+          <div class="menu-actions">
+            <button class="pill-btn primary" data-menu-edit="${escapeHtml(item.id)}" type="button">Edit</button>
           </div>
         </article>
       `;
     }
 
-    function renderMetrics(reservations) {
-      const largeParties = reservations.filter((item) => parseGuestCount(item.people) >= 8 && item.status !== "removed").length;
-      const upcoming = reservations
-        .filter((item) => item.status !== "removed")
-        .map((item) => {
-          const date = toSafeDate(item.date);
-          const minutes = parseTimeForSort(item.time);
-          if (!date || !Number.isFinite(minutes)) return null;
-          const withTime = new Date(date);
-          withTime.setHours(Math.floor(minutes / 60), minutes % 60, 0, 0);
-          return { ...item, sortDate: withTime };
-        })
-        .filter(Boolean)
-        .filter((item) => item.sortDate >= new Date())
-        .sort((a, b) => a.sortDate - b.sortDate)[0];
-
-      document.getElementById("metricReservations").textContent = String(reservations.length);
-      document.getElementById("metricLargeParties").textContent = String(largeParties);
-      document.getElementById("metricNextName").textContent = upcoming?.name || "-";
-      document.getElementById("metricNextMeta").textContent = upcoming
-        ? `${upcoming.time || "-"} · ${upcoming.people || "-"}`
-        : "No upcoming reservation";
+    function renderSortRow(item) {
+      return `
+        <article class="sort-row" data-menu-id="${escapeHtml(item.id)}">
+          <button class="sort-handle" type="button" aria-label="Drag ${escapeHtml(item.name_en || item.name_ko || "menu item")}">Drag</button>
+          <div class="sort-row-title">
+            <strong>${escapeHtml(item.name_ko || item.name_en || "Untitled")}</strong>
+            <span>${escapeHtml(item.name_en || "")} / current ${escapeHtml(item.sort_order ?? "-")}</span>
+          </div>
+          <div class="sort-actions">
+            <button class="icon-btn" data-sort-move="up" type="button" aria-label="Move up">Up</button>
+            <button class="icon-btn" data-sort-move="down" type="button" aria-label="Move down">Dn</button>
+          </div>
+        </article>
+      `;
     }
 
-    function renderReservations() {
-      const filtered = filterReservations();
-      const reservationList = document.getElementById("reservationList");
-      const reservationDateLabel = document.getElementById("reservationDateLabel");
-      const { label } = getDateBounds(state.range);
+    function renderMenu() {
+      refreshCategoryControls();
+      refs.menuSortModeBtn.classList.toggle("is-active", state.menuSortMode);
+      refs.menuSaveSortBtn.hidden = !state.menuSortMode;
+      const items = getVisibleMenuItems();
+      if (state.sortable) {
+        state.sortable.destroy();
+        state.sortable = null;
+      }
 
-      reservationDateLabel.textContent = label;
-      renderMetrics(filtered);
-
-      if (!filtered.length) {
-        reservationList.innerHTML = '<div class="empty-state">No reservations in this view.</div>';
+      if (state.menuSortMode) {
+        if (state.menuCategory === "all") {
+          refs.menuList.innerHTML = '<div class="empty-state">Choose one category before sorting.</div>';
+          return;
+        }
+        refs.menuList.className = "sort-list";
+        refs.menuList.innerHTML = items.length
+          ? items.map(renderSortRow).join("")
+          : '<div class="empty-state">No menu items in this sort view.</div>';
+        if (window.Sortable && items.length) {
+          state.sortable = window.Sortable.create(refs.menuList, {
+            handle: ".sort-handle",
+            animation: 160,
+            forceFallback: true,
+            scroll: true,
+            bubbleScroll: true,
+            scrollSensitivity: 90,
+            scrollSpeed: 12
+          });
+        }
         return;
       }
 
-      reservationList.innerHTML = filtered.map(renderReservationCard).join("");
-    }
-
-    function setActiveChip(group, value) {
-      document.querySelectorAll(group).forEach((button) => {
-        const isMatch = button.dataset.range === value || button.dataset.removed === value;
-        button.classList.toggle("is-active", isMatch);
-      });
-    }
-
-    function setAdminTab(tabName) {
-      state.activeAdminTab = tabName;
-      document.querySelectorAll("[data-admin-tab]").forEach((button) => {
-        button.classList.toggle("is-active", button.dataset.adminTab === tabName);
-      });
-      document.getElementById("reservationsAdminPanel").classList.toggle("is-active", tabName === "reservations");
-      document.getElementById("menuAdminPanel").classList.toggle("is-active", tabName === "menu");
-      if (tabName === "menu") {
-        void refreshMenuSession();
-      }
+      refs.menuList.className = "menu-list";
+      refs.menuList.innerHTML = items.length
+        ? items.map(renderMenuCard).join("")
+        : '<div class="empty-state">No menu items match this view.</div>';
     }
 
     function setMenuStatus(message = "", type = "") {
-      const status = document.getElementById("menuSaveStatus");
-      status.textContent = message;
-      status.className = `menu-save-status${type ? ` is-${type}` : ""}`;
+      refs.menuStatus.textContent = message;
+      refs.menuStatus.className = `status-line${type ? ` is-${type}` : ""}`;
     }
 
     function setMenuAuthStatus(message = "", type = "") {
-      const status = document.getElementById("menuAuthStatus");
-      status.textContent = message;
-      status.className = `menu-auth-status${type ? ` is-${type}` : ""}`;
+      refs.menuAuthStatus.textContent = message;
+      refs.menuAuthStatus.className = `status-line${type ? ` is-${type}` : ""}`;
     }
 
     function updateMenuAuthView() {
-      const isSignedIn = Boolean(state.menuSession?.access_token);
-      document.getElementById("menuAuthCard").hidden = isSignedIn;
-      document.getElementById("menuAdminWorkspace").hidden = !isSignedIn;
-      document.getElementById("menuSessionLabel").textContent = isSignedIn
-        ? state.menuSession.user?.email || "Signed in"
-        : "Sign in required";
+      const signedIn = Boolean(state.menuSession?.access_token);
+      refs.menuAuthCard.hidden = signedIn;
+      refs.menuWorkspace.hidden = !signedIn;
+      refs.menuSessionLabel.textContent = signedIn ? state.menuSession.user?.email || "Signed in" : "Sign in required";
     }
 
     async function refreshMenuSession() {
@@ -1473,9 +1334,7 @@
       }
       state.menuSession = data.session;
       updateMenuAuthView();
-      if (state.menuSession && !state.menuItems.length) {
-        await fetchMenuItems();
-      }
+      if (state.menuSession && !state.menuItems.length) await fetchMenuItems();
     }
 
     async function signInMenuAdmin() {
@@ -1483,22 +1342,20 @@
         setMenuAuthStatus("Supabase client could not load.", "error");
         return;
       }
-      const email = document.getElementById("menuAdminEmail").value.trim();
-      const password = document.getElementById("menuAdminPassword").value;
+      const email = refs.menuAdminEmail.value.trim();
+      const password = refs.menuAdminPassword.value;
       if (!email || !password) {
         setMenuAuthStatus("Enter email and password.", "error");
         return;
       }
-
       setMenuAuthStatus("Signing in...");
       const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
       if (error) {
         setMenuAuthStatus(error.message, "error");
         return;
       }
-
       state.menuSession = data.session;
-      document.getElementById("menuAdminPassword").value = "";
+      refs.menuAdminPassword.value = "";
       setMenuAuthStatus("Signed in.", "success");
       updateMenuAuthView();
       await fetchMenuItems();
@@ -1509,10 +1366,9 @@
       await supabaseClient.auth.signOut();
       state.menuSession = null;
       state.menuItems = [];
-      document.getElementById("menuAdminList").innerHTML = "";
-      setMenuStatus("");
       updateMenuAuthView();
-      setMenuAuthStatus("Signed out.");
+      renderMenu();
+      setMenuStatus("");
     }
 
     async function fetchMenuItems() {
@@ -1520,7 +1376,7 @@
       setMenuStatus("Loading menu...");
       const { data, error } = await supabaseClient
         .from("menu_items")
-        .select("id,branches,sort_order,category,label,name_ko,name_en,price,is_available")
+        .select(MENU_SELECT)
         .order("category", { ascending: true })
         .order("sort_order", { ascending: true, nullsFirst: false })
         .order("id", { ascending: true });
@@ -1531,692 +1387,288 @@
       }
 
       state.menuItems = data || [];
-      renderMenuAdmin();
+      renderMenu();
       setMenuStatus(`Loaded ${state.menuItems.length} menu items.`, "success");
     }
 
-    function getFilteredMenuItems() {
-      const query = state.menuSearch.trim().toLowerCase();
-      return state.menuItems.filter((item) => {
-        const matchesBranch = state.menuBranchFilter === "all" || item.branches === state.menuBranchFilter;
-        if (!matchesBranch) return false;
-        if (!query) return true;
-        return [item.category, item.label, item.name_ko, item.name_en, item.branches]
-          .filter(Boolean)
-          .some((value) => String(value).toLowerCase().includes(query));
-      });
+    function getMenuById(id) {
+      return state.menuItems.find((item) => String(item.id) === String(id));
     }
 
-    function renderMenuAdmin() {
-      const list = document.getElementById("menuAdminList");
-      const items = getFilteredMenuItems();
-      if (!items.length) {
-        list.innerHTML = '<div class="menu-empty-state">No menu items match this view.</div>';
-        return;
-      }
-
-      list.innerHTML = items.map((item) => `
-        <article class="menu-admin-card ${item.is_available === false ? "is-hidden" : ""}" data-menu-id="${item.id}">
-          <div class="menu-admin-top">
-            <div class="menu-admin-title">
-              <h4>${escapeAdminHtml(item.name_ko || item.name_en || "Untitled")}</h4>
-              <p>${escapeAdminHtml(item.name_en || "")}</p>
-            </div>
-            <div class="badge-row">
-              <span class="status-badge branch">${escapeAdminHtml(item.category || "Category")}</span>
-              ${item.label ? `<span class="status-badge active">${escapeAdminHtml(item.label)}</span>` : ""}
-            </div>
-          </div>
-          <div class="menu-admin-fields">
-            <div class="field">
-              <label for="menuSort${item.id}">Sort</label>
-              <input id="menuSort${item.id}" data-menu-field="sort_order" type="number" inputmode="numeric" value="${item.sort_order ?? ""}" placeholder="blank" />
-            </div>
-            <div class="field">
-              <label for="menuBranch${item.id}">Branch</label>
-              <select id="menuBranch${item.id}" data-menu-field="branches">
-                <option value="both" ${item.branches === "both" ? "selected" : ""}>Both</option>
-                <option value="downtown" ${item.branches === "downtown" ? "selected" : ""}>Downtown</option>
-                <option value="uptown" ${item.branches === "uptown" ? "selected" : ""}>Uptown</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="menuPrice${item.id}">Price</label>
-              <input id="menuPrice${item.id}" data-menu-field="price" type="number" min="0" step="0.01" inputmode="decimal" value="${item.price ?? ""}" />
-            </div>
-            <label class="toggle-field" for="menuAvailable${item.id}">
-              <input id="menuAvailable${item.id}" data-menu-field="is_available" type="checkbox" ${item.is_available !== false ? "checked" : ""} />
-              Available
-            </label>
-            <button class="pill-btn primary" data-menu-action="save" data-menu-id="${item.id}" type="button">Save</button>
-          </div>
-        </article>
-      `).join("");
+    function openMenuEditor(item = null) {
+      const isNew = !item;
+      refs.menuEditorTitle.textContent = isNew ? "Add Menu" : "Edit Menu";
+      refs.menuEditorForm.reset();
+      refs.menuEditId = document.getElementById("menuEditId");
+      refs.menuEditId.value = item?.id ?? "";
+      document.getElementById("menuEditNameKo").value = item?.name_ko ?? "";
+      document.getElementById("menuEditNameEn").value = item?.name_en ?? "";
+      document.getElementById("menuEditRomanizedName").value = item?.romanized_name ?? "";
+      document.getElementById("menuEditPrice").value = item?.price ?? "";
+      document.getElementById("menuEditCategory").value = item?.category ?? (state.menuCategory !== "all" ? state.menuCategory : "");
+      document.getElementById("menuEditLabel").value = item?.label ?? "";
+      document.getElementById("menuEditBranch").value = item?.branches ?? "both";
+      document.getElementById("menuEditSortOrder").value = item?.sort_order ?? "";
+      document.getElementById("menuEditDescription").value = item?.description ?? "";
+      document.getElementById("menuEditImageUrl").value = item?.image_url ?? "";
+      document.getElementById("menuEditTags").value = item?.tags ?? "";
+      document.getElementById("menuEditIngredient").value = item?.ingredient ?? "";
+      document.getElementById("menuEditAvailable").checked = item?.is_available !== false;
+      refs.menuDeleteBtn.hidden = isNew;
+      refs.menuEditorModal.classList.add("is-open");
+      refs.menuEditorModal.setAttribute("aria-hidden", "false");
     }
 
-    function getMenuCardPayload(card) {
-      const sortValue = card.querySelector('[data-menu-field="sort_order"]').value.trim();
-      const priceValue = card.querySelector('[data-menu-field="price"]').value.trim();
-      const priceNumber = Number.parseFloat(priceValue);
+    function closeMenuEditor() {
+      refs.menuEditorModal.classList.remove("is-open");
+      refs.menuEditorModal.setAttribute("aria-hidden", "true");
+    }
+
+    function nullableText(value) {
+      const text = String(value ?? "").trim();
+      return text || null;
+    }
+
+    function nullableNumber(value, integer = false) {
+      const text = String(value ?? "").trim();
+      if (!text) return null;
+      const parsed = integer ? Number.parseInt(text, 10) : Number.parseFloat(text);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    function readMenuEditorPayload() {
       return {
-        sort_order: sortValue ? Number.parseInt(sortValue, 10) : null,
-        branches: card.querySelector('[data-menu-field="branches"]').value,
-        price: Number.isFinite(priceNumber) ? priceNumber : null,
-        is_available: card.querySelector('[data-menu-field="is_available"]').checked
+        name_ko: nullableText(document.getElementById("menuEditNameKo").value),
+        name_en: nullableText(document.getElementById("menuEditNameEn").value),
+        romanized_name: nullableText(document.getElementById("menuEditRomanizedName").value),
+        price: nullableNumber(document.getElementById("menuEditPrice").value),
+        category: nullableText(document.getElementById("menuEditCategory").value),
+        label: nullableText(document.getElementById("menuEditLabel").value),
+        branches: document.getElementById("menuEditBranch").value,
+        sort_order: nullableNumber(document.getElementById("menuEditSortOrder").value, true),
+        description: nullableText(document.getElementById("menuEditDescription").value),
+        image_url: nullableText(document.getElementById("menuEditImageUrl").value),
+        tags: nullableText(document.getElementById("menuEditTags").value),
+        ingredient: nullableText(document.getElementById("menuEditIngredient").value),
+        is_available: document.getElementById("menuEditAvailable").checked
       };
     }
 
-    async function saveMenuItem(id) {
+    async function saveMenuEditor(event) {
+      event.preventDefault();
       if (!supabaseClient || !state.menuSession) {
         setMenuStatus("Sign in before saving.", "error");
         return;
       }
-      const card = document.querySelector(`[data-menu-id="${id}"]`);
-      if (!card) return;
-      const payload = getMenuCardPayload(card);
-      if (!["both", "downtown", "uptown"].includes(payload.branches)) {
-        setMenuStatus("Invalid branch value.", "error");
+      const id = document.getElementById("menuEditId").value;
+      const payload = readMenuEditorPayload();
+      if (!payload.name_ko && !payload.name_en) {
+        setMenuStatus("Menu name is required.", "error");
+        return;
+      }
+      if (!payload.category) {
+        setMenuStatus("Category is required.", "error");
         return;
       }
 
-      setMenuStatus("Saving...");
-      const { data, error } = await supabaseClient
-        .from("menu_items")
-        .update(payload)
-        .eq("id", id)
-        .select("id,branches,sort_order,category,label,name_ko,name_en,price,is_available")
-        .single();
-
+      setMenuStatus("Saving menu...");
+      const query = id
+        ? supabaseClient.from("menu_items").update(payload).eq("id", id)
+        : supabaseClient.from("menu_items").insert(payload);
+      const { data, error } = await query.select(MENU_SELECT).single();
       if (error) {
         setMenuStatus(error.message, "error");
         return;
       }
-
-      state.menuItems = state.menuItems.map((item) => String(item.id) === String(id) ? data : item);
-      renderMenuAdmin();
-      setMenuStatus("Saved.", "success");
+      if (id) {
+        state.menuItems = state.menuItems.map((item) => String(item.id) === String(id) ? data : item);
+      } else {
+        state.menuItems = [...state.menuItems, data];
+      }
+      closeMenuEditor();
+      renderMenu();
+      setMenuStatus("Menu saved.", "success");
     }
 
-    function buildMutationForm(fields) {
-      const form = document.createElement("form");
-      form.method = "POST";
-      form.action = APPS_SCRIPT_URL;
-      form.target = "adminMutationFrame";
-      form.style.display = "none";
+    async function deleteMenuItem() {
+      const id = document.getElementById("menuEditId").value;
+      if (!id || !supabaseClient || !state.menuSession) return;
+      const item = getMenuById(id);
+      const ok = window.confirm(`Delete ${item?.name_en || item?.name_ko || "this menu item"}?`);
+      if (!ok) return;
+      setMenuStatus("Deleting menu...");
+      const { error } = await supabaseClient.from("menu_items").delete().eq("id", id);
+      if (error) {
+        setMenuStatus(error.message, "error");
+        return;
+      }
+      state.menuItems = state.menuItems.filter((menuItem) => String(menuItem.id) !== String(id));
+      closeMenuEditor();
+      renderMenu();
+      setMenuStatus("Menu deleted.", "success");
+    }
 
-      Object.entries(fields).forEach(([key, value]) => {
-        const input = document.createElement("input");
-        input.type = "hidden";
-        input.name = key;
-        input.value = value;
-        form.appendChild(input);
+    function moveSortRow(button, direction) {
+      const row = button.closest(".sort-row");
+      if (!row) return;
+      if (direction === "up" && row.previousElementSibling) {
+        row.parentElement.insertBefore(row, row.previousElementSibling);
+      }
+      if (direction === "down" && row.nextElementSibling) {
+        row.parentElement.insertBefore(row.nextElementSibling, row);
+      }
+    }
+
+    function getSortBaseForCategory(category) {
+      const categories = getCategories();
+      const index = Math.max(categories.indexOf(category), 0);
+      return (index + 1) * 1000;
+    }
+
+    async function saveSortOrder() {
+      if (!supabaseClient || !state.menuSession) {
+        setMenuStatus("Sign in before saving sort.", "error");
+        return;
+      }
+      if (state.menuCategory === "all") {
+        setMenuStatus("Choose a category before saving sort.", "error");
+        return;
+      }
+      const rows = [...refs.menuList.querySelectorAll(".sort-row")];
+      if (!rows.length) return;
+      const base = getSortBaseForCategory(state.menuCategory);
+      const updates = rows.map((row, index) => ({
+        id: row.dataset.menuId,
+        sort_order: base + (index + 1) * 10
+      }));
+      setMenuStatus("Saving sort order...");
+      const results = await Promise.all(
+        updates.map((item) => supabaseClient
+          .from("menu_items")
+          .update({ sort_order: item.sort_order })
+          .eq("id", item.id)
+          .select(MENU_SELECT)
+          .single())
+      );
+      const failed = results.find((result) => result.error);
+      if (failed) {
+        setMenuStatus(failed.error.message, "error");
+        return;
+      }
+      const byId = new Map(results.map((result) => [String(result.data.id), result.data]));
+      state.menuItems = state.menuItems.map((item) => byId.get(String(item.id)) || item);
+      renderMenu();
+      setMenuStatus("Sort order saved.", "success");
+    }
+
+    function setActiveTab(tabName) {
+      state.activeTab = tabName;
+      document.querySelectorAll("[data-admin-tab]").forEach((button) => {
+        button.classList.toggle("is-active", button.dataset.adminTab === tabName);
+      });
+      document.getElementById("menuAdminPanel").classList.toggle("is-active", tabName === "menu");
+      document.getElementById("reservationsAdminPanel").classList.toggle("is-active", tabName === "reservations");
+      if (tabName === "menu") void refreshMenuSession();
+      if (tabName === "reservations" && !state.reservations.length) void fetchReservations();
+    }
+
+    function bindEvents() {
+      document.querySelectorAll("[data-admin-tab]").forEach((button) => {
+        button.addEventListener("click", () => setActiveTab(button.dataset.adminTab || "menu"));
       });
 
-      document.body.appendChild(form);
-      form.submit();
-      window.setTimeout(() => form.remove(), 1200);
-    }
-
-    function refreshAfterMutation() {
-      window.setTimeout(async () => {
-        state.reservations = await fetchReservations();
-        renderReservations();
-      }, 900);
-    }
-
-    function formatPhoneNumber(value) {
-      let digits = String(value || "").replace(/\D/g, "");
-      if (digits.startsWith("1")) digits = digits.slice(1);
-      digits = digits.slice(0, 10);
-      if (digits.length < 4) return digits;
-      if (digits.length < 7) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
-      return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
-    }
-
-    function setupReservationForm(container, prefix) {
-      container.innerHTML = `
-        <div class="field full">
-          <label for="${prefix}Date">Date</label>
-          <div class="date-grid" id="${prefix}DateGrid"></div>
-          <input id="${prefix}Date" name="date" type="hidden" required />
-        </div>
-        <div class="field">
-          <label for="${prefix}TimeDisplay">Time</label>
-          <button class="picker-trigger" id="${prefix}TimeDisplay" type="button" data-picker="time" data-prefix="${prefix}">6:00 PM</button>
-          <input id="${prefix}Time" name="time" type="hidden" value="6:00 PM" />
-        </div>
-        <div class="field">
-          <label for="${prefix}PeopleDisplay">Guests</label>
-          <button class="picker-trigger" id="${prefix}PeopleDisplay" type="button" data-picker="people" data-prefix="${prefix}">4 guests</button>
-          <input id="${prefix}PeopleCustom" class="guest-custom-input" type="number" inputmode="numeric" min="2" placeholder="Enter guest count" />
-          <input id="${prefix}People" name="people" type="hidden" value="4 guests" required />
-        </div>
-        <div class="field">
-          <label for="${prefix}Name">Name</label>
-          <input id="${prefix}Name" name="name" type="text" placeholder="Your name" required />
-        </div>
-        <div class="field">
-          <label for="${prefix}Phone">Phone</label>
-          <input id="${prefix}Phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="Phone number" required />
-        </div>
-        <div class="field full">
-          <label for="${prefix}Notes">Notes</label>
-          <textarea id="${prefix}Notes" name="notes" placeholder="Add any request or occasion."></textarea>
-        </div>
-      `;
-
-      const dateInput = document.getElementById(`${prefix}Date`);
-      const dateGrid = document.getElementById(`${prefix}DateGrid`);
-      const timeInput = document.getElementById(`${prefix}Time`);
-      const peopleInput = document.getElementById(`${prefix}People`);
-      const timeDisplay = document.getElementById(`${prefix}TimeDisplay`);
-      const peopleDisplay = document.getElementById(`${prefix}PeopleDisplay`);
-      const peopleCustomInput = document.getElementById(`${prefix}PeopleCustom`);
-      const nameInput = document.getElementById(`${prefix}Name`);
-      const phoneInput = document.getElementById(`${prefix}Phone`);
-      const notesInput = document.getElementById(`${prefix}Notes`);
-
-      const dateOptions = [];
-      const start = new Date();
-      start.setHours(0, 0, 0, 0);
-      for (let i = 0; i < 10; i += 1) {
-        const optionDate = new Date(start);
-        optionDate.setDate(start.getDate() + i);
-        dateOptions.push(formatInputDate(optionDate));
-      }
-
-      function renderDateGrid() {
-        dateGrid.innerHTML = "";
-        const visibleDates = dateOptions.slice(0, 5);
-
-        visibleDates.forEach((value) => {
-          const date = new Date(value + "T00:00:00");
-          const button = document.createElement("button");
-          button.type = "button";
-          button.className = "date-chip";
-          if (dateInput.value === value) button.classList.add("is-active");
-          button.innerHTML = `<span>${new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date)}</span><strong>${new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date)}</strong>`;
-          button.addEventListener("click", () => {
-            dateInput.value = value;
-            renderDateGrid();
-          });
-          dateGrid.appendChild(button);
-        });
-
-        const moreButton = document.createElement("button");
-        moreButton.type = "button";
-        moreButton.className = "date-chip more-chip";
-        const selectedIsCustom = dateInput.value && !visibleDates.includes(dateInput.value);
-        moreButton.innerHTML = selectedIsCustom
-          ? `<span>Chosen</span><strong>${formatDisplayDate(dateInput.value)}</strong>`
-          : "<span>More</span><strong>Choose</strong>";
-        if (selectedIsCustom) moreButton.classList.add("is-active");
-        moreButton.addEventListener("click", () => {
-          state.activeForm = prefix;
-          state.calendarCursor = new Date((dateInput.value || dateOptions[0]) + "T00:00:00");
-          openSheet("date");
-        });
-        dateGrid.appendChild(moreButton);
-      }
-
-      phoneInput.addEventListener("input", () => {
-        phoneInput.value = formatPhoneNumber(phoneInput.value);
-      });
-
-      peopleCustomInput.addEventListener("keydown", (event) => {
+      refs.menuSignInBtn.addEventListener("click", () => void signInMenuAdmin());
+      refs.menuAdminPassword.addEventListener("keydown", (event) => {
         if (event.key === "Enter") {
           event.preventDefault();
-          const count = Number.parseInt(peopleCustomInput.value, 10);
-          if (!Number.isFinite(count) || count < 2) return;
-          const value = `${count} guests`;
-          peopleInput.value = value;
-          peopleDisplay.textContent = value;
-          peopleCustomInput.classList.remove("is-open");
-          peopleDisplay.style.display = "";
+          void signInMenuAdmin();
         }
       });
-
-      peopleCustomInput.addEventListener("blur", () => {
-        if (!peopleCustomInput.value.trim()) {
-          peopleCustomInput.classList.remove("is-open");
-          peopleDisplay.style.display = "";
+      refs.menuSignOutBtn.addEventListener("click", () => void signOutMenuAdmin());
+      refs.menuRefreshBtn.addEventListener("click", () => void fetchMenuItems());
+      refs.menuAddBtn.addEventListener("click", () => openMenuEditor());
+      refs.menuSortModeBtn.addEventListener("click", () => {
+        state.menuSortMode = !state.menuSortMode;
+        renderMenu();
+      });
+      refs.menuSaveSortBtn.addEventListener("click", () => void saveSortOrder());
+      refs.menuSearchInput.addEventListener("input", (event) => {
+        state.menuSearch = event.target.value;
+        renderMenu();
+      });
+      refs.menuCategoryFilter.addEventListener("change", (event) => {
+        state.menuCategory = event.target.value;
+        renderMenu();
+      });
+      refs.menuBranchFilter.addEventListener("change", (event) => {
+        state.menuBranch = event.target.value;
+        renderMenu();
+      });
+      refs.menuList.addEventListener("click", (event) => {
+        const editButton = event.target.closest("[data-menu-edit]");
+        if (editButton) {
+          openMenuEditor(getMenuById(editButton.dataset.menuEdit));
           return;
         }
-        const count = Number.parseInt(peopleCustomInput.value, 10);
-        if (!Number.isFinite(count) || count < 2) return;
-        const value = `${count} guests`;
-        peopleInput.value = value;
-        peopleDisplay.textContent = value;
-        peopleCustomInput.classList.remove("is-open");
-        peopleDisplay.style.display = "";
+        const moveButton = event.target.closest("[data-sort-move]");
+        if (moveButton) moveSortRow(moveButton, moveButton.dataset.sortMove);
+      });
+      refs.menuEditorForm.addEventListener("submit", (event) => void saveMenuEditor(event));
+      refs.menuDeleteBtn.addEventListener("click", () => void deleteMenuItem());
+      refs.menuEditorClose.addEventListener("click", closeMenuEditor);
+      refs.menuEditorCancel.addEventListener("click", closeMenuEditor);
+      refs.menuEditorModal.addEventListener("click", (event) => {
+        if (event.target === refs.menuEditorModal) closeMenuEditor();
       });
 
-      timeDisplay.addEventListener("click", () => {
-        state.activeForm = prefix;
-        openSheet("time");
+      refs.reservationDayChips.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-reservation-date]");
+        if (!button) return;
+        state.reservationDate = button.dataset.reservationDate;
+        renderReservations();
       });
+      refs.reservationSearchInput.addEventListener("input", (event) => {
+        state.reservationSearch = event.target.value;
+        renderReservations();
+      });
+      refs.reservationBranchFilter.addEventListener("change", (event) => {
+        state.reservationBranch = event.target.value;
+        renderReservations();
+      });
+      refs.reservationRefreshBtn.addEventListener("click", () => void fetchReservations());
 
-      peopleDisplay.addEventListener("click", () => {
-        if (peopleCustomInput.classList.contains("is-open")) {
-          peopleCustomInput.classList.remove("is-open");
-          peopleDisplay.style.display = "";
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && refs.menuEditorModal.classList.contains("is-open")) {
+          closeMenuEditor();
         }
-        state.activeForm = prefix;
-        openSheet("people");
       });
-
-      dateInput.value = dateOptions[0];
-      renderDateGrid();
-
-      return {
-        prefix,
-        dateInput,
-        timeInput,
-        peopleInput,
-        timeDisplay,
-        peopleDisplay,
-        peopleCustomInput,
-        nameInput,
-        phoneInput,
-        notesInput,
-        renderDateGrid
-      };
     }
 
-    function formatInputDate(date) {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const day = String(date.getDate()).padStart(2, "0");
-      return `${year}-${month}-${day}`;
-    }
-
-    function formatDisplayDate(value = "") {
-      const date = toSafeDate(value);
-      if (!date) return "Not selected";
-      return new Intl.DateTimeFormat("en-US", {
-        weekday: "short",
-        month: "short",
-        day: "numeric"
-      }).format(date);
-    }
-
-    const quickFormFields = setupReservationForm(document.getElementById("quickAddFields"), "quick");
-
-    const editorModal = document.getElementById("editorModal");
-    const editorTitle = document.getElementById("editorTitle");
-    const editorForm = document.getElementById("editorForm");
-    const editorAction = document.getElementById("editorAction");
-    const editorRowNumber = document.getElementById("editorRowNumber");
-    const editorSheetName = document.getElementById("editorSheetName");
-    const editorStatus = document.getElementById("editorStatus");
-    const editorFields = setupReservationForm(document.getElementById("editorFields"), "editor");
-    const feedbackModal = document.getElementById("feedbackModal");
-    const feedbackTitle = document.getElementById("feedbackTitle");
-    const feedbackMessage = document.getElementById("feedbackMessage");
-    const closeFeedbackModal = document.getElementById("closeFeedbackModal");
-
-    const sheet = document.getElementById("pickerSheet");
-    const sheetTitle = document.getElementById("pickerTitle");
-    const sheetOptions = document.getElementById("pickerOptions");
-    const sheetClose = document.getElementById("pickerClose");
-    const calendarShell = document.getElementById("calendarShell");
-    const calendarGrid = document.getElementById("calendarGrid");
-    const calendarLabel = document.getElementById("calendarLabel");
-    const calendarPrev = document.getElementById("calendarPrev");
-    const calendarNext = document.getElementById("calendarNext");
-
-    function getFormRefs(prefix) {
-      return prefix === "editor" ? editorFields : quickFormFields;
-    }
-
-    function closeSheet() {
-      sheet.classList.remove("is-open");
-      sheet.setAttribute("aria-hidden", "true");
-      sheetOptions.innerHTML = "";
-      calendarShell.hidden = true;
-    }
-
-    function openSheet(type) {
-      sheetOptions.innerHTML = "";
-      calendarShell.hidden = true;
-      const refs = getFormRefs(state.activeForm);
-
-      if (type === "date") {
-        sheetTitle.textContent = "Choose date";
-        state.calendarCursor = new Date((refs.dateInput.value || formatInputDate(new Date())) + "T00:00:00");
-        state.calendarCursor = new Date(state.calendarCursor.getFullYear(), state.calendarCursor.getMonth(), 1);
-        calendarShell.hidden = false;
-        renderCalendar();
-        sheet.classList.add("is-open");
-        sheet.setAttribute("aria-hidden", "false");
-        return;
-      }
-
-      sheetTitle.textContent = type === "time" ? "Select time" : "Select guests";
-      const options = type === "time"
-        ? ["6:00 PM","6:30 PM","7:00 PM","7:30 PM","8:00 PM","8:30 PM","9:00 PM","9:30 PM","10:00 PM","10:30 PM","11:00 PM","11:30 PM","12:00 AM","12:30 AM","1:00 AM"]
-        : ["Custom","2 guests","3 guests","4 guests","5 guests","6 guests","7 guests","8 guests"];
-
-      options.forEach((option) => {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "sheet-option";
-        if (type === "people" && option === "Custom") button.classList.add("is-custom");
-        button.textContent = option;
-        const currentValue = type === "time" ? refs.timeInput.value : refs.peopleInput.value;
-        if (currentValue === option) button.classList.add("is-active");
-        button.addEventListener("click", () => {
-          if (type === "people" && option === "Custom") {
-            closeSheet();
-            refs.peopleDisplay.style.display = "none";
-            refs.peopleCustomInput.classList.add("is-open");
-            refs.peopleCustomInput.value = "";
-            window.setTimeout(() => refs.peopleCustomInput.focus(), 30);
-            return;
-          }
-
-          if (type === "time") {
-            refs.timeInput.value = option;
-            refs.timeDisplay.textContent = option;
-          } else {
-            refs.peopleInput.value = option;
-            refs.peopleDisplay.textContent = option;
-          }
-          closeSheet();
-        });
-        sheetOptions.appendChild(button);
-      });
-
-      sheet.classList.add("is-open");
-      sheet.setAttribute("aria-hidden", "false");
-    }
-
-    function renderCalendar() {
-      const refs = getFormRefs(state.activeForm);
-      calendarGrid.innerHTML = "";
-      calendarLabel.textContent = new Intl.DateTimeFormat("en-US", {
+    function bootstrap() {
+      cacheRefs();
+      refs.todayHeading.textContent = new Intl.DateTimeFormat("en-US", {
+        weekday: "long",
         month: "long",
+        day: "numeric",
         year: "numeric"
-      }).format(state.calendarCursor);
-
-      const monthStart = new Date(state.calendarCursor.getFullYear(), state.calendarCursor.getMonth(), 1);
-      const monthEnd = new Date(state.calendarCursor.getFullYear(), state.calendarCursor.getMonth() + 1, 0);
-      const firstWeekday = monthStart.getDay();
-      const todayFloor = new Date();
-      todayFloor.setHours(0, 0, 0, 0);
-
-      for (let i = 0; i < firstWeekday; i += 1) {
-        const empty = document.createElement("div");
-        empty.className = "calendar-day is-empty";
-        calendarGrid.appendChild(empty);
-      }
-
-      for (let day = 1; day <= monthEnd.getDate(); day += 1) {
-        const date = new Date(state.calendarCursor.getFullYear(), state.calendarCursor.getMonth(), day);
-        const value = formatInputDate(date);
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "calendar-day";
-        button.textContent = String(day);
-        if (date < todayFloor) {
-          button.classList.add("is-disabled");
-          button.disabled = true;
-        } else {
-          button.addEventListener("click", () => {
-            refs.dateInput.value = value;
-            refs.renderDateGrid();
-            closeSheet();
-          });
-        }
-        if (refs.dateInput.value === value) button.classList.add("is-selected");
-        calendarGrid.appendChild(button);
-      }
-    }
-
-    function openEditor(item) {
-      editorTitle.textContent = "Edit Reservation";
-      editorAction.value = "update";
-      editorRowNumber.value = String(item.rowNumber);
-      editorSheetName.value = item.sheetName || "";
-      editorStatus.value = item.status === "removed" ? "removed" : "active";
-      editorFields.dateInput.value = item.date || formatInputDate(new Date());
-      editorFields.timeInput.value = item.time || "6:00 PM";
-      editorFields.timeDisplay.textContent = item.time || "6:00 PM";
-      editorFields.peopleInput.value = item.people || "4 guests";
-      editorFields.peopleDisplay.textContent = item.people || "4 guests";
-      editorFields.nameInput.value = item.name || "";
-      editorFields.phoneInput.value = item.phone || "";
-      editorFields.notesInput.value = item.notes || "";
-      editorFields.peopleCustomInput.classList.remove("is-open");
-      editorFields.peopleDisplay.style.display = "";
-      editorFields.renderDateGrid();
-      editorModal.classList.add("is-open");
-      editorModal.setAttribute("aria-hidden", "false");
-    }
-
-    function closeEditor() {
-      editorModal.classList.remove("is-open");
-      editorModal.setAttribute("aria-hidden", "true");
-    }
-
-    function openFeedback(title, message) {
-      feedbackTitle.textContent = title;
-      feedbackMessage.textContent = message;
-      feedbackModal.classList.add("is-open");
-      feedbackModal.setAttribute("aria-hidden", "false");
-    }
-
-    function closeFeedback() {
-      feedbackModal.classList.remove("is-open");
-      feedbackModal.setAttribute("aria-hidden", "true");
-    }
-
-    function serializeReservationForm(form) {
-      return Object.fromEntries(new FormData(form).entries());
-    }
-
-    function bindFormSubmission(form, extraFields = {}) {
-      form.addEventListener("submit", (event) => {
-        event.preventDefault();
-        const payload = {
-          ...serializeReservationForm(form),
-          ...extraFields
-        };
-        payload.date = getEffectiveReservationDate(payload.date, payload.time);
-        payload.alertStatus = "confirmed";
-        payload.alertType = "";
-        if (payload.status !== "removed") payload.status = "active";
-        buildMutationForm(payload);
-        if (form === editorForm) {
-          closeEditor();
-          openFeedback("Reservation Updated", "Your booking changes have been saved.");
-        } else {
-          form.reset();
-          quickFormFields.dateInput.value = formatInputDate(new Date());
-          quickFormFields.timeInput.value = "6:00 PM";
-          quickFormFields.timeDisplay.textContent = "6:00 PM";
-          quickFormFields.peopleInput.value = "4 guests";
-          quickFormFields.peopleDisplay.textContent = "4 guests";
-          quickFormFields.peopleCustomInput.classList.remove("is-open");
-          quickFormFields.peopleDisplay.style.display = "";
-          quickFormFields.nameInput.value = "";
-          quickFormFields.phoneInput.value = "";
-          quickFormFields.notesInput.value = "";
-          quickFormFields.renderDateGrid();
-          openFeedback("Reservation Added", "The new reservation has been submitted.");
-        }
-        refreshAfterMutation();
-      });
-    }
-
-    function bootstrapAdmin() {
-      fetchReservations()
-        .then((reservations) => {
-          state.reservations = reservations;
-          renderReservations();
-        })
-        .catch((error) => {
-          console.error(error);
-          document.getElementById("reservationList").innerHTML =
-            '<div class="empty-state">Could not load reservation data.</div>';
+      }).format(new Date());
+      bindEvents();
+      renderReservationDayChips();
+      renderReservationMetrics([]);
+      updateMenuAuthView();
+      if (supabaseClient) {
+        supabaseClient.auth.onAuthStateChange((_event, session) => {
+          state.menuSession = session;
+          updateMenuAuthView();
         });
+        void refreshMenuSession();
+      } else {
+        setMenuAuthStatus("Supabase client could not load.", "error");
+      }
+      void fetchReservations();
     }
 
-    document.getElementById("todayHeading").textContent = new Intl.DateTimeFormat("en-CA", {
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-      year: "numeric"
-    }).format(new Date());
-
-    const todayInput = formatInputDate(new Date());
-    quickFormFields.dateInput.value = todayInput;
-    quickFormFields.renderDateGrid();
-
-    bindFormSubmission(document.getElementById("quickAddForm"));
-    bindFormSubmission(editorForm);
-
-    document.querySelectorAll("[data-admin-tab]").forEach((button) => {
-      button.addEventListener("click", () => {
-        setAdminTab(button.dataset.adminTab || "reservations");
-      });
-    });
-
-    document.getElementById("menuSignInBtn").addEventListener("click", () => {
-      void signInMenuAdmin();
-    });
-
-    document.getElementById("menuAdminPassword").addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        void signInMenuAdmin();
-      }
-    });
-
-    document.getElementById("menuSignOutBtn").addEventListener("click", () => {
-      void signOutMenuAdmin();
-    });
-
-    document.getElementById("menuRefreshBtn").addEventListener("click", () => {
-      void fetchMenuItems();
-    });
-
-    document.getElementById("menuSearchInput").addEventListener("input", (event) => {
-      state.menuSearch = event.target.value;
-      renderMenuAdmin();
-    });
-
-    document.getElementById("menuBranchFilter").addEventListener("change", (event) => {
-      state.menuBranchFilter = event.target.value;
-      renderMenuAdmin();
-    });
-
-    document.getElementById("menuAdminList").addEventListener("click", (event) => {
-      const button = event.target.closest("[data-menu-action]");
-      if (!button) return;
-      if (button.dataset.menuAction === "save") {
-        void saveMenuItem(Number(button.dataset.menuId));
-      }
-    });
-
-    if (supabaseClient) {
-      supabaseClient.auth.onAuthStateChange((_event, session) => {
-        state.menuSession = session;
-        updateMenuAuthView();
-      });
-      void refreshMenuSession();
-    } else {
-      setMenuAuthStatus("Supabase client could not load.", "error");
-    }
-
-    document.getElementById("closeEditorModal").addEventListener("click", closeEditor);
-    document.getElementById("cancelEditor").addEventListener("click", closeEditor);
-    editorModal.addEventListener("click", (event) => {
-      if (event.target === editorModal) closeEditor();
-    });
-    closeFeedbackModal.addEventListener("click", closeFeedback);
-    feedbackModal.addEventListener("click", (event) => {
-      if (event.target === feedbackModal) closeFeedback();
-    });
-
-    document.querySelectorAll("[data-range]").forEach((button) => {
-      button.addEventListener("click", () => {
-        state.range = button.dataset.range;
-        setActiveChip("[data-range]", state.range);
-        renderReservations();
-      });
-    });
-
-    document.querySelectorAll("[data-removed]").forEach((button) => {
-      button.addEventListener("click", () => {
-        state.showRemoved = button.dataset.removed === "show";
-        setActiveChip("[data-removed]", state.showRemoved ? "show" : "hide");
-        renderReservations();
-      });
-    });
-
-    document.getElementById("reservationList").addEventListener("click", (event) => {
-      const button = event.target.closest("[data-action]");
-      if (!button) return;
-
-      const rowNumber = Number(button.dataset.row);
-      const sheetName = button.dataset.sheet || "";
-      const reservation = state.reservations.find((item) => item.rowNumber === rowNumber && item.sheetName === sheetName);
-      if (!reservation) return;
-
-      if (button.dataset.action === "edit") {
-        openEditor(reservation);
-        return;
-      }
-
-      if (button.dataset.action === "remove" || button.dataset.action === "restore") {
-        const isRestore = button.dataset.action === "restore";
-        buildMutationForm({
-          action: "status",
-          sheetName,
-          rowNumber: String(rowNumber),
-          status: isRestore ? "active" : "removed",
-          alertStatus: "confirmed",
-          alertType: ""
-        });
-        openFeedback(
-          isRestore ? "Reservation Restored" : "Reservation Removed",
-          isRestore
-            ? "This booking is visible in the active list again."
-            : "This booking has been moved out of the active list."
-        );
-        refreshAfterMutation();
-      }
-    });
-
-    sheetClose.addEventListener("click", closeSheet);
-    sheet.addEventListener("click", (event) => {
-      if (event.target === sheet) closeSheet();
-    });
-
-    calendarPrev.addEventListener("click", () => {
-      state.calendarCursor = new Date(state.calendarCursor.getFullYear(), state.calendarCursor.getMonth() - 1, 1);
-      renderCalendar();
-    });
-
-    calendarNext.addEventListener("click", () => {
-      state.calendarCursor = new Date(state.calendarCursor.getFullYear(), state.calendarCursor.getMonth() + 1, 1);
-      renderCalendar();
-    });
-
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") {
-        if (sheet.classList.contains("is-open")) {
-          closeSheet();
-        } else if (feedbackModal.classList.contains("is-open")) {
-          closeFeedback();
-        } else if (editorModal.classList.contains("is-open")) {
-          closeEditor();
-        }
-      }
-    });
-
-    bootstrapAdmin();
+    bootstrap();
   </script>
 </body>
 </html>
