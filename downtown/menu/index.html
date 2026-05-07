@@ -79,7 +79,10 @@
       padding: 18px 0 8px;
       background: linear-gradient(to bottom, rgba(249, 245, 238, 0.82), rgba(249, 245, 238, 0.4));
       backdrop-filter: none;
-      transition: padding 0.24s ease, background 0.24s ease, backdrop-filter 0.24s ease, box-shadow 0.24s ease;
+      backface-visibility: hidden;
+      transform: translateZ(0);
+      transition: padding 0.22s ease, box-shadow 0.22s ease;
+      will-change: padding;
     }
 
     .menu-sticky-spacer {
@@ -98,7 +101,16 @@
         url("../../assets/pattern.webp") center / 440px auto;
       border: 1px solid rgba(120, 103, 77, 0.14);
       box-shadow: var(--menu-shell-shadow);
+      backface-visibility: hidden;
+      transform: translateZ(0);
       transition: gap 0.24s ease;
+    }
+
+    .menu-page.is-sticky-resetting .menu-sticky-shell,
+    .menu-page.is-sticky-resetting .menu-sticky-inner,
+    .menu-page.is-sticky-resetting .menu-home-link,
+    .menu-page.is-sticky-resetting .menu-home-logo {
+      transition: none !important;
     }
 
     .menu-homebar {
@@ -130,19 +142,16 @@
       z-index: 60;
       padding: 10px 0 12px;
       background: linear-gradient(to bottom, rgba(244, 240, 233, 0.88), rgba(244, 240, 233, 0.54));
+      -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
       box-shadow: 0 8px 24px rgba(28, 35, 48, 0.08);
-    }
-
-    .menu-page.is-scrolled .menu-sticky-spacer {
-      height: var(--menu-sticky-height, 0px);
     }
 
     .menu-page.is-scrolled .menu-sticky-inner {
       gap: 12px;
       background:
         linear-gradient(180deg, rgba(255, 252, 247, 0.97), rgba(251, 246, 238, 0.95)),
-        url("../../assets/pattern.webp") center / 420px auto;
+        url("../../assets/pattern.webp") center / 440px auto;
       border-color: rgba(120, 103, 77, 0.16);
       box-shadow: 0 12px 32px rgba(28, 35, 48, 0.12);
     }
@@ -888,17 +897,26 @@
     function setupStickyHeaderState() {
       const page = document.body;
       const stickyShell = document.querySelector(".menu-sticky-shell");
-      if (!page || !stickyShell) return;
+      const stickySpacer = document.getElementById("menuStickySpacer");
+      if (!page || !stickyShell || !stickySpacer) return;
       const mobileQuery = window.matchMedia("(max-width: 640px)");
       let isSticky = page.classList.contains("is-scrolled");
       let frameId = 0;
-      let stickyHeight = "";
+      let expandedHeaderHeight = Math.ceil(stickyShell.getBoundingClientRect().height);
+      let spacerHeight = "";
 
       const syncHeaderHeight = () => {
-        const nextHeight = `${stickyShell.offsetHeight}px`;
-        if (nextHeight !== stickyHeight) {
-          stickyHeight = nextHeight;
-          document.documentElement.style.setProperty("--menu-sticky-height", nextHeight);
+        const currentHeight = Math.ceil(stickyShell.getBoundingClientRect().height);
+        if (isSticky) {
+          expandedHeaderHeight = Math.max(expandedHeaderHeight, currentHeight);
+        } else {
+          expandedHeaderHeight = currentHeight;
+        }
+
+        const nextSpacerHeight = isSticky ? `${expandedHeaderHeight}px` : "0px";
+        if (nextSpacerHeight !== spacerHeight) {
+          spacerHeight = nextSpacerHeight;
+          stickySpacer.style.height = nextSpacerHeight;
         }
       };
 
@@ -911,9 +929,20 @@
           : window.scrollY > enterThreshold;
 
         if (shouldStick !== isSticky) {
+          if (shouldStick) {
+            expandedHeaderHeight = Math.ceil(stickyShell.getBoundingClientRect().height);
+          } else {
+            page.classList.add("is-sticky-resetting");
+          }
           isSticky = shouldStick;
           page.classList.toggle("is-scrolled", isSticky);
-          requestAnimationFrame(syncHeaderHeight);
+          syncHeaderHeight();
+          requestAnimationFrame(() => {
+            syncHeaderHeight();
+            if (!isSticky) {
+              page.classList.remove("is-sticky-resetting");
+            }
+          });
           return;
         }
 
