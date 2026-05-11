@@ -1443,6 +1443,8 @@
         .filter((cells) => cells.some(Boolean))
         .map((cells) => ({
           sortOrder: toSortOrder(cells[0]),
+          allSortOrder: toSortOrder(cells[0]),
+          categorySortOrder: toSortOrder(cells[0]),
           category: cells[1] || "Uncategorized",
           label: cells[2] || "",
           nameKo: cells[3] || "",
@@ -1463,7 +1465,9 @@
         .map((item) => ({
           id: item.id,
           branches: item.branches || "both",
-          sortOrder: toSortOrder(item.sort_order ?? ""),
+          sortOrder: toSortOrder(item.all_sort_order ?? item.sort_order ?? ""),
+          allSortOrder: toSortOrder(item.all_sort_order ?? item.sort_order ?? ""),
+          categorySortOrder: toSortOrder(item.sort_order ?? ""),
           category: item.category || "Uncategorized",
           label: item.label || "",
           nameKo: item.name_ko || "",
@@ -1477,7 +1481,7 @@
           dietaryTags: parseDietaryTagList(item.ingredient || "")
         }))
         .sort((a, b) => {
-          if (a.sortOrder !== b.sortOrder) return a.sortOrder - b.sortOrder;
+          if (a.allSortOrder !== b.allSortOrder) return a.allSortOrder - b.allSortOrder;
           return (a.id || 0) - (b.id || 0);
         });
     }
@@ -1702,6 +1706,26 @@
       return !compareTags.length || hasVegetarianFallback;
     }
 
+    function shouldUseAllOrder(category) {
+      const normalizedCategory = String(category || "").toLowerCase();
+      return category === "All"
+        || normalizedCategory.includes("vegan")
+        || normalizedCategory.includes("spicy")
+        || normalizedCategory.includes("popular");
+    }
+
+    function compareMenusByOrder(field, a, b) {
+      const orderA = Number.isFinite(Number(a[field])) ? Number(a[field]) : Number.MAX_SAFE_INTEGER;
+      const orderB = Number.isFinite(Number(b[field])) ? Number(b[field]) : Number.MAX_SAFE_INTEGER;
+      if (orderA !== orderB) return orderA - orderB;
+      return (a.id || 0) - (b.id || 0);
+    }
+
+    function sortMenusForCurrentView(menuItems) {
+      const field = shouldUseAllOrder(selectedCategory) ? "allSortOrder" : "categorySortOrder";
+      return [...menuItems].sort((a, b) => compareMenusByOrder(field, a, b));
+    }
+
     function filterMenus(menuItems) {
       let filtered = filterBySelectedCategory(menuItems, selectedCategory);
       const isVeganCategory = String(selectedCategory || "").toLowerCase().includes("vegan");
@@ -1712,7 +1736,7 @@
         } else {
           filtered = filtered.filter((item) => matchesAllowedIngredients(item, selectedDietaryTags));
         }
-        return filtered;
+        return sortMenusForCurrentView(filtered);
       }
 
       if (selectedSubcategory !== "All") {
@@ -1721,7 +1745,7 @@
         );
       }
 
-      return filtered;
+      return sortMenusForCurrentView(filtered);
     }
 
     function scrollToCategoryStart() {

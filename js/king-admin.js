@@ -14,7 +14,7 @@
     ]
   };
 
-  const MENU_SELECT = [
+  const BASE_MENU_COLUMNS = [
     "id",
     "branches",
     "sort_order",
@@ -29,7 +29,28 @@
     "tags",
     "ingredient",
     "is_available"
-  ].join(",");
+  ];
+
+  const EXTENDED_MENU_COLUMNS = [
+    "id",
+    "branches",
+    "sort_order",
+    "all_sort_order",
+    "category",
+    "label",
+    "name_ko",
+    "romanized_name",
+    "name_en",
+    "description",
+    "price",
+    "image_url",
+    "tags",
+    "ingredient",
+    "is_available"
+  ];
+
+  const BASE_MENU_SELECT = BASE_MENU_COLUMNS.join(",");
+  const EXTENDED_MENU_SELECT = EXTENDED_MENU_COLUMNS.join(",");
 
   const DEFAULT_CATEGORY_ORDER = [
     "Tteokbokki",
@@ -46,6 +67,7 @@
   const DETAIL_FIELDS = [
     "branches",
     "sort_order",
+    "all_sort_order",
     "category",
     "label",
     "name_ko",
@@ -78,8 +100,10 @@
     menuMode: "visual",
     menuOrderCategory: "",
     categoryOrder: [],
+    supportsAllSortOrder: true,
     sortables: {
       visual: null,
+      all: null,
       category: null,
       menu: null
     }
@@ -132,9 +156,11 @@
       "menuVisualPanel",
       "menuOrderPanel",
       "menuList",
+      "menuAllOrderList",
       "menuCategoryOrderList",
       "menuOrderCategory",
       "menuOrderList",
+      "menuSaveAllOrderBtn",
       "menuSaveCategoryOrderBtn",
       "menuSaveMenuOrderBtn",
       "menuEditorModal",
@@ -379,11 +405,44 @@
     return branch === "both" || branch === state.menuBranch;
   }
 
-  function compareMenuItems(a, b) {
-    const orderA = Number.isFinite(Number(a.sort_order)) ? Number(a.sort_order) : Number.MAX_SAFE_INTEGER;
-    const orderB = Number.isFinite(Number(b.sort_order)) ? Number(b.sort_order) : Number.MAX_SAFE_INTEGER;
+  function getMenuSelect() {
+    return state.supportsAllSortOrder ? EXTENDED_MENU_SELECT : BASE_MENU_SELECT;
+  }
+
+  function isMissingAllSortOrderError(error) {
+    const message = `${error?.code || ""} ${error?.message || ""} ${error?.details || ""}`;
+    return message.includes("all_sort_order");
+  }
+
+  function normalizeMenuItem(item) {
+    if (!item) return item;
+    return {
+      ...item,
+      all_sort_order: item.all_sort_order ?? item.sort_order ?? null
+    };
+  }
+
+  function getOrderValue(item, field) {
+    const value = Number(item?.[field]);
+    return Number.isFinite(value) ? value : Number.MAX_SAFE_INTEGER;
+  }
+
+  function compareByMenuField(field, a, b) {
+    const orderA = getOrderValue(a, field);
+    const orderB = getOrderValue(b, field);
     if (orderA !== orderB) return orderA - orderB;
     return Number(a.id || 0) - Number(b.id || 0);
+  }
+
+  function compareMenuItems(a, b) {
+    return compareByMenuField("sort_order", a, b);
+  }
+
+  function compareAllMenuItems(a, b) {
+    const orderA = getOrderValue(a, "all_sort_order");
+    const orderB = getOrderValue(b, "all_sort_order");
+    if (orderA !== orderB) return orderA - orderB;
+    return compareMenuItems(a, b);
   }
 
   function getCategoryOrder(category) {
@@ -454,10 +513,9 @@
         ].filter(Boolean).some((value) => String(value).toLowerCase().includes(query));
       })
       .sort((a, b) => {
-        const categoryCompare = getCategoryOrder(a.category) - getCategoryOrder(b.category)
-          || String(a.category || "").localeCompare(String(b.category || ""));
-        if (state.menuCategory === "all" && categoryCompare) return categoryCompare;
-        return compareMenuItems(a, b);
+        return state.menuCategory === "all"
+          ? compareAllMenuItems(a, b)
+          : compareMenuItems(a, b);
       });
   }
 
@@ -552,18 +610,29 @@
   async function fetchMenuItems() {
     if (!supabaseClient) return;
     setMenuStatus("Loading menu...");
-    const { data, error } = await supabaseClient
+    let { data, error } = await supabaseClient
       .from("menu_items")
-      .select(MENU_SELECT)
+      .select(EXTENDED_MENU_SELECT)
       .order("sort_order", { ascending: true, nullsFirst: false })
       .order("id", { ascending: true });
+
+    if (error && isMissingAllSortOrderError(error)) {
+      state.supportsAllSortOrder = false;
+      ({ data, error } = await supabaseClient
+        .from("menu_items")
+        .select(BASE_MENU_SELECT)
+        .order("sort_order", { ascending: true, nullsFirst: false })
+        .order("id", { ascending: true }));
+    } else if (!error) {
+      state.supportsAllSortOrder = true;
+    }
 
     if (error) {
       setMenuStatus(error.message, "error");
       return;
     }
 
-    state.menuItems = data || [];
+    state.menuItems = (data || []).map(normalizeMenuItem);
     syncCategoryOrder();
     renderMenu();
     setMenuStatus(`Loaded ${state.menuItems.length} menu items.`, "success");
@@ -589,12 +658,57 @@
     return "";
   }
 
-  function renderTagBadges(item) {
-    const tags = [...parseList(item.tags), ...parseList(item.ingredient)].slice(0, 8);
+  function renderTagBadgesFromValues(tagsValue, ingredientValue) {
+    const tags = [...parseList(tagsValue), ...parseList(ingredientValue)].slice(0, 8);
     if (!tags.length) return "";
+    return tags.map((tag) => `<span class="menu-tag ${escapeHtml(getTagClass(tag))}">${escapeHtml(tag)}</span>`).join("");
+  }
+
+  function renderTagBadges(item) {
+    const badges = renderTagBadgesFromValues(item.tags, item.ingredient);
+    if (!badges) return "";
     return `
-      <div class="menu-meta">
-        ${tags.map((tag) => `<span class="menu-tag ${escapeHtml(getTagClass(tag))}">${escapeHtml(tag)}</span>`).join("")}
+      <div class="menu-meta" data-preview-tags>${badges}</div>
+    `;
+  }
+
+  function getMenuOptionValues(field) {
+    const values = new Set();
+    state.menuItems.forEach((item) => {
+      if (field === "tags" || field === "ingredient") {
+        parseList(item[field]).forEach((value) => values.add(value));
+      } else if (item[field]) {
+        values.add(item[field]);
+      }
+    });
+    return [...values].sort((a, b) => String(a).localeCompare(String(b)));
+  }
+
+  function renderSelectOptions(values, current = "", placeholder = "") {
+    const safeCurrent = String(current || "");
+    const hasCurrent = safeCurrent && !values.includes(safeCurrent);
+    return [
+      placeholder ? `<option value="">${escapeHtml(placeholder)}</option>` : "",
+      ...values.map((value) => `<option value="${escapeHtml(value)}" ${safeCurrent === value ? "selected" : ""}>${escapeHtml(value)}</option>`),
+      hasCurrent ? `<option value="${escapeHtml(safeCurrent)}" selected>${escapeHtml(safeCurrent)}</option>` : ""
+    ].join("");
+  }
+
+  function renderTokenPicker(field, value = "") {
+    const selected = new Set(parseList(value));
+    const options = getMenuOptionValues(field);
+    return `
+      <div class="option-picker" data-token-group="${escapeHtml(field)}">
+        <input data-visual-field="${escapeHtml(field)}" type="hidden" value="${escapeHtml(parseList(value).join(", "))}" />
+        <div class="option-chip-row">
+          ${options.map((option) => `
+            <button class="option-chip ${selected.has(option) ? "is-selected" : ""}" data-token-toggle="${escapeHtml(option)}" type="button">${escapeHtml(option)}</button>
+          `).join("")}
+        </div>
+        <div class="custom-token-row">
+          <input data-token-custom type="text" placeholder="Add custom" />
+          <button class="pill-btn" data-token-add type="button">Add</button>
+        </div>
       </div>
     `;
   }
@@ -617,7 +731,7 @@
               <p class="menu-preview-name-ko" data-preview-name-ko>${escapeHtml(item.name_ko || item.name_en || "Untitled")}</p>
               <p class="menu-preview-name-en" data-preview-name-en>${escapeHtml(item.name_en || item.romanized_name || "")}</p>
               <p class="menu-preview-desc" data-preview-description>${escapeHtml(item.description || "No description")}</p>
-              ${renderTagBadges(item)}
+              <div class="menu-meta" data-preview-tags>${renderTagBadgesFromValues(item.tags, item.ingredient)}</div>
               <div class="menu-preview-price" data-preview-price>${escapeHtml(formatPrice(item.price))}</div>
             </div>
           </div>
@@ -640,8 +754,20 @@
             <input data-visual-field="price" type="number" step="0.01" min="0" value="${escapeHtml(item.price ?? "")}" />
           </div>
           <div class="preview-field">
-            <label>Branch</label>
-            <select data-visual-field="branches">${branchOptions(item.branches)}</select>
+            <label>Category</label>
+            <select data-visual-field="category">${renderSelectOptions(getCategories(), item.category, "Select category")}</select>
+          </div>
+          <div class="preview-field">
+            <label>Label</label>
+            <select data-visual-field="label">${renderSelectOptions(getMenuOptionValues("label"), item.label, "No label")}</select>
+          </div>
+          <div class="preview-field full">
+            <label>Tags</label>
+            ${renderTokenPicker("tags", item.tags)}
+          </div>
+          <div class="preview-field full">
+            <label>Ingredient</label>
+            ${renderTokenPicker("ingredient", item.ingredient)}
           </div>
           <div class="preview-field full">
             <label>Description</label>
@@ -666,18 +792,20 @@
   function setupSortable(key, element, handle) {
     destroySortable(key);
     if (!window.Sortable || !element || element.children.length < 2) return;
-    state.sortables[key] = window.Sortable.create(element, {
-      handle,
+    const config = {
       animation: 160,
       forceFallback: true,
       scroll: true,
       bubbleScroll: true,
       scrollSensitivity: 90,
       scrollSpeed: 12
-    });
+    };
+    if (handle) config.handle = handle;
+    state.sortables[key] = window.Sortable.create(element, config);
   }
 
   function renderVisualMenu() {
+    destroySortable("all");
     destroySortable("category");
     destroySortable("menu");
     destroySortable("visual");
@@ -687,13 +815,31 @@
       : '<div class="empty-state">No menu items match this view.</div>';
   }
 
+  function renderAllOrder() {
+    const items = [...state.menuItems].sort(compareAllMenuItems);
+    refs.menuAllOrderList.innerHTML = items.length
+      ? items.map((item) => `
+        <article class="menu-order-row all-order-row" data-menu-id="${escapeHtml(item.id)}">
+          <div class="order-row-title">
+            <strong>${escapeHtml(item.name_ko || item.name_en || "Untitled")}</strong>
+            <span>${escapeHtml(item.category || "Uncategorized")} / ${escapeHtml(item.branches || "both")} / All ${escapeHtml(item.all_sort_order ?? "-")}</span>
+          </div>
+          <div class="sort-actions">
+            <button class="icon-btn" data-order-move="up" type="button" aria-label="Move up">Up</button>
+            <button class="icon-btn" data-order-move="down" type="button" aria-label="Move down">Dn</button>
+          </div>
+        </article>
+      `).join("")
+      : '<div class="empty-state">No menu items loaded.</div>';
+    setupSortable("all", refs.menuAllOrderList);
+  }
+
   function renderCategoryOrder() {
     refs.menuCategoryOrderList.innerHTML = state.categoryOrder.length
       ? state.categoryOrder.map((category) => {
         const count = state.menuItems.filter((item) => item.category === category).length;
         return `
           <article class="category-order-row" data-category="${escapeHtml(category)}">
-            <button class="drag-handle" type="button" aria-label="Drag category">Move</button>
             <div class="order-row-title">
               <strong>${escapeHtml(category)}</strong>
               <span>${count} items</span>
@@ -706,7 +852,7 @@
         `;
       }).join("")
       : '<div class="empty-state">No categories loaded.</div>';
-    setupSortable("category", refs.menuCategoryOrderList, ".drag-handle");
+    setupSortable("category", refs.menuCategoryOrderList);
   }
 
   function renderMenuOrder() {
@@ -719,10 +865,9 @@
     refs.menuOrderList.innerHTML = items.length
       ? items.map((item) => `
         <article class="menu-order-row" data-menu-id="${escapeHtml(item.id)}">
-          <button class="drag-handle" type="button" aria-label="Drag menu item">Move</button>
           <div class="order-row-title">
             <strong>${escapeHtml(item.name_ko || item.name_en || "Untitled")}</strong>
-            <span>${escapeHtml(item.name_en || "")} / ${escapeHtml(item.branches || "both")} / current ${escapeHtml(item.sort_order ?? "-")}</span>
+            <span>${escapeHtml(item.name_en || "")} / ${escapeHtml(item.branches || "both")} / Category ${escapeHtml(item.sort_order ?? "-")}</span>
           </div>
           <div class="sort-actions">
             <button class="icon-btn" data-order-move="up" type="button" aria-label="Move up">Up</button>
@@ -731,11 +876,12 @@
         </article>
       `).join("")
       : '<div class="empty-state">No items in this category.</div>';
-    setupSortable("menu", refs.menuOrderList, ".drag-handle");
+    setupSortable("menu", refs.menuOrderList);
   }
 
   function renderOrderPanel() {
     destroySortable("visual");
+    renderAllOrder();
     renderCategoryOrder();
     renderMenuOrder();
   }
@@ -754,6 +900,7 @@
     renderMenuModePanels();
     if (!state.menuSession) {
       destroySortable("visual");
+      destroySortable("all");
       destroySortable("category");
       destroySortable("menu");
       return;
@@ -785,7 +932,7 @@
         payload[field] = Boolean(value);
       } else if (field === "price") {
         payload[field] = nullableNumber(value);
-      } else if (field === "sort_order") {
+      } else if (field === "sort_order" || field === "all_sort_order") {
         payload[field] = nullableNumber(value, true);
       } else if (field === "branches") {
         payload[field] = normalizeBranch(value);
@@ -813,11 +960,12 @@
       .from("menu_items")
       .update(payload)
       .eq("id", id)
-      .select(MENU_SELECT)
+      .select(getMenuSelect())
       .single();
     if (error) throw error;
-    state.menuItems = state.menuItems.map((item) => String(item.id) === String(id) ? data : item);
-    return data;
+    const normalized = normalizeMenuItem(data);
+    state.menuItems = state.menuItems.map((item) => String(item.id) === String(id) ? normalized : item);
+    return normalized;
   }
 
   function syncVisualPreview(card) {
@@ -827,11 +975,13 @@
     const description = card.querySelector("[data-preview-description]");
     const price = card.querySelector("[data-preview-price]");
     const image = card.querySelector("[data-preview-image]");
+    const tags = card.querySelector("[data-preview-tags]");
     if (nameKo) nameKo.textContent = payload.name_ko || payload.name_en || "Untitled";
     if (nameEn) nameEn.textContent = payload.name_en || "";
     if (description) description.textContent = payload.description || "No description";
     if (price) price.textContent = formatPrice(payload.price);
     if (image) image.src = payload.image_url || FALLBACK_IMAGE;
+    if (tags) tags.innerHTML = renderTagBadgesFromValues(payload.tags, payload.ingredient);
   }
 
   async function saveVisualCard(id) {
@@ -853,22 +1003,42 @@
     return (index + 1) * SORT_BASE_STEP;
   }
 
-  async function saveSortUpdates(updates) {
+  async function saveSortUpdates(updates, field = "sort_order") {
     if (!supabaseClient || !state.menuSession) {
       throw new Error("Sign in before saving sort.");
     }
     const results = await Promise.all(
       updates.map((item) => supabaseClient
         .from("menu_items")
-        .update({ sort_order: item.sort_order })
+        .update({ [field]: item[field] })
         .eq("id", item.id)
-        .select(MENU_SELECT)
+        .select(getMenuSelect())
         .single())
     );
     const failed = results.find((result) => result.error);
     if (failed) throw failed.error;
-    const byId = new Map(results.map((result) => [String(result.data.id), result.data]));
+    const byId = new Map(results.map((result) => [String(result.data.id), normalizeMenuItem(result.data)]));
     state.menuItems = state.menuItems.map((item) => byId.get(String(item.id)) || item);
+  }
+
+  async function saveAllOrder() {
+    if (!state.supportsAllSortOrder) {
+      setMenuStatus("Add the all_sort_order column in Supabase before saving All order.", "error");
+      return;
+    }
+    const rows = [...refs.menuAllOrderList.querySelectorAll("[data-menu-id]")];
+    const updates = rows.map((row, index) => ({
+      id: row.dataset.menuId,
+      all_sort_order: (index + 1) * 10
+    }));
+    setMenuStatus("Saving All order...");
+    try {
+      await saveSortUpdates(updates, "all_sort_order");
+      renderMenu();
+      setMenuStatus("All order saved.", "success");
+    } catch (error) {
+      setMenuStatus(error.message, "error");
+    }
   }
 
   async function saveCategoryOrder() {
@@ -888,12 +1058,12 @@
           });
         });
     });
-    setMenuStatus("Saving category order...");
+    setMenuStatus("Saving category button order...");
     try {
       await saveSortUpdates(updates);
       state.categoryOrder = categories;
       renderMenu();
-      setMenuStatus("Category order saved.", "success");
+      setMenuStatus("Category button order saved.", "success");
     } catch (error) {
       setMenuStatus(error.message, "error");
     }
@@ -919,7 +1089,7 @@
   }
 
   function moveRow(button, direction) {
-    const row = button.closest(".category-order-row, .menu-order-row");
+    const row = button.closest(".menu-order-row, .category-order-row");
     if (!row) return;
     if (direction === "up" && row.previousElementSibling) {
       row.parentElement.insertBefore(row, row.previousElementSibling);
@@ -996,15 +1166,15 @@
     const query = id
       ? supabaseClient.from("menu_items").update(payload).eq("id", id)
       : supabaseClient.from("menu_items").insert(payload);
-    const { data, error } = await query.select(MENU_SELECT).single();
+    const { data, error } = await query.select(getMenuSelect()).single();
     if (error) {
       setMenuStatus(error.message, "error");
       return;
     }
     if (id) {
-      state.menuItems = state.menuItems.map((item) => String(item.id) === String(id) ? data : item);
+      state.menuItems = state.menuItems.map((item) => String(item.id) === String(id) ? normalizeMenuItem(data) : item);
     } else {
-      state.menuItems = [...state.menuItems, data];
+      state.menuItems = [...state.menuItems, normalizeMenuItem(data)];
     }
     closeMenuEditor();
     syncCategoryOrder();
@@ -1095,6 +1265,52 @@
       renderMenu();
     });
     refs.menuList.addEventListener("click", (event) => {
+      const tokenToggle = event.target.closest("[data-token-toggle]");
+      if (tokenToggle) {
+        const group = tokenToggle.closest("[data-token-group]");
+        const input = group?.querySelector("[data-visual-field]");
+        if (input) {
+          tokenToggle.classList.toggle("is-selected");
+          input.value = [...group.querySelectorAll("[data-token-toggle].is-selected")]
+            .map((button) => button.dataset.tokenToggle)
+            .filter(Boolean)
+            .join(", ");
+          const card = tokenToggle.closest(".menu-preview-card");
+          if (card) syncVisualPreview(card);
+        }
+        return;
+      }
+      const tokenAdd = event.target.closest("[data-token-add]");
+      if (tokenAdd) {
+        const group = tokenAdd.closest("[data-token-group]");
+        const customInput = group?.querySelector("[data-token-custom]");
+        const value = customInput?.value.trim();
+        if (group && customInput && value) {
+          const existing = [...group.querySelectorAll("[data-token-toggle]")]
+            .find((button) => button.dataset.tokenToggle.toLowerCase() === value.toLowerCase());
+          if (existing) {
+            existing.classList.add("is-selected");
+          } else {
+            const button = document.createElement("button");
+            button.className = "option-chip is-selected";
+            button.type = "button";
+            button.dataset.tokenToggle = value;
+            button.textContent = value;
+            group.querySelector(".option-chip-row")?.appendChild(button);
+          }
+          customInput.value = "";
+          const input = group.querySelector("[data-visual-field]");
+          if (input) {
+            input.value = [...group.querySelectorAll("[data-token-toggle].is-selected")]
+              .map((button) => button.dataset.tokenToggle)
+              .filter(Boolean)
+              .join(", ");
+          }
+          const card = tokenAdd.closest(".menu-preview-card");
+          if (card) syncVisualPreview(card);
+        }
+        return;
+      }
       const saveButton = event.target.closest("[data-visual-save]");
       if (saveButton) {
         void saveVisualCard(saveButton.dataset.visualSave);
@@ -1113,6 +1329,10 @@
       const card = event.target.closest(".menu-preview-card");
       if (card) syncVisualPreview(card);
     });
+    refs.menuAllOrderList.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-order-move]");
+      if (button) moveRow(button, button.dataset.orderMove);
+    });
     refs.menuCategoryOrderList.addEventListener("click", (event) => {
       const button = event.target.closest("[data-order-move]");
       if (button) moveRow(button, button.dataset.orderMove);
@@ -1125,6 +1345,7 @@
       state.menuOrderCategory = event.target.value;
       renderMenuOrder();
     });
+    refs.menuSaveAllOrderBtn.addEventListener("click", () => void saveAllOrder());
     refs.menuSaveCategoryOrderBtn.addEventListener("click", () => void saveCategoryOrder());
     refs.menuSaveMenuOrderBtn.addEventListener("click", () => void saveMenuOrder());
 

@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -44,7 +44,7 @@
       inset: 0;
       background:
         linear-gradient(180deg, rgba(255, 252, 247, 0.2), rgba(255, 252, 247, 0.08)),
-        url("../assets/pattern.webp") center / 760px auto;
+        url("assets/pattern.webp") center / 760px auto;
       opacity: 0.16;
       pointer-events: none;
       z-index: -1;
@@ -158,7 +158,7 @@
       border-radius: var(--radius-xl);
       background:
         linear-gradient(135deg, rgba(22, 15, 11, 0.96) 0%, rgba(37, 23, 16, 0.94) 45%, rgba(68, 24, 33, 0.92) 100%),
-        url("../assets/pattern.webp") center / 520px auto;
+        url("assets/pattern.webp") center / 520px auto;
       color: #fff8f0;
       box-shadow: 0 28px 56px rgba(17, 11, 8, 0.18);
       margin-bottom: 16px;
@@ -240,7 +240,7 @@
       border-radius: var(--radius-xl);
       background:
         linear-gradient(180deg, rgba(255, 252, 247, 0.97), rgba(248, 241, 231, 0.96)),
-        url("../assets/pattern.webp") center / 440px auto;
+        url("assets/pattern.webp") center / 440px auto;
       box-shadow: var(--shadow);
       overflow: hidden;
     }
@@ -587,7 +587,7 @@
       border-radius: 24px;
       background:
         linear-gradient(180deg, rgba(255, 252, 247, 0.99), rgba(248, 241, 231, 0.98)),
-        url("../assets/pattern.webp") center / 440px auto;
+        url("assets/pattern.webp") center / 440px auto;
       box-shadow: 0 32px 72px rgba(11, 7, 5, 0.32);
     }
 
@@ -800,7 +800,7 @@
       border: 1px solid rgba(125, 98, 63, 0.14);
       background:
         linear-gradient(180deg, rgba(255, 252, 247, 0.94), rgba(249, 243, 233, 0.94)),
-        url("../assets/pattern.webp") center / 460px auto;
+        url("assets/pattern.webp") center / 460px auto;
       box-shadow: 0 20px 36px rgba(45, 30, 17, 0.08);
     }
 
@@ -901,6 +901,40 @@
     .menu-tag.vegan { background: rgba(84, 139, 42, 0.14); color: #3d6f21; }
     .menu-tag.seafood { background: rgba(47, 115, 187, 0.13); color: #255b94; }
 
+    .option-picker {
+      display: grid;
+      gap: 9px;
+    }
+
+    .option-chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .option-chip {
+      min-height: 34px;
+      padding: 0 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(113, 88, 60, 0.16);
+      background: rgba(255, 251, 245, 0.9);
+      color: #4f3823;
+      font-size: 0.78rem;
+      font-weight: 900;
+    }
+
+    .option-chip.is-selected {
+      border-color: rgba(123, 31, 47, 0.36);
+      background: rgba(123, 31, 47, 0.12);
+      color: var(--wine);
+    }
+
+    .custom-token-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+    }
+
     .preview-edit-grid {
       display: grid;
       gap: 10px;
@@ -943,17 +977,6 @@
       flex-wrap: wrap;
     }
 
-    .drag-handle {
-      min-width: 42px;
-      min-height: 42px;
-      border-radius: 14px;
-      border: 1px solid rgba(113, 88, 60, 0.14);
-      background: rgba(255, 251, 245, 0.9);
-      color: #4b3828;
-      font-weight: 900;
-      touch-action: none;
-    }
-
     .order-layout {
       display: grid;
       gap: 16px;
@@ -975,6 +998,7 @@
       letter-spacing: -0.02em;
     }
 
+    .all-order-list,
     .category-order-list,
     .menu-order-list {
       display: grid;
@@ -984,13 +1008,19 @@
     .category-order-row,
     .menu-order-row {
       display: grid;
-      grid-template-columns: auto minmax(0, 1fr) auto;
+      grid-template-columns: minmax(0, 1fr) auto;
       gap: 10px;
       align-items: center;
       padding: 10px;
       border-radius: 16px;
       border: 1px solid rgba(113, 88, 60, 0.12);
       background: rgba(255, 252, 247, 0.86);
+      cursor: grab;
+      touch-action: none;
+    }
+
+    .menu-order-row:active {
+      cursor: grabbing;
     }
 
     .order-row-title {
@@ -1041,7 +1071,7 @@
     <header class="topbar">
       <div class="brand">
         <a class="logo-link" href="./index.html" aria-label="EHWA home">
-          <img src="../assets/logo-dark.webp" alt="EHWA logo" />
+          <img src="assets/logo-dark.webp" alt="EHWA logo" />
         </a>
         <div class="brand-copy">
           <p>EHWA Admin</p>
@@ -1166,21 +1196,28 @@
           <section class="menu-mode-panel" id="menuOrderPanel">
             <div class="order-layout">
               <div class="order-box">
-                <h4>Category Order</h4>
+                <h4>All View Order</h4>
+                <div class="all-order-list" id="menuAllOrderList"></div>
+                <div class="order-actions">
+                  <button class="pill-btn primary" id="menuSaveAllOrderBtn" type="button">Save All Order</button>
+                </div>
+              </div>
+              <div class="order-box">
+                <h4>Category Button Order</h4>
                 <div class="category-order-list" id="menuCategoryOrderList"></div>
                 <div class="order-actions">
                   <button class="pill-btn primary" id="menuSaveCategoryOrderBtn" type="button">Save Category Order</button>
                 </div>
               </div>
               <div class="order-box">
-                <h4>Menu Order</h4>
+                <h4>Category View Order</h4>
                 <div class="field">
                   <label for="menuOrderCategory">Category</label>
                   <select id="menuOrderCategory"></select>
                 </div>
                 <div class="menu-order-list" id="menuOrderList"></div>
                 <div class="order-actions">
-                  <button class="pill-btn primary" id="menuSaveMenuOrderBtn" type="button">Save Menu Order</button>
+                  <button class="pill-btn primary" id="menuSaveMenuOrderBtn" type="button">Save Category Order</button>
                 </div>
               </div>
             </div>
@@ -1266,6 +1303,6 @@
     </div>
   </div>
 
-  <script src="../js/king-admin.js?v=20260511-1"></script>
+  <script src="../js/king-admin.js?v=20260511-2"></script>
 </body>
 </html>
