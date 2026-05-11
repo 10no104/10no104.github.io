@@ -979,8 +979,13 @@
 
     .order-layout {
       display: grid;
-      gap: 16px;
+      gap: 12px;
       padding: 18px;
+    }
+
+    .order-toolbar {
+      display: grid;
+      gap: 10px;
     }
 
     .order-box {
@@ -1008,19 +1013,26 @@
     .category-order-row,
     .menu-order-row {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 10px;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 4px;
       align-items: center;
-      padding: 10px;
-      border-radius: 16px;
+      padding: 8px 10px;
+      border-radius: 13px;
       border: 1px solid rgba(113, 88, 60, 0.12);
       background: rgba(255, 252, 247, 0.86);
       cursor: grab;
       touch-action: none;
     }
 
+    .category-order-row:active,
     .menu-order-row:active {
       cursor: grabbing;
+    }
+
+    .category-order-row strong,
+    .menu-order-row strong {
+      font-size: 0.92rem;
+      line-height: 1.25;
     }
 
     .order-row-title {
@@ -1195,29 +1207,17 @@
 
           <section class="menu-mode-panel" id="menuOrderPanel">
             <div class="order-layout">
-              <div class="order-box">
-                <h4>All View Order</h4>
-                <div class="all-order-list" id="menuAllOrderList"></div>
+              <div class="order-toolbar">
+                <div class="segmented menu-category-chips" id="menuOrderChips"></div>
                 <div class="order-actions">
-                  <button class="pill-btn primary" id="menuSaveAllOrderBtn" type="button">Save All Order</button>
+                  <button class="pill-btn" id="menuCategoryOrderBtn" type="button">Category Order</button>
                 </div>
               </div>
               <div class="order-box">
-                <h4>Category Button Order</h4>
-                <div class="category-order-list" id="menuCategoryOrderList"></div>
-                <div class="order-actions">
-                  <button class="pill-btn primary" id="menuSaveCategoryOrderBtn" type="button">Save Category Order</button>
-                </div>
-              </div>
-              <div class="order-box">
-                <h4>Category View Order</h4>
-                <div class="field">
-                  <label for="menuOrderCategory">Category</label>
-                  <select id="menuOrderCategory"></select>
-                </div>
+                <h4 id="menuOrderHeading">All View Order</h4>
                 <div class="menu-order-list" id="menuOrderList"></div>
                 <div class="order-actions">
-                  <button class="pill-btn primary" id="menuSaveMenuOrderBtn" type="button">Save Category Order</button>
+                  <button class="pill-btn primary" id="menuSaveMenuOrderBtn" type="button">Save Order</button>
                 </div>
               </div>
             </div>
@@ -1258,7 +1258,7 @@
           </div>
           <div class="field">
             <label for="menuEditLabel">Label</label>
-            <input id="menuEditLabel" name="label" type="text" />
+            <select id="menuEditLabel" name="label"></select>
           </div>
           <div class="field">
             <label for="menuEditBranch">Branch</label>
@@ -1280,13 +1280,13 @@
             <label for="menuEditImageUrl">Image URL</label>
             <input id="menuEditImageUrl" name="image_url" type="url" />
           </div>
-          <div class="field">
-            <label for="menuEditTags">Tags</label>
-            <input id="menuEditTags" name="tags" type="text" placeholder="Popular, Spicy2" />
+          <div class="field full">
+            <label>Tags</label>
+            <div id="menuEditTagsPicker"></div>
           </div>
-          <div class="field">
-            <label for="menuEditIngredient">Ingredient</label>
-            <input id="menuEditIngredient" name="ingredient" type="text" placeholder="Pork, Seafood" />
+          <div class="field full">
+            <label>Ingredient</label>
+            <div id="menuEditIngredientPicker"></div>
           </div>
           <label class="toggle-field" for="menuEditAvailable">
             <input id="menuEditAvailable" name="is_available" type="checkbox" />
@@ -1303,6 +1303,22 @@
     </div>
   </div>
 
-  <script src="js/king-admin.js?v=20260511-2"></script>
+  <div class="modal-backdrop" id="menuCategoryOrderModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="menuCategoryOrderTitle">
+      <div class="modal-head">
+        <h3 id="menuCategoryOrderTitle">Category Order</h3>
+        <button class="icon-btn" id="menuCategoryOrderClose" type="button" aria-label="Close">X</button>
+      </div>
+      <div class="modal-form">
+        <div class="category-order-list" id="menuCategoryOrderList"></div>
+        <div class="form-actions">
+          <button class="pill-btn" id="menuCategoryOrderCancel" type="button">Cancel</button>
+          <button class="pill-btn primary" id="menuSaveCategoryOrderBtn" type="button">Save Category Order</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/king-admin.js?v=20260511-3"></script>
 </body>
 </html>

@@ -98,7 +98,7 @@
     menuCategory: "all",
     menuBranch: "all",
     menuMode: "visual",
-    menuOrderCategory: "",
+    menuOrderView: "all",
     categoryOrder: [],
     supportsAllSortOrder: true,
     sortables: {
@@ -156,13 +156,16 @@
       "menuVisualPanel",
       "menuOrderPanel",
       "menuList",
-      "menuAllOrderList",
+      "menuOrderChips",
+      "menuOrderHeading",
+      "menuCategoryOrderBtn",
       "menuCategoryOrderList",
-      "menuOrderCategory",
       "menuOrderList",
-      "menuSaveAllOrderBtn",
       "menuSaveCategoryOrderBtn",
       "menuSaveMenuOrderBtn",
+      "menuCategoryOrderModal",
+      "menuCategoryOrderClose",
+      "menuCategoryOrderCancel",
       "menuEditorModal",
       "menuEditorTitle",
       "menuEditorForm",
@@ -488,8 +491,8 @@
     if (state.menuCategory !== "all" && !state.categoryOrder.includes(state.menuCategory)) {
       state.menuCategory = "all";
     }
-    if (!state.menuOrderCategory || !state.categoryOrder.includes(state.menuOrderCategory)) {
-      state.menuOrderCategory = state.categoryOrder[0] || "";
+    if (state.menuOrderView !== "all" && !state.categoryOrder.includes(state.menuOrderView)) {
+      state.menuOrderView = "all";
     }
   }
 
@@ -531,10 +534,6 @@
         <button class="chip-btn ${state.menuCategory === category ? "is-active" : ""}" data-menu-category="${escapeHtml(category)}" type="button">${escapeHtml(category)}</button>
       `)
     ].join("");
-    refs.menuOrderCategory.innerHTML = categories
-      .map((category) => `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`)
-      .join("");
-    refs.menuOrderCategory.value = state.menuOrderCategory || categories[0] || "";
     const datalist = byId("menuCategoryOptions");
     if (datalist) {
       datalist.innerHTML = categories.map((category) => `<option value="${escapeHtml(category)}"></option>`).join("");
@@ -694,12 +693,12 @@
     ].join("");
   }
 
-  function renderTokenPicker(field, value = "") {
+  function renderTokenPicker(field, value = "", attrName = "data-visual-field") {
     const selected = new Set(parseList(value));
     const options = getMenuOptionValues(field);
     return `
       <div class="option-picker" data-token-group="${escapeHtml(field)}">
-        <input data-visual-field="${escapeHtml(field)}" type="hidden" value="${escapeHtml(parseList(value).join(", "))}" />
+        <input ${attrName}="${escapeHtml(field)}" type="hidden" value="${escapeHtml(parseList(value).join(", "))}" />
         <div class="option-chip-row">
           ${options.map((option) => `
             <button class="option-chip ${selected.has(option) ? "is-selected" : ""}" data-token-toggle="${escapeHtml(option)}" type="button">${escapeHtml(option)}</button>
@@ -711,6 +710,11 @@
         </div>
       </div>
     `;
+  }
+
+  function renderEditorTokenPicker(containerId, field, value = "") {
+    const container = byId(containerId);
+    if (container) container.innerHTML = renderTokenPicker(field, value, "data-editor-field");
   }
 
   function branchOptions(current = "both") {
@@ -756,18 +760,6 @@
           <div class="preview-field">
             <label>Category</label>
             <select data-visual-field="category">${renderSelectOptions(getCategories(), item.category, "Select category")}</select>
-          </div>
-          <div class="preview-field">
-            <label>Label</label>
-            <select data-visual-field="label">${renderSelectOptions(getMenuOptionValues("label"), item.label, "No label")}</select>
-          </div>
-          <div class="preview-field full">
-            <label>Tags</label>
-            ${renderTokenPicker("tags", item.tags)}
-          </div>
-          <div class="preview-field full">
-            <label>Ingredient</label>
-            ${renderTokenPicker("ingredient", item.ingredient)}
           </div>
           <div class="preview-field full">
             <label>Description</label>
@@ -815,25 +807,6 @@
       : '<div class="empty-state">No menu items match this view.</div>';
   }
 
-  function renderAllOrder() {
-    const items = [...state.menuItems].sort(compareAllMenuItems);
-    refs.menuAllOrderList.innerHTML = items.length
-      ? items.map((item) => `
-        <article class="menu-order-row all-order-row" data-menu-id="${escapeHtml(item.id)}">
-          <div class="order-row-title">
-            <strong>${escapeHtml(item.name_ko || item.name_en || "Untitled")}</strong>
-            <span>${escapeHtml(item.category || "Uncategorized")} / ${escapeHtml(item.branches || "both")} / All ${escapeHtml(item.all_sort_order ?? "-")}</span>
-          </div>
-          <div class="sort-actions">
-            <button class="icon-btn" data-order-move="up" type="button" aria-label="Move up">Up</button>
-            <button class="icon-btn" data-order-move="down" type="button" aria-label="Move down">Dn</button>
-          </div>
-        </article>
-      `).join("")
-      : '<div class="empty-state">No menu items loaded.</div>';
-    setupSortable("all", refs.menuAllOrderList);
-  }
-
   function renderCategoryOrder() {
     refs.menuCategoryOrderList.innerHTML = state.categoryOrder.length
       ? state.categoryOrder.map((category) => {
@@ -844,10 +817,6 @@
               <strong>${escapeHtml(category)}</strong>
               <span>${count} items</span>
             </div>
-            <div class="sort-actions">
-              <button class="icon-btn" data-order-move="up" type="button" aria-label="Move up">Up</button>
-              <button class="icon-btn" data-order-move="down" type="button" aria-label="Move down">Dn</button>
-            </div>
           </article>
         `;
       }).join("")
@@ -855,34 +824,40 @@
     setupSortable("category", refs.menuCategoryOrderList);
   }
 
+  function renderOrderChips() {
+    const categories = getCategories();
+    refs.menuOrderChips.innerHTML = [
+      `<button class="chip-btn ${state.menuOrderView === "all" ? "is-active" : ""}" data-order-view="all" type="button">All</button>`,
+      ...categories.map((category) => `
+        <button class="chip-btn ${state.menuOrderView === category ? "is-active" : ""}" data-order-view="${escapeHtml(category)}" type="button">${escapeHtml(category)}</button>
+      `)
+    ].join("");
+  }
+
   function renderMenuOrder() {
-    const category = state.menuOrderCategory || state.categoryOrder[0] || "";
-    state.menuOrderCategory = category;
-    refs.menuOrderCategory.value = category;
-    const items = state.menuItems
-      .filter((item) => item.category === category)
-      .sort(compareMenuItems);
+    const isAll = state.menuOrderView === "all";
+    const items = isAll
+      ? [...state.menuItems].sort(compareAllMenuItems)
+      : state.menuItems
+        .filter((item) => item.category === state.menuOrderView)
+        .sort(compareMenuItems);
+    refs.menuOrderHeading.textContent = isAll ? "All View Order" : `${state.menuOrderView} Order`;
     refs.menuOrderList.innerHTML = items.length
       ? items.map((item) => `
         <article class="menu-order-row" data-menu-id="${escapeHtml(item.id)}">
           <div class="order-row-title">
             <strong>${escapeHtml(item.name_ko || item.name_en || "Untitled")}</strong>
-            <span>${escapeHtml(item.name_en || "")} / ${escapeHtml(item.branches || "both")} / Category ${escapeHtml(item.sort_order ?? "-")}</span>
-          </div>
-          <div class="sort-actions">
-            <button class="icon-btn" data-order-move="up" type="button" aria-label="Move up">Up</button>
-            <button class="icon-btn" data-order-move="down" type="button" aria-label="Move down">Dn</button>
+            <span>${escapeHtml(item.category || "Uncategorized")} / ${escapeHtml(item.name_en || "")} / ${escapeHtml(item.branches || "both")} / ${isAll ? `All ${escapeHtml(item.all_sort_order ?? "-")}` : `Category ${escapeHtml(item.sort_order ?? "-")}`}</span>
           </div>
         </article>
       `).join("")
-      : '<div class="empty-state">No items in this category.</div>';
+      : '<div class="empty-state">No items in this view.</div>';
     setupSortable("menu", refs.menuOrderList);
   }
 
   function renderOrderPanel() {
     destroySortable("visual");
-    renderAllOrder();
-    renderCategoryOrder();
+    renderOrderChips();
     renderMenuOrder();
   }
 
@@ -981,7 +956,56 @@
     if (description) description.textContent = payload.description || "No description";
     if (price) price.textContent = formatPrice(payload.price);
     if (image) image.src = payload.image_url || FALLBACK_IMAGE;
-    if (tags) tags.innerHTML = renderTagBadgesFromValues(payload.tags, payload.ingredient);
+    if (tags && ("tags" in payload || "ingredient" in payload)) {
+      tags.innerHTML = renderTagBadgesFromValues(payload.tags, payload.ingredient);
+    }
+  }
+
+  function updateTokenGroup(group) {
+    const input = group?.querySelector("[data-visual-field], [data-editor-field]");
+    if (!input) return;
+    input.value = [...group.querySelectorAll("[data-token-toggle].is-selected")]
+      .map((button) => button.dataset.tokenToggle)
+      .filter(Boolean)
+      .join(", ");
+  }
+
+  function handleTokenPickerClick(event) {
+    const tokenToggle = event.target.closest("[data-token-toggle]");
+    if (tokenToggle) {
+      const group = tokenToggle.closest("[data-token-group]");
+      tokenToggle.classList.toggle("is-selected");
+      updateTokenGroup(group);
+      const card = tokenToggle.closest(".menu-preview-card");
+      if (card) syncVisualPreview(card);
+      return true;
+    }
+
+    const tokenAdd = event.target.closest("[data-token-add]");
+    if (!tokenAdd) return false;
+
+    const group = tokenAdd.closest("[data-token-group]");
+    const customInput = group?.querySelector("[data-token-custom]");
+    const value = customInput?.value.trim();
+    if (group && customInput && value) {
+      const existing = [...group.querySelectorAll("[data-token-toggle]")]
+        .find((button) => button.dataset.tokenToggle.toLowerCase() === value.toLowerCase());
+      if (existing) {
+        existing.classList.add("is-selected");
+      } else {
+        const button = document.createElement("button");
+        button.className = "option-chip is-selected";
+        button.type = "button";
+        button.dataset.tokenToggle = value;
+        button.textContent = value;
+        group.querySelector(".option-chip-row")?.appendChild(button);
+      }
+      customInput.value = "";
+      updateTokenGroup(group);
+      const card = tokenAdd.closest(".menu-preview-card");
+      if (card) syncVisualPreview(card);
+    }
+    return true;
   }
 
   async function saveVisualCard(id) {
@@ -1021,26 +1045,6 @@
     state.menuItems = state.menuItems.map((item) => byId.get(String(item.id)) || item);
   }
 
-  async function saveAllOrder() {
-    if (!state.supportsAllSortOrder) {
-      setMenuStatus("Add the all_sort_order column in Supabase before saving All order.", "error");
-      return;
-    }
-    const rows = [...refs.menuAllOrderList.querySelectorAll("[data-menu-id]")];
-    const updates = rows.map((row, index) => ({
-      id: row.dataset.menuId,
-      all_sort_order: (index + 1) * 10
-    }));
-    setMenuStatus("Saving All order...");
-    try {
-      await saveSortUpdates(updates, "all_sort_order");
-      renderMenu();
-      setMenuStatus("All order saved.", "success");
-    } catch (error) {
-      setMenuStatus(error.message, "error");
-    }
-  }
-
   async function saveCategoryOrder() {
     const categories = [...refs.menuCategoryOrderList.querySelectorAll("[data-category]")]
       .map((row) => row.dataset.category)
@@ -1062,6 +1066,7 @@
     try {
       await saveSortUpdates(updates);
       state.categoryOrder = categories;
+      closeCategoryOrderModal();
       renderMenu();
       setMenuStatus("Category button order saved.", "success");
     } catch (error) {
@@ -1070,32 +1075,25 @@
   }
 
   async function saveMenuOrder() {
-    const category = state.menuOrderCategory;
-    if (!category) return;
     const rows = [...refs.menuOrderList.querySelectorAll("[data-menu-id]")];
-    const base = getSortBaseForCategory(category);
+    const isAll = state.menuOrderView === "all";
+    if (isAll && !state.supportsAllSortOrder) {
+      setMenuStatus("Add the all_sort_order column in Supabase before saving All order.", "error");
+      return;
+    }
+    const base = isAll ? 0 : getSortBaseForCategory(state.menuOrderView);
+    const field = isAll ? "all_sort_order" : "sort_order";
     const updates = rows.map((row, index) => ({
       id: row.dataset.menuId,
-      sort_order: base + (index + 1) * 10
+      [field]: base + (index + 1) * 10
     }));
-    setMenuStatus("Saving menu order...");
+    setMenuStatus(`Saving ${isAll ? "All" : state.menuOrderView} order...`);
     try {
-      await saveSortUpdates(updates);
+      await saveSortUpdates(updates, field);
       renderMenu();
-      setMenuStatus("Menu order saved.", "success");
+      setMenuStatus(`${isAll ? "All" : state.menuOrderView} order saved.`, "success");
     } catch (error) {
       setMenuStatus(error.message, "error");
-    }
-  }
-
-  function moveRow(button, direction) {
-    const row = button.closest(".menu-order-row, .category-order-row");
-    if (!row) return;
-    if (direction === "up" && row.previousElementSibling) {
-      row.parentElement.insertBefore(row, row.previousElementSibling);
-    }
-    if (direction === "down" && row.nextElementSibling) {
-      row.parentElement.insertBefore(row.nextElementSibling, row);
     }
   }
 
@@ -1109,13 +1107,14 @@
     byId("menuEditRomanizedName").value = item?.romanized_name ?? "";
     byId("menuEditPrice").value = item?.price ?? "";
     byId("menuEditCategory").value = item?.category ?? (state.menuCategory !== "all" ? state.menuCategory : "");
+    byId("menuEditLabel").innerHTML = renderSelectOptions(getMenuOptionValues("label"), item?.label ?? "", "No label");
     byId("menuEditLabel").value = item?.label ?? "";
     byId("menuEditBranch").value = item?.branches ?? "both";
     byId("menuEditSortOrder").value = item?.sort_order ?? "";
     byId("menuEditDescription").value = item?.description ?? "";
     byId("menuEditImageUrl").value = item?.image_url ?? "";
-    byId("menuEditTags").value = item?.tags ?? "";
-    byId("menuEditIngredient").value = item?.ingredient ?? "";
+    renderEditorTokenPicker("menuEditTagsPicker", "tags", item?.tags ?? "");
+    renderEditorTokenPicker("menuEditIngredientPicker", "ingredient", item?.ingredient ?? "");
     byId("menuEditAvailable").checked = item?.is_available !== false;
     refs.menuDeleteBtn.hidden = isNew;
     refs.menuEditorModal.classList.add("is-open");
@@ -1127,7 +1126,19 @@
     refs.menuEditorModal.setAttribute("aria-hidden", "true");
   }
 
+  function openCategoryOrderModal() {
+    renderCategoryOrder();
+    refs.menuCategoryOrderModal.classList.add("is-open");
+    refs.menuCategoryOrderModal.setAttribute("aria-hidden", "false");
+  }
+
+  function closeCategoryOrderModal() {
+    refs.menuCategoryOrderModal.classList.remove("is-open");
+    refs.menuCategoryOrderModal.setAttribute("aria-hidden", "true");
+  }
+
   function readMenuEditorPayload() {
+    const editorTokens = readPayloadFromContainer(refs.menuEditorForm, "data-editor-field");
     return coerceMenuPayload({
       name_ko: byId("menuEditNameKo").value,
       name_en: byId("menuEditNameEn").value,
@@ -1139,8 +1150,8 @@
       sort_order: byId("menuEditSortOrder").value,
       description: byId("menuEditDescription").value,
       image_url: byId("menuEditImageUrl").value,
-      tags: byId("menuEditTags").value,
-      ingredient: byId("menuEditIngredient").value,
+      tags: editorTokens.tags,
+      ingredient: editorTokens.ingredient,
       is_available: byId("menuEditAvailable").checked
     });
   }
@@ -1265,52 +1276,7 @@
       renderMenu();
     });
     refs.menuList.addEventListener("click", (event) => {
-      const tokenToggle = event.target.closest("[data-token-toggle]");
-      if (tokenToggle) {
-        const group = tokenToggle.closest("[data-token-group]");
-        const input = group?.querySelector("[data-visual-field]");
-        if (input) {
-          tokenToggle.classList.toggle("is-selected");
-          input.value = [...group.querySelectorAll("[data-token-toggle].is-selected")]
-            .map((button) => button.dataset.tokenToggle)
-            .filter(Boolean)
-            .join(", ");
-          const card = tokenToggle.closest(".menu-preview-card");
-          if (card) syncVisualPreview(card);
-        }
-        return;
-      }
-      const tokenAdd = event.target.closest("[data-token-add]");
-      if (tokenAdd) {
-        const group = tokenAdd.closest("[data-token-group]");
-        const customInput = group?.querySelector("[data-token-custom]");
-        const value = customInput?.value.trim();
-        if (group && customInput && value) {
-          const existing = [...group.querySelectorAll("[data-token-toggle]")]
-            .find((button) => button.dataset.tokenToggle.toLowerCase() === value.toLowerCase());
-          if (existing) {
-            existing.classList.add("is-selected");
-          } else {
-            const button = document.createElement("button");
-            button.className = "option-chip is-selected";
-            button.type = "button";
-            button.dataset.tokenToggle = value;
-            button.textContent = value;
-            group.querySelector(".option-chip-row")?.appendChild(button);
-          }
-          customInput.value = "";
-          const input = group.querySelector("[data-visual-field]");
-          if (input) {
-            input.value = [...group.querySelectorAll("[data-token-toggle].is-selected")]
-              .map((button) => button.dataset.tokenToggle)
-              .filter(Boolean)
-              .join(", ");
-          }
-          const card = tokenAdd.closest(".menu-preview-card");
-          if (card) syncVisualPreview(card);
-        }
-        return;
-      }
+      if (handleTokenPickerClick(event)) return;
       const saveButton = event.target.closest("[data-visual-save]");
       if (saveButton) {
         void saveVisualCard(saveButton.dataset.visualSave);
@@ -1329,26 +1295,20 @@
       const card = event.target.closest(".menu-preview-card");
       if (card) syncVisualPreview(card);
     });
-    refs.menuAllOrderList.addEventListener("click", (event) => {
-      const button = event.target.closest("[data-order-move]");
-      if (button) moveRow(button, button.dataset.orderMove);
-    });
-    refs.menuCategoryOrderList.addEventListener("click", (event) => {
-      const button = event.target.closest("[data-order-move]");
-      if (button) moveRow(button, button.dataset.orderMove);
-    });
-    refs.menuOrderList.addEventListener("click", (event) => {
-      const button = event.target.closest("[data-order-move]");
-      if (button) moveRow(button, button.dataset.orderMove);
-    });
-    refs.menuOrderCategory.addEventListener("change", (event) => {
-      state.menuOrderCategory = event.target.value;
+    refs.menuOrderChips.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-order-view]");
+      if (!button) return;
+      state.menuOrderView = button.dataset.orderView || "all";
+      renderOrderChips();
       renderMenuOrder();
     });
-    refs.menuSaveAllOrderBtn.addEventListener("click", () => void saveAllOrder());
+    refs.menuCategoryOrderBtn.addEventListener("click", openCategoryOrderModal);
     refs.menuSaveCategoryOrderBtn.addEventListener("click", () => void saveCategoryOrder());
     refs.menuSaveMenuOrderBtn.addEventListener("click", () => void saveMenuOrder());
 
+    refs.menuEditorForm.addEventListener("click", (event) => {
+      handleTokenPickerClick(event);
+    });
     refs.menuEditorForm.addEventListener("submit", (event) => void saveMenuEditor(event));
     refs.menuDeleteBtn.addEventListener("click", () => void deleteMenuItem());
     refs.menuEditorClose.addEventListener("click", closeMenuEditor);
@@ -1356,10 +1316,18 @@
     refs.menuEditorModal.addEventListener("click", (event) => {
       if (event.target === refs.menuEditorModal) closeMenuEditor();
     });
+    refs.menuCategoryOrderClose.addEventListener("click", closeCategoryOrderModal);
+    refs.menuCategoryOrderCancel.addEventListener("click", closeCategoryOrderModal);
+    refs.menuCategoryOrderModal.addEventListener("click", (event) => {
+      if (event.target === refs.menuCategoryOrderModal) closeCategoryOrderModal();
+    });
 
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape" && refs.menuEditorModal.classList.contains("is-open")) {
         closeMenuEditor();
+      }
+      if (event.key === "Escape" && refs.menuCategoryOrderModal.classList.contains("is-open")) {
+        closeCategoryOrderModal();
       }
     });
   }
