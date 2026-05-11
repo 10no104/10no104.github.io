@@ -215,7 +215,13 @@
     }
 
     .menu-page .menu-image {
+      background: rgba(44, 33, 22, 0.08);
       box-shadow: 0 16px 28px rgba(39, 22, 11, 0.14);
+      transition: opacity 0.2s ease;
+    }
+
+    .menu-page .menu-image.is-lazy {
+      opacity: 0.18;
     }
 
     .menu-page .menu-price-box {
@@ -1326,6 +1332,7 @@
     const POPULAR_CATEGORY = "Popular ⭐";
     const VEGAN_SUBOPTIONS = ["Seafood", "Egg", "Dairy"];
     const ONTARIO_HST_RATE = 0.13;
+    const MENU_IMAGE_PLACEHOLDER = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
 
     let allMenus = [];
     let cartItems = [];
@@ -1336,6 +1343,7 @@
     let isCartDrawerOpen = false;
     let isServerModalOpen = false;
     let selectedServerRequestType = "water";
+    let menuImageObserver = null;
 
     function escapeHtml(text = "") {
       return text
@@ -1344,6 +1352,42 @@
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#39;");
+    }
+
+    function loadMenuImage(image) {
+      const imageUrl = image.dataset.src;
+      if (!imageUrl) return;
+      image.src = imageUrl;
+      image.removeAttribute("data-src");
+      image.classList.remove("is-lazy");
+    }
+
+    function initLazyMenuImages(container) {
+      if (menuImageObserver) {
+        menuImageObserver.disconnect();
+        menuImageObserver = null;
+      }
+
+      const images = [...container.querySelectorAll("img[data-src]")];
+      if (!images.length) return;
+
+      if (!("IntersectionObserver" in window)) {
+        images.forEach(loadMenuImage);
+        return;
+      }
+
+      menuImageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          loadMenuImage(entry.target);
+          observer.unobserve(entry.target);
+        });
+      }, {
+        rootMargin: "640px 0px",
+        threshold: 0.01
+      });
+
+      images.forEach((image) => menuImageObserver.observe(image));
     }
 
     function getTagKey(label = "") {
@@ -2168,6 +2212,7 @@
 
       if (!filtered.length) {
         menuListEl.innerHTML = `<div class="empty">No menu items found in this category.</div>`;
+        initLazyMenuImages(menuListEl);
         return;
       }
 
@@ -2181,7 +2226,7 @@
 
           return `
             <article class="menu-card">
-              <img class="menu-image" src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.nameEn || item.nameKo)}" />
+              <img class="menu-image is-lazy" src="${MENU_IMAGE_PLACEHOLDER}" data-src="${escapeHtml(item.imageUrl || MENU_IMAGE_PLACEHOLDER)}" alt="${escapeHtml(item.nameEn || item.nameKo)}" loading="lazy" decoding="async" fetchpriority="low" />
               <div class="menu-content">
                 <p class="menu-title name-ko">${escapeHtml(item.nameKo)}</p>
                 <p class="menu-title menu-title-alt name-en">${escapeHtml(item.nameEn)}</p>
@@ -2205,6 +2250,7 @@
           addToCart(menuId);
         });
       });
+      initLazyMenuImages(menuListEl);
     }
 
     function setupToTopButton() {
