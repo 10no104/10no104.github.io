@@ -954,47 +954,6 @@
       touch-action: none;
     }
 
-    .detail-grid-scroller {
-      overflow-x: auto;
-      padding: 18px;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .detail-grid {
-      display: grid;
-      gap: 8px;
-      min-width: 1320px;
-    }
-
-    .detail-grid-row {
-      display: grid;
-      grid-template-columns: 62px 90px 130px 130px 148px 170px 150px 170px 90px 210px 180px 150px 150px 118px;
-      gap: 8px;
-      align-items: start;
-    }
-
-    .detail-grid-row.is-head {
-      color: var(--muted);
-      font-size: 0.74rem;
-      font-weight: 900;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .detail-grid-row input,
-    .detail-grid-row select,
-    .detail-grid-row textarea {
-      min-height: 42px;
-      padding: 9px 10px;
-      border-radius: 10px;
-      font-size: 0.84rem;
-    }
-
-    .detail-grid-row textarea {
-      min-height: 42px;
-      resize: vertical;
-    }
-
     .order-layout {
       display: grid;
       gap: 16px;
@@ -1128,19 +1087,12 @@
         <div class="toolbar">
           <div class="segmented" id="reservationDayChips"></div>
           <div class="branch-chip-row" id="reservationBranchChips" aria-label="Reservation branch filter">
-            <button class="branch-chip is-active" data-reservation-branch="all" type="button">All Branches</button>
+            <button class="branch-chip is-active" data-reservation-branch="all" type="button">Both</button>
             <button class="branch-chip" data-reservation-branch="downtown" type="button">Downtown</button>
             <button class="branch-chip" data-reservation-branch="uptown" type="button">Uptown</button>
           </div>
-          <div class="field-grid">
-            <div class="field">
-              <label for="reservationSearchInput">Search</label>
-              <input id="reservationSearchInput" type="search" placeholder="Name, phone, notes" />
-            </div>
-            <div class="field">
-              <label>&nbsp;</label>
-              <button class="pill-btn" id="reservationRefreshBtn" type="button">Refresh Reservations</button>
-            </div>
+          <div class="segmented">
+            <button class="pill-btn" id="reservationRefreshBtn" type="button">Refresh Reservations</button>
           </div>
           <div class="status-line" id="reservationStatus"></div>
         </div>
@@ -1202,30 +1154,13 @@
           </div>
 
           <div class="segmented menu-mode-tabs" id="menuModeTabs" aria-label="Menu edit mode">
-            <button class="chip-btn is-active" data-menu-mode="visual" type="button">Visual Edit</button>
-            <button class="chip-btn" data-menu-mode="detail" type="button">Detail Grid</button>
+            <button class="chip-btn is-active" data-menu-mode="visual" type="button">Edit</button>
             <button class="chip-btn" data-menu-mode="order" type="button">Order</button>
           </div>
 
           <section class="menu-mode-panel is-active" id="menuVisualPanel">
             <div class="segmented menu-category-chips" id="menuCategoryChips"></div>
-            <div class="toolbar">
-              <div class="segmented">
-                <button class="chip-btn" id="menuSaveVisualOrderBtn" type="button">Save Visible Order</button>
-              </div>
-            </div>
             <div class="menu-list menu-preview-list" id="menuList"></div>
-          </section>
-
-          <section class="menu-mode-panel" id="menuDetailPanel">
-            <div class="toolbar">
-              <div class="segmented">
-                <button class="chip-btn primary" id="menuSaveDetailBtn" type="button">Save Visible Details</button>
-              </div>
-            </div>
-            <div class="detail-grid-scroller">
-              <div class="detail-grid" id="menuDetailGrid"></div>
-            </div>
           </section>
 
           <section class="menu-mode-panel" id="menuOrderPanel">

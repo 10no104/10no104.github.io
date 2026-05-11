@@ -110,7 +110,6 @@
       "reservationDateLabel",
       "reservationDayChips",
       "reservationBranchChips",
-      "reservationSearchInput",
       "reservationRefreshBtn",
       "reservationStatus",
       "reservationList",
@@ -131,12 +130,8 @@
       "menuModeTabs",
       "menuCategoryChips",
       "menuVisualPanel",
-      "menuDetailPanel",
       "menuOrderPanel",
-      "menuSaveVisualOrderBtn",
       "menuList",
-      "menuDetailGrid",
-      "menuSaveDetailBtn",
       "menuCategoryOrderList",
       "menuOrderCategory",
       "menuOrderList",
@@ -270,6 +265,7 @@
   function renderReservationDayChips() {
     const days = getReservationDays();
     refs.reservationDayChips.innerHTML = [
+      `<button class="chip-btn ${state.reservationDate === "all" ? "is-active" : ""}" data-reservation-date="all" type="button">All</button>`,
       ...days.map((value, index) => {
         const date = toSafeDate(value);
         const weekdayLabel = index === 0 ? "Today" : new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date);
@@ -280,8 +276,7 @@
             <span>${escapeHtml(dayLabel)}</span>
           </button>
         `;
-      }),
-      `<button class="chip-btn ${state.reservationDate === "all" ? "is-active" : ""}" data-reservation-date="all" type="button">All Days</button>`
+      })
     ].join("");
   }
 
@@ -292,15 +287,11 @@
   }
 
   function getVisibleReservations() {
-    const query = state.reservationSearch.trim().toLowerCase();
     return state.reservations.filter((item) => {
       if (item.status === "removed") return false;
       if (state.reservationDate !== "all" && item.date !== state.reservationDate) return false;
       if (state.reservationBranch !== "all" && item.branchKey !== state.reservationBranch) return false;
-      if (!query) return true;
-      return [item.name, item.phone, item.notes, item.time, item.people, item.branch]
-        .filter(Boolean)
-        .some((value) => String(value).toLowerCase().includes(query));
+      return true;
     });
   }
 
@@ -311,7 +302,7 @@
     refs.metricReservations.textContent = String(items.length);
     refs.metricDowntown.textContent = String(downtown);
     refs.metricUptown.textContent = String(uptown);
-    const branchLabel = state.reservationBranch === "all" ? "All branches" : formatBranchLabel(state.reservationBranch);
+    const branchLabel = state.reservationBranch === "all" ? "Both" : formatBranchLabel(state.reservationBranch);
     refs.reservationDateLabel.textContent = `${formatDateLabel(state.reservationDate)} / ${branchLabel}`;
   }
 
@@ -631,7 +622,6 @@
             </div>
           </div>
           <div class="preview-actions">
-            <button class="drag-handle" type="button" aria-label="Drag menu item">Move</button>
             <button class="pill-btn" data-menu-edit="${escapeHtml(item.id)}" type="button">Full Edit</button>
             <button class="pill-btn primary" data-visual-save="${escapeHtml(item.id)}" type="button">Save Card</button>
           </div>
@@ -690,53 +680,11 @@
   function renderVisualMenu() {
     destroySortable("category");
     destroySortable("menu");
+    destroySortable("visual");
     const items = getVisibleMenuItems();
     refs.menuList.innerHTML = items.length
       ? items.map(renderVisualMenuCard).join("")
       : '<div class="empty-state">No menu items match this view.</div>';
-    if (state.menuCategory !== "all" && !state.menuSearch.trim() && state.menuBranch === "all") {
-      setupSortable("visual", refs.menuList, ".drag-handle");
-    } else {
-      destroySortable("visual");
-    }
-  }
-
-  function renderDetailGrid() {
-    destroySortable("visual");
-    destroySortable("category");
-    destroySortable("menu");
-    const items = getVisibleMenuItems();
-    if (!items.length) {
-      refs.menuDetailGrid.innerHTML = '<div class="empty-state">No rows match this view.</div>';
-      return;
-    }
-    const header = `
-      <div class="detail-grid-row is-head">
-        <div>ID</div><div>Branch</div><div>Sort</div><div>Category</div><div>Label</div><div>Korean</div><div>Romanized</div><div>English</div><div>Price</div><div>Image URL</div><div>Description</div><div>Tags</div><div>Ingredient</div><div>Visible</div>
-      </div>
-    `;
-    const rows = items.map((item) => `
-      <div class="detail-grid-row" data-menu-id="${escapeHtml(item.id)}">
-        <input value="${escapeHtml(item.id)}" readonly />
-        <select data-grid-field="branches">${branchOptions(item.branches)}</select>
-        <input data-grid-field="sort_order" type="number" value="${escapeHtml(item.sort_order ?? "")}" />
-        <input data-grid-field="category" type="text" value="${escapeHtml(item.category || "")}" />
-        <input data-grid-field="label" type="text" value="${escapeHtml(item.label || "")}" />
-        <input data-grid-field="name_ko" type="text" value="${escapeHtml(item.name_ko || "")}" />
-        <input data-grid-field="romanized_name" type="text" value="${escapeHtml(item.romanized_name || "")}" />
-        <input data-grid-field="name_en" type="text" value="${escapeHtml(item.name_en || "")}" />
-        <input data-grid-field="price" type="number" step="0.01" min="0" value="${escapeHtml(item.price ?? "")}" />
-        <input data-grid-field="image_url" type="url" value="${escapeHtml(item.image_url || "")}" />
-        <textarea data-grid-field="description">${escapeHtml(item.description || "")}</textarea>
-        <input data-grid-field="tags" type="text" value="${escapeHtml(item.tags || "")}" />
-        <input data-grid-field="ingredient" type="text" value="${escapeHtml(item.ingredient || "")}" />
-        <div class="preview-actions">
-          <input data-grid-field="is_available" type="checkbox" ${item.is_available === false ? "" : "checked"} aria-label="Visible" />
-          <button class="icon-btn primary" data-grid-save="${escapeHtml(item.id)}" type="button" aria-label="Save row">OK</button>
-        </div>
-      </div>
-    `).join("");
-    refs.menuDetailGrid.innerHTML = header + rows;
   }
 
   function renderCategoryOrder() {
@@ -797,7 +745,6 @@
       button.classList.toggle("is-active", button.dataset.menuMode === state.menuMode);
     });
     refs.menuVisualPanel.classList.toggle("is-active", state.menuMode === "visual");
-    refs.menuDetailPanel.classList.toggle("is-active", state.menuMode === "detail");
     refs.menuOrderPanel.classList.toggle("is-active", state.menuMode === "order");
   }
 
@@ -811,9 +758,7 @@
       destroySortable("menu");
       return;
     }
-    if (state.menuMode === "detail") {
-      renderDetailGrid();
-    } else if (state.menuMode === "order") {
+    if (state.menuMode === "order") {
       renderOrderPanel();
     } else {
       renderVisualMenu();
@@ -903,26 +848,6 @@
     }
   }
 
-  async function saveDetailRow(row) {
-    const id = row.dataset.menuId;
-    if (!id) return null;
-    return updateMenuItem(id, readPayloadFromContainer(row, "data-grid-field"));
-  }
-
-  async function saveDetailRows(rows) {
-    const targetRows = rows.length ? rows : [...refs.menuDetailGrid.querySelectorAll(".detail-grid-row[data-menu-id]")];
-    if (!targetRows.length) return;
-    setMenuStatus(`Saving ${targetRows.length} row${targetRows.length === 1 ? "" : "s"}...`);
-    try {
-      await Promise.all(targetRows.map((row) => saveDetailRow(row)));
-      syncCategoryOrder();
-      renderMenu();
-      setMenuStatus("Details saved.", "success");
-    } catch (error) {
-      setMenuStatus(error.message, "error");
-    }
-  }
-
   function getSortBaseForCategory(category) {
     const index = Math.max(state.categoryOrder.indexOf(category), 0);
     return (index + 1) * SORT_BASE_STEP;
@@ -944,33 +869,6 @@
     if (failed) throw failed.error;
     const byId = new Map(results.map((result) => [String(result.data.id), result.data]));
     state.menuItems = state.menuItems.map((item) => byId.get(String(item.id)) || item);
-  }
-
-  async function saveVisualOrder() {
-    if (state.menuCategory === "all") {
-      setMenuStatus("Choose one category before saving visible order.", "error");
-      return;
-    }
-    if (state.menuSearch.trim() || state.menuBranch !== "all") {
-      setMenuStatus("Clear search and set branch to All before saving visible order.", "error");
-      return;
-    }
-    const rows = [...refs.menuList.querySelectorAll(".menu-preview-card[data-menu-id]")];
-    if (!rows.length) return;
-    const base = getSortBaseForCategory(state.menuCategory);
-    const updates = rows.map((row, index) => ({
-      id: row.dataset.menuId,
-      sort_order: base + (index + 1) * 10
-    }));
-    setMenuStatus("Saving visible order...");
-    try {
-      await saveSortUpdates(updates);
-      syncCategoryOrder();
-      renderMenu();
-      setMenuStatus("Visible order saved.", "success");
-    } catch (error) {
-      setMenuStatus(error.message, "error");
-    }
   }
 
   async function saveCategoryOrder() {
@@ -1160,10 +1058,6 @@
       state.reservationBranch = button.dataset.reservationBranch;
       renderReservations();
     });
-    refs.reservationSearchInput.addEventListener("input", (event) => {
-      state.reservationSearch = event.target.value;
-      renderReservations();
-    });
     refs.reservationRefreshBtn.addEventListener("click", () => void fetchReservations());
 
     refs.menuSignInBtn.addEventListener("click", () => void signInMenuAdmin());
@@ -1219,14 +1113,6 @@
       const card = event.target.closest(".menu-preview-card");
       if (card) syncVisualPreview(card);
     });
-    refs.menuSaveVisualOrderBtn.addEventListener("click", () => void saveVisualOrder());
-    refs.menuDetailGrid.addEventListener("click", (event) => {
-      const saveButton = event.target.closest("[data-grid-save]");
-      if (!saveButton) return;
-      const row = saveButton.closest(".detail-grid-row[data-menu-id]");
-      if (row) void saveDetailRows([row]);
-    });
-    refs.menuSaveDetailBtn.addEventListener("click", () => void saveDetailRows([]));
     refs.menuCategoryOrderList.addEventListener("click", (event) => {
       const button = event.target.closest("[data-order-move]");
       if (button) moveRow(button, button.dataset.orderMove);
