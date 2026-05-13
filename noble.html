@@ -344,7 +344,7 @@
 
     .history-table th,
     .history-table td {
-      padding: 13px 12px;
+      padding: 13px 10px;
       border-bottom: 1px solid rgba(113, 88, 60, 0.12);
       text-align: right;
       font-size: 0.93rem;
@@ -363,23 +363,16 @@
     .history-table th:first-child,
     .history-table td:first-child {
       text-align: left;
+      padding-left: 16px;
     }
 
-    .history-table th:nth-child(1),
-    .history-table td:nth-child(1) { width: 18%; }
+    .history-table th:last-child,
+    .history-table td:last-child {
+      padding-right: 16px;
+    }
 
-    .history-table th:nth-child(2),
-    .history-table td:nth-child(2) { width: 15%; }
-
-    .history-table th:nth-child(3),
-    .history-table td:nth-child(3) { width: 22%; }
-
-    .history-table th:nth-child(4),
-    .history-table td:nth-child(4) { width: 22%; }
-
-    .history-table th:nth-child(5),
-    .history-table td:nth-child(5) {
-      width: 23%;
+    .history-table th:last-child,
+    .history-table td:last-child {
       color: #7b6d62;
     }
 
@@ -595,8 +588,8 @@
 
       .history-table th,
       .history-table td {
-        padding: 9px 3px;
-        font-size: 0.74rem;
+        padding: 9px 4px;
+        font-size: 0.73rem;
       }
 
       .history-table th {
@@ -604,21 +597,14 @@
         letter-spacing: 0.02em;
       }
 
-      .history-table th:nth-child(1),
-      .history-table td:nth-child(1) { width: 20%; }
+      .history-table th:first-child,
+      .history-table td:first-child {
+        padding-left: 10px;
+      }
 
-      .history-table th:nth-child(2),
-      .history-table td:nth-child(2) { width: 14%; }
-
-      .history-table th:nth-child(3),
-      .history-table td:nth-child(3) { width: 20%; }
-
-      .history-table th:nth-child(4),
-      .history-table td:nth-child(4) { width: 20%; }
-
-      .history-table th:nth-child(5),
-      .history-table td:nth-child(5) {
-        width: 26%;
+      .history-table th:last-child,
+      .history-table td:last-child {
+        padding-right: 10px;
         font-size: 0.68rem;
       }
 
@@ -1074,6 +1060,13 @@
               </button>
               <div class="period-details">
                 <table class="history-table">
+                  <colgroup>
+                    <col style="width: 20%;" />
+                    <col style="width: 15%;" />
+                    <col style="width: 21%;" />
+                    <col style="width: 20%;" />
+                    <col style="width: 24%;" />
+                  </colgroup>
                   <thead>
                     <tr>
                       <th>Date</th>
