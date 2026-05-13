@@ -40,7 +40,32 @@ function doPost(e) {
 }
 
 function handleCreate_(params) {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(5000);
+
+  try {
+    return createReservation_(params);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function createReservation_(params) {
   const sheet = getSheet_(params.sheetName);
+  const duplicate = findDuplicateReservation_(sheet, params);
+  if (duplicate) {
+    const duplicateResult = resolveDuplicateReservation_(sheet, duplicate, params);
+    return {
+      ok: true,
+      duplicate: true,
+      skipped: duplicateResult.skipped,
+      updated: duplicateResult.updated,
+      action: "create",
+      sheetName: sheet.getName(),
+      rowNumber: duplicate.rowNumber
+    };
+  }
+
   const row = [];
   row[COLUMN.timestamp - 1] = new Date();
   row[COLUMN.date - 1] = getText_(params.date);
@@ -61,6 +86,64 @@ function handleCreate_(params) {
     sheetName: sheet.getName(),
     rowNumber: sheet.getLastRow()
   };
+}
+
+function resolveDuplicateReservation_(sheet, duplicate, params) {
+  const values = ensureWidth_(duplicate.values, COLUMN.tableAssignment);
+  const existingNotes = getText_(values[COLUMN.notes - 1]);
+  const incomingNotes = getText_(params.notes);
+  const nextNotes = chooseBestNotes_(existingNotes, incomingNotes);
+
+  if (nextNotes !== existingNotes) {
+    values[COLUMN.notes - 1] = nextNotes;
+    writeRowValues_(sheet, duplicate.rowNumber, values);
+    return {
+      skipped: false,
+      updated: true
+    };
+  }
+
+  return {
+    skipped: true,
+    updated: false
+  };
+}
+
+function findDuplicateReservation_(sheet, params) {
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return null;
+
+  const incomingKey = getDuplicateKey_({
+    date: params.date,
+    time: params.time,
+    people: params.people,
+    name: params.name,
+    phone: params.phone
+  });
+
+  const rows = sheet.getRange(2, 1, lastRow - 1, COLUMN.tableAssignment).getValues();
+  for (var index = 0; index < rows.length; index += 1) {
+    const row = ensureWidth_(rows[index], COLUMN.tableAssignment);
+    const status = getText_(row[COLUMN.status - 1]).toLowerCase();
+    if (status === "removed" || status === "canceled" || status === "cancelled") continue;
+
+    const rowKey = getDuplicateKey_({
+      date: row[COLUMN.date - 1],
+      time: row[COLUMN.time - 1],
+      people: row[COLUMN.people - 1],
+      name: row[COLUMN.name - 1],
+      phone: row[COLUMN.phone - 1]
+    });
+
+    if (rowKey === incomingKey) {
+      return {
+        rowNumber: index + 2,
+        values: row
+      };
+    }
+  }
+
+  return null;
 }
 
 function handleUpdate_(params) {
@@ -168,6 +251,48 @@ function ensureWidth_(values, width) {
   const row = Array.isArray(values) ? values.slice(0, width) : [];
   while (row.length < width) row.push("");
   return row;
+}
+
+function getDuplicateKey_(reservation) {
+  return [
+    normalizeTextKey_(reservation.date),
+    normalizeTextKey_(reservation.time),
+    normalizeGuestKey_(reservation.people),
+    normalizeTextKey_(reservation.name),
+    normalizePhoneKey_(reservation.phone)
+  ].join("::");
+}
+
+function chooseBestNotes_(existingNotes, incomingNotes) {
+  const existing = getText_(existingNotes);
+  const incoming = getText_(incomingNotes);
+  const existingKey = normalizeTextKey_(existing);
+  const incomingKey = normalizeTextKey_(incoming);
+
+  if (!incomingKey || incomingKey === "-") return existing;
+  if (!existingKey || existingKey === "-") return incoming;
+  if (existingKey === incomingKey) return existing;
+  if (existingKey.indexOf(incomingKey) !== -1) return existing;
+  if (incomingKey.indexOf(existingKey) !== -1) return incoming;
+
+  return existing.length >= incoming.length
+    ? existing + " / " + incoming
+    : incoming + " / " + existing;
+}
+
+function normalizeTextKey_(value) {
+  return getText_(value).toLowerCase().replace(/\s+/g, " ");
+}
+
+function normalizeGuestKey_(value) {
+  const digits = getText_(value).replace(/\D/g, "");
+  return digits || normalizeTextKey_(value);
+}
+
+function normalizePhoneKey_(value) {
+  let digits = getText_(value).replace(/\D/g, "");
+  if (digits.charAt(0) === "1" && digits.length === 11) digits = digits.slice(1);
+  return digits;
 }
 
 function getText_(value) {
