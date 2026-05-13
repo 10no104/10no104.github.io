@@ -196,6 +196,12 @@
       gap: 8px;
     }
 
+    .lookup-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
     .lookup-row input {
       min-width: 0;
       width: 100%;
@@ -217,6 +223,16 @@
     .lookup-card .pill-btn {
       min-height: 48px;
       padding: 0 18px;
+    }
+
+    .lookup-card .pill-btn.secondary {
+      min-height: 36px;
+      padding: 0 12px;
+      border-color: rgba(255, 230, 185, 0.16);
+      background: rgba(255, 248, 238, 0.12);
+      color: #fff2dd;
+      font-size: 0.84rem;
+      box-shadow: none;
     }
 
     .lookup-status {
@@ -524,6 +540,14 @@
         width: 100%;
       }
 
+      .lookup-actions {
+        justify-content: stretch;
+      }
+
+      .lookup-card .pill-btn.secondary {
+        width: 100%;
+      }
+
       .profile-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 8px;
@@ -619,6 +643,9 @@
           <input id="staffIdInput" name="staffId" type="text" autocomplete="off" placeholder="고유 번호 입력" />
           <button class="pill-btn primary" type="submit">조회</button>
         </div>
+        <div class="lookup-actions">
+          <button class="pill-btn secondary" id="clearSavedRefBtn" type="button">초기화</button>
+        </div>
         <p class="lookup-status" id="lookupStatus">Loading...</p>
       </form>
     </section>
@@ -679,6 +706,7 @@
         anonKey: "sb_publishable_3Ox2JIQXVLwusT-xzIMJ4g_YXTR5q8e"
       };
       const SOURCE_BRANCH = "Downtown";
+      const SAVED_REF_KEY = "ehwa:noble:ref-code";
       const BASE_COLUMN_COUNT = 7;
       const MONEY_FORMAT = new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       const HOUR_FORMAT = new Intl.NumberFormat("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -701,6 +729,7 @@
         [
           "lookupForm",
           "staffIdInput",
+          "clearSavedRefBtn",
           "lookupStatus",
           "profilePanel",
           "profileTitle",
@@ -944,6 +973,30 @@
         refs.lookupStatus.textContent = message;
       }
 
+      function getSavedRefCode() {
+        try {
+          return window.localStorage.getItem(SAVED_REF_KEY) || "";
+        } catch (error) {
+          return "";
+        }
+      }
+
+      function saveRefCode(value = "") {
+        try {
+          window.localStorage.setItem(SAVED_REF_KEY, String(value).trim());
+        } catch (error) {
+          // Private browsing or storage restrictions can block this.
+        }
+      }
+
+      function clearSavedRefCode() {
+        try {
+          window.localStorage.removeItem(SAVED_REF_KEY);
+        } catch (error) {
+          // Private browsing or storage restrictions can block this.
+        }
+      }
+
       function setEmpty(message) {
         state.periods = [];
         state.openPeriodKey = null;
@@ -1073,7 +1126,7 @@
           setStatus("Ready");
 
           const params = new URLSearchParams(window.location.search);
-          const initialId = params.get("id");
+          const initialId = params.get("id") || getSavedRefCode();
           if (initialId) {
             refs.staffIdInput.value = initialId;
             handleLookup(initialId);
@@ -1108,6 +1161,7 @@
             return;
           }
 
+          saveRefCode(input);
           renderProfile(staff, access);
         } catch (error) {
           console.error(error);
@@ -1130,6 +1184,18 @@
         refs.lookupForm.addEventListener("submit", (event) => {
           event.preventDefault();
           submitLookup();
+        });
+
+        refs.clearSavedRefBtn.addEventListener("click", () => {
+          clearSavedRefCode();
+          refs.staffIdInput.value = "";
+          state.periods = [];
+          state.openPeriodKey = null;
+          refs.profilePanel.classList.add("is-hidden");
+          refs.historyPanel.classList.add("is-hidden");
+          refs.emptyPanel.classList.remove("is-hidden");
+          refs.emptyMessage.textContent = "Reference code를 입력해주세요.";
+          setStatus("Cleared");
         });
 
         refs.periodList.addEventListener("click", (event) => {
