@@ -48,11 +48,10 @@
       background:
         radial-gradient(circle at top left, rgba(212, 175, 55, 0.14), transparent 28%),
         radial-gradient(circle at 86% 12%, rgba(123, 31, 47, 0.18), transparent 24%),
-        linear-gradient(180deg, rgba(255, 252, 247, 0.06), rgba(255, 252, 247, 0.02)),
-        url("assets/pattern.webp") center / 760px auto;
+        linear-gradient(180deg, rgba(255, 252, 247, 0.055), rgba(255, 252, 247, 0.018)),
         linear-gradient(180deg, #120d0a 0%, #1d130f 42%, #261712 100%);
-      background-repeat: no-repeat, no-repeat, no-repeat, repeat, no-repeat;
-      background-size: auto, auto, auto, 760px auto, cover;
+      background-repeat: no-repeat;
+      background-size: auto, auto, auto, cover;
       min-height: 100vh;
       min-height: 100dvh;
     }
@@ -260,7 +259,9 @@
     .panel {
       border: 1px solid var(--line);
       border-radius: var(--radius-xl);
-      background: var(--paper);
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.97), rgba(248, 241, 231, 0.96)),
+        url("assets/pattern.webp") center / 520px auto;
       color: var(--ink);
       box-shadow: var(--shadow);
       overflow: hidden;
@@ -390,7 +391,9 @@
     .period-card {
       border: 1px solid rgba(113, 88, 60, 0.14);
       border-radius: var(--radius-lg);
-      background: linear-gradient(180deg, rgba(255, 254, 250, 0.94), rgba(249, 241, 230, 0.9));
+      background:
+        linear-gradient(180deg, rgba(255, 254, 250, 0.94), rgba(249, 241, 230, 0.9)),
+        url("assets/pattern.webp") center / 420px auto;
       overflow: hidden;
       transition: border-color 160ms ease, box-shadow 160ms ease;
     }
@@ -518,6 +521,12 @@
           linear-gradient(180deg, #120d0a 0%, #1d130f 42%, #261712 100%);
         background-repeat: no-repeat;
         background-size: auto, auto, cover;
+      }
+
+      .panel,
+      .period-card {
+        background:
+          linear-gradient(180deg, rgba(255, 252, 247, 0.97), rgba(248, 241, 231, 0.96));
       }
 
       .shell {
