@@ -332,7 +332,7 @@
 
     .history-table {
       width: 100%;
-      min-width: 680px;
+      min-width: 0;
       border-collapse: collapse;
       border-spacing: 0;
       overflow: hidden;
@@ -358,9 +358,7 @@
     }
 
     .history-table th:first-child,
-    .history-table td:first-child,
-    .history-table th:nth-child(2),
-    .history-table td:nth-child(2) {
+    .history-table td:first-child {
       text-align: left;
     }
 
@@ -514,6 +512,21 @@
 
       .period-list {
         padding: 14px;
+      }
+
+      .period-details {
+        padding: 0 10px 12px;
+        overflow-x: visible;
+      }
+
+      .history-table th,
+      .history-table td {
+        padding: 11px 8px;
+        font-size: 0.86rem;
+      }
+
+      .history-table th {
+        font-size: 0.72rem;
       }
     }
   </style>
@@ -789,6 +802,12 @@
         }).format(date);
       }
 
+      function formatCompactRecordDate(record) {
+        const parsed = parseKoreanMonthDay(record.date);
+        const dateLabel = parsed ? `${parsed.month}/${parsed.day}` : record.date;
+        return [record.day, dateLabel].filter(Boolean).join(" ");
+      }
+
       function getDailyRecords(staff) {
         const tracker = createDateTracker();
 
@@ -854,7 +873,7 @@
           periods.push(summarizePeriod(current, periods.length));
         }
 
-        return periods;
+        return periods.reverse();
       }
 
       function setStatus(message) {
@@ -886,26 +905,8 @@
         }[value] || value || "EHWA";
       }
 
-      function isPastPeriod(period) {
-        if (!period.endDate) return false;
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const endDate = new Date(period.endDate);
-        endDate.setHours(23, 59, 59, 999);
-        return endDate < today;
-      }
-
-      function getDefaultOpenPeriod(periods = []) {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        return periods.find((period) => {
-          if (!period.startDate || !period.endDate) return false;
-          const start = new Date(period.startDate);
-          const end = new Date(period.endDate);
-          start.setHours(0, 0, 0, 0);
-          end.setHours(23, 59, 59, 999);
-          return start <= today && today <= end;
-        }) || null;
+      function getMostRecentWorkedPeriod(periods = []) {
+        return periods.find((period) => period.records.length > 0) || periods[0] || null;
       }
 
       function renderPeriodCards(periods = []) {
@@ -919,12 +920,9 @@
           const detailRows = period.records.map((record) => {
             return `
               <tr>
-                <td>${escapeHtml(record.day)}</td>
-                <td>${escapeHtml(record.date)}</td>
+                <td>${escapeHtml(formatCompactRecordDate(record))}</td>
                 <td>${formatHours(record.hours)}</td>
                 <td>${formatMoney(record.tip)}</td>
-                <td>${formatMoney(record.hours > 0 ? record.tip / record.hours : 0)}</td>
-                <td>${formatMoney(record.hallTip)}</td>
               </tr>
             `;
           }).join("");
@@ -933,7 +931,7 @@
             <article class="period-card ${isOpen ? "is-open" : ""}">
               <button class="period-toggle" type="button" data-period-id="${period.id}" aria-expanded="${isOpen ? "true" : "false"}">
                 <span>
-                  <span class="period-title">${escapeHtml(period.label)}${isPastPeriod(period) ? " · Closed" : ""}</span>
+                  <span class="period-title">${escapeHtml(period.label)}</span>
                   <span class="period-summary">
                     <span>${period.workedDays} days</span>
                     <span>${formatHours(period.totalHours)}</span>
@@ -947,15 +945,12 @@
                 <table class="history-table">
                   <thead>
                     <tr>
-                      <th>요일</th>
                       <th>날짜</th>
                       <th>근무 시간</th>
                       <th>팁</th>
-                      <th>시간당 팁</th>
-                      <th>전체 홀 팁</th>
                     </tr>
                   </thead>
-                  <tbody>${detailRows || `<tr><td colspan="6">이 기간에는 근무 기록이 없습니다.</td></tr>`}</tbody>
+                  <tbody>${detailRows || `<tr><td colspan="3">이 기간에는 근무 기록이 없습니다.</td></tr>`}</tbody>
                 </table>
               </div>
             </article>
@@ -965,7 +960,7 @@
 
       function renderProfile(staff, access = {}) {
         const periods = getPeriods(staff);
-        const defaultOpenPeriod = getDefaultOpenPeriod(periods);
+        const defaultOpenPeriod = getMostRecentWorkedPeriod(periods);
         state.periods = periods;
         state.openPeriodKey = defaultOpenPeriod ? defaultOpenPeriod.id : null;
         const records = periods.flatMap((period) => period.records);

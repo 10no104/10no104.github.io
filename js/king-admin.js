@@ -9,8 +9,8 @@
   const ADMIN_SHEET_CONFIG = {
     sheetId: "1xa9OZbctYnlbaAL8lKIgmefM5hvSw0Plk01lxp5G2fc",
     sheets: [
-      { name: "Downtown Reservation", label: "Downtown", key: "downtown" },
-      { name: "Uptown Reservation", label: "Uptown", key: "uptown" }
+      { name: "Downtown Reservation", label: "다운타운", key: "downtown" },
+      { name: "Uptown Reservation", label: "업타운", key: "uptown" }
     ]
   };
 
@@ -195,10 +195,10 @@
   }
 
   function formatDateLabel(value = "") {
-    if (value === "all") return "All Days";
+    if (value === "all") return "전체 날짜";
     const date = toSafeDate(value);
-    if (!date) return value || "No date";
-    return new Intl.DateTimeFormat("en-US", {
+    if (!date) return value || "날짜 없음";
+    return new Intl.DateTimeFormat("ko-KR", {
       weekday: "short",
       month: "short",
       day: "numeric"
@@ -252,13 +252,13 @@
   }
 
   async function fetchReservations() {
-    setReservationStatus("Loading reservations...");
+    setReservationStatus("예약을 불러오는 중...");
     try {
       const groups = await Promise.all(
         ADMIN_SHEET_CONFIG.sheets.map(async (sheetConfig) => {
           const url = `https://docs.google.com/spreadsheets/d/${ADMIN_SHEET_CONFIG.sheetId}/gviz/tq?sheet=${encodeURIComponent(sheetConfig.name)}&tqx=out:json`;
           const response = await fetch(url);
-          if (!response.ok) throw new Error(`Failed to fetch ${sheetConfig.label}`);
+          if (!response.ok) throw new Error(`${sheetConfig.label} 예약을 불러오지 못했습니다.`);
           const data = parseGvizText(await response.text());
           return (data.table?.rows || [])
             .map((row) => row.c || [])
@@ -274,10 +274,10 @@
         return parseTimeForSort(a.time) - parseTimeForSort(b.time);
       });
       renderReservations();
-      setReservationStatus(`Loaded ${state.reservations.length} reservations.`, "success");
+      setReservationStatus(`예약 ${state.reservations.length}개를 불러왔습니다.`, "success");
     } catch (error) {
-      setReservationStatus(error.message || "Could not load reservations.", "error");
-      refs.reservationList.innerHTML = '<div class="empty-state">Could not load reservation data.</div>';
+      setReservationStatus(error.message || "예약을 불러오지 못했습니다.", "error");
+      refs.reservationList.innerHTML = '<div class="empty-state">예약 데이터를 불러오지 못했습니다.</div>';
     }
   }
 
@@ -294,11 +294,11 @@
   function renderReservationDayChips() {
     const days = getReservationDays();
     refs.reservationDayChips.innerHTML = [
-      `<button class="chip-btn ${state.reservationDate === "all" ? "is-active" : ""}" data-reservation-date="all" type="button">All</button>`,
+      `<button class="chip-btn ${state.reservationDate === "all" ? "is-active" : ""}" data-reservation-date="all" type="button">전체</button>`,
       ...days.map((value, index) => {
         const date = toSafeDate(value);
-        const weekdayLabel = index === 0 ? "Today" : new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date);
-        const dayLabel = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date);
+        const weekdayLabel = index === 0 ? "오늘" : new Intl.DateTimeFormat("ko-KR", { weekday: "short" }).format(date);
+        const dayLabel = new Intl.DateTimeFormat("ko-KR", { month: "short", day: "numeric" }).format(date);
         return `
           <button class="chip-btn day-chip ${state.reservationDate === value ? "is-active" : ""}" data-reservation-date="${value}" type="button">
             <strong>${escapeHtml(weekdayLabel)}</strong>
@@ -331,7 +331,7 @@
     refs.metricReservations.textContent = String(items.length);
     refs.metricDowntown.textContent = String(downtown);
     refs.metricUptown.textContent = String(uptown);
-    const branchLabel = state.reservationBranch === "all" ? "Both" : formatBranchLabel(state.reservationBranch);
+    const branchLabel = state.reservationBranch === "all" ? "전체" : formatBranchLabel(state.reservationBranch);
     refs.reservationDateLabel.textContent = `${formatDateLabel(state.reservationDate)} / ${branchLabel}`;
   }
 
@@ -345,7 +345,7 @@
           </div>
           <div class="badge-row">
             <span class="status-badge ${escapeHtml(item.branchKey)}">${escapeHtml(item.branch)}</span>
-            ${large ? '<span class="status-badge large">Large Party</span>' : ""}
+            ${large ? '<span class="status-badge large">단체 예약</span>' : ""}
           </div>
         </div>
         <div class="reservation-focus">
@@ -353,13 +353,13 @@
             <div class="reservation-time-pill">${escapeHtml(item.time || "-")}</div>
             <div class="reservation-guests-pill">${escapeHtml(item.people || "-")}</div>
           </div>
-          <h4 class="reservation-name-box">${escapeHtml(item.name || "Guest")}</h4>
+          <h4 class="reservation-name-box">${escapeHtml(item.name || "손님")}</h4>
         </div>
         <div class="reservation-meta">
-          <div class="meta-box"><span>Phone</span><strong>${escapeHtml(item.phone || "-")}</strong></div>
-          <div class="meta-box"><span>Branch</span><strong>${escapeHtml(item.branch || "-")}</strong></div>
+          <div class="meta-box"><span>전화번호</span><strong>${escapeHtml(item.phone || "-")}</strong></div>
+          <div class="meta-box"><span>지점</span><strong>${escapeHtml(formatBranchLabel(item.branchKey || item.branch) || "-")}</strong></div>
         </div>
-        <div class="reservation-notes">${escapeHtml(item.notes || "No notes")}</div>
+        <div class="reservation-notes">${escapeHtml(item.notes || "메모 없음")}</div>
       </article>
     `;
   }
@@ -371,7 +371,7 @@
     renderReservationMetrics(items);
     refs.reservationList.innerHTML = items.length
       ? items.map(renderReservationCard).join("")
-      : '<div class="empty-state">No reservations in this view.</div>';
+      : '<div class="empty-state">현재 조건에 맞는 예약이 없습니다.</div>';
   }
 
   function setReservationStatus(message = "", type = "") {
@@ -381,11 +381,15 @@
 
   function formatBranchLabel(branch = "") {
     const normalized = String(branch).trim().toLowerCase();
-    if (normalized === "both") return "Both";
-    if (normalized === "downtown") return "Downtown";
-    if (normalized === "uptown") return "Uptown";
-    if (normalized === "all") return "All";
+    if (normalized === "both") return "공통";
+    if (normalized === "downtown") return "다운타운";
+    if (normalized === "uptown") return "업타운";
+    if (normalized === "all") return "전체";
     return branch || "-";
+  }
+
+  function formatOrderScopeLabel(value = "") {
+    return value === "all" ? "전체" : value;
   }
 
   function formatPrice(value) {
@@ -524,12 +528,12 @@
 
   function refreshCategoryControls() {
     const categories = getCategories();
-    const categoryOptions = ['<option value="all">All categories</option>']
+    const categoryOptions = ['<option value="all">전체 카테고리</option>']
       .concat(categories.map((category) => `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`));
     refs.menuCategoryFilter.innerHTML = categoryOptions.join("");
     refs.menuCategoryFilter.value = state.menuCategory;
     refs.menuCategoryChips.innerHTML = [
-      `<button class="chip-btn ${state.menuCategory === "all" ? "is-active" : ""}" data-menu-category="all" type="button">All</button>`,
+      `<button class="chip-btn ${state.menuCategory === "all" ? "is-active" : ""}" data-menu-category="all" type="button">전체</button>`,
       ...categories.map((category) => `
         <button class="chip-btn ${state.menuCategory === category ? "is-active" : ""}" data-menu-category="${escapeHtml(category)}" type="button">${escapeHtml(category)}</button>
       `)
@@ -554,12 +558,12 @@
     const signedIn = Boolean(state.menuSession?.access_token);
     refs.menuAuthCard.hidden = signedIn;
     refs.menuWorkspace.hidden = !signedIn;
-    refs.menuSessionLabel.textContent = signedIn ? state.menuSession.user?.email || "Signed in" : "Sign in required";
+    refs.menuSessionLabel.textContent = signedIn ? state.menuSession.user?.email || "로그인됨" : "로그인이 필요합니다";
   }
 
   async function refreshMenuSession() {
     if (!supabaseClient) {
-      setMenuAuthStatus("Supabase client could not load.", "error");
+      setMenuAuthStatus("Supabase 클라이언트를 불러오지 못했습니다.", "error");
       return;
     }
     const { data, error } = await supabaseClient.auth.getSession();
@@ -574,16 +578,16 @@
 
   async function signInMenuAdmin() {
     if (!supabaseClient) {
-      setMenuAuthStatus("Supabase client could not load.", "error");
+      setMenuAuthStatus("Supabase 클라이언트를 불러오지 못했습니다.", "error");
       return;
     }
     const email = refs.menuAdminEmail.value.trim();
     const password = refs.menuAdminPassword.value;
     if (!email || !password) {
-      setMenuAuthStatus("Enter email and password.", "error");
+      setMenuAuthStatus("이메일과 비밀번호를 입력하세요.", "error");
       return;
     }
-    setMenuAuthStatus("Signing in...");
+    setMenuAuthStatus("로그인 중...");
     const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
     if (error) {
       setMenuAuthStatus(error.message, "error");
@@ -592,7 +596,7 @@
     state.menuSession = data.session;
     refs.menuAdminPassword.value = "";
     updateMenuAuthView();
-    setMenuAuthStatus("Signed in.", "success");
+    setMenuAuthStatus("로그인되었습니다.", "success");
     await fetchMenuItems();
   }
 
@@ -608,7 +612,7 @@
 
   async function fetchMenuItems() {
     if (!supabaseClient) return;
-    setMenuStatus("Loading menu...");
+    setMenuStatus("메뉴를 불러오는 중...");
     let { data, error } = await supabaseClient
       .from("menu_items")
       .select(EXTENDED_MENU_SELECT)
@@ -634,7 +638,7 @@
     state.menuItems = (data || []).map(normalizeMenuItem);
     syncCategoryOrder();
     renderMenu();
-    setMenuStatus(`Loaded ${state.menuItems.length} menu items.`, "success");
+    setMenuStatus(`메뉴 ${state.menuItems.length}개를 불러왔습니다.`, "success");
   }
 
   function getMenuById(id) {
@@ -705,8 +709,8 @@
           `).join("")}
         </div>
         <div class="custom-token-row">
-          <input data-token-custom type="text" placeholder="Add custom" />
-          <button class="pill-btn" data-token-add type="button">Add</button>
+          <input data-token-custom type="text" placeholder="직접 추가" />
+          <button class="pill-btn" data-token-add type="button">추가</button>
         </div>
       </div>
     `;
@@ -730,43 +734,43 @@
       <article class="menu-preview-card ${hiddenClass}" data-menu-id="${escapeHtml(item.id)}">
         <div class="menu-preview-main">
           <div class="menu-preview-visual">
-            <img class="menu-preview-image" data-preview-image src="${escapeHtml(item.image_url || FALLBACK_IMAGE)}" alt="${escapeHtml(item.name_en || item.name_ko || "Menu image")}" loading="lazy" />
+            <img class="menu-preview-image" data-preview-image src="${escapeHtml(item.image_url || FALLBACK_IMAGE)}" alt="${escapeHtml(item.name_en || item.name_ko || "메뉴 이미지")}" loading="lazy" />
             <div class="menu-preview-content">
-              <p class="menu-preview-name-ko" data-preview-name-ko>${escapeHtml(item.name_ko || item.name_en || "Untitled")}</p>
+              <p class="menu-preview-name-ko" data-preview-name-ko>${escapeHtml(item.name_ko || item.name_en || "이름 없음")}</p>
               <p class="menu-preview-name-en" data-preview-name-en>${escapeHtml(item.name_en || item.romanized_name || "")}</p>
-              <p class="menu-preview-desc" data-preview-description>${escapeHtml(item.description || "No description")}</p>
+              <p class="menu-preview-desc" data-preview-description>${escapeHtml(item.description || "설명 없음")}</p>
               <div class="menu-meta" data-preview-tags>${renderTagBadgesFromValues(item.tags, item.ingredient)}</div>
               <div class="menu-preview-price" data-preview-price>${escapeHtml(formatPrice(item.price))}</div>
             </div>
           </div>
           <div class="preview-actions">
-            <button class="pill-btn" data-menu-edit="${escapeHtml(item.id)}" type="button">Full Edit</button>
-            <button class="pill-btn primary" data-visual-save="${escapeHtml(item.id)}" type="button">Save Card</button>
+            <button class="pill-btn" data-menu-edit="${escapeHtml(item.id)}" type="button">전체 편집</button>
+            <button class="pill-btn primary" data-visual-save="${escapeHtml(item.id)}" type="button">카드 저장</button>
           </div>
         </div>
         <div class="preview-edit-grid">
           <div class="preview-field">
-            <label>Korean</label>
+            <label>한국어</label>
             <input data-visual-field="name_ko" type="text" value="${escapeHtml(item.name_ko || "")}" />
           </div>
           <div class="preview-field">
-            <label>English</label>
+            <label>영어</label>
             <input data-visual-field="name_en" type="text" value="${escapeHtml(item.name_en || "")}" />
           </div>
           <div class="preview-field">
-            <label>Price</label>
+            <label>가격</label>
             <input data-visual-field="price" type="number" step="0.01" min="0" value="${escapeHtml(item.price ?? "")}" />
           </div>
           <div class="preview-field">
-            <label>Category</label>
-            <select data-visual-field="category">${renderSelectOptions(getCategories(), item.category, "Select category")}</select>
+            <label>카테고리</label>
+            <select data-visual-field="category">${renderSelectOptions(getCategories(), item.category, "카테고리 선택")}</select>
           </div>
           <div class="preview-field full">
-            <label>Description</label>
+            <label>설명</label>
             <textarea data-visual-field="description">${escapeHtml(item.description || "")}</textarea>
           </div>
           <div class="preview-field full">
-            <label>Image URL</label>
+            <label>이미지 URL</label>
             <input data-visual-field="image_url" type="url" value="${escapeHtml(item.image_url || "")}" />
           </div>
         </div>
@@ -804,7 +808,7 @@
     const items = getVisibleMenuItems();
     refs.menuList.innerHTML = items.length
       ? items.map(renderVisualMenuCard).join("")
-      : '<div class="empty-state">No menu items match this view.</div>';
+      : '<div class="empty-state">현재 조건에 맞는 메뉴가 없습니다.</div>';
   }
 
   function renderCategoryOrder() {
@@ -815,19 +819,19 @@
           <article class="category-order-row" data-category="${escapeHtml(category)}">
             <div class="order-row-title">
               <strong>${escapeHtml(category)}</strong>
-              <span>${count} items</span>
+              <span>${count}개 메뉴</span>
             </div>
           </article>
         `;
       }).join("")
-      : '<div class="empty-state">No categories loaded.</div>';
+      : '<div class="empty-state">불러온 카테고리가 없습니다.</div>';
     setupSortable("category", refs.menuCategoryOrderList);
   }
 
   function renderOrderChips() {
     const categories = getCategories();
     refs.menuOrderChips.innerHTML = [
-      `<button class="chip-btn ${state.menuOrderView === "all" ? "is-active" : ""}" data-order-view="all" type="button">All</button>`,
+      `<button class="chip-btn ${state.menuOrderView === "all" ? "is-active" : ""}" data-order-view="all" type="button">전체</button>`,
       ...categories.map((category) => `
         <button class="chip-btn ${state.menuOrderView === category ? "is-active" : ""}" data-order-view="${escapeHtml(category)}" type="button">${escapeHtml(category)}</button>
       `)
@@ -841,17 +845,17 @@
       : state.menuItems
         .filter((item) => item.category === state.menuOrderView)
         .sort(compareMenuItems);
-    refs.menuOrderHeading.textContent = isAll ? "All View Order" : `${state.menuOrderView} Order`;
+    refs.menuOrderHeading.textContent = isAll ? "전체 보기 순서" : `${state.menuOrderView} 순서`;
     refs.menuOrderList.innerHTML = items.length
       ? items.map((item) => `
         <article class="menu-order-row" data-menu-id="${escapeHtml(item.id)}">
           <div class="order-row-title">
-            <strong>${escapeHtml(item.name_ko || item.name_en || "Untitled")}</strong>
-            <span>${escapeHtml(item.category || "Uncategorized")} / ${escapeHtml(item.name_en || "")} / ${escapeHtml(item.branches || "both")} / ${isAll ? `All ${escapeHtml(item.all_sort_order ?? "-")}` : `Category ${escapeHtml(item.sort_order ?? "-")}`}</span>
+            <strong>${escapeHtml(item.name_ko || item.name_en || "이름 없음")}</strong>
+            <span>${escapeHtml(item.category || "미분류")} / ${escapeHtml(item.name_en || "")} / ${escapeHtml(formatBranchLabel(item.branches || "both"))} / ${isAll ? `전체 ${escapeHtml(item.all_sort_order ?? "-")}` : `카테고리 ${escapeHtml(item.sort_order ?? "-")}`}</span>
           </div>
         </article>
       `).join("")
-      : '<div class="empty-state">No items in this view.</div>';
+      : '<div class="empty-state">현재 보기에는 메뉴가 없습니다.</div>';
     setupSortable("menu", refs.menuOrderList);
   }
 
@@ -929,7 +933,7 @@
 
   async function updateMenuItem(id, payload) {
     if (!supabaseClient || !state.menuSession) {
-      throw new Error("Sign in before saving.");
+      throw new Error("저장하려면 먼저 로그인하세요.");
     }
     const { data, error } = await supabaseClient
       .from("menu_items")
@@ -951,9 +955,9 @@
     const price = card.querySelector("[data-preview-price]");
     const image = card.querySelector("[data-preview-image]");
     const tags = card.querySelector("[data-preview-tags]");
-    if (nameKo) nameKo.textContent = payload.name_ko || payload.name_en || "Untitled";
+    if (nameKo) nameKo.textContent = payload.name_ko || payload.name_en || "이름 없음";
     if (nameEn) nameEn.textContent = payload.name_en || "";
-    if (description) description.textContent = payload.description || "No description";
+    if (description) description.textContent = payload.description || "설명 없음";
     if (price) price.textContent = formatPrice(payload.price);
     if (image) image.src = payload.image_url || FALLBACK_IMAGE;
     if (tags && ("tags" in payload || "ingredient" in payload)) {
@@ -1011,12 +1015,12 @@
   async function saveVisualCard(id) {
     const card = refs.menuList.querySelector(`[data-menu-id="${CSS.escape(String(id))}"]`);
     if (!card) return;
-    setMenuStatus("Saving menu card...");
+    setMenuStatus("메뉴 카드를 저장하는 중...");
     try {
       const data = await updateMenuItem(id, readPayloadFromContainer(card, "data-visual-field"));
       syncCategoryOrder();
       renderMenu();
-      setMenuStatus(`Saved ${data.name_en || data.name_ko || "menu item"}.`, "success");
+      setMenuStatus(`${data.name_ko || data.name_en || "메뉴"} 저장 완료.`, "success");
     } catch (error) {
       setMenuStatus(error.message, "error");
     }
@@ -1029,7 +1033,7 @@
 
   async function saveSortUpdates(updates, field = "sort_order") {
     if (!supabaseClient || !state.menuSession) {
-      throw new Error("Sign in before saving sort.");
+      throw new Error("순서를 저장하려면 먼저 로그인하세요.");
     }
     const results = await Promise.all(
       updates.map((item) => supabaseClient
@@ -1062,13 +1066,13 @@
           });
         });
     });
-    setMenuStatus("Saving category button order...");
+    setMenuStatus("카테고리 버튼 순서를 저장하는 중...");
     try {
       await saveSortUpdates(updates);
       state.categoryOrder = categories;
       closeCategoryOrderModal();
       renderMenu();
-      setMenuStatus("Category button order saved.", "success");
+      setMenuStatus("카테고리 버튼 순서를 저장했습니다.", "success");
     } catch (error) {
       setMenuStatus(error.message, "error");
     }
@@ -1078,7 +1082,7 @@
     const rows = [...refs.menuOrderList.querySelectorAll("[data-menu-id]")];
     const isAll = state.menuOrderView === "all";
     if (isAll && !state.supportsAllSortOrder) {
-      setMenuStatus("Add the all_sort_order column in Supabase before saving All order.", "error");
+      setMenuStatus("전체 순서를 저장하려면 Supabase에 all_sort_order 컬럼을 먼저 추가하세요.", "error");
       return;
     }
     const base = isAll ? 0 : getSortBaseForCategory(state.menuOrderView);
@@ -1087,11 +1091,11 @@
       id: row.dataset.menuId,
       [field]: base + (index + 1) * 10
     }));
-    setMenuStatus(`Saving ${isAll ? "All" : state.menuOrderView} order...`);
+    setMenuStatus(`${formatOrderScopeLabel(isAll ? "all" : state.menuOrderView)} 순서를 저장하는 중...`);
     try {
       await saveSortUpdates(updates, field);
       renderMenu();
-      setMenuStatus(`${isAll ? "All" : state.menuOrderView} order saved.`, "success");
+      setMenuStatus(`${formatOrderScopeLabel(isAll ? "all" : state.menuOrderView)} 순서를 저장했습니다.`, "success");
     } catch (error) {
       setMenuStatus(error.message, "error");
     }
@@ -1099,7 +1103,7 @@
 
   function openMenuEditor(item = null) {
     const isNew = !item;
-    refs.menuEditorTitle.textContent = isNew ? "Add Menu" : "Edit Menu";
+    refs.menuEditorTitle.textContent = isNew ? "메뉴 추가" : "메뉴 편집";
     refs.menuEditorForm.reset();
     byId("menuEditId").value = item?.id ?? "";
     byId("menuEditNameKo").value = item?.name_ko ?? "";
@@ -1107,7 +1111,7 @@
     byId("menuEditRomanizedName").value = item?.romanized_name ?? "";
     byId("menuEditPrice").value = item?.price ?? "";
     byId("menuEditCategory").value = item?.category ?? (state.menuCategory !== "all" ? state.menuCategory : "");
-    byId("menuEditLabel").innerHTML = renderSelectOptions(getMenuOptionValues("label"), item?.label ?? "", "No label");
+    byId("menuEditLabel").innerHTML = renderSelectOptions(getMenuOptionValues("label"), item?.label ?? "", "라벨 없음");
     byId("menuEditLabel").value = item?.label ?? "";
     byId("menuEditBranch").value = item?.branches ?? "both";
     byId("menuEditSortOrder").value = item?.sort_order ?? "";
@@ -1159,21 +1163,21 @@
   async function saveMenuEditor(event) {
     event.preventDefault();
     if (!supabaseClient || !state.menuSession) {
-      setMenuStatus("Sign in before saving.", "error");
+      setMenuStatus("저장하려면 먼저 로그인하세요.", "error");
       return;
     }
     const id = byId("menuEditId").value;
     const payload = readMenuEditorPayload();
     if (!payload.name_ko && !payload.name_en) {
-      setMenuStatus("Menu name is required.", "error");
+      setMenuStatus("메뉴 이름을 입력하세요.", "error");
       return;
     }
     if (!payload.category) {
-      setMenuStatus("Category is required.", "error");
+      setMenuStatus("카테고리를 입력하세요.", "error");
       return;
     }
 
-    setMenuStatus("Saving menu...");
+    setMenuStatus("메뉴를 저장하는 중...");
     const query = id
       ? supabaseClient.from("menu_items").update(payload).eq("id", id)
       : supabaseClient.from("menu_items").insert(payload);
@@ -1190,16 +1194,16 @@
     closeMenuEditor();
     syncCategoryOrder();
     renderMenu();
-    setMenuStatus("Menu saved.", "success");
+    setMenuStatus("메뉴를 저장했습니다.", "success");
   }
 
   async function deleteMenuItem() {
     const id = byId("menuEditId").value;
     if (!id || !supabaseClient || !state.menuSession) return;
     const item = getMenuById(id);
-    const ok = window.confirm(`Delete ${item?.name_en || item?.name_ko || "this menu item"}?`);
+    const ok = window.confirm(`${item?.name_ko || item?.name_en || "이 메뉴"}를 삭제할까요?`);
     if (!ok) return;
-    setMenuStatus("Deleting menu...");
+    setMenuStatus("메뉴를 삭제하는 중...");
     const { error } = await supabaseClient.from("menu_items").delete().eq("id", id);
     if (error) {
       setMenuStatus(error.message, "error");
@@ -1209,7 +1213,7 @@
     closeMenuEditor();
     syncCategoryOrder();
     renderMenu();
-    setMenuStatus("Menu deleted.", "success");
+    setMenuStatus("메뉴를 삭제했습니다.", "success");
   }
 
   function setActiveTab(tabName) {
@@ -1334,7 +1338,7 @@
 
   function bootstrap() {
     cacheRefs();
-    refs.todayHeading.textContent = new Intl.DateTimeFormat("en-US", {
+    refs.todayHeading.textContent = new Intl.DateTimeFormat("ko-KR", {
       weekday: "long",
       month: "long",
       day: "numeric",
@@ -1354,7 +1358,7 @@
       });
       void refreshMenuSession();
     } else {
-      setMenuAuthStatus("Supabase client could not load.", "error");
+      setMenuAuthStatus("Supabase 클라이언트를 불러오지 못했습니다.", "error");
     }
     void fetchReservations();
   }
