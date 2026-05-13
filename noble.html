@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/global.css?v=20260423-10" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
       --ink: #231914;
@@ -467,13 +468,12 @@
       </div>
 
       <form class="lookup-card" id="lookupForm">
-        <label for="staffIdInput">직원 ID / 이름</label>
+        <label for="staffIdInput">Reference Code</label>
         <div class="lookup-row">
-          <input id="staffIdInput" name="staffId" type="text" autocomplete="off" placeholder="예: 영환" />
+          <input id="staffIdInput" name="staffId" type="text" autocomplete="off" placeholder="고유 번호 입력" />
           <button class="pill-btn primary" type="submit">조회</button>
         </div>
         <p class="lookup-status" id="lookupStatus">정산표를 불러오는 중...</p>
-        <div class="staff-chips" id="staffChips" aria-label="직원 바로 조회"></div>
       </form>
     </section>
 
@@ -533,7 +533,7 @@
     </section>
 
     <section class="panel" id="emptyPanel">
-      <div class="empty-state" id="emptyMessage">직원 ID 또는 이름을 입력하면 본인 정산 기록을 볼 수 있습니다.</div>
+      <div class="empty-state" id="emptyMessage">고유 번호를 입력하면 본인 정산 기록을 볼 수 있습니다.</div>
     </section>
   </main>
 
@@ -542,15 +542,16 @@
       "use strict";
 
       const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRNRIMOfYbtWYBKCmX3pq-1oA-a-XPBafNLjij_scpvXLoBbbdsJB9u03mrbYfNxQ/pub?gid=1128274968&single=true&output=csv";
+      const SUPABASE_CONFIG = {
+        url: "https://pzhzdjsjfdzbzkhnaxmc.supabase.co",
+        anonKey: "sb_publishable_3Ox2JIQXVLwusT-xzIMJ4g_YXTR5q8e"
+      };
       const BASE_COLUMN_COUNT = 7;
       const MONEY_FORMAT = new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       const HOUR_FORMAT = new Intl.NumberFormat("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
-      const STAFF_PROFILES = {
-        // Example: "1001": { name: "영환", hourlyWage: 16.5, branch: "Uptown" }
-      };
-
       const refs = {};
+      const supabaseClient = window.supabase?.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
       const state = {
         rows: [],
         staff: [],
@@ -566,7 +567,6 @@
           "lookupForm",
           "staffIdInput",
           "lookupStatus",
-          "staffChips",
           "profilePanel",
           "profileTitle",
           "profileSubtitle",
@@ -666,20 +666,21 @@
         return staff;
       }
 
-      function findStaff(input = "") {
-        const key = normalizeKey(input);
+      function findStaffByKey(staffKey = "") {
+        const key = normalizeKey(staffKey);
         if (!key) return null;
 
-        const profile = STAFF_PROFILES[input] || Object.values(STAFF_PROFILES).find((item) => {
-          return normalizeKey(item.name) === key || normalizeKey(item.id) === key;
-        });
-
-        if (profile) {
-          const staff = state.staff.find((item) => normalizeKey(item.name) === normalizeKey(profile.name));
-          return staff ? { ...staff, profile } : null;
-        }
-
         return state.staff.find((item) => item.key === key || normalizeKey(item.id) === key) || null;
+      }
+
+      async function lookupReference(input = "") {
+        const refCode = String(input || "").trim();
+        if (!refCode) return null;
+        if (!supabaseClient) throw new Error("Supabase client is not available.");
+
+        const { data, error } = await supabaseClient.rpc("lookup_employee_ref", { input_ref: refCode });
+        if (error) throw error;
+        return Array.isArray(data) ? data[0] : data;
       }
 
       function getRecords(staff) {
@@ -697,12 +698,6 @@
         }).filter((record) => record.hours > 0 || record.tip > 0);
       }
 
-      function renderStaffChips() {
-        refs.staffChips.innerHTML = state.staff.map((staff) => {
-          return `<button class="staff-chip" type="button" data-staff="${staff.name}">${staff.name}</button>`;
-        }).join("");
-      }
-
       function setStatus(message) {
         refs.lookupStatus.textContent = message;
       }
@@ -714,21 +709,35 @@
         refs.emptyMessage.textContent = message;
       }
 
-      function renderProfile(staff) {
+      function getRoleLabel(value = "") {
+        return {
+          server: "서버",
+          kitchen: "주방",
+          manager: "매니저"
+        }[value] || value || "직원";
+      }
+
+      function getBranchLabel(value = "") {
+        return {
+          uptown: "Uptown",
+          downtown: "Downtown",
+          both: "Uptown + Downtown"
+        }[value] || value || "EHWA";
+      }
+
+      function renderProfile(staff, access = {}) {
         const records = getRecords(staff);
-        const profile = staff.profile || {};
         const totalHours = records.reduce((sum, record) => sum + record.hours, 0);
         const totalTip = records.reduce((sum, record) => sum + record.tip, 0);
         const tipPerHour = totalHours > 0 ? totalTip / totalHours : 0;
-        const wage = Number.parseFloat(profile.hourlyWage);
 
         refs.emptyPanel.classList.add("is-hidden");
         refs.profilePanel.classList.remove("is-hidden");
         refs.historyPanel.classList.remove("is-hidden");
         refs.profileTitle.textContent = `${staff.name}님의 Noble`;
-        refs.profileSubtitle.textContent = `${records.length}개 정산 기록을 찾았습니다.`;
-        refs.hourlyWageValue.textContent = Number.isFinite(wage) ? formatMoney(wage) : "등록 필요";
-        refs.hourlyWageNote.textContent = Number.isFinite(wage) ? `${profile.branch || "EHWA"} 기준 시급` : "시급은 STAFF_PROFILES에 ID와 함께 등록하면 표시됩니다.";
+        refs.profileSubtitle.textContent = `${getBranchLabel(access.branch_scope)} · ${getRoleLabel(access.job_role)} · ${records.length}개 기록`;
+        refs.hourlyWageValue.textContent = getRoleLabel(access.job_role);
+        refs.hourlyWageNote.textContent = "시급 컬럼이 시트에 연결되면 이 영역을 급여 정보로 바꿀 수 있습니다.";
         refs.totalHoursValue.textContent = formatHours(totalHours);
         refs.totalTipValue.textContent = formatMoney(totalTip);
         refs.tipPerHourValue.textContent = formatMoney(tipPerHour);
@@ -768,9 +777,7 @@
           state.rows = parseCsv(text);
           state.staff = buildStaff(state.rows[0] || []);
           state.loaded = true;
-
-          renderStaffChips();
-          setStatus(`${state.staff.length}명의 직원 기록을 불러왔습니다.`);
+          setStatus("고유 번호를 입력해주세요.");
 
           const params = new URLSearchParams(window.location.search);
           const initialId = params.get("id");
@@ -785,33 +792,51 @@
         }
       }
 
-      function handleLookup(input) {
+      async function handleLookup(input) {
         if (!state.loaded) {
           setStatus("정산표를 아직 불러오는 중입니다.");
           return;
         }
 
-        const staff = findStaff(input);
-        if (!staff) {
-          setStatus("일치하는 직원 ID 또는 이름이 없습니다.");
-          setEmpty("직원 ID 또는 이름을 다시 확인해주세요.");
+        setStatus("고유 번호를 확인하는 중...");
+
+        try {
+          const access = await lookupReference(input);
+          if (!access?.staff_key) {
+            setStatus("일치하는 고유 번호가 없습니다.");
+            setEmpty("고유 번호를 다시 확인해주세요.");
+            return;
+          }
+
+          const staff = findStaffByKey(access.staff_key);
+          if (!staff) {
+            setStatus("권한은 확인됐지만 시트에서 직원 컬럼을 찾지 못했습니다.");
+            setEmpty(`시트 헤더에 "${access.staff_key}" 직원 컬럼이 있는지 확인해주세요.`);
+            return;
+          }
+
+          renderProfile(staff, access);
+        } catch (error) {
+          console.error(error);
+          setStatus("고유 번호 확인 중 오류가 발생했습니다.");
+          setEmpty("Supabase 함수 또는 네트워크 상태를 확인해주세요.");
+        }
+      }
+
+      function submitLookup() {
+        const value = refs.staffIdInput.value;
+        if (!String(value).trim()) {
+          setStatus("고유 번호를 입력해주세요.");
+          setEmpty("고유 번호를 입력하면 본인 정산 기록을 볼 수 있습니다.");
           return;
         }
-
-        renderProfile(staff);
+        handleLookup(value);
       }
 
       function bindEvents() {
         refs.lookupForm.addEventListener("submit", (event) => {
           event.preventDefault();
-          handleLookup(refs.staffIdInput.value);
-        });
-
-        refs.staffChips.addEventListener("click", (event) => {
-          const button = event.target.closest("[data-staff]");
-          if (!button) return;
-          refs.staffIdInput.value = button.dataset.staff;
-          handleLookup(button.dataset.staff);
+          submitLookup();
         });
       }
 
