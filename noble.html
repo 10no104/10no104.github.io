@@ -140,7 +140,7 @@
       gap: 16px;
       align-items: stretch;
       margin-bottom: 16px;
-      padding: 20px;
+      padding: 16px;
       border-radius: var(--radius-xl);
       color: #fff8f0;
       background:
@@ -153,8 +153,8 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 18px;
-      min-height: 268px;
+      gap: 14px;
+      min-height: 194px;
     }
 
     .hero-kicker {
@@ -169,17 +169,9 @@
     .hero h2 {
       margin: 0;
       max-width: 620px;
-      font-size: clamp(2rem, 6.5vw, 4rem);
+      font-size: clamp(1.75rem, 5.6vw, 3.25rem);
       letter-spacing: -0.05em;
       line-height: 0.95;
-    }
-
-    .hero-note {
-      margin: 0;
-      max-width: 560px;
-      color: rgba(255, 245, 230, 0.78);
-      font-size: 1rem;
-      line-height: 1.65;
     }
 
     .lookup-card {
@@ -269,7 +261,7 @@
       align-items: flex-end;
       justify-content: space-between;
       gap: 12px;
-      padding: 18px 18px 0;
+      padding: 14px 18px 0;
     }
 
     .panel-head h3 {
@@ -279,7 +271,7 @@
     }
 
     .panel-head p {
-      margin: 6px 0 0;
+      margin: 4px 0 0;
       color: var(--muted);
       font-size: 0.92rem;
       line-height: 1.55;
@@ -289,12 +281,12 @@
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 10px;
-      padding: 18px;
+      padding: 14px 18px 16px;
     }
 
     .metric-card {
-      min-height: 112px;
-      padding: 14px;
+      min-height: 94px;
+      padding: 12px;
       border: 1px solid rgba(113, 88, 60, 0.13);
       border-radius: var(--radius-lg);
       background: linear-gradient(180deg, rgba(255, 254, 250, 0.92), rgba(249, 241, 230, 0.88));
@@ -305,20 +297,20 @@
     .metric-card small { display: block; }
 
     .metric-card span {
-      margin-bottom: 9px;
+      margin-bottom: 7px;
       color: var(--muted);
       font-size: 0.82rem;
       font-weight: 800;
     }
 
     .metric-card strong {
-      font-size: 1.52rem;
+      font-size: 1.34rem;
       line-height: 1.08;
       letter-spacing: -0.03em;
     }
 
     .metric-card small {
-      margin-top: 8px;
+      margin-top: 6px;
       color: #8b7d72;
       font-size: 0.78rem;
       line-height: 1.45;
@@ -367,7 +359,7 @@
     .period-list {
       display: grid;
       gap: 10px;
-      padding: 16px 18px 18px;
+      padding: 12px 18px 16px;
     }
 
     .period-card {
@@ -383,7 +375,7 @@
       grid-template-columns: minmax(0, 1fr) auto;
       gap: 12px;
       align-items: center;
-      padding: 14px;
+      padding: 12px;
       border: 0;
       background: transparent;
       color: var(--ink);
@@ -485,7 +477,7 @@
       }
 
       .hero {
-        padding: 16px;
+        padding: 14px;
         border-radius: 22px;
       }
 
@@ -498,8 +490,26 @@
       }
 
       .profile-grid {
-        grid-template-columns: 1fr;
-        padding: 14px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        padding: 12px;
+      }
+
+      .metric-card {
+        min-height: 84px;
+        padding: 10px;
+      }
+
+      .metric-card span {
+        font-size: 0.76rem;
+      }
+
+      .metric-card strong {
+        font-size: 1.12rem;
+      }
+
+      .metric-card small {
+        display: none;
       }
 
       .panel-head {
@@ -521,12 +531,12 @@
 
       .history-table th,
       .history-table td {
-        padding: 11px 8px;
-        font-size: 0.86rem;
+        padding: 10px 6px;
+        font-size: 0.8rem;
       }
 
       .history-table th {
-        font-size: 0.72rem;
+        font-size: 0.66rem;
       }
     }
   </style>
@@ -550,9 +560,8 @@
       <div class="hero-copy">
         <div>
           <p class="hero-kicker">Private lookup</p>
-          <h2 id="nobleTitle">내 근무 기록과 팁을 빠르게 확인</h2>
+          <h2 id="nobleTitle">Noble</h2>
         </div>
-        <p class="hero-note">직원 ID 또는 이름을 입력하면 공개 정산표에서 본인 컬럼만 모아 보여줍니다.</p>
       </div>
 
       <form class="lookup-card" id="lookupForm">
@@ -561,7 +570,7 @@
           <input id="staffIdInput" name="staffId" type="text" autocomplete="off" placeholder="고유 번호 입력" />
           <button class="pill-btn primary" type="submit">조회</button>
         </div>
-        <p class="lookup-status" id="lookupStatus">정산표를 불러오는 중...</p>
+        <p class="lookup-status" id="lookupStatus">Loading...</p>
       </form>
     </section>
 
@@ -574,24 +583,24 @@
       </div>
       <div class="profile-grid">
         <article class="metric-card">
-          <span>등록 시급</span>
+          <span>직무</span>
           <strong id="hourlyWageValue">-</strong>
-          <small id="hourlyWageNote">시급 데이터가 연결되면 자동 표시됩니다.</small>
+          <small id="hourlyWageNote">-</small>
         </article>
         <article class="metric-card">
-          <span>총 근무 시간</span>
+          <span>총 근무</span>
           <strong id="totalHoursValue">-</strong>
-          <small>정산표에 입력된 시간 합계</small>
+          <small>시간 합계</small>
         </article>
         <article class="metric-card">
           <span>총 팁</span>
           <strong id="totalTipValue">-</strong>
-          <small>직원 컬럼 기준 팁 합계</small>
+          <small>팁 합계</small>
         </article>
         <article class="metric-card">
           <span>시간당 팁</span>
           <strong id="tipPerHourValue">-</strong>
-          <small>총 팁 / 총 근무 시간</small>
+          <small>팁 / 시간</small>
         </article>
       </div>
     </section>
@@ -599,15 +608,15 @@
     <section class="panel is-hidden" id="historyPanel">
       <div class="panel-head">
         <div>
-          <h3>최근 정산 기록</h3>
-          <p id="historySubtitle">팁이 있거나 근무 시간이 입력된 날짜만 표시합니다.</p>
+          <h3>정산 기록</h3>
+          <p id="historySubtitle"></p>
         </div>
       </div>
       <div class="period-list" id="periodList"></div>
     </section>
 
     <section class="panel" id="emptyPanel">
-      <div class="empty-state" id="emptyMessage">고유 번호를 입력하면 본인 정산 기록을 볼 수 있습니다.</div>
+      <div class="empty-state" id="emptyMessage">Reference code를 입력해주세요.</div>
     </section>
   </main>
 
@@ -620,6 +629,7 @@
         url: "https://pzhzdjsjfdzbzkhnaxmc.supabase.co",
         anonKey: "sb_publishable_3Ox2JIQXVLwusT-xzIMJ4g_YXTR5q8e"
       };
+      const SOURCE_BRANCH = "Downtown";
       const BASE_COLUMN_COUNT = 7;
       const MONEY_FORMAT = new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       const HOUR_FORMAT = new Intl.NumberFormat("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -808,6 +818,10 @@
         return [record.day, dateLabel].filter(Boolean).join(" ");
       }
 
+      function formatRecordBranch(record) {
+        return record.branch || SOURCE_BRANCH;
+      }
+
       function getDailyRecords(staff) {
         const tracker = createDateTracker();
 
@@ -821,6 +835,7 @@
             day: String(row[0] || "").trim(),
             date: String(row[1] || "").trim(),
             dateObj,
+            branch: SOURCE_BRANCH,
             hallTip: parseNumber(row[3]),
             hourlyTip: parseNumber(row[6]),
             hours,
@@ -921,8 +936,10 @@
             return `
               <tr>
                 <td>${escapeHtml(formatCompactRecordDate(record))}</td>
+                <td>${escapeHtml(formatRecordBranch(record))}</td>
                 <td>${formatHours(record.hours)}</td>
                 <td>${formatMoney(record.tip)}</td>
+                <td>${formatMoney(record.hours > 0 ? record.tip / record.hours : 0)}</td>
               </tr>
             `;
           }).join("");
@@ -946,11 +963,13 @@
                   <thead>
                     <tr>
                       <th>날짜</th>
+                      <th>지점</th>
                       <th>근무 시간</th>
                       <th>팁</th>
+                      <th>시간당 팁</th>
                     </tr>
                   </thead>
-                  <tbody>${detailRows || `<tr><td colspan="3">이 기간에는 근무 기록이 없습니다.</td></tr>`}</tbody>
+                  <tbody>${detailRows || `<tr><td colspan="5">기록 없음</td></tr>`}</tbody>
                 </table>
               </div>
             </article>
@@ -971,17 +990,17 @@
         refs.emptyPanel.classList.add("is-hidden");
         refs.profilePanel.classList.remove("is-hidden");
         refs.historyPanel.classList.remove("is-hidden");
-        refs.profileTitle.textContent = `${staff.name}님의 Noble`;
-        refs.profileSubtitle.textContent = `${getBranchLabel(access.branch_scope)} · ${getRoleLabel(access.job_role)} · ${records.length}개 기록`;
+        refs.profileTitle.textContent = staff.name;
+        refs.profileSubtitle.textContent = `${getBranchLabel(access.branch_scope)} · ${getRoleLabel(access.job_role)}`;
         refs.hourlyWageValue.textContent = getRoleLabel(access.job_role);
-        refs.hourlyWageNote.textContent = "시급 컬럼이 시트에 연결되면 이 영역을 급여 정보로 바꿀 수 있습니다.";
+        refs.hourlyWageNote.textContent = getBranchLabel(access.branch_scope);
         refs.totalHoursValue.textContent = formatHours(totalHours);
         refs.totalTipValue.textContent = formatMoney(totalTip);
         refs.tipPerHourValue.textContent = formatMoney(tipPerHour);
-        refs.historySubtitle.textContent = periods.length ? "2주 정산 기간별로 접어두고, 클릭한 기간만 펼칩니다." : "현재 표시할 정산 기록이 없습니다.";
+        refs.historySubtitle.textContent = periods.length ? `${periods.length} periods` : "";
         renderPeriodCards(periods);
 
-        setStatus(`${staff.name}님 기록을 표시 중입니다.`);
+        setStatus("Ready");
       }
 
       function escapeHtml(value = "") {
@@ -1002,7 +1021,7 @@
           state.rows = parseCsv(text);
           state.staff = buildStaff(state.rows[0] || []);
           state.loaded = true;
-          setStatus("고유 번호를 입력해주세요.");
+          setStatus("Ready");
 
           const params = new URLSearchParams(window.location.search);
           const initialId = params.get("id");
@@ -1012,30 +1031,30 @@
           }
         } catch (error) {
           console.error(error);
-          setStatus("정산표를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.");
-          setEmpty("정산표 연결에 실패했습니다.");
+          setStatus("Load failed");
+          setEmpty("정산표 연결 실패");
         }
       }
 
       async function handleLookup(input) {
         if (!state.loaded) {
-          setStatus("정산표를 아직 불러오는 중입니다.");
+          setStatus("Loading...");
           return;
         }
 
-        setStatus("고유 번호를 확인하는 중...");
+        setStatus("Checking...");
 
         try {
           const access = await lookupReference(input);
           if (!access?.staff_key) {
-            setStatus("일치하는 고유 번호가 없습니다.");
-            setEmpty("고유 번호를 다시 확인해주세요.");
+            setStatus("Not found");
+            setEmpty("Reference code를 확인해주세요.");
             return;
           }
 
           const staff = findStaffByKey(access.staff_key);
           if (!staff) {
-            setStatus("권한은 확인됐지만 시트에서 직원 컬럼을 찾지 못했습니다.");
+            setStatus("No sheet column");
             setEmpty(`시트 헤더에 "${access.staff_key}" 직원 컬럼이 있는지 확인해주세요.`);
             return;
           }
@@ -1043,16 +1062,16 @@
           renderProfile(staff, access);
         } catch (error) {
           console.error(error);
-          setStatus("고유 번호 확인 중 오류가 발생했습니다.");
-          setEmpty("Supabase 함수 또는 네트워크 상태를 확인해주세요.");
+          setStatus("Lookup failed");
+          setEmpty("조회 실패");
         }
       }
 
       function submitLookup() {
         const value = refs.staffIdInput.value;
         if (!String(value).trim()) {
-          setStatus("고유 번호를 입력해주세요.");
-          setEmpty("고유 번호를 입력하면 본인 정산 기록을 볼 수 있습니다.");
+          setStatus("Enter reference code");
+          setEmpty("Reference code를 입력해주세요.");
           return;
         }
         handleLookup(value);
