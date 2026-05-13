@@ -366,6 +366,77 @@
 
     .history-table tr:last-child td { border-bottom: 0; }
 
+    .period-list {
+      display: grid;
+      gap: 10px;
+      padding: 16px 18px 18px;
+    }
+
+    .period-card {
+      border: 1px solid rgba(113, 88, 60, 0.14);
+      border-radius: var(--radius-lg);
+      background: linear-gradient(180deg, rgba(255, 254, 250, 0.94), rgba(249, 241, 230, 0.9));
+      overflow: hidden;
+    }
+
+    .period-toggle {
+      width: 100%;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 14px;
+      border: 0;
+      background: transparent;
+      color: var(--ink);
+      text-align: left;
+    }
+
+    .period-title {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .period-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: #6f5b4b;
+      font-size: 0.84rem;
+      font-weight: 800;
+    }
+
+    .period-chevron {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      background: rgba(123, 31, 47, 0.1);
+      color: var(--wine);
+      font-weight: 800;
+    }
+
+    .period-card.is-open .period-chevron {
+      background: rgba(123, 31, 47, 0.16);
+      transform: rotate(180deg);
+    }
+
+    .period-details {
+      display: none;
+      padding: 0 14px 14px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .period-card.is-open .period-details {
+      display: block;
+    }
+
     .empty-state {
       padding: 24px 18px 26px;
       color: var(--muted);
@@ -438,6 +509,10 @@
       }
 
       .history-wrap {
+        padding: 14px;
+      }
+
+      .period-list {
         padding: 14px;
       }
     }
@@ -515,21 +590,7 @@
           <p id="historySubtitle">팁이 있거나 근무 시간이 입력된 날짜만 표시합니다.</p>
         </div>
       </div>
-      <div class="history-wrap">
-        <table class="history-table">
-          <thead>
-            <tr>
-              <th>요일</th>
-              <th>날짜</th>
-              <th>근무 시간</th>
-              <th>팁</th>
-              <th>시간당 팁</th>
-              <th>전체 홀 팁</th>
-            </tr>
-          </thead>
-          <tbody id="historyBody"></tbody>
-        </table>
-      </div>
+      <div class="period-list" id="periodList"></div>
     </section>
 
     <section class="panel" id="emptyPanel">
@@ -555,6 +616,8 @@
       const state = {
         rows: [],
         staff: [],
+        periods: [],
+        openPeriodKey: null,
         loaded: false
       };
 
@@ -577,7 +640,7 @@
           "tipPerHourValue",
           "historyPanel",
           "historySubtitle",
-          "historyBody",
+          "periodList",
           "emptyPanel",
           "emptyMessage"
         ].forEach((id) => {
@@ -683,19 +746,115 @@
         return Array.isArray(data) ? data[0] : data;
       }
 
-      function getRecords(staff) {
+      function isPeriodSummaryRow(row = []) {
+        const day = String(row[0] || "").trim();
+        const date = String(row[1] || "").trim();
+        return !day && !date && (parseNumber(row[2]) > 0 || parseNumber(row[3]) > 0);
+      }
+
+      function parseKoreanMonthDay(value = "") {
+        const match = String(value).trim().match(/(\d{1,2})\s*월\s*(\d{1,2})\s*일/);
+        if (!match) return null;
+        return {
+          month: Number(match[1]),
+          day: Number(match[2])
+        };
+      }
+
+      function createDateTracker() {
+        const today = new Date();
+        const firstDateRow = state.rows.slice(1).find((row) => parseKoreanMonthDay(row[1]));
+        const firstDate = firstDateRow ? parseKoreanMonthDay(firstDateRow[1]) : null;
+        return {
+          year: firstDate && firstDate.month > today.getMonth() + 1 ? today.getFullYear() - 1 : today.getFullYear(),
+          lastMonth: null
+        };
+      }
+
+      function resolveRecordDate(value, tracker) {
+        const parsed = parseKoreanMonthDay(value);
+        if (!parsed) return null;
+        if (tracker.lastMonth && parsed.month < tracker.lastMonth && tracker.lastMonth >= 11 && parsed.month <= 2) {
+          tracker.year += 1;
+        }
+        tracker.lastMonth = parsed.month;
+        return new Date(tracker.year, parsed.month - 1, parsed.day);
+      }
+
+      function formatPeriodDate(date) {
+        if (!date) return "";
+        return new Intl.DateTimeFormat("ko-KR", {
+          month: "numeric",
+          day: "numeric"
+        }).format(date);
+      }
+
+      function getDailyRecords(staff) {
+        const tracker = createDateTracker();
+
         return state.rows.slice(1).map((row) => {
+          if (isPeriodSummaryRow(row)) return { isSummary: true };
+
+          const dateObj = resolveRecordDate(row[1], tracker);
           const hours = parseNumber(row[staff.hoursIndex]);
           const tip = parseNumber(row[staff.tipIndex]);
           return {
             day: String(row[0] || "").trim(),
             date: String(row[1] || "").trim(),
+            dateObj,
             hallTip: parseNumber(row[3]),
             hourlyTip: parseNumber(row[6]),
             hours,
-            tip
+            tip,
+            isSummary: false
           };
-        }).filter((record) => record.hours > 0 || record.tip > 0);
+        });
+      }
+
+      function summarizePeriod(records, index) {
+        const visibleRecords = records.filter((record) => record.hours > 0 || record.tip > 0);
+        const allDates = records.filter((record) => record.dateObj);
+        const startDate = allDates[0]?.dateObj || null;
+        const endDate = allDates[allDates.length - 1]?.dateObj || null;
+        const totalHours = visibleRecords.reduce((sum, record) => sum + record.hours, 0);
+        const totalTip = visibleRecords.reduce((sum, record) => sum + record.tip, 0);
+        const totalHallTip = records.reduce((sum, record) => sum + record.hallTip, 0);
+
+        return {
+          id: `period-${index}`,
+          records: visibleRecords,
+          startDate,
+          endDate,
+          totalHours,
+          totalTip,
+          totalHallTip,
+          workedDays: visibleRecords.length,
+          label: startDate && endDate ? `${formatPeriodDate(startDate)} - ${formatPeriodDate(endDate)}` : `Period ${index + 1}`
+        };
+      }
+
+      function getPeriods(staff) {
+        const sourceRecords = getDailyRecords(staff);
+        const periods = [];
+        let current = [];
+
+        sourceRecords.forEach((record) => {
+          if (record.isSummary) {
+            if (current.length) {
+              periods.push(summarizePeriod(current, periods.length));
+              current = [];
+            }
+            return;
+          }
+
+          current.push(record);
+        });
+
+        if (current.length) {
+          periods.push(summarizePeriod(current, periods.length));
+        }
+
+        return periods;
       }
 
       function setStatus(message) {
@@ -703,6 +862,8 @@
       }
 
       function setEmpty(message) {
+        state.periods = [];
+        state.openPeriodKey = null;
         refs.emptyPanel.classList.remove("is-hidden");
         refs.profilePanel.classList.add("is-hidden");
         refs.historyPanel.classList.add("is-hidden");
@@ -725,10 +886,91 @@
         }[value] || value || "EHWA";
       }
 
+      function isPastPeriod(period) {
+        if (!period.endDate) return false;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const endDate = new Date(period.endDate);
+        endDate.setHours(23, 59, 59, 999);
+        return endDate < today;
+      }
+
+      function getDefaultOpenPeriod(periods = []) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return periods.find((period) => {
+          if (!period.startDate || !period.endDate) return false;
+          const start = new Date(period.startDate);
+          const end = new Date(period.endDate);
+          start.setHours(0, 0, 0, 0);
+          end.setHours(23, 59, 59, 999);
+          return start <= today && today <= end;
+        }) || null;
+      }
+
+      function renderPeriodCards(periods = []) {
+        if (!periods.length) {
+          refs.periodList.innerHTML = `<div class="empty-state">표시할 정산 기간이 없습니다.</div>`;
+          return;
+        }
+
+        refs.periodList.innerHTML = periods.map((period) => {
+          const isOpen = state.openPeriodKey === period.id;
+          const detailRows = period.records.map((record) => {
+            return `
+              <tr>
+                <td>${escapeHtml(record.day)}</td>
+                <td>${escapeHtml(record.date)}</td>
+                <td>${formatHours(record.hours)}</td>
+                <td>${formatMoney(record.tip)}</td>
+                <td>${formatMoney(record.hours > 0 ? record.tip / record.hours : 0)}</td>
+                <td>${formatMoney(record.hallTip)}</td>
+              </tr>
+            `;
+          }).join("");
+
+          return `
+            <article class="period-card ${isOpen ? "is-open" : ""}">
+              <button class="period-toggle" type="button" data-period-id="${period.id}" aria-expanded="${isOpen ? "true" : "false"}">
+                <span>
+                  <span class="period-title">${escapeHtml(period.label)}${isPastPeriod(period) ? " · Closed" : ""}</span>
+                  <span class="period-summary">
+                    <span>${period.workedDays} days</span>
+                    <span>${formatHours(period.totalHours)}</span>
+                    <span>${formatMoney(period.totalTip)}</span>
+                    <span>${formatMoney(period.totalHours > 0 ? period.totalTip / period.totalHours : 0)}/h</span>
+                  </span>
+                </span>
+                <span class="period-chevron" aria-hidden="true">⌄</span>
+              </button>
+              <div class="period-details">
+                <table class="history-table">
+                  <thead>
+                    <tr>
+                      <th>요일</th>
+                      <th>날짜</th>
+                      <th>근무 시간</th>
+                      <th>팁</th>
+                      <th>시간당 팁</th>
+                      <th>전체 홀 팁</th>
+                    </tr>
+                  </thead>
+                  <tbody>${detailRows || `<tr><td colspan="6">이 기간에는 근무 기록이 없습니다.</td></tr>`}</tbody>
+                </table>
+              </div>
+            </article>
+          `;
+        }).join("");
+      }
+
       function renderProfile(staff, access = {}) {
-        const records = getRecords(staff);
-        const totalHours = records.reduce((sum, record) => sum + record.hours, 0);
-        const totalTip = records.reduce((sum, record) => sum + record.tip, 0);
+        const periods = getPeriods(staff);
+        const defaultOpenPeriod = getDefaultOpenPeriod(periods);
+        state.periods = periods;
+        state.openPeriodKey = defaultOpenPeriod ? defaultOpenPeriod.id : null;
+        const records = periods.flatMap((period) => period.records);
+        const totalHours = periods.reduce((sum, period) => sum + period.totalHours, 0);
+        const totalTip = periods.reduce((sum, period) => sum + period.totalTip, 0);
         const tipPerHour = totalHours > 0 ? totalTip / totalHours : 0;
 
         refs.emptyPanel.classList.add("is-hidden");
@@ -741,20 +983,8 @@
         refs.totalHoursValue.textContent = formatHours(totalHours);
         refs.totalTipValue.textContent = formatMoney(totalTip);
         refs.tipPerHourValue.textContent = formatMoney(tipPerHour);
-        refs.historySubtitle.textContent = records.length ? "팁이 있거나 근무 시간이 입력된 날짜만 표시합니다." : "현재 표시할 정산 기록이 없습니다.";
-
-        refs.historyBody.innerHTML = records.slice().reverse().map((record) => {
-          return `
-            <tr>
-              <td>${escapeHtml(record.day)}</td>
-              <td>${escapeHtml(record.date)}</td>
-              <td>${formatHours(record.hours)}</td>
-              <td>${formatMoney(record.tip)}</td>
-              <td>${formatMoney(record.hours > 0 ? record.tip / record.hours : 0)}</td>
-              <td>${formatMoney(record.hallTip)}</td>
-            </tr>
-          `;
-        }).join("");
+        refs.historySubtitle.textContent = periods.length ? "2주 정산 기간별로 접어두고, 클릭한 기간만 펼칩니다." : "현재 표시할 정산 기록이 없습니다.";
+        renderPeriodCards(periods);
 
         setStatus(`${staff.name}님 기록을 표시 중입니다.`);
       }
@@ -837,6 +1067,14 @@
         refs.lookupForm.addEventListener("submit", (event) => {
           event.preventDefault();
           submitLookup();
+        });
+
+        refs.periodList.addEventListener("click", (event) => {
+          const button = event.target.closest("[data-period-id]");
+          if (!button) return;
+          const periodId = button.dataset.periodId;
+          state.openPeriodKey = state.openPeriodKey === periodId ? null : periodId;
+          renderPeriodCards(state.periods);
         });
       }
 
