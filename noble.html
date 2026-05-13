@@ -11,14 +11,14 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
-      --ink: #231914;
-      --muted: #75675d;
+      --ink: #fff6e8;
+      --muted: rgba(255, 234, 206, 0.66);
       --wine: #7b1f2f;
       --gold: #d4af37;
-      --paper: rgba(255, 252, 247, 0.95);
-      --paper-strong: rgba(255, 252, 247, 0.98);
-      --line: rgba(116, 88, 58, 0.17);
-      --shadow: 0 24px 54px rgba(30, 19, 12, 0.12);
+      --paper: rgba(31, 20, 15, 0.9);
+      --paper-strong: rgba(41, 26, 19, 0.96);
+      --line: rgba(255, 224, 164, 0.16);
+      --shadow: 0 24px 54px rgba(0, 0, 0, 0.3);
       --radius-xl: 26px;
       --radius-lg: 18px;
       --radius-md: 12px;
@@ -32,9 +32,9 @@
       color: var(--ink);
       font-family: "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background:
-        radial-gradient(circle at 10% 0%, rgba(212, 175, 55, 0.18), transparent 29%),
-        radial-gradient(circle at 88% 14%, rgba(123, 31, 47, 0.14), transparent 24%),
-        linear-gradient(180deg, #fbf7f1 0%, #f2eadf 100%);
+        radial-gradient(circle at 10% 0%, rgba(212, 175, 55, 0.16), transparent 29%),
+        radial-gradient(circle at 88% 14%, rgba(123, 31, 47, 0.2), transparent 24%),
+        linear-gradient(180deg, #120d0a 0%, #1d130f 42%, #261712 100%);
     }
 
     body::before {
@@ -44,9 +44,9 @@
       z-index: -1;
       pointer-events: none;
       background:
-        linear-gradient(180deg, rgba(255, 252, 247, 0.16), rgba(255, 252, 247, 0.06)),
+        linear-gradient(180deg, rgba(255, 252, 247, 0.06), rgba(255, 252, 247, 0.02)),
         url("assets/pattern.webp") center / 760px auto;
-      opacity: 0.16;
+      opacity: 0.18;
     }
 
     button,
@@ -84,9 +84,9 @@
       height: 58px;
       flex: none;
       border-radius: 999px;
-      border: 1px solid rgba(73, 53, 36, 0.12);
-      background: linear-gradient(180deg, rgba(255, 254, 250, 0.98), rgba(243, 231, 215, 0.94));
-      box-shadow: 0 14px 28px rgba(42, 28, 18, 0.1);
+      border: 1px solid rgba(255, 219, 154, 0.28);
+      background: linear-gradient(180deg, rgba(255, 252, 247, 0.28), rgba(255, 243, 224, 0.18));
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.24);
     }
 
     .logo-link img {
@@ -97,7 +97,7 @@
 
     .brand-copy p {
       margin: 0 0 3px;
-      color: var(--wine);
+      color: #e9bf69;
       font-size: 0.78rem;
       font-weight: 800;
       letter-spacing: 0.14em;
@@ -118,13 +118,13 @@
       min-height: 42px;
       padding: 0 14px;
       border-radius: 999px;
-      border: 1px solid rgba(113, 88, 60, 0.16);
-      background: rgba(255, 251, 245, 0.84);
-      color: #2c2016;
+      border: 1px solid rgba(255, 233, 194, 0.24);
+      background: rgba(255, 248, 238, 0.16);
+      color: #fff4e5;
       font-size: 0.92rem;
       font-weight: 800;
       white-space: nowrap;
-      box-shadow: 0 10px 22px rgba(32, 20, 13, 0.05);
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.2);
     }
 
     .pill-btn.primary {
@@ -196,12 +196,6 @@
       gap: 8px;
     }
 
-    .lookup-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 8px;
-    }
-
     .lookup-row input {
       min-width: 0;
       width: 100%;
@@ -223,16 +217,6 @@
     .lookup-card .pill-btn {
       min-height: 48px;
       padding: 0 18px;
-    }
-
-    .lookup-card .pill-btn.secondary {
-      min-height: 36px;
-      padding: 0 12px;
-      border-color: rgba(255, 230, 185, 0.16);
-      background: rgba(255, 248, 238, 0.12);
-      color: #fff2dd;
-      font-size: 0.84rem;
-      box-shadow: none;
     }
 
     .lookup-status {
@@ -305,7 +289,7 @@
       padding: 12px;
       border: 1px solid rgba(113, 88, 60, 0.13);
       border-radius: var(--radius-lg);
-      background: linear-gradient(180deg, rgba(255, 254, 250, 0.92), rgba(249, 241, 230, 0.88));
+      background: linear-gradient(180deg, rgba(255, 250, 244, 0.12), rgba(255, 240, 219, 0.08));
     }
 
     .metric-card span,
@@ -327,7 +311,7 @@
 
     .metric-card small {
       margin-top: 6px;
-      color: #8b7d72;
+      color: rgba(255, 232, 202, 0.56);
       font-size: 0.78rem;
       line-height: 1.45;
     }
@@ -351,15 +335,15 @@
     .history-table th,
     .history-table td {
       padding: 13px 12px;
-      border-bottom: 1px solid rgba(113, 88, 60, 0.12);
+      border-bottom: 1px solid rgba(255, 224, 164, 0.12);
       text-align: right;
       font-size: 0.93rem;
       white-space: nowrap;
     }
 
     .history-table th {
-      color: #6f5b4b;
-      background: rgba(240, 226, 208, 0.58);
+      color: rgba(255, 234, 206, 0.72);
+      background: rgba(255, 224, 164, 0.08);
       font-size: 0.78rem;
       font-weight: 800;
       letter-spacing: 0.04em;
@@ -386,7 +370,7 @@
     .history-table th:nth-child(5),
     .history-table td:nth-child(5) {
       width: 17%;
-      color: #7b6d62;
+      color: rgba(255, 234, 206, 0.64);
     }
 
     .history-table tr:last-child td { border-bottom: 0; }
@@ -398,16 +382,16 @@
     }
 
     .period-card {
-      border: 1px solid rgba(113, 88, 60, 0.14);
+      border: 1px solid rgba(255, 224, 164, 0.14);
       border-radius: var(--radius-lg);
-      background: linear-gradient(180deg, rgba(255, 254, 250, 0.94), rgba(249, 241, 230, 0.9));
+      background: linear-gradient(180deg, rgba(255, 250, 244, 0.09), rgba(255, 240, 219, 0.055));
       overflow: hidden;
       transition: border-color 160ms ease, box-shadow 160ms ease;
     }
 
     .period-card.is-open {
-      border-color: rgba(123, 31, 47, 0.26);
-      box-shadow: 0 16px 30px rgba(46, 29, 18, 0.08);
+      border-color: rgba(233, 191, 105, 0.32);
+      box-shadow: 0 16px 30px rgba(0, 0, 0, 0.16);
     }
 
     .period-toggle {
@@ -425,7 +409,7 @@
     }
 
     .period-toggle:hover {
-      background: rgba(123, 31, 47, 0.035);
+      background: rgba(255, 224, 164, 0.045);
     }
 
     .period-title {
@@ -440,7 +424,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      color: #6f5b4b;
+      color: rgba(255, 234, 206, 0.78);
       font-size: 0.8rem;
       font-weight: 800;
     }
@@ -451,7 +435,7 @@
       min-height: 24px;
       padding: 0 8px;
       border-radius: 999px;
-      background: rgba(123, 31, 47, 0.06);
+      background: rgba(255, 224, 164, 0.1);
     }
 
     .period-chevron {
@@ -461,8 +445,8 @@
       width: 32px;
       height: 32px;
       border-radius: 999px;
-      background: rgba(123, 31, 47, 0.1);
-      color: var(--wine);
+      background: rgba(255, 224, 164, 0.12);
+      color: #e9bf69;
       transition: background 160ms ease, transform 160ms ease;
     }
 
@@ -478,7 +462,7 @@
     }
 
     .period-card.is-open .period-chevron {
-      background: rgba(123, 31, 47, 0.16);
+      background: rgba(233, 191, 105, 0.18);
     }
 
     .period-card.is-open .period-chevron::before {
@@ -556,14 +540,6 @@
       }
 
       .lookup-card .pill-btn {
-        width: 100%;
-      }
-
-      .lookup-actions {
-        justify-content: stretch;
-      }
-
-      .lookup-card .pill-btn.secondary {
         width: 100%;
       }
 
@@ -662,9 +638,6 @@
           <input id="staffIdInput" name="staffId" type="text" autocomplete="off" placeholder="Reference code" />
           <button class="pill-btn primary" type="submit">View</button>
         </div>
-        <div class="lookup-actions">
-          <button class="pill-btn secondary" id="clearSavedRefBtn" type="button">Clear saved code</button>
-        </div>
         <p class="lookup-status" id="lookupStatus">Loading...</p>
       </form>
     </section>
@@ -748,7 +721,6 @@
         [
           "lookupForm",
           "staffIdInput",
-          "clearSavedRefBtn",
           "lookupStatus",
           "profilePanel",
           "profileTitle",
@@ -1008,14 +980,6 @@
         }
       }
 
-      function clearSavedRefCode() {
-        try {
-          window.localStorage.removeItem(SAVED_REF_KEY);
-        } catch (error) {
-          // Private browsing or storage restrictions can block this.
-        }
-      }
-
       function setEmpty(message) {
         state.periods = [];
         state.openPeriodKey = null;
@@ -1203,18 +1167,6 @@
         refs.lookupForm.addEventListener("submit", (event) => {
           event.preventDefault();
           submitLookup();
-        });
-
-        refs.clearSavedRefBtn.addEventListener("click", () => {
-          clearSavedRefCode();
-          refs.staffIdInput.value = "";
-          state.periods = [];
-          state.openPeriodKey = null;
-          refs.profilePanel.classList.add("is-hidden");
-          refs.historyPanel.classList.add("is-hidden");
-          refs.emptyPanel.classList.remove("is-hidden");
-          refs.emptyMessage.textContent = "Enter your reference code.";
-          setStatus("Cleared");
         });
 
         refs.periodList.addEventListener("click", (event) => {
