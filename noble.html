@@ -342,6 +342,7 @@
       width: 100%;
       min-width: 0;
       border-collapse: collapse;
+      table-layout: fixed;
       border-spacing: 0;
       overflow: hidden;
       border-radius: var(--radius-lg);
@@ -368,6 +369,24 @@
     .history-table th:first-child,
     .history-table td:first-child {
       text-align: left;
+    }
+
+    .history-table th:nth-child(1),
+    .history-table td:nth-child(1) { width: 26%; }
+
+    .history-table th:nth-child(2),
+    .history-table td:nth-child(2) { width: 17%; }
+
+    .history-table th:nth-child(3),
+    .history-table td:nth-child(3) { width: 20%; }
+
+    .history-table th:nth-child(4),
+    .history-table td:nth-child(4) { width: 20%; }
+
+    .history-table th:nth-child(5),
+    .history-table td:nth-child(5) {
+      width: 17%;
+      color: #7b6d62;
     }
 
     .history-table tr:last-child td { border-bottom: 0; }
@@ -640,11 +659,11 @@
       <form class="lookup-card" id="lookupForm">
         <label for="staffIdInput">Reference Code</label>
         <div class="lookup-row">
-          <input id="staffIdInput" name="staffId" type="text" autocomplete="off" placeholder="고유 번호 입력" />
-          <button class="pill-btn primary" type="submit">조회</button>
+          <input id="staffIdInput" name="staffId" type="text" autocomplete="off" placeholder="Reference code" />
+          <button class="pill-btn primary" type="submit">View</button>
         </div>
         <div class="lookup-actions">
-          <button class="pill-btn secondary" id="clearSavedRefBtn" type="button">초기화</button>
+          <button class="pill-btn secondary" id="clearSavedRefBtn" type="button">Clear saved code</button>
         </div>
         <p class="lookup-status" id="lookupStatus">Loading...</p>
       </form>
@@ -653,30 +672,30 @@
     <section class="panel is-hidden" id="profilePanel" aria-live="polite">
       <div class="panel-head">
         <div>
-          <h3 id="profileTitle">직원 정보</h3>
-          <p id="profileSubtitle">조회된 기록이 여기에 표시됩니다.</p>
+          <h3 id="profileTitle">Staff</h3>
+          <p id="profileSubtitle"></p>
         </div>
       </div>
       <div class="profile-grid">
         <article class="metric-card">
-          <span>직무</span>
+          <span>Role</span>
           <strong id="hourlyWageValue">-</strong>
           <small id="hourlyWageNote">-</small>
         </article>
         <article class="metric-card">
-          <span>총 근무</span>
+          <span>Total hours</span>
           <strong id="totalHoursValue">-</strong>
-          <small>시간 합계</small>
+          <small>Hours</small>
         </article>
         <article class="metric-card">
-          <span>총 팁</span>
+          <span>Total tips</span>
           <strong id="totalTipValue">-</strong>
-          <small>팁 합계</small>
+          <small>Tips</small>
         </article>
         <article class="metric-card">
-          <span>시간당 팁</span>
+          <span>Tip / hour</span>
           <strong id="tipPerHourValue">-</strong>
-          <small>팁 / 시간</small>
+          <small>Tips per hour</small>
         </article>
       </div>
     </section>
@@ -684,7 +703,7 @@
     <section class="panel is-hidden" id="historyPanel">
       <div class="panel-head">
         <div>
-          <h3>정산 기록</h3>
+          <h3>Pay periods</h3>
           <p id="historySubtitle"></p>
         </div>
       </div>
@@ -692,7 +711,7 @@
     </section>
 
     <section class="panel" id="emptyPanel">
-      <div class="empty-state" id="emptyMessage">Reference code를 입력해주세요.</div>
+      <div class="empty-state" id="emptyMessage">Enter your reference code.</div>
     </section>
   </main>
 
@@ -1008,10 +1027,10 @@
 
       function getRoleLabel(value = "") {
         return {
-          server: "서버",
-          kitchen: "주방",
-          manager: "매니저"
-        }[value] || value || "직원";
+          server: "Server",
+          kitchen: "Kitchen",
+          manager: "Manager"
+        }[value] || value || "Staff";
       }
 
       function getBranchLabel(value = "") {
@@ -1028,7 +1047,7 @@
 
       function renderPeriodCards(periods = []) {
         if (!periods.length) {
-          refs.periodList.innerHTML = `<div class="empty-state">표시할 정산 기간이 없습니다.</div>`;
+          refs.periodList.innerHTML = `<div class="empty-state">No pay periods.</div>`;
           return;
         }
 
@@ -1038,10 +1057,10 @@
             return `
               <tr>
                 <td>${escapeHtml(formatCompactRecordDate(record))}</td>
-                <td>${escapeHtml(formatRecordBranch(record))}</td>
                 <td>${formatHours(record.hours)}</td>
                 <td>${formatMoney(record.tip)}</td>
                 <td>${formatMoney(record.hours > 0 ? record.tip / record.hours : 0)}</td>
+                <td>${escapeHtml(formatRecordBranch(record))}</td>
               </tr>
             `;
           }).join("");
@@ -1052,7 +1071,7 @@
                 <span>
                   <span class="period-title">${escapeHtml(period.label)}</span>
                   <span class="period-summary">
-                    <span>${period.workedDays}일</span>
+                    <span>${period.workedDays} days</span>
                     <span>${formatHours(period.totalHours)}</span>
                     <span>${formatMoney(period.totalTip)}</span>
                     <span>${formatMoney(period.totalHours > 0 ? period.totalTip / period.totalHours : 0)}/h</span>
@@ -1064,14 +1083,14 @@
                 <table class="history-table">
                   <thead>
                     <tr>
-                      <th>날짜</th>
-                      <th>지점</th>
-                      <th>근무</th>
-                      <th>팁</th>
-                      <th>팁/h</th>
+                      <th>Date</th>
+                      <th>Hours</th>
+                      <th>Tips</th>
+                      <th>Tip/h</th>
+                      <th>Branch</th>
                     </tr>
                   </thead>
-                  <tbody>${detailRows || `<tr><td colspan="5">기록 없음</td></tr>`}</tbody>
+                  <tbody>${detailRows || `<tr><td colspan="5">No records</td></tr>`}</tbody>
                 </table>
               </div>
             </article>
@@ -1134,7 +1153,7 @@
         } catch (error) {
           console.error(error);
           setStatus("Load failed");
-          setEmpty("정산표 연결 실패");
+          setEmpty("Could not load the sheet.");
         }
       }
 
@@ -1150,14 +1169,14 @@
           const access = await lookupReference(input);
           if (!access?.staff_key) {
             setStatus("Not found");
-            setEmpty("Reference code를 확인해주세요.");
+            setEmpty("Check your reference code.");
             return;
           }
 
           const staff = findStaffByKey(access.staff_key);
           if (!staff) {
             setStatus("No sheet column");
-            setEmpty(`시트 헤더에 "${access.staff_key}" 직원 컬럼이 있는지 확인해주세요.`);
+            setEmpty(`No sheet column found for "${access.staff_key}".`);
             return;
           }
 
@@ -1166,7 +1185,7 @@
         } catch (error) {
           console.error(error);
           setStatus("Lookup failed");
-          setEmpty("조회 실패");
+          setEmpty("Lookup failed.");
         }
       }
 
@@ -1174,7 +1193,7 @@
         const value = refs.staffIdInput.value;
         if (!String(value).trim()) {
           setStatus("Enter reference code");
-          setEmpty("Reference code를 입력해주세요.");
+          setEmpty("Enter your reference code.");
           return;
         }
         handleLookup(value);
@@ -1194,7 +1213,7 @@
           refs.profilePanel.classList.add("is-hidden");
           refs.historyPanel.classList.add("is-hidden");
           refs.emptyPanel.classList.remove("is-hidden");
-          refs.emptyMessage.textContent = "Reference code를 입력해주세요.";
+          refs.emptyMessage.textContent = "Enter your reference code.";
           setStatus("Cleared");
         });
 
