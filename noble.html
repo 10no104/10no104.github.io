@@ -152,13 +152,13 @@
     .hero-copy {
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      gap: 14px;
-      min-height: 194px;
+      justify-content: center;
+      gap: 8px;
+      min-height: 0;
     }
 
     .hero-kicker {
-      margin: 0 0 10px;
+      margin: 0;
       color: #e9bf69;
       font-size: 0.8rem;
       font-weight: 800;
@@ -169,7 +169,7 @@
     .hero h2 {
       margin: 0;
       max-width: 620px;
-      font-size: clamp(1.75rem, 5.6vw, 3.25rem);
+      font-size: clamp(1.75rem, 5.2vw, 3rem);
       letter-spacing: -0.05em;
       line-height: 0.95;
     }
@@ -367,6 +367,12 @@
       border-radius: var(--radius-lg);
       background: linear-gradient(180deg, rgba(255, 254, 250, 0.94), rgba(249, 241, 230, 0.9));
       overflow: hidden;
+      transition: border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .period-card.is-open {
+      border-color: rgba(123, 31, 47, 0.26);
+      box-shadow: 0 16px 30px rgba(46, 29, 18, 0.08);
     }
 
     .period-toggle {
@@ -380,6 +386,11 @@
       background: transparent;
       color: var(--ink);
       text-align: left;
+      transition: background 160ms ease;
+    }
+
+    .period-toggle:hover {
+      background: rgba(123, 31, 47, 0.035);
     }
 
     .period-title {
@@ -393,10 +404,19 @@
     .period-summary {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 6px;
       color: #6f5b4b;
-      font-size: 0.84rem;
+      font-size: 0.8rem;
       font-weight: 800;
+    }
+
+    .period-summary span {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 0 8px;
+      border-radius: 999px;
+      background: rgba(123, 31, 47, 0.06);
     }
 
     .period-chevron {
@@ -408,12 +428,27 @@
       border-radius: 999px;
       background: rgba(123, 31, 47, 0.1);
       color: var(--wine);
-      font-weight: 800;
+      transition: background 160ms ease, transform 160ms ease;
+    }
+
+    .period-chevron::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      margin-top: -4px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(45deg);
+      transition: transform 160ms ease, margin 160ms ease;
     }
 
     .period-card.is-open .period-chevron {
       background: rgba(123, 31, 47, 0.16);
-      transform: rotate(180deg);
+    }
+
+    .period-card.is-open .period-chevron::before {
+      margin-top: 4px;
+      transform: rotate(225deg);
     }
 
     .period-details {
@@ -531,12 +566,26 @@
 
       .history-table th,
       .history-table td {
-        padding: 10px 6px;
-        font-size: 0.8rem;
+        padding: 9px 5px;
+        font-size: 0.78rem;
       }
 
       .history-table th {
-        font-size: 0.66rem;
+        font-size: 0.64rem;
+      }
+
+      .period-title {
+        font-size: 0.94rem;
+      }
+
+      .period-summary {
+        gap: 5px;
+        font-size: 0.74rem;
+      }
+
+      .period-summary span {
+        min-height: 22px;
+        padding: 0 6px;
       }
     }
   </style>
@@ -950,13 +999,13 @@
                 <span>
                   <span class="period-title">${escapeHtml(period.label)}</span>
                   <span class="period-summary">
-                    <span>${period.workedDays} days</span>
+                    <span>${period.workedDays}일</span>
                     <span>${formatHours(period.totalHours)}</span>
                     <span>${formatMoney(period.totalTip)}</span>
                     <span>${formatMoney(period.totalHours > 0 ? period.totalTip / period.totalHours : 0)}/h</span>
                   </span>
                 </span>
-                <span class="period-chevron" aria-hidden="true">⌄</span>
+                <span class="period-chevron" aria-hidden="true"></span>
               </button>
               <div class="period-details">
                 <table class="history-table">
@@ -964,9 +1013,9 @@
                     <tr>
                       <th>날짜</th>
                       <th>지점</th>
-                      <th>근무 시간</th>
+                      <th>근무</th>
                       <th>팁</th>
-                      <th>시간당 팁</th>
+                      <th>팁/h</th>
                     </tr>
                   </thead>
                   <tbody>${detailRows || `<tr><td colspan="5">기록 없음</td></tr>`}</tbody>
