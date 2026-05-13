@@ -1,0 +1,824 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Noble | EHWA Staff</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/global.css?v=20260423-10" />
+  <style>
+    :root {
+      --ink: #231914;
+      --muted: #75675d;
+      --wine: #7b1f2f;
+      --gold: #d4af37;
+      --paper: rgba(255, 252, 247, 0.95);
+      --paper-strong: rgba(255, 252, 247, 0.98);
+      --line: rgba(116, 88, 58, 0.17);
+      --shadow: 0 24px 54px rgba(30, 19, 12, 0.12);
+      --radius-xl: 26px;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(212, 175, 55, 0.18), transparent 29%),
+        radial-gradient(circle at 88% 14%, rgba(123, 31, 47, 0.14), transparent 24%),
+        linear-gradient(180deg, #fbf7f1 0%, #f2eadf 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.16), rgba(255, 252, 247, 0.06)),
+        url("assets/pattern.webp") center / 760px auto;
+      opacity: 0.16;
+    }
+
+    button,
+    input { font: inherit; }
+
+    button { cursor: pointer; }
+    a { color: inherit; text-decoration: none; }
+
+    .shell {
+      width: min(100% - 18px, 1040px);
+      margin: 0 auto;
+      padding: 16px 0 42px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .logo-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 58px;
+      height: 58px;
+      flex: none;
+      border-radius: 999px;
+      border: 1px solid rgba(73, 53, 36, 0.12);
+      background: linear-gradient(180deg, rgba(255, 254, 250, 0.98), rgba(243, 231, 215, 0.94));
+      box-shadow: 0 14px 28px rgba(42, 28, 18, 0.1);
+    }
+
+    .logo-link img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+    }
+
+    .brand-copy p {
+      margin: 0 0 3px;
+      color: var(--wine);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .brand-copy h1 {
+      margin: 0;
+      font-size: clamp(1.42rem, 5vw, 2.35rem);
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+
+    .pill-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(113, 88, 60, 0.16);
+      background: rgba(255, 251, 245, 0.84);
+      color: #2c2016;
+      font-size: 0.92rem;
+      font-weight: 800;
+      white-space: nowrap;
+      box-shadow: 0 10px 22px rgba(32, 20, 13, 0.05);
+    }
+
+    .pill-btn.primary {
+      color: #fff;
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--wine), #b9871f);
+      box-shadow: 0 18px 30px rgba(123, 31, 47, 0.18);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr);
+      gap: 16px;
+      align-items: stretch;
+      margin-bottom: 16px;
+      padding: 20px;
+      border-radius: var(--radius-xl);
+      color: #fff8f0;
+      background:
+        linear-gradient(135deg, rgba(22, 15, 11, 0.96) 0%, rgba(37, 23, 16, 0.94) 46%, rgba(68, 24, 33, 0.92) 100%),
+        url("assets/pattern.webp") center / 520px auto;
+      box-shadow: 0 28px 56px rgba(17, 11, 8, 0.18);
+    }
+
+    .hero-copy {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+      min-height: 268px;
+    }
+
+    .hero-kicker {
+      margin: 0 0 10px;
+      color: #e9bf69;
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .hero h2 {
+      margin: 0;
+      max-width: 620px;
+      font-size: clamp(2rem, 6.5vw, 4rem);
+      letter-spacing: -0.05em;
+      line-height: 0.95;
+    }
+
+    .hero-note {
+      margin: 0;
+      max-width: 560px;
+      color: rgba(255, 245, 230, 0.78);
+      font-size: 1rem;
+      line-height: 1.65;
+    }
+
+    .lookup-card {
+      align-self: stretch;
+      padding: 16px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255, 230, 185, 0.16);
+      background: rgba(255, 250, 244, 0.1);
+      box-shadow: inset 0 1px 0 rgba(255, 247, 228, 0.12);
+    }
+
+    .lookup-card label {
+      display: block;
+      margin-bottom: 8px;
+      color: rgba(255, 248, 240, 0.74);
+      font-size: 0.88rem;
+      font-weight: 800;
+    }
+
+    .lookup-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .lookup-row input {
+      min-width: 0;
+      width: 100%;
+      min-height: 48px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 230, 185, 0.18);
+      background: rgba(255, 252, 247, 0.94);
+      color: #211813;
+      outline: none;
+      font-weight: 800;
+    }
+
+    .lookup-row input:focus {
+      border-color: rgba(233, 191, 105, 0.72);
+      box-shadow: 0 0 0 3px rgba(233, 191, 105, 0.18);
+    }
+
+    .lookup-card .pill-btn {
+      min-height: 48px;
+      padding: 0 18px;
+    }
+
+    .lookup-status {
+      min-height: 22px;
+      margin: 12px 2px 0;
+      color: rgba(255, 244, 222, 0.84);
+      font-size: 0.88rem;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .staff-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .staff-chip {
+      min-height: 34px;
+      padding: 0 12px;
+      border: 1px solid rgba(255, 230, 185, 0.16);
+      border-radius: 999px;
+      background: rgba(255, 248, 238, 0.12);
+      color: #fff2dd;
+      font-size: 0.84rem;
+      font-weight: 800;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      background: var(--paper);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel + .panel { margin-top: 14px; }
+
+    .panel-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px 18px 0;
+    }
+
+    .panel-head h3 {
+      margin: 0;
+      font-size: 1.35rem;
+      letter-spacing: -0.04em;
+    }
+
+    .panel-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      padding: 18px;
+    }
+
+    .metric-card {
+      min-height: 112px;
+      padding: 14px;
+      border: 1px solid rgba(113, 88, 60, 0.13);
+      border-radius: var(--radius-lg);
+      background: linear-gradient(180deg, rgba(255, 254, 250, 0.92), rgba(249, 241, 230, 0.88));
+    }
+
+    .metric-card span,
+    .metric-card strong,
+    .metric-card small { display: block; }
+
+    .metric-card span {
+      margin-bottom: 9px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .metric-card strong {
+      font-size: 1.52rem;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+    }
+
+    .metric-card small {
+      margin-top: 8px;
+      color: #8b7d72;
+      font-size: 0.78rem;
+      line-height: 1.45;
+    }
+
+    .history-wrap {
+      padding: 16px 18px 18px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .history-table {
+      width: 100%;
+      min-width: 680px;
+      border-collapse: collapse;
+      border-spacing: 0;
+      overflow: hidden;
+      border-radius: var(--radius-lg);
+    }
+
+    .history-table th,
+    .history-table td {
+      padding: 13px 12px;
+      border-bottom: 1px solid rgba(113, 88, 60, 0.12);
+      text-align: right;
+      font-size: 0.93rem;
+      white-space: nowrap;
+    }
+
+    .history-table th {
+      color: #6f5b4b;
+      background: rgba(240, 226, 208, 0.58);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .history-table th:first-child,
+    .history-table td:first-child,
+    .history-table th:nth-child(2),
+    .history-table td:nth-child(2) {
+      text-align: left;
+    }
+
+    .history-table tr:last-child td { border-bottom: 0; }
+
+    .empty-state {
+      padding: 24px 18px 26px;
+      color: var(--muted);
+      font-size: 0.96rem;
+      line-height: 1.65;
+    }
+
+    .is-hidden { display: none !important; }
+
+    @media (max-width: 820px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-copy {
+        min-height: auto;
+      }
+
+      .profile-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 560px) {
+      .shell {
+        width: min(100% - 12px, 1040px);
+        padding-top: 10px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+      }
+
+      .logo-link {
+        width: 52px;
+        height: 52px;
+      }
+
+      .logo-link img {
+        width: 36px;
+        height: 36px;
+      }
+
+      .pill-btn.home-link {
+        min-height: 38px;
+        padding: 0 11px;
+        font-size: 0.84rem;
+      }
+
+      .hero {
+        padding: 16px;
+        border-radius: 22px;
+      }
+
+      .lookup-row {
+        flex-direction: column;
+      }
+
+      .lookup-card .pill-btn {
+        width: 100%;
+      }
+
+      .profile-grid {
+        grid-template-columns: 1fr;
+        padding: 14px;
+      }
+
+      .panel-head {
+        padding: 16px 14px 0;
+      }
+
+      .history-wrap {
+        padding: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <a class="logo-link" href="index.html" aria-label="EHWA home">
+          <img src="assets/cropped-favicon-white-192x192.png" alt="" />
+        </a>
+        <div class="brand-copy">
+          <p>EHWA Staff</p>
+          <h1>Noble</h1>
+        </div>
+      </div>
+      <a class="pill-btn home-link" href="index.html">Home</a>
+    </header>
+
+    <section class="hero" aria-labelledby="nobleTitle">
+      <div class="hero-copy">
+        <div>
+          <p class="hero-kicker">Private lookup</p>
+          <h2 id="nobleTitle">내 근무 기록과 팁을 빠르게 확인</h2>
+        </div>
+        <p class="hero-note">직원 ID 또는 이름을 입력하면 공개 정산표에서 본인 컬럼만 모아 보여줍니다.</p>
+      </div>
+
+      <form class="lookup-card" id="lookupForm">
+        <label for="staffIdInput">직원 ID / 이름</label>
+        <div class="lookup-row">
+          <input id="staffIdInput" name="staffId" type="text" autocomplete="off" placeholder="예: 영환" />
+          <button class="pill-btn primary" type="submit">조회</button>
+        </div>
+        <p class="lookup-status" id="lookupStatus">정산표를 불러오는 중...</p>
+        <div class="staff-chips" id="staffChips" aria-label="직원 바로 조회"></div>
+      </form>
+    </section>
+
+    <section class="panel is-hidden" id="profilePanel" aria-live="polite">
+      <div class="panel-head">
+        <div>
+          <h3 id="profileTitle">직원 정보</h3>
+          <p id="profileSubtitle">조회된 기록이 여기에 표시됩니다.</p>
+        </div>
+      </div>
+      <div class="profile-grid">
+        <article class="metric-card">
+          <span>등록 시급</span>
+          <strong id="hourlyWageValue">-</strong>
+          <small id="hourlyWageNote">시급 데이터가 연결되면 자동 표시됩니다.</small>
+        </article>
+        <article class="metric-card">
+          <span>총 근무 시간</span>
+          <strong id="totalHoursValue">-</strong>
+          <small>정산표에 입력된 시간 합계</small>
+        </article>
+        <article class="metric-card">
+          <span>총 팁</span>
+          <strong id="totalTipValue">-</strong>
+          <small>직원 컬럼 기준 팁 합계</small>
+        </article>
+        <article class="metric-card">
+          <span>시간당 팁</span>
+          <strong id="tipPerHourValue">-</strong>
+          <small>총 팁 / 총 근무 시간</small>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel is-hidden" id="historyPanel">
+      <div class="panel-head">
+        <div>
+          <h3>최근 정산 기록</h3>
+          <p id="historySubtitle">팁이 있거나 근무 시간이 입력된 날짜만 표시합니다.</p>
+        </div>
+      </div>
+      <div class="history-wrap">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>요일</th>
+              <th>날짜</th>
+              <th>근무 시간</th>
+              <th>팁</th>
+              <th>시간당 팁</th>
+              <th>전체 홀 팁</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel" id="emptyPanel">
+      <div class="empty-state" id="emptyMessage">직원 ID 또는 이름을 입력하면 본인 정산 기록을 볼 수 있습니다.</div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      "use strict";
+
+      const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRNRIMOfYbtWYBKCmX3pq-1oA-a-XPBafNLjij_scpvXLoBbbdsJB9u03mrbYfNxQ/pub?gid=1128274968&single=true&output=csv";
+      const BASE_COLUMN_COUNT = 7;
+      const MONEY_FORMAT = new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const HOUR_FORMAT = new Intl.NumberFormat("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+
+      const STAFF_PROFILES = {
+        // Example: "1001": { name: "영환", hourlyWage: 16.5, branch: "Uptown" }
+      };
+
+      const refs = {};
+      const state = {
+        rows: [],
+        staff: [],
+        loaded: false
+      };
+
+      function byId(id) {
+        return document.getElementById(id);
+      }
+
+      function cacheRefs() {
+        [
+          "lookupForm",
+          "staffIdInput",
+          "lookupStatus",
+          "staffChips",
+          "profilePanel",
+          "profileTitle",
+          "profileSubtitle",
+          "hourlyWageValue",
+          "hourlyWageNote",
+          "totalHoursValue",
+          "totalTipValue",
+          "tipPerHourValue",
+          "historyPanel",
+          "historySubtitle",
+          "historyBody",
+          "emptyPanel",
+          "emptyMessage"
+        ].forEach((id) => {
+          refs[id] = byId(id);
+        });
+      }
+
+      function normalizeKey(value = "") {
+        return String(value).trim().toLowerCase().replace(/\s+/g, "");
+      }
+
+      function parseNumber(value = "") {
+        const number = Number.parseFloat(String(value).replace(/,/g, "").trim());
+        return Number.isFinite(number) ? number : 0;
+      }
+
+      function formatMoney(value) {
+        return `$${MONEY_FORMAT.format(value || 0)}`;
+      }
+
+      function formatHours(value) {
+        return `${HOUR_FORMAT.format(value || 0)}h`;
+      }
+
+      function parseCsv(text = "") {
+        const rows = [];
+        let row = [];
+        let cell = "";
+        let inQuotes = false;
+
+        for (let index = 0; index < text.length; index += 1) {
+          const char = text[index];
+          const next = text[index + 1];
+
+          if (char === '"') {
+            if (inQuotes && next === '"') {
+              cell += '"';
+              index += 1;
+            } else {
+              inQuotes = !inQuotes;
+            }
+            continue;
+          }
+
+          if (char === "," && !inQuotes) {
+            row.push(cell);
+            cell = "";
+            continue;
+          }
+
+          if ((char === "\n" || char === "\r") && !inQuotes) {
+            if (char === "\r" && next === "\n") index += 1;
+            row.push(cell);
+            rows.push(row);
+            row = [];
+            cell = "";
+            continue;
+          }
+
+          cell += char;
+        }
+
+        if (cell || row.length) {
+          row.push(cell);
+          rows.push(row);
+        }
+
+        return rows.filter((cells) => cells.some((value) => String(value).trim()));
+      }
+
+      function buildStaff(header = []) {
+        const staff = [];
+
+        for (let index = BASE_COLUMN_COUNT; index < header.length; index += 2) {
+          const name = String(header[index] || "").trim();
+          if (!name) continue;
+          staff.push({
+            id: name,
+            name,
+            key: normalizeKey(name),
+            hoursIndex: index,
+            tipIndex: index + 1
+          });
+        }
+
+        return staff;
+      }
+
+      function findStaff(input = "") {
+        const key = normalizeKey(input);
+        if (!key) return null;
+
+        const profile = STAFF_PROFILES[input] || Object.values(STAFF_PROFILES).find((item) => {
+          return normalizeKey(item.name) === key || normalizeKey(item.id) === key;
+        });
+
+        if (profile) {
+          const staff = state.staff.find((item) => normalizeKey(item.name) === normalizeKey(profile.name));
+          return staff ? { ...staff, profile } : null;
+        }
+
+        return state.staff.find((item) => item.key === key || normalizeKey(item.id) === key) || null;
+      }
+
+      function getRecords(staff) {
+        return state.rows.slice(1).map((row) => {
+          const hours = parseNumber(row[staff.hoursIndex]);
+          const tip = parseNumber(row[staff.tipIndex]);
+          return {
+            day: String(row[0] || "").trim(),
+            date: String(row[1] || "").trim(),
+            hallTip: parseNumber(row[3]),
+            hourlyTip: parseNumber(row[6]),
+            hours,
+            tip
+          };
+        }).filter((record) => record.hours > 0 || record.tip > 0);
+      }
+
+      function renderStaffChips() {
+        refs.staffChips.innerHTML = state.staff.map((staff) => {
+          return `<button class="staff-chip" type="button" data-staff="${staff.name}">${staff.name}</button>`;
+        }).join("");
+      }
+
+      function setStatus(message) {
+        refs.lookupStatus.textContent = message;
+      }
+
+      function setEmpty(message) {
+        refs.emptyPanel.classList.remove("is-hidden");
+        refs.profilePanel.classList.add("is-hidden");
+        refs.historyPanel.classList.add("is-hidden");
+        refs.emptyMessage.textContent = message;
+      }
+
+      function renderProfile(staff) {
+        const records = getRecords(staff);
+        const profile = staff.profile || {};
+        const totalHours = records.reduce((sum, record) => sum + record.hours, 0);
+        const totalTip = records.reduce((sum, record) => sum + record.tip, 0);
+        const tipPerHour = totalHours > 0 ? totalTip / totalHours : 0;
+        const wage = Number.parseFloat(profile.hourlyWage);
+
+        refs.emptyPanel.classList.add("is-hidden");
+        refs.profilePanel.classList.remove("is-hidden");
+        refs.historyPanel.classList.remove("is-hidden");
+        refs.profileTitle.textContent = `${staff.name}님의 Noble`;
+        refs.profileSubtitle.textContent = `${records.length}개 정산 기록을 찾았습니다.`;
+        refs.hourlyWageValue.textContent = Number.isFinite(wage) ? formatMoney(wage) : "등록 필요";
+        refs.hourlyWageNote.textContent = Number.isFinite(wage) ? `${profile.branch || "EHWA"} 기준 시급` : "시급은 STAFF_PROFILES에 ID와 함께 등록하면 표시됩니다.";
+        refs.totalHoursValue.textContent = formatHours(totalHours);
+        refs.totalTipValue.textContent = formatMoney(totalTip);
+        refs.tipPerHourValue.textContent = formatMoney(tipPerHour);
+        refs.historySubtitle.textContent = records.length ? "팁이 있거나 근무 시간이 입력된 날짜만 표시합니다." : "현재 표시할 정산 기록이 없습니다.";
+
+        refs.historyBody.innerHTML = records.slice().reverse().map((record) => {
+          return `
+            <tr>
+              <td>${escapeHtml(record.day)}</td>
+              <td>${escapeHtml(record.date)}</td>
+              <td>${formatHours(record.hours)}</td>
+              <td>${formatMoney(record.tip)}</td>
+              <td>${formatMoney(record.hours > 0 ? record.tip / record.hours : 0)}</td>
+              <td>${formatMoney(record.hallTip)}</td>
+            </tr>
+          `;
+        }).join("");
+
+        setStatus(`${staff.name}님 기록을 표시 중입니다.`);
+      }
+
+      function escapeHtml(value = "") {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#39;");
+      }
+
+      async function loadData() {
+        try {
+          const response = await fetch(CSV_URL, { cache: "no-store" });
+          if (!response.ok) throw new Error(`CSV request failed: ${response.status}`);
+
+          const text = await response.text();
+          state.rows = parseCsv(text);
+          state.staff = buildStaff(state.rows[0] || []);
+          state.loaded = true;
+
+          renderStaffChips();
+          setStatus(`${state.staff.length}명의 직원 기록을 불러왔습니다.`);
+
+          const params = new URLSearchParams(window.location.search);
+          const initialId = params.get("id");
+          if (initialId) {
+            refs.staffIdInput.value = initialId;
+            handleLookup(initialId);
+          }
+        } catch (error) {
+          console.error(error);
+          setStatus("정산표를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.");
+          setEmpty("정산표 연결에 실패했습니다.");
+        }
+      }
+
+      function handleLookup(input) {
+        if (!state.loaded) {
+          setStatus("정산표를 아직 불러오는 중입니다.");
+          return;
+        }
+
+        const staff = findStaff(input);
+        if (!staff) {
+          setStatus("일치하는 직원 ID 또는 이름이 없습니다.");
+          setEmpty("직원 ID 또는 이름을 다시 확인해주세요.");
+          return;
+        }
+
+        renderProfile(staff);
+      }
+
+      function bindEvents() {
+        refs.lookupForm.addEventListener("submit", (event) => {
+          event.preventDefault();
+          handleLookup(refs.staffIdInput.value);
+        });
+
+        refs.staffChips.addEventListener("click", (event) => {
+          const button = event.target.closest("[data-staff]");
+          if (!button) return;
+          refs.staffIdInput.value = button.dataset.staff;
+          handleLookup(button.dataset.staff);
+        });
+      }
+
+      cacheRefs();
+      bindEvents();
+      loadData();
+    }());
+  </script>
+</body>
+</html>
