@@ -348,9 +348,13 @@
     .history-table td {
       padding: 13px 10px;
       border-bottom: 1px solid rgba(113, 88, 60, 0.12);
-      text-align: right;
+      text-align: left;
       font-size: 0.93rem;
       white-space: nowrap;
+    }
+
+    .history-table th {
+      text-align: left;
     }
 
     .history-table th {
@@ -363,14 +367,11 @@
     }
 
     .history-table th:first-child,
-    .history-table td:first-child {
-      text-align: left;
-      padding-left: 16px;
-    }
+    .history-table td:first-child { padding-left: 22px; }
 
     .history-table th:last-child,
     .history-table td:last-child {
-      padding-right: 16px;
+      padding-right: 22px;
     }
 
     .history-table th:last-child,
@@ -477,7 +478,7 @@
 
     .period-details {
       display: none;
-      padding: 0 14px 14px;
+      padding: 0 18px 18px;
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
     }
@@ -584,7 +585,7 @@
       }
 
       .period-details {
-        padding: 0 10px 12px;
+        padding: 0 12px 12px;
         overflow-x: visible;
       }
 
@@ -601,12 +602,12 @@
 
       .history-table th:first-child,
       .history-table td:first-child {
-        padding-left: 10px;
+        padding-left: 12px;
       }
 
       .history-table th:last-child,
       .history-table td:last-child {
-        padding-right: 10px;
+        padding-right: 12px;
         font-size: 0.68rem;
       }
 
