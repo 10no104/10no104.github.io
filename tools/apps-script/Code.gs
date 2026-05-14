@@ -255,8 +255,8 @@ function ensureWidth_(values, width) {
 
 function getDuplicateKey_(reservation) {
   return [
-    normalizeTextKey_(reservation.date),
-    normalizeTextKey_(reservation.time),
+    normalizeDateKey_(reservation.date),
+    normalizeTimeKey_(reservation.time),
     normalizeGuestKey_(reservation.people),
     normalizeTextKey_(reservation.name),
     normalizePhoneKey_(reservation.phone)
@@ -284,6 +284,60 @@ function normalizeTextKey_(value) {
   return getText_(value).toLowerCase().replace(/\s+/g, " ");
 }
 
+function normalizeDateKey_(value) {
+  if (value instanceof Date && !isNaN(value.getTime())) {
+    return Utilities.formatDate(value, Session.getScriptTimeZone(), "yyyy-MM-dd");
+  }
+
+  const text = normalizeTextKey_(value);
+  const isoMatch = text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (isoMatch) {
+    return [
+      isoMatch[1],
+      pad2_(isoMatch[2]),
+      pad2_(isoMatch[3])
+    ].join("-");
+  }
+
+  const slashMatch = text.match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?$/);
+  if (slashMatch) {
+    const year = slashMatch[3]
+      ? normalizeYear_(slashMatch[3])
+      : String(new Date().getFullYear());
+    return [
+      year,
+      pad2_(slashMatch[1]),
+      pad2_(slashMatch[2])
+    ].join("-");
+  }
+
+  const parsed = new Date(text);
+  if (!isNaN(parsed.getTime())) {
+    return Utilities.formatDate(parsed, Session.getScriptTimeZone(), "yyyy-MM-dd");
+  }
+
+  return text;
+}
+
+function normalizeTimeKey_(value) {
+  if (value instanceof Date && !isNaN(value.getTime())) {
+    return Utilities.formatDate(value, Session.getScriptTimeZone(), "HH:mm");
+  }
+
+  const text = normalizeTextKey_(value).replace(/\s+/g, "");
+  const match = text.match(/^(\d{1,2})(?::(\d{2}))?(am|pm)?$/);
+  if (!match) return text;
+
+  let hour = Number(match[1]);
+  const minute = Number(match[2] || "0");
+  const meridiem = match[3];
+
+  if (meridiem === "pm" && hour < 12) hour += 12;
+  if (meridiem === "am" && hour === 12) hour = 0;
+
+  return pad2_(hour) + ":" + pad2_(minute);
+}
+
 function normalizeGuestKey_(value) {
   const digits = getText_(value).replace(/\D/g, "");
   return digits || normalizeTextKey_(value);
@@ -293,6 +347,16 @@ function normalizePhoneKey_(value) {
   let digits = getText_(value).replace(/\D/g, "");
   if (digits.charAt(0) === "1" && digits.length === 11) digits = digits.slice(1);
   return digits;
+}
+
+function normalizeYear_(value) {
+  const year = Number(value);
+  if (year < 100) return String(2000 + year);
+  return String(year);
+}
+
+function pad2_(value) {
+  return String(value).padStart(2, "0");
 }
 
 function getText_(value) {
