@@ -804,26 +804,36 @@
     }
 
     .phone-box .phone-number {
-      margin-bottom: 8px;
+      min-width: 0;
+      margin-bottom: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .phone-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
     }
 
     .phone-actions {
       display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+      flex: 0 0 auto;
+      gap: 6px;
+      flex-wrap: nowrap;
     }
 
     .phone-actions a {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 34px;
-      padding: 0 12px;
+      min-height: 28px;
+      padding: 0 9px;
       border-radius: 999px;
       background: rgba(123, 31, 47, 0.08);
       border: 1px solid rgba(123, 31, 47, 0.16);
       color: #561b28;
-      font-size: 0.78rem;
+      font-size: 0.72rem;
       font-weight: 900;
       text-decoration: none;
     }
@@ -2035,12 +2045,14 @@
 
     function buildReservationSmsMessage(item = {}) {
       const branch = ADMIN_SHEET_CONFIG.branchLabel || "EHWA";
+      const name = String(item.name || "").trim();
+      const greeting = name ? `Hi ${name},` : "Hi,";
       const date = item.date ? formatDateLabel(item.date) : "";
       const time = item.time || "";
       const reservationParts = [date, time].filter(Boolean).join(" at ");
       return reservationParts
-        ? `Hi, this is EHWA ${branch}. We are contacting you about your reservation on ${reservationParts}.`
-        : `Hi, this is EHWA ${branch}. We are contacting you about your reservation.`;
+        ? `${greeting} this is EHWA ${branch}. We are contacting you about your reservation on ${reservationParts}.`
+        : `${greeting} this is EHWA ${branch}. We are contacting you about your reservation.`;
     }
 
     function renderPhoneLinks(value = "", item = {}) {
@@ -2049,10 +2061,12 @@
       if (!linkNumber) return `<strong class="phone-number">-</strong>`;
       const smsBody = encodeURIComponent(buildReservationSmsMessage(item));
       return `
-        <strong class="phone-number">${display}</strong>
-        <div class="phone-actions">
-          <a href="tel:${linkNumber}" aria-label="Call ${display}">Call</a>
-          <a href="sms:${linkNumber}?&body=${smsBody}" aria-label="Text ${display}">Text</a>
+        <div class="phone-line">
+          <strong class="phone-number">${display}</strong>
+          <div class="phone-actions">
+            <a href="tel:${linkNumber}" aria-label="Call ${display}">Call</a>
+            <a href="sms:${linkNumber}?&body=${smsBody}" aria-label="Text ${display}">Text</a>
+          </div>
         </div>
       `;
     }
