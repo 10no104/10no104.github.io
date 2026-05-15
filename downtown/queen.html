@@ -816,6 +816,31 @@
       letter-spacing: -0.02em;
     }
 
+    .phone-box .phone-number {
+      margin-bottom: 8px;
+    }
+
+    .phone-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .phone-actions a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 34px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: rgba(123, 31, 47, 0.08);
+      border: 1px solid rgba(123, 31, 47, 0.16);
+      color: #561b28;
+      font-size: 0.78rem;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
     .meta-box.guests-box {
       background: linear-gradient(135deg, rgba(123, 31, 47, 0.1), rgba(255, 245, 229, 0.98));
       border: 1px solid rgba(123, 31, 47, 0.18);
@@ -2013,6 +2038,27 @@
       return getStatusBadge(item);
     }
 
+    function getPhoneLinkNumber(value = "") {
+      let digits = String(value || "").replace(/\D/g, "");
+      if (!digits) return "";
+      if (digits.length === 10) return `+1${digits}`;
+      if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
+      return `+${digits}`;
+    }
+
+    function renderPhoneLinks(value = "") {
+      const display = String(value || "").trim();
+      const linkNumber = getPhoneLinkNumber(display);
+      if (!linkNumber) return `<strong class="phone-number">-</strong>`;
+      return `
+        <strong class="phone-number">${display}</strong>
+        <div class="phone-actions">
+          <a href="tel:${linkNumber}" aria-label="Call ${display}">Call</a>
+          <a href="sms:${linkNumber}" aria-label="Text ${display}">Text</a>
+        </div>
+      `;
+    }
+
     function renderReservationCard(item) {
       const status = getReservationBadge(item);
       const primaryLabel = item.status === "removed" ? "Restore" : "Remove";
@@ -2037,9 +2083,9 @@
               <span>Name</span>
               <strong>${item.name || "Guest"}</strong>
             </div>
-            <div class="meta-box">
+            <div class="meta-box phone-box">
               <span>Phone</span>
-              <strong>${item.phone || "-"}</strong>
+              ${renderPhoneLinks(item.phone)}
             </div>
           </div>
           <div class="reservation-notes">${item.notes || "No notes"}</div>
