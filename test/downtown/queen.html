@@ -29,6 +29,7 @@
       min-height: 100vh;
       color: #f4e7d7;
       font-family: "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow-x: hidden;
       background:
         radial-gradient(circle at top left, rgba(212, 175, 55, 0.14), transparent 28%),
         radial-gradient(circle at 86% 12%, rgba(123, 31, 47, 0.18), transparent 24%),
@@ -51,9 +52,10 @@
     a { color: inherit; text-decoration: none; }
 
     .shell {
-      width: min(100% - 18px, 1180px);
+      width: min(calc(100% - 24px), 1180px);
       margin: 0 auto;
       padding: 18px 0 40px;
+      overflow-x: hidden;
     }
 
     .topbar {
@@ -97,6 +99,10 @@
       font-weight: 800;
       letter-spacing: 0.14em;
       text-transform: uppercase;
+    }
+
+    .brand-copy {
+      min-width: 0;
     }
 
     .brand-copy h1 {
@@ -393,6 +399,9 @@
     }
 
     .panel {
+      min-width: 0;
+      width: 100%;
+      max-width: 100%;
       border: 1px solid var(--line);
       border-radius: var(--radius-xl);
       background:
@@ -407,6 +416,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
+      min-width: 0;
       padding: 18px 18px 0;
     }
 
@@ -571,12 +581,15 @@
     .control-row {
       display: grid;
       gap: 10px;
+      min-width: 0;
       padding: 14px 18px 0;
     }
 
     .range-chips {
       display: flex;
       gap: 10px;
+      min-width: 0;
+      max-width: 100%;
       overflow: auto;
       -webkit-overflow-scrolling: touch;
     }
@@ -648,10 +661,16 @@
     .reservation-list {
       display: grid;
       gap: 12px;
+      min-width: 0;
+      width: 100%;
+      max-width: 100%;
       padding: 14px 18px 18px;
     }
 
     .reservation-card {
+      min-width: 0;
+      width: 100%;
+      max-width: 100%;
       padding: 14px 18px 18px;
       border-radius: 22px;
       background:
@@ -877,9 +896,13 @@
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
       margin-top: 12px;
+      width: 100%;
+      max-width: 100%;
     }
 
     .action-btn {
+      min-width: 0;
+      width: 100%;
       min-height: 42px;
       border: 0;
       border-radius: 14px;
@@ -1455,12 +1478,130 @@
         margin: 0 -18px -18px;
         padding: 12px 18px 18px;
       }
+
+      .reservation-list {
+        padding: 10px;
+      }
+
+      .reservation-card {
+        width: calc(100% - 16px);
+        padding: 12px;
+        margin: 0 auto;
+      }
+
+      .reservation-actions {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .action-btn {
+        padding: 0 8px;
+        font-size: 0.94rem;
+      }
+
+      .action-btn.table-btn {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .shell {
+        width: min(calc(100% - 36px), 1180px);
+      }
+
+      .panel {
+        width: 100%;
+        border-radius: 22px;
+      }
+
+      .topbar {
+        gap: 8px;
+      }
+
+      .brand {
+        gap: 8px;
+        flex: 1 1 auto;
+      }
+
+      .logo-link {
+        width: 54px;
+        height: 54px;
+      }
+
+      .logo-link img {
+        width: 36px;
+        height: 36px;
+      }
+
+      .brand-copy p {
+        font-size: 0.68rem;
+        letter-spacing: 0.1em;
+      }
+
+      .brand-copy h1 {
+        font-size: 1.45rem;
+      }
+
+      .topbar .pill-btn {
+        flex: 0 0 auto;
+        min-height: 34px;
+        padding: 0 8px;
+        font-size: 0.78rem;
+      }
+
+      .panel-head {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 16px 14px 0;
+      }
+
+      .panel-head > div,
+      .panel-head h3 {
+        min-width: 0;
+      }
+
+      .control-row {
+        padding: 12px 14px 0;
+      }
+
+      .reservation-list {
+        padding: 8px 4px 12px;
+      }
+
+      .reservation-card {
+        width: calc(100% - 24px);
+      }
+
+      .phone-line {
+        gap: 8px;
+      }
+
+      .phone-actions {
+        gap: 4px;
+      }
+
+      .phone-actions a {
+        min-height: 26px;
+        padding: 0 8px;
+        font-size: 0.68rem;
+      }
     }
 
     @media (min-width: 720px) {
       .field-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .field.full { grid-column: 1 / -1; }
       .form-actions { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 980px) {
+      .reservation-meta {
+        grid-template-columns: 1fr;
+      }
+
+      .phone-line {
+        justify-content: flex-start;
+      }
     }
 
     @media (min-width: 980px) {
