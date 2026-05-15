@@ -386,6 +386,11 @@
      * tags 예시:
      * 🌶️ Spicy|red, 🌱 Vegan|green, ⭐ Popular|yellow, 🐟 Seafood|blue
      */
+    const MENU_BRANCH = "downtown";
+    const SUPABASE_CONFIG = {
+      url: "https://pzhzdjsjfdzbzkhnaxmc.supabase.co",
+      anonKey: "sb_publishable_3Ox2JIQXVLwusT-xzIMJ4g_YXTR5q8e"
+    };
     const SHEET_CONFIG = {
       sheetId: "1xa9OZbctYnlbaAL8lKIgmefM5hvSw0Plk01lxp5G2fc",
       gid: "0"
@@ -596,6 +601,8 @@
         .filter((cells) => cells.some(Boolean))
         .map((cells) => ({
           sortOrder: toSortOrder(cells[0]),
+          allSortOrder: toSortOrder(cells[0]),
+          categorySortOrder: toSortOrder(cells[0]),
           category: cells[1] || "Uncategorized",
           label: cells[2] || "",
           nameKo: cells[3] || "",
@@ -608,6 +615,54 @@
           dietaryTags: parseDietaryTagList(cells[9] || "")
         }))
         .sort((a, b) => a.sortOrder - b.sortOrder);
+    }
+
+    function normalizeMenuRows(items = []) {
+      return items
+        .filter((item) => item && (item.name_ko || item.name_en))
+        .map((item) => ({
+          id: item.id,
+          branches: item.branches || "both",
+          sortOrder: toSortOrder(item.all_sort_order ?? item.sort_order ?? ""),
+          allSortOrder: toSortOrder(item.all_sort_order ?? item.sort_order ?? ""),
+          categorySortOrder: toSortOrder(item.sort_order ?? ""),
+          category: item.category || "Uncategorized",
+          label: item.label || "",
+          nameKo: item.name_ko || "",
+          romanizedName: item.romanized_name || "",
+          nameEn: item.name_en || "",
+          description: item.description || "",
+          price: item.price ?? "",
+          imageUrl: item.image_url || "",
+          tags: parseTags(item.tags || ""),
+          ingredient: item.ingredient || "",
+          dietaryTags: parseDietaryTagList(item.ingredient || "")
+        }))
+        .sort((a, b) => {
+          if (a.allSortOrder !== b.allSortOrder) return a.allSortOrder - b.allSortOrder;
+          return (a.id || 0) - (b.id || 0);
+        });
+    }
+
+    async function fetchMenusFromSupabase() {
+      const { url, anonKey } = SUPABASE_CONFIG;
+      if (!url || !anonKey) throw new Error("Missing Supabase anon key");
+
+      const endpoint = new URL(`${url}/rest/v1/menu_items`);
+      endpoint.searchParams.set("select", "*");
+      endpoint.searchParams.set("is_available", "eq.true");
+      endpoint.searchParams.set("or", `(branches.eq.both,branches.eq.${MENU_BRANCH})`);
+      endpoint.searchParams.set("order", "sort_order.asc.nullslast,id.asc");
+
+      const res = await fetch(endpoint.toString(), {
+        headers: {
+          apikey: anonKey,
+          Authorization: `Bearer ${anonKey}`
+        }
+      });
+
+      if (!res.ok) throw new Error("Failed to fetch Supabase menu");
+      return normalizeMenuRows(await res.json());
     }
 
     async function fetchMenusFromGoogleSheet() {
@@ -788,6 +843,26 @@
       return !compareTags.length || hasVegetarianFallback;
     }
 
+    function shouldUseAllOrder(category) {
+      const normalizedCategory = String(category || "").toLowerCase();
+      return category === "All"
+        || normalizedCategory.includes("vegan")
+        || normalizedCategory.includes("spicy")
+        || normalizedCategory.includes("popular");
+    }
+
+    function compareMenusByOrder(field, a, b) {
+      const orderA = Number.isFinite(Number(a[field])) ? Number(a[field]) : Number.MAX_SAFE_INTEGER;
+      const orderB = Number.isFinite(Number(b[field])) ? Number(b[field]) : Number.MAX_SAFE_INTEGER;
+      if (orderA !== orderB) return orderA - orderB;
+      return (a.id || 0) - (b.id || 0);
+    }
+
+    function sortMenusForCurrentView(menuItems) {
+      const field = shouldUseAllOrder(selectedCategory) ? "allSortOrder" : "categorySortOrder";
+      return [...menuItems].sort((a, b) => compareMenusByOrder(field, a, b));
+    }
+
     function filterMenus(menuItems) {
       let filtered = filterBySelectedCategory(menuItems, selectedCategory);
       const isVeganCategory = String(selectedCategory || "").toLowerCase().includes("vegan");
@@ -798,7 +873,7 @@
         } else {
           filtered = filtered.filter((item) => matchesAllowedIngredients(item, selectedDietaryTags));
         }
-        return filtered;
+        return sortMenusForCurrentView(filtered);
       }
 
       if (selectedSubcategory !== "All") {
@@ -807,7 +882,7 @@
         );
       }
 
-      return filtered;
+      return sortMenusForCurrentView(filtered);
     }
 
     function scrollToCategoryStart() {
@@ -1036,10 +1111,10 @@
 
     async function bootstrap() {
       try {
-        allMenus = await fetchMenusFromGoogleSheet();
+        allMenus = await fetchMenusFromSupabase();
       } catch (error) {
         console.error(error);
-        allMenus = SAMPLE_MENU;
+        allMenus = await fetchMenusFromGoogleSheet().catch(() => SAMPLE_MENU);
       }
 
       renderTabs();
