@@ -2046,15 +2046,26 @@
       return `+${digits}`;
     }
 
-    function renderPhoneLinks(value = "") {
+    function buildReservationSmsMessage(item = {}) {
+      const branch = ADMIN_SHEET_CONFIG.branchLabel || "EHWA";
+      const date = item.date ? formatDateLabel(item.date) : "";
+      const time = item.time || "";
+      const reservationParts = [date, time].filter(Boolean).join(" at ");
+      return reservationParts
+        ? `Hi, this is EHWA ${branch}. We are contacting you about your reservation on ${reservationParts}.`
+        : `Hi, this is EHWA ${branch}. We are contacting you about your reservation.`;
+    }
+
+    function renderPhoneLinks(value = "", item = {}) {
       const display = String(value || "").trim();
       const linkNumber = getPhoneLinkNumber(display);
       if (!linkNumber) return `<strong class="phone-number">-</strong>`;
+      const smsBody = encodeURIComponent(buildReservationSmsMessage(item));
       return `
         <strong class="phone-number">${display}</strong>
         <div class="phone-actions">
           <a href="tel:${linkNumber}" aria-label="Call ${display}">Call</a>
-          <a href="sms:${linkNumber}" aria-label="Text ${display}">Text</a>
+          <a href="sms:${linkNumber}?&body=${smsBody}" aria-label="Text ${display}">Text</a>
         </div>
       `;
     }
@@ -2085,7 +2096,7 @@
             </div>
             <div class="meta-box phone-box">
               <span>Phone</span>
-              ${renderPhoneLinks(item.phone)}
+              ${renderPhoneLinks(item.phone, item)}
             </div>
           </div>
           <div class="reservation-notes">${item.notes || "No notes"}</div>
