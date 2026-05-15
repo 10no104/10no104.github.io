@@ -743,21 +743,28 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 34px;
-      padding: 0 12px;
+      min-height: 38px;
+      padding: 0 15px;
       border-radius: 999px;
-      background: rgba(212, 175, 55, 0.2);
-      border: 1px solid rgba(167, 108, 14, 0.16);
-      color: #5f3308;
-      font-size: 0.88rem;
+      background: linear-gradient(135deg, rgba(215, 162, 54, 0.92), rgba(244, 212, 136, 0.96));
+      border: 1px solid rgba(167, 108, 14, 0.18);
+      color: #4c2600;
+      font-size: 1.04rem;
       font-weight: 800;
       letter-spacing: 0.01em;
       width: fit-content;
       white-space: nowrap;
     }
 
-    .reservation-identity {
-      margin: 0;
+    .reservation-info-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .reservation-info-box {
+      min-width: 0;
       padding: 10px 12px;
       border-radius: 15px;
       background: linear-gradient(135deg, rgba(123, 31, 47, 0.08), rgba(255, 244, 224, 0.98));
@@ -766,28 +773,26 @@
       color: #20150f;
     }
 
+    .reservation-phone-box {
+      background: rgba(255, 255, 255, 0.82);
+      border-color: rgba(113, 88, 60, 0.13);
+    }
+
     .reservation-guest-name {
       display: block;
       min-width: 0;
-      margin-bottom: 7px;
+      margin-top: 4px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      font-size: 1.24rem;
+      font-size: 1.32rem;
       line-height: 1.08;
       letter-spacing: -0.03em;
       color: #20150f;
     }
 
-    .reservation-phone-row {
-      display: grid;
-      grid-template-columns: auto minmax(0, 1fr);
-      align-items: center;
-      gap: 9px;
-      min-width: 0;
-    }
-
     .reservation-label {
+      display: block;
       color: #8b7561;
       font-size: 0.68rem;
       font-weight: 900;
@@ -873,9 +878,11 @@
     .phone-line {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 8px;
+      justify-content: flex-start;
+      gap: 7px;
+      flex-wrap: wrap;
       min-width: 0;
+      margin-top: 4px;
     }
 
     .phone-actions {
@@ -889,13 +896,13 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 25px;
-      padding: 0 8px;
+      min-height: 28px;
+      padding: 0 10px;
       border-radius: 999px;
       background: rgba(123, 31, 47, 0.08);
       border: 1px solid rgba(123, 31, 47, 0.16);
       color: #561b28;
-      font-size: 0.68rem;
+      font-size: 0.72rem;
       font-weight: 900;
       text-decoration: none;
     }
@@ -1540,9 +1547,13 @@
       }
 
       .reservation-card {
-        width: min(100%, 320px);
+        width: min(100%, 340px);
         padding: 12px;
         margin: 0 auto;
+      }
+
+      .reservation-info-grid {
+        grid-template-columns: 1fr;
       }
 
       .reservation-actions {
@@ -1632,17 +1643,16 @@
         width: min(100%, calc(100vw - 88px));
       }
 
-      .reservation-identity {
+      .reservation-info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .reservation-info-box {
         padding: 9px 10px;
       }
 
       .reservation-guest-name {
-        font-size: 1.12rem;
-      }
-
-      .reservation-phone-row {
-        grid-template-columns: 1fr;
-        gap: 4px;
+        font-size: 1.24rem;
       }
 
       .phone-line {
@@ -2290,8 +2300,8 @@
         <div class="phone-line">
           <strong class="phone-number">${display}</strong>
           <div class="phone-actions">
-            <a href="tel:${linkNumber}" aria-label="Call ${display}">Call</a>
-            <a href="sms:${linkNumber}?&body=${smsBody}" aria-label="Text ${display}">Text</a>
+            <a href="tel:${linkNumber}" aria-label="Call ${display}">📞 Call</a>
+            <a href="sms:${linkNumber}?&body=${smsBody}" aria-label="Text ${display}">💬 Text</a>
           </div>
         </div>
       `;
@@ -2317,9 +2327,12 @@
               <div class="reservation-guests-pill">${item.people || "-"}</div>
             </div>
           </div>
-          <div class="reservation-identity">
-            <strong class="reservation-guest-name">${item.name || "Guest"}</strong>
-            <div class="reservation-phone-row">
+          <div class="reservation-info-grid">
+            <div class="reservation-info-box reservation-name-box">
+              <span class="reservation-label">Name</span>
+              <strong class="reservation-guest-name">${item.name || "Guest"}</strong>
+            </div>
+            <div class="reservation-info-box reservation-phone-box">
               <span class="reservation-label">Phone</span>
               ${renderPhoneLinks(item.phone, item)}
             </div>
