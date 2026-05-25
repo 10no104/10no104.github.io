@@ -731,6 +731,7 @@
       const state = {
         rows: [],
         sources: [],
+        sourceErrors: {},
         staff: [],
         periods: [],
         openPeriodKey: null,
@@ -1006,14 +1007,64 @@
         return periods.reverse();
       }
 
+      function getPeriodKey(period) {
+        return [
+          period.startDate?.getTime() || "",
+          period.endDate?.getTime() || "",
+          period.label
+        ].join(":");
+      }
+
+      function mergePeriods(periods = []) {
+        const groups = new Map();
+
+        periods.forEach((period) => {
+          const key = getPeriodKey(period);
+          if (!groups.has(key)) {
+            groups.set(key, {
+              ...period,
+              records: [],
+              sourcePeriodIds: []
+            });
+          }
+
+          const group = groups.get(key);
+          group.records.push(...period.records);
+          group.sourcePeriodIds.push(period.id);
+        });
+
+        return Array.from(groups.values()).map((period, index) => {
+          const records = period.records.sort((a, b) => {
+            const dateA = a.dateObj?.getTime() || 0;
+            const dateB = b.dateObj?.getTime() || 0;
+            if (dateA !== dateB) return dateA - dateB;
+            return formatRecordBranch(a).localeCompare(formatRecordBranch(b));
+          });
+          const totalHours = records.reduce((sum, record) => sum + record.hours, 0);
+          const totalTip = records.reduce((sum, record) => sum + record.tip, 0);
+          const totalHallTip = records.reduce((sum, record) => sum + record.hallTip, 0);
+
+          return {
+            ...period,
+            id: `both-period-${index}`,
+            records,
+            totalHours,
+            totalTip,
+            totalHallTip,
+            workedDays: records.length,
+            branch: "Uptown + Downtown"
+          };
+        });
+      }
+
       function getPeriods(staff) {
         if (Array.isArray(staff.sources) && staff.sources.length) {
-          return staff.sources
-            .flatMap((sourceStaff) => getSingleSourcePeriods(sourceStaff).map((period) => ({
+          const sourcePeriods = staff.sources.flatMap((sourceStaff) => getSingleSourcePeriods(sourceStaff).map((period) => ({
               ...period,
-              id: `${sourceStaff.sourceKey}-${period.id}`,
-              label: `${period.branch} · ${period.label}`
-            })))
+              id: `${sourceStaff.sourceKey}-${period.id}`
+            })));
+
+          return mergePeriods(sourcePeriods)
             .sort((a, b) => (b.endDate?.getTime() || 0) - (a.endDate?.getTime() || 0));
         }
 
@@ -1183,14 +1234,20 @@
           const sources = settledSources
             .filter((result) => result.status === "fulfilled")
             .map((result) => result.value);
+          const sourceErrors = {};
 
-          settledSources
-            .filter((result) => result.status === "rejected")
-            .forEach((result) => console.warn(result.reason));
+          settledSources.forEach((result, index) => {
+            if (result.status === "rejected") {
+              const source = SHEET_SOURCES[index];
+              sourceErrors[source.key] = result.reason;
+              console.warn(`${source.branch} sheet failed`, result.reason);
+            }
+          });
 
           if (!sources.length) throw new Error("No sheets loaded.");
 
           state.sources = sources;
+          state.sourceErrors = sourceErrors;
           state.rows = sources[0]?.rows || [];
           state.staff = sources.flatMap((source) => source.staff);
           state.loaded = true;
@@ -1223,6 +1280,24 @@
             setStatus("Not found");
             setEmpty("Check your reference code.");
             return;
+          }
+
+          const branchScope = normalizeKey(access.branch_scope);
+          if (branchScope && branchScope !== "both" && state.sourceErrors[branchScope]) {
+            setStatus(`${getBranchLabel(branchScope)} sheet unavailable`);
+            setEmpty(`${getBranchLabel(branchScope)} sheet is not published or accessible.`);
+            return;
+          }
+
+          if (branchScope === "both") {
+            const missingBranches = SHEET_SOURCES
+              .filter((source) => state.sourceErrors[source.key])
+              .map((source) => source.branch);
+            if (missingBranches.length) {
+              setStatus(`${missingBranches.join(" + ")} sheet unavailable`);
+              setEmpty(`${missingBranches.join(" + ")} sheet is not published or accessible.`);
+              return;
+            }
           }
 
           const staff = findStaffByKey(access.staff_key, access);
