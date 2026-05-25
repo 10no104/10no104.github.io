@@ -704,12 +704,23 @@
     (function () {
       "use strict";
 
-      const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRNRIMOfYbtWYBKCmX3pq-1oA-a-XPBafNLjij_scpvXLoBbbdsJB9u03mrbYfNxQ/pub?gid=1128274968&single=true&output=csv";
+      const SHEET_SOURCES = [
+        {
+          key: "downtown",
+          branch: "Downtown",
+          csvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRNRIMOfYbtWYBKCmX3pq-1oA-a-XPBafNLjij_scpvXLoBbbdsJB9u03mrbYfNxQ/pub?gid=1128274968&single=true&output=csv"
+        },
+        {
+          key: "uptown",
+          branch: "Uptown",
+          csvUrl: "https://docs.google.com/spreadsheets/d/1oUFLwbTKZ_CAFpu73I2NjF-ORpT_E_1X1vT3nnllIs4/gviz/tq?gid=624949641&tqx=out:csv"
+        }
+      ];
       const SUPABASE_CONFIG = {
         url: "https://pzhzdjsjfdzbzkhnaxmc.supabase.co",
         anonKey: "sb_publishable_3Ox2JIQXVLwusT-xzIMJ4g_YXTR5q8e"
       };
-      const SOURCE_BRANCH = "Downtown";
+      const DEFAULT_BRANCH = "Downtown";
       const SAVED_REF_KEY = "ehwa:noble:ref-code";
       const BASE_COLUMN_COUNT = 7;
       const MONEY_FORMAT = new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -719,6 +730,7 @@
       const supabaseClient = window.supabase?.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
       const state = {
         rows: [],
+        sources: [],
         staff: [],
         periods: [],
         openPeriodKey: null,
@@ -815,7 +827,7 @@
         return rows.filter((cells) => cells.some((value) => String(value).trim()));
       }
 
-      function buildStaff(header = []) {
+      function buildStaff(header = [], source = {}) {
         const staff = [];
 
         for (let index = BASE_COLUMN_COUNT; index < header.length; index += 2) {
@@ -825,6 +837,9 @@
             id: name,
             name,
             key: normalizeKey(name),
+            sourceKey: source.key || "",
+            branch: source.branch || DEFAULT_BRANCH,
+            rows: source.rows || state.rows,
             hoursIndex: index,
             tipIndex: index + 1
           });
@@ -833,11 +848,28 @@
         return staff;
       }
 
-      function findStaffByKey(staffKey = "") {
+      function findStaffByKey(staffKey = "", access = {}) {
         const key = normalizeKey(staffKey);
         if (!key) return null;
 
-        return state.staff.find((item) => item.key === key || normalizeKey(item.id) === key) || null;
+        const branchScope = normalizeKey(access.branch_scope);
+        const matches = state.staff.filter((item) => item.key === key || normalizeKey(item.id) === key);
+        if (!matches.length) return null;
+
+        if (branchScope && branchScope !== "both") {
+          return matches.find((item) => normalizeKey(item.sourceKey) === branchScope) || null;
+        }
+
+        if (branchScope === "both" && matches.length > 1) {
+          return {
+            ...matches[0],
+            sourceKey: "both",
+            branch: "Uptown + Downtown",
+            sources: matches
+          };
+        }
+
+        return matches[0];
       }
 
       async function lookupReference(input = "") {
@@ -865,9 +897,9 @@
         };
       }
 
-      function createDateTracker() {
+      function createDateTracker(rows = state.rows) {
         const today = new Date();
-        const firstDateRow = state.rows.slice(1).find((row) => parseKoreanMonthDay(row[1]));
+        const firstDateRow = rows.slice(1).find((row) => parseKoreanMonthDay(row[1]));
         const firstDate = firstDateRow ? parseKoreanMonthDay(firstDateRow[1]) : null;
         return {
           year: firstDate && firstDate.month > today.getMonth() + 1 ? today.getFullYear() - 1 : today.getFullYear(),
@@ -900,13 +932,14 @@
       }
 
       function formatRecordBranch(record) {
-        return record.branch || SOURCE_BRANCH;
+        return record.branch || DEFAULT_BRANCH;
       }
 
       function getDailyRecords(staff) {
-        const tracker = createDateTracker();
+        const rows = staff.rows || state.rows;
+        const tracker = createDateTracker(rows);
 
-        return state.rows.slice(1).map((row) => {
+        return rows.slice(1).map((row) => {
           if (isPeriodSummaryRow(row)) return { isSummary: true };
 
           const dateObj = resolveRecordDate(row[1], tracker);
@@ -916,7 +949,7 @@
             day: String(row[0] || "").trim(),
             date: String(row[1] || "").trim(),
             dateObj,
-            branch: SOURCE_BRANCH,
+            branch: staff.branch || DEFAULT_BRANCH,
             hallTip: parseNumber(row[3]),
             hourlyTip: parseNumber(row[6]),
             hours,
@@ -944,11 +977,12 @@
           totalTip,
           totalHallTip,
           workedDays: visibleRecords.length,
+          branch: visibleRecords[0]?.branch || records[0]?.branch || DEFAULT_BRANCH,
           label: startDate && endDate ? `${formatPeriodDate(startDate)} - ${formatPeriodDate(endDate)}` : `Period ${index + 1}`
         };
       }
 
-      function getPeriods(staff) {
+      function getSingleSourcePeriods(staff) {
         const sourceRecords = getDailyRecords(staff);
         const periods = [];
         let current = [];
@@ -970,6 +1004,20 @@
         }
 
         return periods.reverse();
+      }
+
+      function getPeriods(staff) {
+        if (Array.isArray(staff.sources) && staff.sources.length) {
+          return staff.sources
+            .flatMap((sourceStaff) => getSingleSourcePeriods(sourceStaff).map((period) => ({
+              ...period,
+              id: `${sourceStaff.sourceKey}-${period.id}`,
+              label: `${period.branch} · ${period.label}`
+            })))
+            .sort((a, b) => (b.endDate?.getTime() || 0) - (a.endDate?.getTime() || 0));
+        }
+
+        return getSingleSourcePeriods(staff);
       }
 
       function setStatus(message) {
@@ -1116,14 +1164,35 @@
           .replaceAll("'", "&#39;");
       }
 
+      async function fetchSheetSource(sourceConfig) {
+        const response = await fetch(sourceConfig.csvUrl, { cache: "no-store" });
+        if (!response.ok) throw new Error(`${sourceConfig.branch} CSV request failed: ${response.status}`);
+
+        const text = await response.text();
+        const rows = parseCsv(text);
+        return {
+          ...sourceConfig,
+          rows,
+          staff: buildStaff(rows[0] || [], { ...sourceConfig, rows })
+        };
+      }
+
       async function loadData() {
         try {
-          const response = await fetch(CSV_URL, { cache: "no-store" });
-          if (!response.ok) throw new Error(`CSV request failed: ${response.status}`);
+          const settledSources = await Promise.allSettled(SHEET_SOURCES.map(fetchSheetSource));
+          const sources = settledSources
+            .filter((result) => result.status === "fulfilled")
+            .map((result) => result.value);
 
-          const text = await response.text();
-          state.rows = parseCsv(text);
-          state.staff = buildStaff(state.rows[0] || []);
+          settledSources
+            .filter((result) => result.status === "rejected")
+            .forEach((result) => console.warn(result.reason));
+
+          if (!sources.length) throw new Error("No sheets loaded.");
+
+          state.sources = sources;
+          state.rows = sources[0]?.rows || [];
+          state.staff = sources.flatMap((source) => source.staff);
           state.loaded = true;
           setStatus("Ready");
 
@@ -1156,7 +1225,7 @@
             return;
           }
 
-          const staff = findStaffByKey(access.staff_key);
+          const staff = findStaffByKey(access.staff_key, access);
           if (!staff) {
             setStatus("No sheet column");
             setEmpty(`No sheet column found for "${access.staff_key}".`);
