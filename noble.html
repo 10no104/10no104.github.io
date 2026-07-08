@@ -43,6 +43,7 @@
     body {
       margin: 0;
       min-height: 100vh;
+      padding-bottom: calc(var(--nav-height) + 26px + env(safe-area-inset-bottom, 0px));
       color: #fff4ec;
       font-family: "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background:
@@ -328,7 +329,7 @@
     .app-frame {
       position: relative;
       min-height: 760px;
-      padding: 18px 18px calc(var(--nav-height) + 18px);
+      padding: 18px;
       border: 1px solid rgba(255, 225, 182, 0.12);
       border-radius: 34px;
       background:
@@ -666,156 +667,55 @@
       border-bottom: none;
     }
 
-    .week-summary {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .week-pill {
-      padding: 16px;
-      border-radius: 20px;
-      background: rgba(255, 249, 242, 0.82);
-      border: 1px solid rgba(191, 147, 84, 0.18);
-    }
-
-    .week-pill span,
-    .week-pill strong {
-      display: block;
-    }
-
-    .week-pill span {
-      color: var(--muted);
-      font-size: 0.78rem;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .week-pill strong {
-      margin-top: 8px;
-      color: #1f1310;
-      font-size: 1.42rem;
-      font-weight: 800;
-      letter-spacing: -0.04em;
-    }
-
     .schedule-list {
-      display: grid;
-      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 2px;
     }
 
-    .schedule-item {
-      display: grid;
-      grid-template-columns: 84px minmax(0, 1fr);
-      gap: 14px;
-      align-items: stretch;
-      padding: 14px;
-      border-radius: 22px;
-      background: rgba(255, 250, 244, 0.9);
-      border: 1px solid rgba(191, 147, 84, 0.16);
-      box-shadow: 0 12px 22px rgba(52, 29, 22, 0.08);
+    .schedule-table {
+      width: 100%;
+      min-width: 720px;
+      border-collapse: collapse;
+      table-layout: fixed;
+      border: 1px solid #1f1b19;
+      background: #fffdf9;
+      color: #16110f;
     }
 
-    .schedule-date {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      border-radius: 18px;
-      background: linear-gradient(180deg, rgba(143, 36, 56, 0.08), rgba(224, 177, 95, 0.16));
-      color: #6a2330;
+    .schedule-table th,
+    .schedule-table td {
+      height: 52px;
+      border: 1px solid #1f1b19;
+      padding: 6px;
       text-align: center;
-    }
-
-    .schedule-date strong {
-      font-size: 1.35rem;
-      line-height: 1;
-      letter-spacing: -0.05em;
-    }
-
-    .schedule-date span {
-      margin-top: 6px;
-      font-size: 0.82rem;
+      vertical-align: middle;
+      font-size: 0.92rem;
       font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      line-height: 1.25;
     }
 
-    .schedule-main {
-      display: grid;
-      gap: 10px;
-      min-width: 0;
+    .schedule-table thead th {
+      background: #cfe4f4;
+      color: #0f161c;
+      font-size: 0.86rem;
+      white-space: nowrap;
     }
 
-    .schedule-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
+    .schedule-table .branch-cell {
+      width: 88px;
+      background: #f8f0e7;
+      color: #3b211b;
     }
 
-    .schedule-top strong {
-      color: #1f1310;
-      font-size: 1rem;
-      letter-spacing: -0.03em;
+    .schedule-table td.is-work {
+      background: #ffe5a8;
+      color: #321c10;
+      box-shadow: inset 0 0 0 2px rgba(143, 36, 56, 0.24);
     }
 
-    .state-chip {
-      display: inline-flex;
-      align-items: center;
-      min-height: 30px;
-      padding: 0 10px;
-      border-radius: 999px;
-      font-size: 0.78rem;
-      font-weight: 800;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-    }
-
-    .state-chip.work {
-      color: #145946;
-      background: rgba(46, 124, 103, 0.12);
-    }
-
-    .state-chip.off {
-      color: #70574f;
-      background: rgba(113, 87, 79, 0.12);
-    }
-
-    .state-chip.blocked {
-      color: #8f2438;
-      background: rgba(143, 36, 56, 0.12);
-    }
-
-    .state-chip.conflict {
-      color: #8d5102;
-      background: rgba(224, 177, 95, 0.18);
-    }
-
-    .schedule-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .schedule-meta span {
-      display: inline-flex;
-      align-items: center;
-      min-height: 30px;
-      padding: 0 10px;
-      border-radius: 999px;
-      background: rgba(143, 36, 56, 0.08);
-      color: #6f2433;
-      font-size: 0.82rem;
-      font-weight: 700;
-    }
-
-    .schedule-note {
-      color: var(--muted);
-      font-size: 0.88rem;
-      line-height: 1.55;
+    .schedule-table td.is-unavailable {
+      background: #f4d6da;
+      color: #7b1f2f;
     }
 
     .calendar-meta {
@@ -981,15 +881,16 @@
     }
 
     .bottom-nav {
-      position: absolute;
-      left: 16px;
-      right: 16px;
-      bottom: 16px;
-      z-index: 3;
+      position: fixed;
+      left: 50%;
+      bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+      z-index: 50;
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
+      width: min(760px, calc(100% - 22px));
       padding: 10px;
+      transform: translateX(-50%);
       border-radius: 28px;
       border: 1px solid rgba(255, 226, 189, 0.12);
       background: rgba(22, 13, 12, 0.9);
@@ -1055,15 +956,14 @@
         grid-template-columns: 1fr;
       }
 
-      .metrics,
-      .week-summary {
+      .metrics {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
 
     @media (max-width: 680px) {
       .shell {
-        width: min(100% - 12px, 100%);
+        width: min(100% - 10px, 100%);
         padding-top: 12px;
       }
 
@@ -1077,8 +977,8 @@
       }
 
       .hero {
-        padding: 14px;
-        border-radius: 26px;
+        padding: 12px;
+        border-radius: 22px;
       }
 
       .lookup-row {
@@ -1091,8 +991,8 @@
 
       .app-frame {
         min-height: 700px;
-        padding: 14px 14px calc(var(--nav-height) + 14px);
-        border-radius: 28px;
+        padding: 12px;
+        border-radius: 22px;
       }
 
       .app-head {
@@ -1100,17 +1000,27 @@
         flex-direction: column;
       }
 
-      .metrics,
-      .week-summary {
+      .metrics {
         grid-template-columns: 1fr;
       }
 
-      .schedule-item {
-        grid-template-columns: 1fr;
+      .schedule-table {
+        min-width: 620px;
       }
 
-      .schedule-date {
-        min-height: 78px;
+      .schedule-table th,
+      .schedule-table td {
+        height: 48px;
+        padding: 5px;
+        font-size: 0.82rem;
+      }
+
+      .schedule-table thead th {
+        font-size: 0.76rem;
+      }
+
+      .schedule-table .branch-cell {
+        width: 76px;
       }
 
       .calendar-day {
@@ -1234,28 +1144,9 @@
                 <span id="weekRangeLabel"></span>
               </div>
               <div class="card-body">
-                <div class="week-summary">
-                  <article class="week-pill">
-                    <span>Worked Days</span>
-                    <strong id="weekWorkedDaysValue">-</strong>
-                  </article>
-                  <article class="week-pill">
-                    <span>Hours</span>
-                    <strong id="weekHoursValue">-</strong>
-                  </article>
-                  <article class="week-pill">
-                    <span>Tips</span>
-                    <strong id="weekTipValue">-</strong>
-                  </article>
-                </div>
-              </div>
-            </article>
-
-            <article class="surface-card">
-              <div class="card-body">
                 <div class="section-head">
                   <div>
-                    <h3>Detail</h3>
+                    <h3>Schedule</h3>
                   </div>
                 </div>
                 <div class="schedule-list" id="scheduleList"></div>
@@ -1298,40 +1189,40 @@
             </article>
           </section>
         </div>
-
-        <nav class="bottom-nav" aria-label="Noble sections">
-          <button class="nav-tab is-active" type="button" data-tab="wage" aria-pressed="true">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M4 7h16"></path>
-              <path d="M6 11h12"></path>
-              <path d="M7 16h10"></path>
-              <path d="M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"></path>
-            </svg>
-            <span>임금</span>
-          </button>
-          <button class="nav-tab" type="button" data-tab="schedule" aria-pressed="false">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M8 3v4"></path>
-              <path d="M16 3v4"></path>
-              <path d="M4 8h16"></path>
-              <path d="M6 12h5"></path>
-              <path d="M6 16h4"></path>
-              <path d="M5 5h14a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"></path>
-            </svg>
-            <span>스케줄</span>
-          </button>
-          <button class="nav-tab" type="button" data-tab="calendar" aria-pressed="false">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M8 3v4"></path>
-              <path d="M16 3v4"></path>
-              <path d="M4 8h16"></path>
-              <path d="M5 5h14a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"></path>
-              <path d="m9 14 2 2 4-4"></path>
-            </svg>
-            <span>달력</span>
-          </button>
-        </nav>
       </div>
+
+      <nav class="bottom-nav" aria-label="Noble sections">
+        <button class="nav-tab is-active" type="button" data-tab="wage" aria-pressed="true">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 7h16"></path>
+            <path d="M6 11h12"></path>
+            <path d="M7 16h10"></path>
+            <path d="M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"></path>
+          </svg>
+          <span>임금</span>
+        </button>
+        <button class="nav-tab" type="button" data-tab="schedule" aria-pressed="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 3v4"></path>
+            <path d="M16 3v4"></path>
+            <path d="M4 8h16"></path>
+            <path d="M6 12h5"></path>
+            <path d="M6 16h4"></path>
+            <path d="M5 5h14a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"></path>
+          </svg>
+          <span>스케줄</span>
+        </button>
+        <button class="nav-tab" type="button" data-tab="calendar" aria-pressed="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 3v4"></path>
+            <path d="M16 3v4"></path>
+            <path d="M4 8h16"></path>
+            <path d="M5 5h14a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"></path>
+            <path d="m9 14 2 2 4-4"></path>
+          </svg>
+          <span>달력</span>
+        </button>
+      </nav>
     </section>
   </main>
 
@@ -1360,7 +1251,6 @@
       const CALENDAR_KEY_PREFIX = "ehwa:noble:calendar:";
       const BASE_COLUMN_COUNT = 7;
       const TAB_ORDER = ["wage", "schedule", "calendar"];
-      const WEEKDAY_SHORT = ["일", "월", "화", "수", "목", "금", "토"];
       const MONEY_FORMAT = new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       const HOUR_FORMAT = new Intl.NumberFormat("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
@@ -1402,9 +1292,6 @@
           "historySubtitle",
           "periodList",
           "weekRangeLabel",
-          "weekWorkedDaysValue",
-          "weekHoursValue",
-          "weekTipValue",
           "scheduleList",
           "calendarSummary",
           "calendarLabel",
@@ -2016,28 +1903,14 @@
           const isoDate = toIsoDate(date);
           const blocked = state.unavailableDates.has(isoDate);
 
-          let status = "off";
-          let statusLabel = "OFF";
-          if (blocked && totalHours > 0) {
-            status = "conflict";
-            statusLabel = "겹침";
-          } else if (blocked) {
-            status = "blocked";
-            statusLabel = "불가";
-          } else if (totalHours > 0 || totalTip > 0) {
-            status = "work";
-            statusLabel = "근무";
-          }
-
           cards.push({
             date,
             isoDate,
+            records: dayRecords,
             totalHours,
             totalTip,
             branches,
-            blocked,
-            status,
-            statusLabel
+            blocked
           });
         }
 
@@ -2048,58 +1921,69 @@
         };
       }
 
+      function formatScheduleHeaderDate(date) {
+        const weekday = ["일", "월", "화", "수", "목", "금", "토"][date.getDay()];
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${weekday}(${month}/${day})`;
+      }
+
+      function getBranchScheduleCell(card, branchKey) {
+        const branchRecords = card.records.filter((record) => normalizeKey(formatRecordBranch(record)) === branchKey);
+        const worked = branchRecords.some((record) => record.hours > 0 || record.tip > 0);
+        return {
+          name: worked ? state.currentStaff?.name || "" : "",
+          worked,
+          blocked: card.blocked
+        };
+      }
+
       function renderScheduleView() {
         if (!state.currentStaff || !state.currentAccess) {
           refs.weekRangeLabel.textContent = "";
-          refs.weekWorkedDaysValue.textContent = "-";
-          refs.weekHoursValue.textContent = "-";
-          refs.weekTipValue.textContent = "-";
           refs.scheduleList.innerHTML = `<div class="empty-state">데이터 없음</div>`;
           return;
         }
 
         const allRecords = getAllRecords(state.periods);
         const week = getCurrentWeekCards(allRecords);
-        const workedDays = week.cards.filter((card) => card.totalHours > 0 || card.totalTip > 0).length;
-        const totalHours = week.cards.reduce((sum, card) => sum + card.totalHours, 0);
-        const totalTip = week.cards.reduce((sum, card) => sum + card.totalTip, 0);
+        const branchRows = [
+          { key: "uptown", label: "업타운" },
+          { key: "downtown", label: "다운타운" }
+        ];
 
         refs.weekRangeLabel.textContent = `${formatLongDate(week.weekStart)} - ${formatLongDate(week.weekEnd)}`;
-        refs.weekWorkedDaysValue.textContent = `${workedDays}일`;
-        refs.weekHoursValue.textContent = formatHours(totalHours);
-        refs.weekTipValue.textContent = formatMoney(totalTip);
 
-        refs.scheduleList.innerHTML = week.cards.map((card) => {
-          const dateNumber = card.date.getDate();
-          const weekday = WEEKDAY_SHORT[card.date.getDay()];
-          const branchText = card.branches.length ? card.branches.join(" · ") : "기록 없음";
-          const note = card.blocked
-            ? "달력에서 안되는 날로 표시된 날짜입니다."
-            : (card.totalHours > 0 || card.totalTip > 0)
-              ? "이번 주 시트에 기록된 근무 정보입니다."
-              : "현재 시트 기준 근무 기록이 없습니다.";
+        const headerCells = week.cards.map((card) => `<th scope="col">${escapeHtml(formatScheduleHeaderDate(card.date))}</th>`).join("");
+        const bodyRows = branchRows.map((branch) => {
+          const cells = week.cards.map((card) => {
+            const cell = getBranchScheduleCell(card, branch.key);
+            const classes = [
+              cell.worked ? "is-work" : "",
+              !cell.worked && cell.blocked ? "is-unavailable" : ""
+            ].filter(Boolean).join(" ");
+            return `<td class="${classes}">${escapeHtml(cell.name)}</td>`;
+          }).join("");
 
           return `
-            <article class="schedule-item">
-              <div class="schedule-date">
-                <strong>${dateNumber}</strong>
-                <span>${weekday}</span>
-              </div>
-              <div class="schedule-main">
-                <div class="schedule-top">
-                  <strong>${escapeHtml(formatLongDate(card.date))}</strong>
-                  <span class="state-chip ${card.status}">${card.statusLabel}</span>
-                </div>
-                <div class="schedule-meta">
-                  <span>${card.totalHours > 0 ? formatHours(card.totalHours) : "0.0h"}</span>
-                  <span>${card.totalTip > 0 ? formatMoney(card.totalTip) : "$0.00"}</span>
-                  <span>${escapeHtml(branchText)}</span>
-                </div>
-                <div class="schedule-note">${escapeHtml(note)}</div>
-              </div>
-            </article>
+            <tr>
+              <th class="branch-cell" scope="row">${branch.label}</th>
+              ${cells}
+            </tr>
           `;
         }).join("");
+
+        refs.scheduleList.innerHTML = `
+          <table class="schedule-table">
+            <thead>
+              <tr>
+                <th class="branch-cell" scope="col">지점</th>
+                ${headerCells}
+              </tr>
+            </thead>
+            <tbody>${bodyRows}</tbody>
+          </table>
+        `;
       }
 
       function renderCalendar() {
