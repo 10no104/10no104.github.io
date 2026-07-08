@@ -491,18 +491,19 @@
     }
 
     .card-body {
-      padding: 18px;
+      padding: 16px;
     }
 
     .metrics {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
+      gap: 10px;
     }
 
     .metric-card {
-      padding: 16px;
-      border-radius: 20px;
+      min-width: 0;
+      padding: 14px;
+      border-radius: 16px;
       background: rgba(255, 249, 242, 0.82);
       border: 1px solid rgba(191, 147, 84, 0.18);
       box-shadow: 0 10px 24px rgba(57, 32, 23, 0.08);
@@ -515,25 +516,29 @@
 
     .metric-card span {
       color: var(--muted);
-      font-size: 0.8rem;
+      font-size: 0.72rem;
       font-weight: 800;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.04em;
       text-transform: uppercase;
+      white-space: nowrap;
     }
 
     .metric-card strong {
       display: block;
-      margin: 8px 0 6px;
+      margin: 8px 0 0;
       color: #211310;
-      font-size: 1.54rem;
+      font-size: 1.34rem;
       font-weight: 800;
-      letter-spacing: -0.04em;
+      letter-spacing: 0;
       line-height: 1.05;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .metric-card small {
       color: var(--muted);
-      font-size: 0.86rem;
+      font-size: 0.76rem;
       font-weight: 700;
       line-height: 1.55;
     }
@@ -564,11 +569,11 @@
 
     .period-list {
       display: grid;
-      gap: 12px;
+      gap: 10px;
     }
 
     .period-card {
-      border-radius: 20px;
+      border-radius: 14px;
       border: 1px solid rgba(191, 147, 84, 0.16);
       background: rgba(255, 251, 246, 0.92);
       overflow: hidden;
@@ -580,7 +585,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      padding: 18px;
+      padding: 14px;
       border: none;
       background: transparent;
       color: inherit;
@@ -590,28 +595,35 @@
     .period-title {
       display: block;
       color: #2a1b18;
-      font-size: 1rem;
+      font-size: 0.92rem;
       font-weight: 800;
-      letter-spacing: -0.02em;
+      letter-spacing: 0;
+      white-space: nowrap;
     }
 
     .period-summary {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+      display: grid;
+      grid-template-columns: 0.9fr 1fr 1.15fr 1.15fr 1fr;
+      gap: 6px;
       margin-top: 8px;
+      width: min(100%, 620px);
     }
 
     .period-summary span {
       display: inline-flex;
       align-items: center;
-      min-height: 30px;
-      padding: 0 10px;
-      border-radius: 999px;
+      justify-content: center;
+      min-width: 0;
+      min-height: 28px;
+      padding: 0 8px;
+      border-radius: 8px;
       background: rgba(143, 36, 56, 0.08);
       color: #6f2433;
-      font-size: 0.82rem;
-      font-weight: 700;
+      font-size: 0.78rem;
+      font-weight: 800;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .period-chevron {
@@ -632,7 +644,8 @@
 
     .period-details {
       display: none;
-      padding: 0 18px 18px;
+      overflow-x: auto;
+      padding: 0 14px 14px;
     }
 
     .period-card.is-open .period-details {
@@ -641,25 +654,28 @@
 
     .history-table {
       width: 100%;
+      min-width: 560px;
       border-collapse: collapse;
       background: rgba(255, 249, 242, 0.76);
-      border-radius: 18px;
+      border-radius: 12px;
       overflow: hidden;
+      table-layout: fixed;
     }
 
     .history-table th,
     .history-table td {
-      padding: 12px 10px;
+      padding: 10px 8px;
       border-bottom: 1px solid rgba(113, 67, 50, 0.1);
       text-align: left;
-      font-size: 0.88rem;
+      font-size: 0.82rem;
+      white-space: nowrap;
     }
 
     .history-table th {
       color: var(--muted);
-      font-size: 0.76rem;
+      font-size: 0.7rem;
       font-weight: 800;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.04em;
       text-transform: uppercase;
     }
 
@@ -998,10 +1014,78 @@
       .app-head {
         align-items: start;
         flex-direction: column;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      .identity small {
+        display: none;
+      }
+
+      .identity strong {
+        font-size: 1.22rem;
+      }
+
+      .app-status-badge {
+        min-height: 34px;
+        padding: 0 12px;
+        font-size: 0.78rem;
+      }
+
+      .view-hero {
+        padding: 14px;
+      }
+
+      .view-hero h2 {
+        font-size: 1.7rem;
+      }
+
+      .card-body {
+        padding: 12px;
       }
 
       .metrics {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .metric-card {
+        padding: 12px;
+      }
+
+      .metric-card span {
+        font-size: 0.66rem;
+      }
+
+      .metric-card strong {
+        font-size: 1.12rem;
+      }
+
+      .metric-card small:empty {
+        display: none;
+      }
+
+      .period-toggle {
+        padding: 12px;
+      }
+
+      .period-title {
+        font-size: 0.84rem;
+      }
+
+      .period-summary {
+        grid-template-columns: 1.05fr 0.85fr 0.95fr 1.05fr 1fr;
+        gap: 4px;
+      }
+
+      .period-summary span {
+        min-height: 26px;
+        padding: 0 5px;
+        font-size: 0.67rem;
+      }
+
+      .period-details {
+        padding: 0 12px 12px;
       }
 
       .schedule-table {
@@ -1035,12 +1119,24 @@
 
       .bottom-nav {
         gap: 8px;
-        padding: 8px;
-        border-radius: 24px;
+        bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+        padding: 6px;
+        border-radius: 22px;
+      }
+
+      .nav-tab {
+        min-height: 54px;
+        padding: 8px 6px;
+        border-radius: 18px;
+      }
+
+      .nav-tab svg {
+        width: 20px;
+        height: 20px;
       }
 
       .nav-tab span {
-        font-size: 0.72rem;
+        font-size: 0.68rem;
       }
     }
   </style>
@@ -1102,22 +1198,22 @@
                   <article class="metric-card">
                     <span>Pay</span>
                     <strong id="payHeadlineValue">-</strong>
-                    <small id="payHeadlineNote">-</small>
+                    <small id="payHeadlineNote"></small>
                   </article>
                   <article class="metric-card">
                     <span>Total Hours</span>
                     <strong id="totalHoursValue">-</strong>
-                    <small>누적 근무 시간</small>
+                    <small></small>
                   </article>
                   <article class="metric-card">
                     <span>Total Tips</span>
                     <strong id="totalTipValue">-</strong>
-                    <small>누적 팁 합계</small>
+                    <small></small>
                   </article>
                   <article class="metric-card">
                     <span>Tip Per Hour</span>
                     <strong id="tipPerHourValue">-</strong>
-                    <small>시간당 평균 팁</small>
+                    <small></small>
                   </article>
                 </div>
               </div>
@@ -1792,14 +1888,14 @@
           if (amount > 0) {
             return {
               value: `${formatMoney(amount)}/h`,
-              note: `${getRoleLabel(access.job_role)} · ${getBranchLabel(access.branch_scope)}`
+              note: ""
             };
           }
         }
 
         return {
           value: getRoleLabel(access.job_role),
-          note: `${getBranchLabel(access.branch_scope)} · 시급 수치 연동 전`
+          note: ""
         };
       }
 
@@ -1827,6 +1923,7 @@
                 <span>
                   <span class="period-title">${escapeHtml(period.label)}</span>
                   <span class="period-summary">
+                    <span>${escapeHtml(period.branch || "")}</span>
                     <span>${period.workedDays} days</span>
                     <span>${formatHours(period.totalHours)}</span>
                     <span>${formatMoney(period.totalTip)}</span>
@@ -1864,7 +1961,7 @@
       function renderWageView() {
         if (!state.currentStaff || !state.currentAccess) {
           refs.payHeadlineValue.textContent = "-";
-          refs.payHeadlineNote.textContent = "-";
+          refs.payHeadlineNote.textContent = "";
           refs.totalHoursValue.textContent = "-";
           refs.totalTipValue.textContent = "-";
           refs.tipPerHourValue.textContent = "-";
@@ -1884,7 +1981,7 @@
         refs.totalHoursValue.textContent = formatHours(totalHours);
         refs.totalTipValue.textContent = formatMoney(totalTip);
         refs.tipPerHourValue.textContent = formatMoney(tipPerHour);
-        refs.historySubtitle.textContent = periods.length ? `${periods.length}개 기간 정산 기록` : "정산 기록이 없습니다.";
+        refs.historySubtitle.textContent = periods.length ? `${periods.length} periods` : "";
         renderPeriodCards(periods);
       }
 
