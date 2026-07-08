@@ -35,8 +35,8 @@
 
     .poster {
       position: relative;
-      width: min(100vw, 1024px);
-      aspect-ratio: 2 / 3;
+      width: min(100vw, 1120px, calc(100vh * 1.8));
+      aspect-ratio: 90 / 50;
       overflow: hidden;
       isolation: isolate;
       background:
@@ -52,7 +52,7 @@
       inset: 0;
       background:
         linear-gradient(90deg, rgba(0, 0, 0, 0.08), transparent 16%, transparent 84%, rgba(0, 0, 0, 0.12)),
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='320' viewBox='0 0 280 320'%3E%3Cg fill='none' stroke='%2363211b' stroke-opacity='.68' stroke-width='2'%3E%3Cpath d='M40 10v94M102 10v94M71 10v38M10 42h30V10h62v32h30M10 70h24v-18h74v18h22M30 104h20v-18h42v18h20'/%3E%3Crect x='30' y='116' width='82' height='94'/%3E%3Cpath d='M50 136h42M50 154h42M50 172h42M112 42h24V14h56v28h24M112 74h18V50h68v24h18M130 98h50V74h-50z'/%3E%3Crect x='136' y='118' width='86' height='96'/%3E%3Cpath d='M154 138h50M154 156h50M154 174h50M40 224v88M102 224v88M71 224v38M10 256h30v-32h62v32h30M10 286h24v-20h74v20h22M30 320h20v-18h42v18h20'/%3E%3Crect x='136' y='228' width='86' height='84'/%3E%3Cpath d='M154 248h50M154 266h50M154 284h50'/%3E%3C/g%3E%3Cg fill='none' stroke='%2363211b' stroke-opacity='.58' stroke-width='1.8'%3E%3Ccircle cx='71' cy='163' r='22'/%3E%3Cpath d='M71 145v36M53 163h36M58 150c8 4 16 4 26 0M58 176c8-4 16-4 26 0'/%3E%3Ccircle cx='179' cy='164' r='22'/%3E%3Cpath d='M179 146v36M161 164h36M166 151c8 4 18 4 26 0M166 177c8-4 18-4 26 0'/%3E%3Ccircle cx='179' cy='270' r='22'/%3E%3Cpath d='M179 252v36M161 270h36M166 257c8 4 18 4 26 0M166 283c8-4 18-4 26 0'/%3E%3C/g%3E%3C/svg%3E") center top / 39% auto repeat;
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='320' viewBox='0 0 280 320'%3E%3Cg fill='none' stroke='%2363211b' stroke-opacity='.68' stroke-width='2'%3E%3Cpath d='M40 10v94M102 10v94M71 10v38M10 42h30V10h62v32h30M10 70h24v-18h74v18h22M30 104h20v-18h42v18h20'/%3E%3Crect x='30' y='116' width='82' height='94'/%3E%3Cpath d='M50 136h42M50 154h42M50 172h42M112 42h24V14h56v28h24M112 74h18V50h68v24h18M130 98h50V74h-50z'/%3E%3Crect x='136' y='118' width='86' height='96'/%3E%3Cpath d='M154 138h50M154 156h50M154 174h50M40 224v88M102 224v88M71 224v38M10 256h30v-32h62v32h30M10 286h24v-20h74v20h22M30 320h20v-18h42v18h20'/%3E%3Crect x='136' y='228' width='86' height='84'/%3E%3Cpath d='M154 248h50M154 266h50M154 284h50'/%3E%3C/g%3E%3Cg fill='none' stroke='%2363211b' stroke-opacity='.58' stroke-width='1.8'%3E%3Ccircle cx='71' cy='163' r='22'/%3E%3Cpath d='M71 145v36M53 163h36M58 150c8 4 16 4 26 0M58 176c8-4 16-4 26 0'/%3E%3Ccircle cx='179' cy='164' r='22'/%3E%3Cpath d='M179 146v36M161 164h36M166 151c8 4 18 4 26 0M166 177c8-4 18-4 26 0'/%3E%3Ccircle cx='179' cy='270' r='22'/%3E%3Cpath d='M179 252v36M161 270h36M166 257c8 4 18 4 26 0M166 283c8-4 18-4 26 0'/%3E%3C/g%3E%3C/svg%3E") center top / 23% auto repeat;
       opacity: 0.78;
       z-index: -3;
     }
@@ -80,37 +80,37 @@
 
     .brand {
       position: absolute;
-      top: 8.2%;
-      left: 50%;
+      top: 7.2%;
+      left: 35.5%;
       transform: translateX(-50%);
       display: grid;
       justify-items: center;
-      gap: 12px;
+      gap: 4px;
       z-index: 6;
       text-align: center;
     }
 
     .brand-mark {
-      width: clamp(78px, 11vw, 126px);
+      width: 70px;
       height: auto;
       filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.34));
     }
 
     .brand-name {
       font-family: "Cormorant Garamond", serif;
-      font-size: clamp(2.7rem, 5vw, 4rem);
-      line-height: 0.9;
-      letter-spacing: 0.12em;
+      font-size: 2.15rem;
+      line-height: 0.82;
+      letter-spacing: 0.18em;
       font-weight: 500;
       text-shadow: 0 6px 18px rgba(0, 0, 0, 0.36);
     }
 
     .branch {
       position: absolute;
-      top: -0.2%;
-      right: -2%;
-      width: 40%;
-      height: 20%;
+      top: -7%;
+      right: -1.5%;
+      width: 28%;
+      height: 35%;
       z-index: 4;
       pointer-events: none;
     }
@@ -148,16 +148,16 @@
 
     .qr-wrap {
       position: absolute;
-      top: 23.2%;
-      left: 50%;
-      width: 47.9%;
+      top: 26.5%;
+      left: 35.5%;
+      width: 26.5%;
       transform: translateX(-50%);
       z-index: 5;
     }
 
     .qr-frame {
       position: relative;
-      padding: 7.2%;
+      padding: 5.6%;
       background:
         linear-gradient(180deg, rgba(21, 13, 10, 0.72), rgba(15, 10, 8, 0.84));
       border: 1px solid rgba(199, 155, 66, 0.74);
@@ -170,7 +170,7 @@
     .qr-frame::after {
       content: "";
       position: absolute;
-      inset: -13px;
+      inset: -9px;
       border: 1px solid rgba(199, 155, 66, 0.8);
       clip-path: polygon(
         0 0, 12% 0, 12% 8px, 8px 8px, 8px 12%, 0 12%,
@@ -182,7 +182,7 @@
     }
 
     .qr-frame::after {
-      inset: -21px;
+      inset: -15px;
       opacity: 0.58;
     }
 
@@ -229,12 +229,12 @@
 
     .caption {
       position: absolute;
-      top: 57.8%;
-      left: 50%;
+      top: 78.8%;
+      left: 35.5%;
       transform: translateX(-50%);
       display: grid;
       justify-items: center;
-      gap: 10px;
+      gap: 5px;
       color: var(--gold);
       text-align: center;
       z-index: 6;
@@ -243,11 +243,12 @@
     .caption-title {
       display: flex;
       align-items: center;
-      gap: 18px;
-      font-size: clamp(1.15rem, 3.15vw, 2rem);
+      gap: 12px;
+      font-family: "Cormorant Garamond", serif;
+      font-size: 1.55rem;
       line-height: 1;
       font-weight: 700;
-      letter-spacing: 0.38em;
+      letter-spacing: 0.34em;
       text-transform: uppercase;
       text-shadow: 0 4px 10px rgba(0, 0, 0, 0.24);
     }
@@ -255,8 +256,8 @@
     .caption-title::before,
     .caption-title::after {
       content: "";
-      width: 56px;
-      height: 10px;
+      width: 42px;
+      height: 8px;
       background:
         linear-gradient(90deg, transparent, var(--gold-soft)),
         linear-gradient(90deg, transparent, transparent 42%, var(--gold) 42%, var(--gold) 58%, transparent 58%);
@@ -274,7 +275,7 @@
 
     .caption-subtitle {
       margin: 0;
-      font-size: clamp(0.8rem, 1.85vw, 1.12rem);
+      font-size: 0.82rem;
       letter-spacing: 0.02em;
       color: rgba(216, 168, 73, 0.94);
       text-shadow: 0 2px 8px rgba(0, 0, 0, 0.24);
@@ -287,21 +288,21 @@
     }
 
     .mountain-back {
-      left: -10%;
-      bottom: 13.5%;
-      width: 76%;
-      opacity: 0.74;
-      filter: brightness(0.82) contrast(1.12);
+      left: -11%;
+      bottom: -2%;
+      width: 58%;
+      opacity: 0.58;
+      filter: brightness(0.68) contrast(1.12);
       mix-blend-mode: screen;
       z-index: 1;
     }
 
     .mountain-front {
-      left: -17%;
-      bottom: -2%;
-      width: 82%;
-      opacity: 0.44;
-      filter: brightness(0.34) contrast(1.38);
+      left: -13%;
+      bottom: -24%;
+      width: 64%;
+      opacity: 0.42;
+      filter: brightness(0.3) contrast(1.4);
       mix-blend-mode: normal;
       z-index: 2;
     }
@@ -310,8 +311,8 @@
       position: absolute;
       left: -4%;
       right: 0;
-      bottom: -8%;
-      height: 25%;
+      bottom: -10%;
+      height: 38%;
       background:
         radial-gradient(circle at 22% 38%, rgba(255, 255, 255, 0.05), transparent 18%),
         radial-gradient(circle at 43% 20%, rgba(255, 255, 255, 0.02), transparent 16%),
@@ -321,28 +322,46 @@
 
     .woman {
       position: absolute;
-      right: -4%;
-      bottom: -1.5%;
-      width: 36.4%;
+      right: 3.8%;
+      bottom: -13.5%;
+      width: 24.5%;
       filter: drop-shadow(-18px 22px 30px rgba(0, 0, 0, 0.4));
       z-index: 6;
     }
 
     .petal {
       position: absolute;
-      width: clamp(28px, 3.6vw, 42px);
+      width: 28px;
       opacity: 0.94;
       filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.22));
       z-index: 4;
     }
 
-    .p1 { top: 10.7%; left: 62.5%; transform: rotate(5deg) scale(0.84); }
-    .p2 { top: 17%; left: 8%; transform: rotate(18deg) scale(0.86); }
-    .p3 { top: 28.2%; right: 5.4%; transform: rotate(-14deg) scale(0.92); }
-    .p4 { top: 44.5%; left: 9%; transform: rotate(-14deg) scale(0.88); }
-    .p5 { top: 58.8%; right: 39%; transform: rotate(-12deg) scale(0.78); }
-    .p6 { bottom: 2.8%; left: 8%; transform: rotate(16deg) scale(0.82); }
-    .p7 { bottom: 1.5%; left: 49%; transform: rotate(-6deg) scale(0.9); }
+    .p1 { top: 24%; left: 57.5%; transform: rotate(5deg) scale(0.74); }
+    .p2 { top: 26%; left: 9%; transform: rotate(18deg) scale(0.72); }
+    .p3 { top: 37%; right: 4.6%; transform: rotate(-14deg) scale(0.76); }
+    .p4 { top: 58%; left: 12%; transform: rotate(-14deg) scale(0.72); }
+    .p5 { top: 70%; right: 40%; transform: rotate(-12deg) scale(0.66); }
+    .p6 { bottom: 5%; left: 7%; transform: rotate(16deg) scale(0.68); }
+    .p7 { bottom: 4%; left: 47%; transform: rotate(-6deg) scale(0.72); }
+
+    @page {
+      size: 90mm 50mm;
+      margin: 0;
+    }
+
+    @media print {
+      body {
+        min-height: auto;
+        background: transparent;
+      }
+
+      .poster {
+        width: 90mm;
+        height: 50mm;
+        box-shadow: none;
+      }
+    }
 
     @media (max-width: 720px) {
       body {
@@ -355,40 +374,41 @@
       }
 
       .branch {
-        width: 43%;
+        width: 30%;
       }
 
       .qr-wrap {
-        top: 23.8%;
-        width: 51%;
+        top: 26.5%;
+        width: 27.5%;
       }
 
       .caption {
-        top: 58.6%;
+        top: 78.5%;
       }
 
       .caption-title {
-        gap: 12px;
-        letter-spacing: 0.26em;
+        gap: 9px;
+        font-size: 1.15rem;
+        letter-spacing: 0.24em;
       }
 
       .caption-title::before,
       .caption-title::after {
-        width: 36px;
+        width: 28px;
       }
 
       .mountain-back {
-        width: 84%;
-        left: -18%;
+        width: 62%;
+        left: -16%;
       }
 
       .mountain-front {
-        width: 90%;
+        width: 70%;
       }
 
       .woman {
-        width: 39.5%;
-        right: -6%;
+        width: 26%;
+        right: 1%;
       }
     }
   </style>
@@ -418,11 +438,11 @@
 
     <div class="caption">
       <div class="caption-title">Scan Me</div>
-      <p class="caption-subtitle">메뉴와 다양한 정보를 확인해보세요</p>
+      <p class="caption-subtitle">&#47700;&#45684;&#50752; &#45796;&#50577;&#54620; &#51221;&#48372;&#47484; &#54869;&#51064;&#54644;&#48372;&#49464;&#50836;</p>
     </div>
 
-    <img class="mountain mountain-back" src="assets/background수묵.webp" alt="" />
-    <img class="mountain mountain-front" src="assets/background수묵.webp" alt="" />
+    <img class="mountain mountain-back" src="assets/background%EC%88%98%EB%AC%B5.webp" alt="" />
+    <img class="mountain mountain-front" src="assets/background%EC%88%98%EB%AC%B5.webp" alt="" />
     <div class="ground" aria-hidden="true"></div>
     <img class="woman" src="assets/woman-578x1024.webp" alt="" />
 
