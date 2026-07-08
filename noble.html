@@ -684,54 +684,96 @@
     }
 
     .schedule-list {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(118px, 1fr));
+      gap: 8px;
       overflow-x: auto;
-      padding-bottom: 2px;
+      padding: 2px 2px 6px;
+      scroll-snap-type: x proximity;
     }
 
-    .schedule-table {
-      width: 100%;
-      min-width: 720px;
-      border-collapse: collapse;
-      table-layout: fixed;
-      border: 1px solid #1f1b19;
-      background: #fffdf9;
-      color: #16110f;
+    .schedule-list.is-empty {
+      display: block;
+      overflow-x: visible;
     }
 
-    .schedule-table th,
-    .schedule-table td {
-      height: 52px;
-      border: 1px solid #1f1b19;
-      padding: 6px;
-      text-align: center;
-      vertical-align: middle;
-      font-size: 0.92rem;
+    .schedule-day-card {
+      min-height: 150px;
+      padding: 10px;
+      border: 1px solid rgba(113, 67, 50, 0.12);
+      border-radius: 14px;
+      background: rgba(255, 252, 247, 0.94);
+      color: #241714;
+      box-shadow: 0 10px 20px rgba(52, 29, 22, 0.06);
+      scroll-snap-align: start;
+    }
+
+    .schedule-day-card.is-today {
+      border-color: rgba(224, 177, 95, 0.62);
+      box-shadow: inset 0 0 0 2px rgba(224, 177, 95, 0.18), 0 10px 20px rgba(52, 29, 22, 0.06);
+    }
+
+    .schedule-day-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(113, 67, 50, 0.1);
+    }
+
+    .schedule-day-head strong {
+      font-size: 0.95rem;
+      line-height: 1;
+    }
+
+    .schedule-day-head span {
+      color: var(--muted);
+      font-size: 0.75rem;
       font-weight: 800;
-      line-height: 1.25;
     }
 
-    .schedule-table thead th {
-      background: #cfe4f4;
-      color: #0f161c;
-      font-size: 0.86rem;
+    .schedule-branch-list {
+      display: grid;
+      gap: 7px;
+      margin-top: 10px;
+    }
+
+    .schedule-branch {
+      display: grid;
+      gap: 4px;
+      min-height: 44px;
+      padding: 8px;
+      border-radius: 10px;
+      background: rgba(143, 36, 56, 0.06);
+    }
+
+    .schedule-branch.is-work {
+      background: linear-gradient(135deg, rgba(255, 229, 168, 0.95), rgba(255, 244, 218, 0.96));
+      box-shadow: inset 0 0 0 1px rgba(143, 36, 56, 0.2);
+    }
+
+    .schedule-branch.is-unavailable {
+      background: rgba(200, 104, 111, 0.16);
+    }
+
+    .schedule-branch span {
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .schedule-branch strong {
+      min-height: 1.1em;
+      color: #211310;
+      font-size: 0.9rem;
+      font-weight: 800;
+      line-height: 1.15;
       white-space: nowrap;
-    }
-
-    .schedule-table .branch-cell {
-      width: 88px;
-      background: #f8f0e7;
-      color: #3b211b;
-    }
-
-    .schedule-table td.is-work {
-      background: #ffe5a8;
-      color: #321c10;
-      box-shadow: inset 0 0 0 2px rgba(143, 36, 56, 0.24);
-    }
-
-    .schedule-table td.is-unavailable {
-      background: #f4d6da;
-      color: #7b1f2f;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .calendar-meta {
@@ -807,7 +849,7 @@
     .calendar-grid {
       display: grid;
       grid-template-columns: repeat(7, minmax(0, 1fr));
-      gap: 8px;
+      gap: 6px;
     }
 
     .calendar-weekdays {
@@ -825,13 +867,14 @@
 
     .calendar-day {
       position: relative;
-      min-height: 88px;
-      padding: 12px 10px;
+      aspect-ratio: 1;
+      min-height: 0;
+      padding: 8px;
       border: 1px solid rgba(113, 67, 50, 0.1);
-      border-radius: 18px;
+      border-radius: 12px;
       background: rgba(255, 251, 246, 0.92);
       color: #211310;
-      text-align: left;
+      text-align: center;
       box-shadow: 0 10px 18px rgba(52, 29, 22, 0.06);
       transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
     }
@@ -864,36 +907,27 @@
 
     .calendar-day strong {
       display: block;
-      font-size: 1rem;
+      font-size: 0.95rem;
       line-height: 1;
-      letter-spacing: -0.04em;
+      letter-spacing: 0;
     }
 
     .calendar-day small {
-      display: block;
-      margin-top: 10px;
-      color: var(--muted);
-      font-size: 0.76rem;
-      font-weight: 700;
-      line-height: 1.45;
+      display: none;
     }
 
     .calendar-day em {
       position: absolute;
-      right: 10px;
-      bottom: 10px;
-      display: inline-flex;
-      align-items: center;
-      min-height: 24px;
-      padding: 0 8px;
-      border-radius: 999px;
-      background: rgba(200, 104, 111, 0.14);
-      color: #8f2438;
-      font-size: 0.72rem;
-      font-style: normal;
-      font-weight: 800;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
+      left: 50%;
+      bottom: 7px;
+      width: 6px;
+      height: 6px;
+      padding: 0;
+      border-radius: 50%;
+      background: #c8686f;
+      color: transparent;
+      font-size: 0;
+      transform: translateX(-50%);
     }
 
     .bottom-nav {
@@ -1088,33 +1122,72 @@
         padding: 0 12px 12px;
       }
 
-      .schedule-table {
-        min-width: 620px;
+      .schedule-list {
+        grid-template-columns: repeat(7, minmax(118px, 128px));
+        gap: 7px;
+        margin-inline: -2px;
       }
 
-      .schedule-table th,
-      .schedule-table td {
-        height: 48px;
-        padding: 5px;
+      .schedule-day-card {
+        min-height: 138px;
+        padding: 9px;
+        border-radius: 12px;
+      }
+
+      .schedule-branch {
+        min-height: 40px;
+        padding: 7px;
+      }
+
+      .schedule-branch strong {
         font-size: 0.82rem;
       }
 
-      .schedule-table thead th {
+      .calendar-meta {
+        margin-bottom: 10px;
+      }
+
+      .calendar-legend {
+        gap: 8px;
+      }
+
+      .legend-item {
         font-size: 0.76rem;
       }
 
-      .schedule-table .branch-cell {
-        width: 76px;
+      .calendar-toolbar {
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      .calendar-nav {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+      }
+
+      .calendar-weekdays,
+      .calendar-grid {
+        gap: 4px;
+      }
+
+      .calendar-weekdays span {
+        font-size: 0.66rem;
+        letter-spacing: 0.02em;
       }
 
       .calendar-day {
-        min-height: 76px;
-        padding: 10px 8px;
+        padding: 5px;
+        border-radius: 9px;
+        box-shadow: none;
+      }
+
+      .calendar-day strong {
+        font-size: 0.82rem;
       }
 
       .calendar-day em {
-        right: 8px;
-        bottom: 8px;
+        bottom: 5px;
       }
 
       .bottom-nav {
@@ -2018,11 +2091,12 @@
         };
       }
 
-      function formatScheduleHeaderDate(date) {
-        const weekday = ["일", "월", "화", "수", "목", "금", "토"][date.getDay()];
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        return `${weekday}(${month}/${day})`;
+      function formatScheduleDay(date) {
+        return ["일", "월", "화", "수", "목", "금", "토"][date.getDay()];
+      }
+
+      function formatScheduleMonthDay(date) {
+        return `${date.getMonth() + 1}/${date.getDate()}`;
       }
 
       function getBranchScheduleCell(card, branchKey) {
@@ -2038,10 +2112,12 @@
       function renderScheduleView() {
         if (!state.currentStaff || !state.currentAccess) {
           refs.weekRangeLabel.textContent = "";
+          refs.scheduleList.classList.add("is-empty");
           refs.scheduleList.innerHTML = `<div class="empty-state">데이터 없음</div>`;
           return;
         }
 
+        refs.scheduleList.classList.remove("is-empty");
         const allRecords = getAllRecords(state.periods);
         const week = getCurrentWeekCards(allRecords);
         const branchRows = [
@@ -2051,36 +2127,35 @@
 
         refs.weekRangeLabel.textContent = `${formatLongDate(week.weekStart)} - ${formatLongDate(week.weekEnd)}`;
 
-        const headerCells = week.cards.map((card) => `<th scope="col">${escapeHtml(formatScheduleHeaderDate(card.date))}</th>`).join("");
-        const bodyRows = branchRows.map((branch) => {
-          const cells = week.cards.map((card) => {
+        refs.scheduleList.innerHTML = week.cards.map((card) => {
+          const branches = branchRows.map((branch) => {
             const cell = getBranchScheduleCell(card, branch.key);
             const classes = [
+              "schedule-branch",
               cell.worked ? "is-work" : "",
               !cell.worked && cell.blocked ? "is-unavailable" : ""
             ].filter(Boolean).join(" ");
-            return `<td class="${classes}">${escapeHtml(cell.name)}</td>`;
+            return `
+              <div class="${classes}">
+                <span>${branch.label}</span>
+                <strong>${escapeHtml(cell.name)}</strong>
+              </div>
+            `;
           }).join("");
-
+          const cardClasses = [
+            "schedule-day-card",
+            isSameDate(card.date, new Date()) ? "is-today" : ""
+          ].filter(Boolean).join(" ");
           return `
-            <tr>
-              <th class="branch-cell" scope="row">${branch.label}</th>
-              ${cells}
-            </tr>
+            <article class="${cardClasses}">
+              <div class="schedule-day-head">
+                <strong>${escapeHtml(formatScheduleDay(card.date))}</strong>
+                <span>${escapeHtml(formatScheduleMonthDay(card.date))}</span>
+              </div>
+              <div class="schedule-branch-list">${branches}</div>
+            </article>
           `;
         }).join("");
-
-        refs.scheduleList.innerHTML = `
-          <table class="schedule-table">
-            <thead>
-              <tr>
-                <th class="branch-cell" scope="col">지점</th>
-                ${headerCells}
-              </tr>
-            </thead>
-            <tbody>${bodyRows}</tbody>
-          </table>
-        `;
       }
 
       function renderCalendar() {
