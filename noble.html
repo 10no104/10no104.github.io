@@ -851,6 +851,12 @@
       box-shadow: 0 10px 20px rgba(52, 29, 22, 0.08);
     }
 
+    .schedule-nav:disabled {
+      opacity: 0.42;
+      cursor: default;
+      box-shadow: none;
+    }
+
     .branch-schedule-grid {
       display: grid;
       gap: 12px;
@@ -923,6 +929,12 @@
     .branch-day.is-today {
       border-color: rgba(224, 177, 95, 0.58);
       box-shadow: inset 0 0 0 2px rgba(224, 177, 95, 0.16);
+    }
+
+    .branch-day.is-my-work {
+      border-color: rgba(143, 36, 56, 0.38);
+      background: linear-gradient(180deg, rgba(255, 235, 224, 0.98), rgba(255, 244, 218, 0.96));
+      box-shadow: inset 0 0 0 2px rgba(143, 36, 56, 0.12);
     }
 
     .branch-day-head {
@@ -1066,23 +1078,36 @@
       text-transform: uppercase;
     }
 
-    .calendar-weekday-button {
-      min-height: 32px;
-      border: 1px solid transparent;
-      border-radius: 10px;
-      background: transparent;
-      color: var(--muted);
-      text-align: center;
-      font-size: 0.76rem;
-      font-weight: 900;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+    .calendar-mode {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
     }
 
-    .calendar-weekday-button.is-selected {
-      border-color: rgba(46, 124, 103, 0.24);
-      background: rgba(46, 124, 103, 0.12);
-      color: #245f51;
+    .calendar-mode-button {
+      min-height: 40px;
+      border: 1px solid rgba(113, 67, 50, 0.14);
+      border-radius: 13px;
+      background: rgba(255, 251, 246, 0.94);
+      color: #3c2721;
+      font-size: 0.82rem;
+      font-weight: 900;
+    }
+
+    .calendar-mode-button.is-active {
+      color: #fffaf2;
+      box-shadow: 0 12px 22px rgba(52, 29, 22, 0.12);
+    }
+
+    .calendar-mode-button[data-calendar-mode="unavailable"].is-active {
+      border-color: rgba(200, 104, 111, 0.32);
+      background: linear-gradient(135deg, #9f3044, #d2787c);
+    }
+
+    .calendar-mode-button[data-calendar-mode="preferred"].is-active {
+      border-color: rgba(46, 124, 103, 0.32);
+      background: linear-gradient(135deg, #2e7c67, #c29a4a);
     }
 
     .calendar-day {
@@ -1449,7 +1474,7 @@
       }
 
       .calendar-weekdays span,
-      .calendar-weekday-button {
+      .calendar-mode-button {
         font-size: 0.66rem;
         letter-spacing: 0.02em;
       }
@@ -1622,7 +1647,7 @@
                   <div class="calendar-legend">
                     <span class="legend-item"><span class="legend-swatch today"></span>오늘</span>
                     <span class="legend-item"><span class="legend-swatch blocked"></span>안되는 날</span>
-                    <span class="legend-item"><span class="legend-swatch preferred"></span>선호 요일</span>
+                    <span class="legend-item"><span class="legend-swatch preferred"></span>선호 날짜</span>
                   </div>
                   <div class="helper-text" id="calendarSummary"></div>
                 </div>
@@ -1633,14 +1658,19 @@
                   <button class="calendar-nav" id="calendarNext" type="button" aria-label="Next month">&gt;</button>
                 </div>
 
-                <div class="calendar-weekdays" id="preferredWeekdays" aria-label="Preferred weekdays">
-                  <button class="calendar-weekday-button" type="button" data-preferred-day="mon">Mon</button>
-                  <button class="calendar-weekday-button" type="button" data-preferred-day="tue">Tue</button>
-                  <button class="calendar-weekday-button" type="button" data-preferred-day="wed">Wed</button>
-                  <button class="calendar-weekday-button" type="button" data-preferred-day="thu">Thu</button>
-                  <button class="calendar-weekday-button" type="button" data-preferred-day="fri">Fri</button>
-                  <button class="calendar-weekday-button" type="button" data-preferred-day="sat">Sat</button>
-                  <button class="calendar-weekday-button" type="button" data-preferred-day="sun">Sun</button>
+                <div class="calendar-mode" id="calendarMode">
+                  <button class="calendar-mode-button is-active" type="button" data-calendar-mode="unavailable">안되는 날</button>
+                  <button class="calendar-mode-button" type="button" data-calendar-mode="preferred">선호 날짜</button>
+                </div>
+
+                <div class="calendar-weekdays" aria-hidden="true">
+                  <span>Mon</span>
+                  <span>Tue</span>
+                  <span>Wed</span>
+                  <span>Thu</span>
+                  <span>Fri</span>
+                  <span>Sat</span>
+                  <span>Sun</span>
                 </div>
                 <div class="calendar-grid" id="calendarGrid"></div>
                 <div class="calendar-actions">
@@ -1713,8 +1743,8 @@
           </select>
         </div>
         <div class="request-field">
-          <label for="requestNote">Note</label>
-          <textarea id="requestNote" name="note" placeholder="Reference code request, schedule access, etc."></textarea>
+          <label for="requestSmartServerNumber">Smart Server Number</label>
+          <input id="requestSmartServerNumber" name="smartServerNumber" type="text" inputmode="numeric" autocomplete="off" required />
         </div>
         <button class="request-submit" type="submit">Submit Request</button>
         <p class="request-status" id="requestStatus"></p>
@@ -1748,15 +1778,6 @@
       const CALENDAR_KEY_PREFIX = "ehwa:noble:calendar:";
       const BASE_COLUMN_COUNT = 7;
       const TAB_ORDER = ["wage", "schedule", "calendar"];
-      const PREFERRED_WEEKDAYS = [
-        { key: "mon", label: "월" },
-        { key: "tue", label: "화" },
-        { key: "wed", label: "수" },
-        { key: "thu", label: "목" },
-        { key: "fri", label: "금" },
-        { key: "sat", label: "토" },
-        { key: "sun", label: "일" }
-      ];
       const MONEY_FORMAT = new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       const HOUR_FORMAT = new Intl.NumberFormat("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
@@ -1774,9 +1795,11 @@
         currentStaff: null,
         currentAccess: null,
         scheduleCursor: startOfWeek(new Date()),
+        latestScheduleWeekStart: startOfWeek(new Date()),
         calendarCursor: startOfMonth(new Date()),
         unavailableDates: new Set(),
-        preferredDays: new Set(),
+        preferredDates: new Set(),
+        calendarMode: "unavailable",
         availabilityDirty: false
       };
 
@@ -1795,7 +1818,7 @@
           "requestForm",
           "requestName",
           "requestBranch",
-          "requestNote",
+          "requestSmartServerNumber",
           "requestStatus",
           "appUserName",
           "appUserMeta",
@@ -1817,7 +1840,7 @@
           "calendarPrev",
           "calendarNext",
           "calendarGrid",
-          "preferredWeekdays",
+          "calendarMode",
           "saveAvailabilityButton",
           "availabilityStatus"
         ].forEach((id) => {
@@ -2278,12 +2301,12 @@
         const payload = {
           name: refs.requestName.value.trim(),
           branch: refs.requestBranch.value,
-          note: refs.requestNote.value.trim(),
+          smartServerNumber: refs.requestSmartServerNumber.value.trim(),
           submittedAt: new Date().toISOString()
         };
 
-        if (!payload.name || !payload.branch) {
-          refs.requestStatus.textContent = "Name and branch are required.";
+        if (!payload.name || !payload.branch || !payload.smartServerNumber) {
+          refs.requestStatus.textContent = "Name, branch, server number are required.";
           return;
         }
 
@@ -2303,7 +2326,7 @@
       function loadUnavailableDates() {
         const key = getUnavailableStorageKey();
         state.unavailableDates = new Set();
-        state.preferredDays = new Set();
+        state.preferredDates = new Set();
         state.availabilityDirty = false;
         if (!key) return;
 
@@ -2311,7 +2334,7 @@
           const raw = window.localStorage.getItem(key);
           const parsed = raw ? JSON.parse(raw) : null;
           const unavailableDates = Array.isArray(parsed) ? parsed : parsed?.unavailableDates;
-          const preferredDays = Array.isArray(parsed?.preferredDays) ? parsed.preferredDays : [];
+          const preferredDates = Array.isArray(parsed?.preferredDates) ? parsed.preferredDates : [];
 
           if (Array.isArray(unavailableDates)) {
             unavailableDates
@@ -2319,12 +2342,12 @@
               .forEach((value) => state.unavailableDates.add(String(value)));
           }
 
-          preferredDays
-            .filter((value) => PREFERRED_WEEKDAYS.some((day) => day.key === value))
-            .forEach((value) => state.preferredDays.add(String(value)));
+          preferredDates
+            .filter((value) => /^\d{4}-\d{2}-\d{2}$/.test(String(value)))
+            .forEach((value) => state.preferredDates.add(String(value)));
         } catch (error) {
           state.unavailableDates = new Set();
-          state.preferredDays = new Set();
+          state.preferredDates = new Set();
         }
       }
 
@@ -2335,7 +2358,7 @@
         try {
           const payload = {
             unavailableDates: Array.from(state.unavailableDates).sort(),
-            preferredDays: Array.from(state.preferredDays),
+            preferredDates: Array.from(state.preferredDates).sort(),
             submittedAt: new Date().toISOString()
           };
           window.localStorage.setItem(key, JSON.stringify(payload));
@@ -2354,9 +2377,10 @@
         state.currentAccess = null;
         state.periods = [];
         state.openPeriodKey = null;
-        state.scheduleCursor = startOfWeek(new Date());
+        state.scheduleCursor = state.latestScheduleWeekStart || startOfWeek(new Date());
         state.unavailableDates = new Set();
-        state.preferredDays = new Set();
+        state.preferredDates = new Set();
+        state.calendarMode = "unavailable";
         state.availabilityDirty = false;
         renderIdentity();
         renderWageView();
@@ -2481,6 +2505,27 @@
         renderPeriodCards(periods);
       }
 
+      function getLatestScheduleWeekStart() {
+        let latestDate = null;
+
+        state.sources.forEach((source) => {
+          source.staff.forEach((staff) => {
+            getDailyRecords(staff).forEach((record) => {
+              if (record.isSummary || !record.dateObj || !(record.hours > 0 || record.tip > 0)) return;
+              if (!latestDate || record.dateObj > latestDate) latestDate = record.dateObj;
+            });
+          });
+        });
+
+        return latestDate ? startOfWeek(latestDate) : startOfWeek(new Date());
+      }
+
+      function clampScheduleCursor(cursor) {
+        const latestWeek = state.latestScheduleWeekStart || getLatestScheduleWeekStart();
+        const weekStart = startOfWeek(cursor);
+        return weekStart > latestWeek ? latestWeek : weekStart;
+      }
+
       function getWeekCards(records = [], cursor = new Date()) {
         const weekStart = startOfWeek(cursor);
         const weekEnd = endOfWeek(weekStart);
@@ -2521,10 +2566,6 @@
         return `${date.getMonth() + 1}/${date.getDate()}`;
       }
 
-      function getPreferredWeekdayKey(date) {
-        return ["sun", "mon", "tue", "wed", "thu", "fri", "sat"][date.getDay()];
-      }
-
       function getBranchScheduleCell(card, branchKey) {
         const source = state.sources.find((item) => normalizeKey(item.key) === branchKey);
         if (!source?.staff?.length) return [];
@@ -2555,6 +2596,7 @@
 
         refs.scheduleList.classList.remove("is-empty");
         const allRecords = getAllRecords(state.periods);
+        state.scheduleCursor = clampScheduleCursor(state.scheduleCursor);
         const week = getWeekCards(allRecords, state.scheduleCursor);
         const branchRows = [
           { key: "uptown", label: "Uptown" },
@@ -2562,18 +2604,21 @@
         ];
 
         refs.weekRangeLabel.textContent = `${formatLongDate(week.weekStart)} - ${formatLongDate(week.weekEnd)}`;
+        refs.scheduleNext.disabled = isSameDate(week.weekStart, state.latestScheduleWeekStart);
 
         refs.scheduleList.innerHTML = `
           <div class="branch-schedule-grid">
             ${branchRows.map((branch) => {
               const days = week.cards.map((card) => {
                 const servers = getBranchScheduleCell(card, branch.key);
+                const isMyWork = servers.some((server) => server.isMe);
                 const serverMarkup = servers.length
                   ? servers.map((server) => `<span class="server-chip ${server.isMe ? "is-me" : ""}">${escapeHtml(server.name)}</span>`).join("")
                   : `<span class="server-empty">-</span>`;
                 const dayClasses = [
                   "branch-day",
-                  isSameDate(card.date, new Date()) ? "is-today" : ""
+                  isSameDate(card.date, new Date()) ? "is-today" : "",
+                  isMyWork ? "is-my-work" : ""
                 ].filter(Boolean).join(" ");
                 return `
                   <article class="${dayClasses}">
@@ -2613,7 +2658,7 @@
         }).format(cursor);
 
         if (hasProfile) {
-          refs.calendarSummary.textContent = `${state.currentStaff.name} 기준 안되는 날 ${state.unavailableDates.size}일 · 선호 요일 ${state.preferredDays.size}개`;
+          refs.calendarSummary.textContent = `${state.currentStaff.name} 기준 안되는 날 ${state.unavailableDates.size}일 · 선호 날짜 ${state.preferredDates.size}일`;
         } else {
           refs.calendarSummary.textContent = "";
         }
@@ -2627,7 +2672,7 @@
           const isoDate = toIsoDate(date);
           const isToday = isSameDate(date, today);
           const isBlocked = state.unavailableDates.has(isoDate);
-          const isPreferred = state.preferredDays.has(getPreferredWeekdayKey(date));
+          const isPreferred = state.preferredDates.has(isoDate);
           const classes = ["calendar-day"];
           if (!hasProfile) classes.push("is-disabled");
           if (isToday) classes.push("is-today");
@@ -2650,24 +2695,18 @@
         }
 
         refs.calendarGrid.innerHTML = cells.join("");
-        renderPreferredWeekdays();
+        renderCalendarMode();
         setAvailabilityStatus(state.availabilityDirty ? "Unsaved" : "");
       }
 
-      function renderPreferredWeekdays() {
+      function renderCalendarMode() {
         const hasProfile = Boolean(state.currentStaff && state.currentAccess);
-        refs.preferredWeekdays.innerHTML = PREFERRED_WEEKDAYS.map((day) => {
-          const selected = state.preferredDays.has(day.key);
-          return `
-            <button
-              class="calendar-weekday-button ${selected ? "is-selected" : ""}"
-              type="button"
-              data-preferred-day="${day.key}"
-              ${hasProfile ? "" : "disabled"}
-              aria-pressed="${selected ? "true" : "false"}"
-            >${day.label}</button>
-          `;
-        }).join("");
+        refs.calendarMode.querySelectorAll("[data-calendar-mode]").forEach((button) => {
+          const isActive = button.dataset.calendarMode === state.calendarMode;
+          button.classList.toggle("is-active", isActive);
+          button.disabled = !hasProfile;
+          button.setAttribute("aria-pressed", isActive ? "true" : "false");
+        });
       }
 
       function renderAll() {
@@ -2755,6 +2794,8 @@
           state.sourceErrors = sourceErrors;
           state.rows = sources[0]?.rows || [];
           state.staff = sources.flatMap((source) => source.staff);
+          state.latestScheduleWeekStart = getLatestScheduleWeekStart();
+          state.scheduleCursor = state.latestScheduleWeekStart;
           state.loaded = true;
           setStatus("Ready");
 
@@ -2818,7 +2859,7 @@
           state.currentAccess = access;
           state.periods = periods;
           state.openPeriodKey = defaultOpenPeriod ? defaultOpenPeriod.id : null;
-          state.scheduleCursor = startOfWeek(new Date());
+          state.scheduleCursor = state.latestScheduleWeekStart || getLatestScheduleWeekStart();
           state.calendarCursor = startOfMonth(new Date());
           saveRefCode(input);
           loadUnavailableDates();
@@ -2847,25 +2888,42 @@
           state.unavailableDates.delete(isoDate);
         } else {
           state.unavailableDates.add(isoDate);
+          state.preferredDates.delete(isoDate);
         }
 
         state.availabilityDirty = true;
-        renderScheduleView();
         renderCalendar();
         setStatus("Availability updated");
       }
 
-      function togglePreferredDay(dayKey) {
+      function togglePreferredDate(isoDate) {
         if (!state.currentStaff || !state.currentAccess) return;
 
-        if (state.preferredDays.has(dayKey)) {
-          state.preferredDays.delete(dayKey);
+        if (state.preferredDates.has(isoDate)) {
+          state.preferredDates.delete(isoDate);
         } else {
-          state.preferredDays.add(dayKey);
+          state.preferredDates.add(isoDate);
+          state.unavailableDates.delete(isoDate);
         }
 
         state.availabilityDirty = true;
         renderCalendar();
+        setStatus("Availability updated");
+      }
+
+      function toggleCalendarDate(isoDate) {
+        if (state.calendarMode === "preferred") {
+          togglePreferredDate(isoDate);
+          return;
+        }
+
+        toggleUnavailableDate(isoDate);
+      }
+
+      function setCalendarMode(mode) {
+        if (!["unavailable", "preferred"].includes(mode)) return;
+        state.calendarMode = mode;
+        renderCalendarMode();
       }
 
       function submitAvailability() {
@@ -2915,7 +2973,7 @@
         });
 
         refs.scheduleNext.addEventListener("click", () => {
-          state.scheduleCursor = addDays(state.scheduleCursor, 7);
+          state.scheduleCursor = clampScheduleCursor(addDays(state.scheduleCursor, 7));
           renderScheduleView();
         });
 
@@ -2940,13 +2998,13 @@
         refs.calendarGrid.addEventListener("click", (event) => {
           const button = event.target.closest("[data-date]");
           if (!button || button.disabled) return;
-          toggleUnavailableDate(button.dataset.date);
+          toggleCalendarDate(button.dataset.date);
         });
 
-        refs.preferredWeekdays.addEventListener("click", (event) => {
-          const button = event.target.closest("[data-preferred-day]");
+        refs.calendarMode.addEventListener("click", (event) => {
+          const button = event.target.closest("[data-calendar-mode]");
           if (!button || button.disabled) return;
-          togglePreferredDay(button.dataset.preferredDay);
+          setCalendarMode(button.dataset.calendarMode);
         });
 
         refs.saveAvailabilityButton.addEventListener("click", submitAvailability);
