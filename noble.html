@@ -1078,38 +1078,6 @@
       text-transform: uppercase;
     }
 
-    .calendar-mode {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-
-    .calendar-mode-button {
-      min-height: 40px;
-      border: 1px solid rgba(113, 67, 50, 0.14);
-      border-radius: 13px;
-      background: rgba(255, 251, 246, 0.94);
-      color: #3c2721;
-      font-size: 0.82rem;
-      font-weight: 900;
-    }
-
-    .calendar-mode-button.is-active {
-      color: #fffaf2;
-      box-shadow: 0 12px 22px rgba(52, 29, 22, 0.12);
-    }
-
-    .calendar-mode-button[data-calendar-mode="unavailable"].is-active {
-      border-color: rgba(200, 104, 111, 0.32);
-      background: linear-gradient(135deg, #9f3044, #d2787c);
-    }
-
-    .calendar-mode-button[data-calendar-mode="preferred"].is-active {
-      border-color: rgba(46, 124, 103, 0.32);
-      background: linear-gradient(135deg, #2e7c67, #c29a4a);
-    }
-
     .calendar-day {
       position: relative;
       aspect-ratio: 1;
@@ -1155,6 +1123,18 @@
       background: linear-gradient(180deg, rgba(245, 255, 250, 0.98), rgba(232, 248, 240, 0.98));
     }
 
+    .calendar-day.has-detail::after {
+      content: "";
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 0 3px rgba(224, 177, 95, 0.18);
+    }
+
     .calendar-day strong {
       display: block;
       font-size: 0.95rem;
@@ -1166,18 +1146,42 @@
       display: none;
     }
 
-    .calendar-day em {
+    .calendar-mark {
       position: absolute;
       left: 50%;
-      bottom: 7px;
-      width: 6px;
-      height: 6px;
-      padding: 0;
-      border-radius: 50%;
-      background: #c8686f;
-      color: transparent;
-      font-size: 0;
+      top: 52%;
       transform: translateX(-50%);
+      pointer-events: none;
+    }
+
+    .calendar-mark-unavailable {
+      color: rgba(143, 36, 56, 0.82);
+      font-size: clamp(1.55rem, 6vw, 2.4rem);
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .calendar-mark-preferred {
+      min-width: 30px;
+      padding: 4px 7px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(46, 124, 103, 0.94), rgba(194, 154, 74, 0.9));
+      color: #fffaf2;
+      font-size: 0.62rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+    }
+
+    .calendar-state-label {
+      position: absolute;
+      left: 50%;
+      bottom: 5px;
+      transform: translateX(-50%);
+      color: var(--muted);
+      font-size: 0.58rem;
+      font-weight: 900;
+      line-height: 1;
+      white-space: nowrap;
     }
 
     .calendar-actions {
@@ -1205,6 +1209,23 @@
       color: var(--muted);
       font-size: 0.82rem;
       font-weight: 800;
+    }
+
+    .date-detail-dialog {
+      width: min(100%, 460px);
+    }
+
+    .date-detail-meta {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 800;
+    }
+
+    .date-time-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
     }
 
     .bottom-nav {
@@ -1473,8 +1494,7 @@
         gap: 4px;
       }
 
-      .calendar-weekdays span,
-      .calendar-mode-button {
+      .calendar-weekdays span {
         font-size: 0.66rem;
         letter-spacing: 0.02em;
       }
@@ -1658,11 +1678,6 @@
                   <button class="calendar-nav" id="calendarNext" type="button" aria-label="Next month">&gt;</button>
                 </div>
 
-                <div class="calendar-mode" id="calendarMode">
-                  <button class="calendar-mode-button is-active" type="button" data-calendar-mode="unavailable">안되는 날</button>
-                  <button class="calendar-mode-button" type="button" data-calendar-mode="preferred">선호 날짜</button>
-                </div>
-
                 <div class="calendar-weekdays" aria-hidden="true">
                   <span>Mon</span>
                   <span>Tue</span>
@@ -1752,6 +1767,47 @@
     </div>
   </div>
 
+  <div class="request-modal" id="dateDetailModal" hidden aria-hidden="true">
+    <div class="request-dialog date-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="dateDetailTitle">
+      <div class="request-head">
+        <div>
+          <p>Date Detail</p>
+          <h3 id="dateDetailTitle">날짜 상세 설정</h3>
+        </div>
+        <button class="request-close" id="dateDetailCloseButton" type="button" aria-label="Close date detail">×</button>
+      </div>
+
+      <p class="date-detail-meta" id="dateDetailMeta"></p>
+      <form class="request-form" id="dateDetailForm">
+        <input id="dateDetailDate" name="date" type="hidden" />
+        <div class="request-field">
+          <label for="dateDetailStatus">Status</label>
+          <select id="dateDetailStatus" name="status">
+            <option value="default">Default</option>
+            <option value="unavailable">안되는 날</option>
+            <option value="preferred">선호 날짜</option>
+          </select>
+        </div>
+        <div class="date-time-row">
+          <div class="request-field">
+            <label for="dateDetailStart">From</label>
+            <input id="dateDetailStart" name="startTime" type="time" />
+          </div>
+          <div class="request-field">
+            <label for="dateDetailEnd">To</label>
+            <input id="dateDetailEnd" name="endTime" type="time" />
+          </div>
+        </div>
+        <div class="request-field">
+          <label for="dateDetailNote">Note</label>
+          <textarea id="dateDetailNote" name="note" placeholder="가능 시간, 요청사항 등을 남겨주세요."></textarea>
+        </div>
+        <button class="request-submit" type="submit">Save Detail</button>
+        <p class="request-status" id="dateDetailStatusText"></p>
+      </form>
+    </div>
+  </div>
+
   <script>
     (function () {
       "use strict";
@@ -1799,7 +1855,9 @@
         calendarCursor: startOfMonth(new Date()),
         unavailableDates: new Set(),
         preferredDates: new Set(),
-        calendarMode: "unavailable",
+        dateDetails: {},
+        calendarPressTimer: null,
+        calendarLongPressTriggered: false,
         availabilityDirty: false
       };
 
@@ -1840,9 +1898,18 @@
           "calendarPrev",
           "calendarNext",
           "calendarGrid",
-          "calendarMode",
           "saveAvailabilityButton",
-          "availabilityStatus"
+          "availabilityStatus",
+          "dateDetailModal",
+          "dateDetailCloseButton",
+          "dateDetailForm",
+          "dateDetailDate",
+          "dateDetailMeta",
+          "dateDetailStatus",
+          "dateDetailStart",
+          "dateDetailEnd",
+          "dateDetailNote",
+          "dateDetailStatusText"
         ].forEach((id) => {
           refs[id] = byId(id);
         });
@@ -2284,6 +2351,27 @@
         document.body.classList.remove("modal-open");
       }
 
+      function openDateDetailModal(isoDate) {
+        const detail = state.dateDetails[isoDate] || {};
+        refs.dateDetailDate.value = isoDate;
+        refs.dateDetailMeta.textContent = formatLongDate(new Date(`${isoDate}T00:00:00`));
+        refs.dateDetailStatus.value = getCalendarDateStatus(isoDate);
+        refs.dateDetailStart.value = detail.startTime || "";
+        refs.dateDetailEnd.value = detail.endTime || "";
+        refs.dateDetailNote.value = detail.note || "";
+        refs.dateDetailStatusText.textContent = "";
+        refs.dateDetailModal.hidden = false;
+        refs.dateDetailModal.setAttribute("aria-hidden", "false");
+        document.body.classList.add("modal-open");
+        refs.dateDetailStatus.focus();
+      }
+
+      function closeDateDetailModal() {
+        refs.dateDetailModal.hidden = true;
+        refs.dateDetailModal.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("modal-open");
+      }
+
       function saveAccessRequest(payload) {
         try {
           const raw = window.localStorage.getItem(ACCESS_REQUEST_KEY);
@@ -2327,6 +2415,7 @@
         const key = getUnavailableStorageKey();
         state.unavailableDates = new Set();
         state.preferredDates = new Set();
+        state.dateDetails = {};
         state.availabilityDirty = false;
         if (!key) return;
 
@@ -2335,6 +2424,7 @@
           const parsed = raw ? JSON.parse(raw) : null;
           const unavailableDates = Array.isArray(parsed) ? parsed : parsed?.unavailableDates;
           const preferredDates = Array.isArray(parsed?.preferredDates) ? parsed.preferredDates : [];
+          const dateDetails = parsed?.dateDetails && typeof parsed.dateDetails === "object" ? parsed.dateDetails : {};
 
           if (Array.isArray(unavailableDates)) {
             unavailableDates
@@ -2345,9 +2435,20 @@
           preferredDates
             .filter((value) => /^\d{4}-\d{2}-\d{2}$/.test(String(value)))
             .forEach((value) => state.preferredDates.add(String(value)));
+
+          Object.entries(dateDetails).forEach(([date, detail]) => {
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !detail || typeof detail !== "object") return;
+            state.dateDetails[date] = {
+              status: ["default", "unavailable", "preferred"].includes(detail.status) ? detail.status : "default",
+              startTime: String(detail.startTime || ""),
+              endTime: String(detail.endTime || ""),
+              note: String(detail.note || "")
+            };
+          });
         } catch (error) {
           state.unavailableDates = new Set();
           state.preferredDates = new Set();
+          state.dateDetails = {};
         }
       }
 
@@ -2359,6 +2460,7 @@
           const payload = {
             unavailableDates: Array.from(state.unavailableDates).sort(),
             preferredDates: Array.from(state.preferredDates).sort(),
+            dateDetails: state.dateDetails,
             submittedAt: new Date().toISOString()
           };
           window.localStorage.setItem(key, JSON.stringify(payload));
@@ -2380,7 +2482,10 @@
         state.scheduleCursor = state.latestScheduleWeekStart || startOfWeek(new Date());
         state.unavailableDates = new Set();
         state.preferredDates = new Set();
-        state.calendarMode = "unavailable";
+        state.dateDetails = {};
+        window.clearTimeout(state.calendarPressTimer);
+        state.calendarPressTimer = null;
+        state.calendarLongPressTriggered = false;
         state.availabilityDirty = false;
         renderIdentity();
         renderWageView();
@@ -2566,6 +2671,31 @@
         return `${date.getMonth() + 1}/${date.getDate()}`;
       }
 
+      function getCalendarDateStatus(isoDate) {
+        if (state.unavailableDates.has(isoDate)) return "unavailable";
+        if (state.preferredDates.has(isoDate)) return "preferred";
+        return "default";
+      }
+
+      function setCalendarDateStatus(isoDate, status) {
+        state.unavailableDates.delete(isoDate);
+        state.preferredDates.delete(isoDate);
+
+        if (status === "unavailable") {
+          state.unavailableDates.add(isoDate);
+        } else if (status === "preferred") {
+          state.preferredDates.add(isoDate);
+        }
+      }
+
+      function getNextCalendarDateStatus(isoDate) {
+        return {
+          default: "unavailable",
+          unavailable: "preferred",
+          preferred: "default"
+        }[getCalendarDateStatus(isoDate)] || "default";
+      }
+
       function getBranchScheduleCell(card, branchKey) {
         const source = state.sources.find((item) => normalizeKey(item.key) === branchKey);
         if (!source?.staff?.length) return [];
@@ -2671,13 +2801,16 @@
           const date = new Date(cursor.getFullYear(), cursor.getMonth(), day);
           const isoDate = toIsoDate(date);
           const isToday = isSameDate(date, today);
-          const isBlocked = state.unavailableDates.has(isoDate);
-          const isPreferred = state.preferredDates.has(isoDate);
+          const status = getCalendarDateStatus(isoDate);
+          const detail = state.dateDetails[isoDate];
+          const isBlocked = status === "unavailable";
+          const isPreferred = status === "preferred";
           const classes = ["calendar-day"];
           if (!hasProfile) classes.push("is-disabled");
           if (isToday) classes.push("is-today");
           if (isBlocked) classes.push("is-blocked");
           if (isPreferred) classes.push("is-preferred");
+          if (detail?.startTime || detail?.endTime || detail?.note) classes.push("has-detail");
 
           cells.push(`
             <button
@@ -2685,28 +2818,19 @@
               type="button"
               data-date="${isoDate}"
               ${hasProfile ? "" : "disabled"}
-              aria-pressed="${isBlocked ? "true" : "false"}"
+              aria-label="${escapeHtml(`${formatLongDate(date)} ${status}`)}"
+              aria-pressed="${status === "default" ? "false" : "true"}"
             >
               <strong>${day}</strong>
               <small>${escapeHtml(formatLongDate(date))}</small>
-              ${isBlocked ? "<em>Blocked</em>" : ""}
+              ${isBlocked ? '<span class="calendar-mark calendar-mark-unavailable">X</span><span class="calendar-state-label">안됨</span>' : ""}
+              ${isPreferred ? '<span class="calendar-mark calendar-mark-preferred">OK</span><span class="calendar-state-label">선호</span>' : ""}
             </button>
           `);
         }
 
         refs.calendarGrid.innerHTML = cells.join("");
-        renderCalendarMode();
         setAvailabilityStatus(state.availabilityDirty ? "Unsaved" : "");
-      }
-
-      function renderCalendarMode() {
-        const hasProfile = Boolean(state.currentStaff && state.currentAccess);
-        refs.calendarMode.querySelectorAll("[data-calendar-mode]").forEach((button) => {
-          const isActive = button.dataset.calendarMode === state.calendarMode;
-          button.classList.toggle("is-active", isActive);
-          button.disabled = !hasProfile;
-          button.setAttribute("aria-pressed", isActive ? "true" : "false");
-        });
       }
 
       function renderAll() {
@@ -2884,13 +3008,7 @@
       function toggleUnavailableDate(isoDate) {
         if (!state.currentStaff || !state.currentAccess) return;
 
-        if (state.unavailableDates.has(isoDate)) {
-          state.unavailableDates.delete(isoDate);
-        } else {
-          state.unavailableDates.add(isoDate);
-          state.preferredDates.delete(isoDate);
-        }
-
+        setCalendarDateStatus(isoDate, state.unavailableDates.has(isoDate) ? "default" : "unavailable");
         state.availabilityDirty = true;
         renderCalendar();
         setStatus("Availability updated");
@@ -2899,31 +3017,59 @@
       function togglePreferredDate(isoDate) {
         if (!state.currentStaff || !state.currentAccess) return;
 
-        if (state.preferredDates.has(isoDate)) {
-          state.preferredDates.delete(isoDate);
-        } else {
-          state.preferredDates.add(isoDate);
-          state.unavailableDates.delete(isoDate);
-        }
-
+        setCalendarDateStatus(isoDate, state.preferredDates.has(isoDate) ? "default" : "preferred");
         state.availabilityDirty = true;
         renderCalendar();
         setStatus("Availability updated");
       }
 
       function toggleCalendarDate(isoDate) {
-        if (state.calendarMode === "preferred") {
-          togglePreferredDate(isoDate);
-          return;
-        }
-
-        toggleUnavailableDate(isoDate);
+        if (!state.currentStaff || !state.currentAccess) return;
+        setCalendarDateStatus(isoDate, getNextCalendarDateStatus(isoDate));
+        state.availabilityDirty = true;
+        renderCalendar();
+        setStatus("Availability updated");
       }
 
-      function setCalendarMode(mode) {
-        if (!["unavailable", "preferred"].includes(mode)) return;
-        state.calendarMode = mode;
-        renderCalendarMode();
+      function saveDateDetail() {
+        const isoDate = refs.dateDetailDate.value;
+        if (!isoDate) return;
+
+        const status = refs.dateDetailStatus.value;
+        const detail = {
+          status,
+          startTime: refs.dateDetailStart.value,
+          endTime: refs.dateDetailEnd.value,
+          note: refs.dateDetailNote.value.trim()
+        };
+
+        setCalendarDateStatus(isoDate, status);
+
+        if (detail.startTime || detail.endTime || detail.note || status !== "default") {
+          state.dateDetails[isoDate] = detail;
+        } else {
+          delete state.dateDetails[isoDate];
+        }
+
+        state.availabilityDirty = true;
+        renderCalendar();
+        refs.dateDetailStatusText.textContent = "Saved.";
+        window.setTimeout(closeDateDetailModal, 450);
+        setStatus("Availability updated");
+      }
+
+      function startCalendarLongPress(button) {
+        window.clearTimeout(state.calendarPressTimer);
+        state.calendarLongPressTriggered = false;
+        state.calendarPressTimer = window.setTimeout(() => {
+          state.calendarLongPressTriggered = true;
+          openDateDetailModal(button.dataset.date);
+        }, 620);
+      }
+
+      function clearCalendarLongPress() {
+        window.clearTimeout(state.calendarPressTimer);
+        state.calendarPressTimer = null;
       }
 
       function submitAvailability() {
@@ -2952,13 +3098,26 @@
           if (event.target === refs.requestModal) closeRequestModal();
         });
 
+        refs.dateDetailCloseButton.addEventListener("click", closeDateDetailModal);
+
+        refs.dateDetailModal.addEventListener("click", (event) => {
+          if (event.target === refs.dateDetailModal) closeDateDetailModal();
+        });
+
         refs.requestForm.addEventListener("submit", (event) => {
           event.preventDefault();
           submitAccessRequest();
         });
 
+        refs.dateDetailForm.addEventListener("submit", (event) => {
+          event.preventDefault();
+          saveDateDetail();
+        });
+
         document.addEventListener("keydown", (event) => {
-          if (event.key === "Escape" && !refs.requestModal.hidden) closeRequestModal();
+          if (event.key !== "Escape") return;
+          if (!refs.requestModal.hidden) closeRequestModal();
+          if (!refs.dateDetailModal.hidden) closeDateDetailModal();
         });
 
         refs.navTabs.forEach((button) => {
@@ -2998,13 +3157,25 @@
         refs.calendarGrid.addEventListener("click", (event) => {
           const button = event.target.closest("[data-date]");
           if (!button || button.disabled) return;
+          if (state.calendarLongPressTriggered) {
+            state.calendarLongPressTriggered = false;
+            return;
+          }
           toggleCalendarDate(button.dataset.date);
         });
 
-        refs.calendarMode.addEventListener("click", (event) => {
-          const button = event.target.closest("[data-calendar-mode]");
+        refs.calendarGrid.addEventListener("pointerdown", (event) => {
+          const button = event.target.closest("[data-date]");
           if (!button || button.disabled) return;
-          setCalendarMode(button.dataset.calendarMode);
+          startCalendarLongPress(button);
+        });
+
+        ["pointerup", "pointerleave", "pointercancel"].forEach((eventName) => {
+          refs.calendarGrid.addEventListener(eventName, clearCalendarLongPress);
+        });
+
+        refs.calendarGrid.addEventListener("contextmenu", (event) => {
+          if (event.target.closest("[data-date]")) event.preventDefault();
         });
 
         refs.saveAvailabilityButton.addEventListener("click", submitAvailability);
