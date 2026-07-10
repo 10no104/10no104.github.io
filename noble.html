@@ -313,6 +313,19 @@
       box-shadow: 0 18px 32px rgba(143, 36, 56, 0.3);
     }
 
+    .lookup-request {
+      align-self: flex-start;
+      min-height: 46px;
+      padding: 0 18px;
+      border: 1px solid rgba(255, 229, 194, 0.24);
+      border-radius: 16px;
+      background: rgba(255, 248, 238, 0.12);
+      color: #fff7ef;
+      font-size: 0.9rem;
+      font-weight: 800;
+      box-shadow: inset 0 1px 0 rgba(255, 248, 236, 0.12);
+    }
+
     .lookup-status {
       min-height: 22px;
       margin: 0;
@@ -320,6 +333,136 @@
       font-size: 0.9rem;
       font-weight: 700;
       line-height: 1.55;
+    }
+
+    body.modal-open {
+      overflow: hidden;
+    }
+
+    .request-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: rgba(18, 10, 9, 0.64);
+      backdrop-filter: blur(14px);
+    }
+
+    .request-modal[hidden] {
+      display: none;
+    }
+
+    .request-dialog {
+      width: min(100%, 430px);
+      padding: 18px;
+      border: 1px solid rgba(255, 226, 189, 0.18);
+      border-radius: 28px;
+      background: linear-gradient(180deg, rgba(255, 250, 244, 0.98), rgba(255, 242, 231, 0.96));
+      color: var(--text);
+      box-shadow: 0 28px 70px rgba(8, 4, 3, 0.42);
+    }
+
+    .request-head {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .request-head p {
+      margin: 0 0 5px;
+      color: var(--accent);
+      font-size: 0.76rem;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .request-head h3 {
+      margin: 0;
+      color: #211310;
+      font-size: 1.35rem;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    .request-close {
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border: none;
+      border-radius: 999px;
+      background: rgba(143, 36, 56, 0.1);
+      color: var(--accent-strong);
+      font-size: 1.2rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .request-form {
+      display: grid;
+      gap: 10px;
+    }
+
+    .request-field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .request-field label {
+      color: #4b2b24;
+      font-size: 0.78rem;
+      font-weight: 900;
+    }
+
+    .request-field input,
+    .request-field select,
+    .request-field textarea {
+      width: 100%;
+      min-height: 46px;
+      padding: 0 13px;
+      border: 1px solid rgba(113, 67, 50, 0.14);
+      border-radius: 14px;
+      background: rgba(255, 252, 248, 0.96);
+      color: var(--text);
+      font: inherit;
+      font-weight: 800;
+      outline: none;
+    }
+
+    .request-field textarea {
+      min-height: 84px;
+      padding-top: 12px;
+      resize: vertical;
+    }
+
+    .request-field input:focus,
+    .request-field select:focus,
+    .request-field textarea:focus {
+      border-color: rgba(143, 36, 56, 0.38);
+      box-shadow: 0 0 0 4px rgba(143, 36, 56, 0.1);
+    }
+
+    .request-submit {
+      min-height: 48px;
+      margin-top: 4px;
+      border: none;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--accent), #c08931);
+      color: #fffaf2;
+      font-weight: 900;
+      box-shadow: 0 16px 26px rgba(143, 36, 56, 0.24);
+    }
+
+    .request-status {
+      min-height: 1.4em;
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 800;
     }
 
     .stage {
@@ -1131,6 +1274,20 @@
         width: 100%;
       }
 
+      .lookup-request {
+        align-self: stretch;
+        width: 100%;
+      }
+
+      .request-modal {
+        align-items: end;
+        padding: 10px;
+      }
+
+      .request-dialog {
+        border-radius: 24px;
+      }
+
       .app-frame {
         min-height: 700px;
         padding: 12px;
@@ -1361,6 +1518,7 @@
           <input id="staffIdInput" name="staffId" type="text" autocomplete="off" placeholder="Reference code" />
           <button class="lookup-button" type="submit">열기</button>
         </div>
+        <button class="lookup-request" id="requestAccessButton" type="button">추가 요청</button>
         <p class="lookup-status" id="lookupStatus">Loading...</p>
       </form>
     </section>
@@ -1521,6 +1679,44 @@
     </section>
   </main>
 
+  <div class="request-modal" id="requestModal" hidden aria-hidden="true">
+    <div class="request-dialog" role="dialog" aria-modal="true" aria-labelledby="requestModalTitle">
+      <div class="request-head">
+        <div>
+          <p>Access Request</p>
+          <h3 id="requestModalTitle">본인 정보 입력</h3>
+        </div>
+        <button class="request-close" id="requestCloseButton" type="button" aria-label="Close request form">×</button>
+      </div>
+
+      <form class="request-form" id="requestForm">
+        <div class="request-field">
+          <label for="requestName">Name</label>
+          <input id="requestName" name="name" type="text" autocomplete="name" required />
+        </div>
+        <div class="request-field">
+          <label for="requestContact">Phone / Email</label>
+          <input id="requestContact" name="contact" type="text" autocomplete="email" required />
+        </div>
+        <div class="request-field">
+          <label for="requestBranch">Branch</label>
+          <select id="requestBranch" name="branch" required>
+            <option value="">Select branch</option>
+            <option value="Uptown">Uptown</option>
+            <option value="Downtown">Downtown</option>
+            <option value="Both">Both</option>
+          </select>
+        </div>
+        <div class="request-field">
+          <label for="requestNote">Note</label>
+          <textarea id="requestNote" name="note" placeholder="Reference code request, schedule access, etc."></textarea>
+        </div>
+        <button class="request-submit" type="submit">Submit Request</button>
+        <p class="request-status" id="requestStatus"></p>
+      </form>
+    </div>
+  </div>
+
   <script>
     (function () {
       "use strict";
@@ -1543,6 +1739,7 @@
       };
       const DEFAULT_BRANCH = "Downtown";
       const SAVED_REF_KEY = "ehwa:noble:ref-code";
+      const ACCESS_REQUEST_KEY = "ehwa:noble:access-requests";
       const CALENDAR_KEY_PREFIX = "ehwa:noble:calendar:";
       const BASE_COLUMN_COUNT = 7;
       const TAB_ORDER = ["wage", "schedule", "calendar"];
@@ -1586,6 +1783,15 @@
           "lookupForm",
           "staffIdInput",
           "lookupStatus",
+          "requestAccessButton",
+          "requestModal",
+          "requestCloseButton",
+          "requestForm",
+          "requestName",
+          "requestContact",
+          "requestBranch",
+          "requestNote",
+          "requestStatus",
           "appUserName",
           "appUserMeta",
           "appStatus",
@@ -2032,6 +2238,55 @@
         } catch (error) {
           // Local storage can be unavailable.
         }
+      }
+
+      function openRequestModal() {
+        refs.requestModal.hidden = false;
+        refs.requestModal.setAttribute("aria-hidden", "false");
+        document.body.classList.add("modal-open");
+        refs.requestStatus.textContent = "";
+        refs.requestName.focus();
+      }
+
+      function closeRequestModal() {
+        refs.requestModal.hidden = true;
+        refs.requestModal.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("modal-open");
+      }
+
+      function saveAccessRequest(payload) {
+        try {
+          const raw = window.localStorage.getItem(ACCESS_REQUEST_KEY);
+          const requests = raw ? JSON.parse(raw) : [];
+          const nextRequests = Array.isArray(requests) ? requests : [];
+          nextRequests.push(payload);
+          window.localStorage.setItem(ACCESS_REQUEST_KEY, JSON.stringify(nextRequests));
+          return true;
+        } catch (error) {
+          return false;
+        }
+      }
+
+      function submitAccessRequest() {
+        const payload = {
+          name: refs.requestName.value.trim(),
+          contact: refs.requestContact.value.trim(),
+          branch: refs.requestBranch.value,
+          note: refs.requestNote.value.trim(),
+          submittedAt: new Date().toISOString()
+        };
+
+        if (!payload.name || !payload.contact || !payload.branch) {
+          refs.requestStatus.textContent = "Name, contact, branch are required.";
+          return;
+        }
+
+        const saved = saveAccessRequest(payload);
+        refs.requestStatus.textContent = saved ? "Request saved." : "Could not save request.";
+        if (!saved) return;
+
+        refs.requestForm.reset();
+        window.setTimeout(closeRequestModal, 650);
       }
 
       function getUnavailableStorageKey() {
@@ -2617,6 +2872,23 @@
         refs.lookupForm.addEventListener("submit", (event) => {
           event.preventDefault();
           submitLookup();
+        });
+
+        refs.requestAccessButton.addEventListener("click", openRequestModal);
+
+        refs.requestCloseButton.addEventListener("click", closeRequestModal);
+
+        refs.requestModal.addEventListener("click", (event) => {
+          if (event.target === refs.requestModal) closeRequestModal();
+        });
+
+        refs.requestForm.addEventListener("submit", (event) => {
+          event.preventDefault();
+          submitAccessRequest();
+        });
+
+        document.addEventListener("keydown", (event) => {
+          if (event.key === "Escape" && !refs.requestModal.hidden) closeRequestModal();
         });
 
         refs.navTabs.forEach((button) => {
