@@ -27,6 +27,7 @@
     body {
       margin: 0;
       min-height: 100vh;
+      padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
       color: #f4e7d7;
       font-family: "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       overflow-x: hidden;
@@ -396,6 +397,211 @@
     .layout {
       display: grid;
       gap: 16px;
+    }
+
+    .app-view {
+      display: none;
+    }
+
+    .app-view.is-active {
+      display: block;
+    }
+
+    .placeholder-view {
+      display: grid;
+      gap: 16px;
+    }
+
+    .app-view.placeholder-view {
+      display: none;
+    }
+
+    .app-view.placeholder-view.is-active {
+      display: grid;
+    }
+
+    .purpose-hero,
+    .purpose-panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .purpose-hero {
+      display: grid;
+      gap: 10px;
+      padding: 22px;
+      background:
+        linear-gradient(135deg, rgba(22, 15, 11, 0.96), rgba(41, 25, 18, 0.95) 48%, rgba(87, 29, 42, 0.9)),
+        url("../assets/pattern.webp") center / 520px auto;
+      color: #fff8f0;
+    }
+
+    .purpose-kicker {
+      margin: 0;
+      color: #e9bf69;
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .purpose-hero h2 {
+      margin: 0;
+      font-size: clamp(1.9rem, 6vw, 3.4rem);
+      line-height: 0.96;
+      letter-spacing: -0.05em;
+    }
+
+    .purpose-hero p:not(.purpose-kicker) {
+      max-width: 720px;
+      margin: 0;
+      color: rgba(255, 246, 232, 0.78);
+      line-height: 1.65;
+    }
+
+    .purpose-panel {
+      padding: 18px;
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.97), rgba(248, 241, 231, 0.96)),
+        url("../assets/pattern.webp") center / 440px auto;
+      color: var(--ink);
+    }
+
+    .purpose-panel h3 {
+      margin: 0 0 14px;
+      color: #3b2418;
+      font-size: 1.12rem;
+      letter-spacing: -0.03em;
+    }
+
+    .table-map-preview {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      min-height: 280px;
+      padding: 14px;
+      border-radius: 22px;
+      border: 1px dashed rgba(123, 31, 47, 0.24);
+      background:
+        linear-gradient(135deg, rgba(123, 31, 47, 0.07), rgba(212, 175, 55, 0.08)),
+        rgba(255, 255, 255, 0.66);
+    }
+
+    .table-map-zone {
+      display: grid;
+      place-items: center;
+      min-height: 72px;
+      border-radius: 18px;
+      border: 1px solid rgba(113, 88, 60, 0.13);
+      background: rgba(255, 255, 255, 0.76);
+      color: #6b3127;
+      font-weight: 900;
+    }
+
+    .table-map-zone.is-wide {
+      grid-column: span 2;
+    }
+
+    .online-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .online-card {
+      min-height: 148px;
+      padding: 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(113, 88, 60, 0.13);
+      background: rgba(255, 255, 255, 0.78);
+      color: #2b1e14;
+    }
+
+    .online-card span,
+    .online-card strong,
+    .online-card small {
+      display: block;
+    }
+
+    .online-card span {
+      width: fit-content;
+      margin-bottom: 18px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(123, 31, 47, 0.1);
+      color: #6b2230;
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .online-card strong {
+      margin-bottom: 6px;
+      font-size: 1.12rem;
+      letter-spacing: -0.03em;
+    }
+
+    .online-card small {
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+      z-index: 90;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      width: min(760px, calc(100% - 22px));
+      padding: 10px;
+      transform: translateX(-50%);
+      border-radius: 28px;
+      border: 1px solid rgba(255, 226, 189, 0.12);
+      background: rgba(22, 13, 12, 0.91);
+      box-shadow: 0 18px 36px rgba(0, 0, 0, 0.24);
+      backdrop-filter: blur(16px);
+    }
+
+    .nav-tab {
+      display: grid;
+      gap: 6px;
+      justify-items: center;
+      min-height: 62px;
+      padding: 10px 8px;
+      border: none;
+      border-radius: 22px;
+      background: transparent;
+      color: rgba(255, 240, 221, 0.68);
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+
+    .nav-tab svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .nav-tab span {
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+    }
+
+    .nav-tab.is-active {
+      background: linear-gradient(135deg, rgba(123, 31, 47, 0.98), rgba(212, 175, 55, 0.92));
+      color: #fffaf2;
+      transform: translateY(-2px);
+      box-shadow: 0 16px 28px rgba(123, 31, 47, 0.28);
     }
 
     .panel {
@@ -1561,6 +1767,32 @@
         gap: 6px;
       }
 
+      .online-grid,
+      .table-map-preview {
+        grid-template-columns: 1fr;
+      }
+
+      .table-map-zone.is-wide {
+        grid-column: span 1;
+      }
+
+      .bottom-nav {
+        gap: 6px;
+        width: min(100% - 12px, 760px);
+        padding: 8px;
+        border-radius: 24px;
+      }
+
+      .nav-tab {
+        min-height: 58px;
+        padding: 8px 6px;
+        border-radius: 18px;
+      }
+
+      .nav-tab span {
+        font-size: 0.72rem;
+      }
+
       .action-btn {
         gap: 4px;
         padding: 0 5px;
@@ -1711,61 +1943,148 @@
         <a class="pill-btn" href="./reservation/">Guest Form</a>
     </header>
 
-    <section class="hero">
-      <h2 id="todayHeading">Today</h2>
-      <div class="metric-grid">
-        <div class="metric-card">
-          <span>Total Reservations</span>
-          <strong id="metricReservations">0</strong>
+    <section class="app-view is-active" data-view="reservation">
+      <section class="hero">
+        <h2 id="todayHeading">Today</h2>
+        <div class="metric-grid">
+          <div class="metric-card">
+            <span>Total Reservations</span>
+            <strong id="metricReservations">0</strong>
+          </div>
+          <div class="metric-card">
+            <span>Large Parties</span>
+            <strong id="metricLargeParties">0</strong>
+          </div>
         </div>
-        <div class="metric-card">
-          <span>Large Parties</span>
-          <strong id="metricLargeParties">0</strong>
+        <div class="next-booking-card">
+          <span>Next Booking</span>
+          <strong id="metricNextName">-</strong>
+          <p id="metricNextMeta">No upcoming reservation</p>
         </div>
-      </div>
-      <div class="next-booking-card">
-        <span>Next Booking</span>
-        <strong id="metricNextName">-</strong>
-        <p id="metricNextMeta">No upcoming reservation</p>
-      </div>
+      </section>
+
+      <main class="layout">
+        <section class="panel add-panel is-collapsed" id="quickAddPanel">
+          <div class="panel-head">
+            <h3>Add Reservation</h3>
+          </div>
+
+          <form class="booking-form" id="quickAddForm">
+            <input name="action" type="hidden" value="create" />
+            <input name="status" type="hidden" value="active" />
+            <input name="sheetName" type="hidden" value="Downtown Reservation" />
+            <div class="field-grid" id="quickAddFields"></div>
+            <div class="form-actions">
+              <button class="pill-btn primary" type="submit">Add Reservation</button>
+            </div>
+          </form>
+          <button class="add-toggle" id="toggleQuickAdd" type="button" aria-expanded="false">
+            <span>Show Form</span>
+          </button>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h3>Reservations</h3>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;">
+              <span id="reservationDateLabel">Loading</span>
+              <button class="chip-btn trash-toggle" id="trashToggle" type="button">&#128465; Trash</button>
+            </div>
+          </div>
+
+          <div class="control-row">
+            <div class="range-chips" id="dateFilterChips"></div>
+          </div>
+
+          <div class="reservation-list" id="reservationList"></div>
+        </section>
+      </main>
     </section>
 
-    <main class="layout">
-      <section class="panel add-panel is-collapsed" id="quickAddPanel">
-        <div class="panel-head">
-          <h3>Add Reservation</h3>
-        </div>
-
-        <form class="booking-form" id="quickAddForm">
-          <input name="action" type="hidden" value="create" />
-          <input name="status" type="hidden" value="active" />
-          <input name="sheetName" type="hidden" value="Downtown Reservation" />
-          <div class="field-grid" id="quickAddFields"></div>
-          <div class="form-actions">
-            <button class="pill-btn primary" type="submit">Add Reservation</button>
-          </div>
-        </form>
-        <button class="add-toggle" id="toggleQuickAdd" type="button" aria-expanded="false">
-          <span>Show Form</span>
-        </button>
+    <section class="app-view placeholder-view" data-view="tables">
+      <section class="purpose-hero">
+        <p class="purpose-kicker">Downtown floor</p>
+        <h2>Table Status</h2>
+        <p>Table map, seating status, and floor notes will live here.</p>
       </section>
 
-      <section class="panel">
-        <div class="panel-head">
-          <h3>Reservations</h3>
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;">
-            <span id="reservationDateLabel">Loading</span>
-            <button class="chip-btn trash-toggle" id="trashToggle" type="button">&#128465; Trash</button>
-          </div>
+      <section class="purpose-panel">
+        <h3>Table Map</h3>
+        <div class="table-map-preview" aria-label="Table map placeholder">
+          <div class="table-map-zone is-wide">Map Area</div>
+          <div class="table-map-zone">Patio</div>
+          <div class="table-map-zone">Bar</div>
+          <div class="table-map-zone">T1</div>
+          <div class="table-map-zone">T2</div>
+          <div class="table-map-zone">T3</div>
+          <div class="table-map-zone">T4</div>
+          <div class="table-map-zone is-wide">Main Dining</div>
+          <div class="table-map-zone">Private</div>
+          <div class="table-map-zone">Wait</div>
         </div>
-
-        <div class="control-row">
-          <div class="range-chips" id="dateFilterChips"></div>
-        </div>
-
-        <div class="reservation-list" id="reservationList"></div>
       </section>
-    </main>
+    </section>
+
+    <section class="app-view placeholder-view" data-view="online">
+      <section class="purpose-hero">
+        <p class="purpose-kicker">Digital orders</p>
+        <h2>Online</h2>
+        <p>To-go orders, reservation pause controls, and online requests will be organized here.</p>
+      </section>
+
+      <section class="purpose-panel">
+        <h3>Online Queue</h3>
+        <div class="online-grid">
+          <article class="online-card">
+            <span>To-go</span>
+            <strong>Orders</strong>
+            <small>Incoming pickup and takeout requests.</small>
+          </article>
+          <article class="online-card">
+            <span>Reservations</span>
+            <strong>Pause Intake</strong>
+            <small>Stop or resume online reservation requests.</small>
+          </article>
+          <article class="online-card">
+            <span>Requests</span>
+            <strong>Online Messages</strong>
+            <small>Special requests and follow-up items.</small>
+          </article>
+        </div>
+      </section>
+    </section>
+
+    <nav class="bottom-nav" aria-label="Queen sections">
+      <button class="nav-tab is-active" type="button" data-queen-tab="reservation" aria-pressed="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8 3v4"></path>
+          <path d="M16 3v4"></path>
+          <path d="M4 8h16"></path>
+          <path d="M6 12h5"></path>
+          <path d="M6 16h4"></path>
+          <path d="M5 5h14a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"></path>
+        </svg>
+        <span>예약</span>
+      </button>
+      <button class="nav-tab" type="button" data-queen-tab="tables" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 4h16v16H4z"></path>
+          <path d="M4 10h16"></path>
+          <path d="M10 4v16"></path>
+          <path d="M15 14h2"></path>
+        </svg>
+        <span>테이블 현황</span>
+      </button>
+      <button class="nav-tab" type="button" data-queen-tab="online" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 8h14"></path>
+          <path d="M7 8l1 12h8l1-12"></path>
+          <path d="M9 8a3 3 0 0 1 6 0"></path>
+          <path d="M9 13h6"></path>
+        </svg>
+        <span>온라인</span>
+      </button>
+    </nav>
   </div>
 
   <iframe name="adminMutationFrame" hidden></iframe>
@@ -3350,6 +3669,43 @@
     });
 
     bootstrapAdmin();
+  </script>
+  <script>
+    (() => {
+      const tabs = Array.from(document.querySelectorAll("[data-queen-tab]"));
+      const views = Array.from(document.querySelectorAll(".app-view[data-view]"));
+      const viewIds = new Set(views.map((view) => view.dataset.view));
+
+      function setQueenView(viewId, { syncHash = true } = {}) {
+        if (!viewIds.has(viewId)) return;
+
+        tabs.forEach((tab) => {
+          const isActive = tab.dataset.queenTab === viewId;
+          tab.classList.toggle("is-active", isActive);
+          tab.setAttribute("aria-pressed", isActive ? "true" : "false");
+        });
+
+        views.forEach((view) => {
+          view.classList.toggle("is-active", view.dataset.view === viewId);
+        });
+
+        if (syncHash) {
+          history.replaceState(null, "", viewId === "reservation" ? location.pathname : `#${viewId}`);
+        }
+      }
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => setQueenView(tab.dataset.queenTab));
+      });
+
+      const initialView = location.hash.replace("#", "") || "reservation";
+      setQueenView(viewIds.has(initialView) ? initialView : "reservation", { syncHash: false });
+
+      window.addEventListener("hashchange", () => {
+        const nextView = location.hash.replace("#", "") || "reservation";
+        setQueenView(viewIds.has(nextView) ? nextView : "reservation", { syncHash: false });
+      });
+    })();
   </script>
 </body>
 </html>
