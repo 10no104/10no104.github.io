@@ -831,10 +831,29 @@
       gap: 10px;
     }
 
+    .schedule-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .schedule-nav {
+      width: 40px;
+      height: 40px;
+      border: 1px solid rgba(113, 67, 50, 0.14);
+      border-radius: 14px;
+      background: rgba(255, 251, 246, 0.94);
+      color: #2a1b18;
+      font-size: 1.12rem;
+      font-weight: 900;
+      box-shadow: 0 10px 20px rgba(52, 29, 22, 0.08);
+    }
+
     .branch-schedule-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
+      gap: 12px;
     }
 
     .branch-schedule-column {
@@ -857,14 +876,15 @@
     }
 
     .branch-schedule-title {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 36px;
+      min-height: 34px;
       margin: 0 0 9px;
-      border-radius: 12px;
+      padding: 0 14px;
+      border-radius: 999px;
       color: #fffaf2;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       font-weight: 900;
       line-height: 1.1;
     }
@@ -881,17 +901,23 @@
 
     .branch-day-list {
       display: grid;
+      grid-template-columns: repeat(7, minmax(96px, 1fr));
       gap: 7px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scroll-snap-type: x proximity;
     }
 
     .branch-day {
       display: grid;
+      align-content: start;
       gap: 7px;
-      min-height: 76px;
+      min-height: 92px;
       padding: 9px;
       border: 1px solid rgba(113, 67, 50, 0.1);
       border-radius: 12px;
       background: rgba(255, 250, 244, 0.9);
+      scroll-snap-align: start;
     }
 
     .branch-day.is-today {
@@ -988,6 +1014,11 @@
       box-shadow: 0 0 0 4px rgba(200, 104, 111, 0.16);
     }
 
+    .legend-swatch.preferred {
+      background: var(--mint);
+      box-shadow: 0 0 0 4px rgba(46, 124, 103, 0.14);
+    }
+
     .calendar-toolbar {
       display: flex;
       align-items: center;
@@ -1035,6 +1066,25 @@
       text-transform: uppercase;
     }
 
+    .calendar-weekday-button {
+      min-height: 32px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.76rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .calendar-weekday-button.is-selected {
+      border-color: rgba(46, 124, 103, 0.24);
+      background: rgba(46, 124, 103, 0.12);
+      color: #245f51;
+    }
+
     .calendar-day {
       position: relative;
       aspect-ratio: 1;
@@ -1075,6 +1125,11 @@
       background: linear-gradient(180deg, rgba(255, 245, 245, 0.98), rgba(255, 236, 238, 0.98));
     }
 
+    .calendar-day.is-preferred:not(.is-blocked) {
+      border-color: rgba(46, 124, 103, 0.28);
+      background: linear-gradient(180deg, rgba(245, 255, 250, 0.98), rgba(232, 248, 240, 0.98));
+    }
+
     .calendar-day strong {
       display: block;
       font-size: 0.95rem;
@@ -1100,50 +1155,12 @@
       transform: translateX(-50%);
     }
 
-    .preference-panel {
-      display: grid;
-      gap: 10px;
-      margin-top: 14px;
-      padding-top: 14px;
-      border-top: 1px solid rgba(113, 67, 50, 0.12);
-    }
-
-    .preference-panel h3 {
-      margin: 0;
-      color: #231613;
-      font-size: 1rem;
-      font-weight: 900;
-      letter-spacing: 0;
-    }
-
-    .weekday-picker {
-      display: grid;
-      grid-template-columns: repeat(7, minmax(0, 1fr));
-      gap: 6px;
-    }
-
-    .weekday-toggle {
-      min-height: 42px;
-      border: 1px solid rgba(113, 67, 50, 0.14);
-      border-radius: 12px;
-      background: rgba(255, 251, 246, 0.94);
-      color: #261713;
-      font-size: 0.84rem;
-      font-weight: 900;
-    }
-
-    .weekday-toggle.is-selected {
-      border-color: rgba(143, 36, 56, 0.34);
-      background: linear-gradient(135deg, rgba(143, 36, 56, 0.92), rgba(224, 177, 95, 0.86));
-      color: #fffaf2;
-      box-shadow: 0 10px 20px rgba(143, 36, 56, 0.18);
-    }
-
     .calendar-actions {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
+      margin-top: 12px;
       flex-wrap: wrap;
     }
 
@@ -1384,8 +1401,12 @@
         font-size: 0.86rem;
       }
 
+      .branch-day-list {
+        grid-template-columns: repeat(7, minmax(92px, 92px));
+      }
+
       .branch-day {
-        min-height: 70px;
+        min-height: 88px;
         padding: 7px;
       }
 
@@ -1427,7 +1448,8 @@
         gap: 4px;
       }
 
-      .calendar-weekdays span {
+      .calendar-weekdays span,
+      .calendar-weekday-button {
         font-size: 0.66rem;
         letter-spacing: 0.02em;
       }
@@ -1444,16 +1466,6 @@
 
       .calendar-day em {
         bottom: 5px;
-      }
-
-      .weekday-picker {
-        gap: 4px;
-      }
-
-      .weekday-toggle {
-        min-height: 36px;
-        border-radius: 10px;
-        font-size: 0.76rem;
       }
 
       .calendar-actions {
@@ -1538,7 +1550,6 @@
           <section class="app-view is-active" id="wageView" data-view="wage">
             <article class="surface-card">
               <div class="view-hero">
-                <p>Tab One</p>
                 <h2>임금 확인</h2>
               </div>
               <div class="card-body">
@@ -1583,11 +1594,14 @@
           <section class="app-view" id="scheduleView" data-view="schedule">
             <article class="surface-card">
               <div class="view-hero">
-                <p>Tab Two</p>
-                <h2>이번주 스케줄</h2>
-                <span id="weekRangeLabel"></span>
+                <h2>스케줄</h2>
               </div>
               <div class="card-body">
+                <div class="schedule-controls">
+                  <button class="schedule-nav" id="schedulePrev" type="button" aria-label="Previous week">&lt;</button>
+                  <div class="helper-text" id="weekRangeLabel"></div>
+                  <button class="schedule-nav" id="scheduleNext" type="button" aria-label="Next week">&gt;</button>
+                </div>
                 <div class="section-head">
                   <div>
                     <h3>Schedule</h3>
@@ -1601,7 +1615,6 @@
           <section class="app-view" id="calendarView" data-view="calendar">
             <article class="surface-card">
               <div class="view-hero">
-                <p>Tab Three</p>
                 <h2>안되는날 달력</h2>
               </div>
               <div class="card-body">
@@ -1609,6 +1622,7 @@
                   <div class="calendar-legend">
                     <span class="legend-item"><span class="legend-swatch today"></span>오늘</span>
                     <span class="legend-item"><span class="legend-swatch blocked"></span>안되는 날</span>
+                    <span class="legend-item"><span class="legend-swatch preferred"></span>선호 요일</span>
                   </div>
                   <div class="helper-text" id="calendarSummary"></div>
                 </div>
@@ -1619,24 +1633,19 @@
                   <button class="calendar-nav" id="calendarNext" type="button" aria-label="Next month">&gt;</button>
                 </div>
 
-                <div class="calendar-weekdays" aria-hidden="true">
-                  <span>Mon</span>
-                  <span>Tue</span>
-                  <span>Wed</span>
-                  <span>Thu</span>
-                  <span>Fri</span>
-                  <span>Sat</span>
-                  <span>Sun</span>
+                <div class="calendar-weekdays" id="preferredWeekdays" aria-label="Preferred weekdays">
+                  <button class="calendar-weekday-button" type="button" data-preferred-day="mon">Mon</button>
+                  <button class="calendar-weekday-button" type="button" data-preferred-day="tue">Tue</button>
+                  <button class="calendar-weekday-button" type="button" data-preferred-day="wed">Wed</button>
+                  <button class="calendar-weekday-button" type="button" data-preferred-day="thu">Thu</button>
+                  <button class="calendar-weekday-button" type="button" data-preferred-day="fri">Fri</button>
+                  <button class="calendar-weekday-button" type="button" data-preferred-day="sat">Sat</button>
+                  <button class="calendar-weekday-button" type="button" data-preferred-day="sun">Sun</button>
                 </div>
                 <div class="calendar-grid" id="calendarGrid"></div>
-
-                <div class="preference-panel">
-                  <h3>Preferred Days</h3>
-                  <div class="weekday-picker" id="preferredWeekdays"></div>
-                  <div class="calendar-actions">
-                    <button class="availability-save" id="saveAvailabilityButton" type="button">Submit</button>
-                    <div class="availability-status" id="availabilityStatus"></div>
-                  </div>
+                <div class="calendar-actions">
+                  <button class="availability-save" id="saveAvailabilityButton" type="button">Submit</button>
+                  <div class="availability-status" id="availabilityStatus"></div>
                 </div>
               </div>
             </article>
@@ -1693,10 +1702,6 @@
         <div class="request-field">
           <label for="requestName">Name</label>
           <input id="requestName" name="name" type="text" autocomplete="name" required />
-        </div>
-        <div class="request-field">
-          <label for="requestContact">Phone / Email</label>
-          <input id="requestContact" name="contact" type="text" autocomplete="email" required />
         </div>
         <div class="request-field">
           <label for="requestBranch">Branch</label>
@@ -1768,6 +1773,7 @@
         activeTab: "wage",
         currentStaff: null,
         currentAccess: null,
+        scheduleCursor: startOfWeek(new Date()),
         calendarCursor: startOfMonth(new Date()),
         unavailableDates: new Set(),
         preferredDays: new Set(),
@@ -1788,7 +1794,6 @@
           "requestCloseButton",
           "requestForm",
           "requestName",
-          "requestContact",
           "requestBranch",
           "requestNote",
           "requestStatus",
@@ -1804,6 +1809,8 @@
           "historySubtitle",
           "periodList",
           "weekRangeLabel",
+          "schedulePrev",
+          "scheduleNext",
           "scheduleList",
           "calendarSummary",
           "calendarLabel",
@@ -2270,14 +2277,13 @@
       function submitAccessRequest() {
         const payload = {
           name: refs.requestName.value.trim(),
-          contact: refs.requestContact.value.trim(),
           branch: refs.requestBranch.value,
           note: refs.requestNote.value.trim(),
           submittedAt: new Date().toISOString()
         };
 
-        if (!payload.name || !payload.contact || !payload.branch) {
-          refs.requestStatus.textContent = "Name, contact, branch are required.";
+        if (!payload.name || !payload.branch) {
+          refs.requestStatus.textContent = "Name and branch are required.";
           return;
         }
 
@@ -2348,6 +2354,7 @@
         state.currentAccess = null;
         state.periods = [];
         state.openPeriodKey = null;
+        state.scheduleCursor = startOfWeek(new Date());
         state.unavailableDates = new Set();
         state.preferredDays = new Set();
         state.availabilityDirty = false;
@@ -2474,10 +2481,9 @@
         renderPeriodCards(periods);
       }
 
-      function getCurrentWeekCards(records = []) {
-        const today = new Date();
-        const weekStart = startOfWeek(today);
-        const weekEnd = endOfWeek(today);
+      function getWeekCards(records = [], cursor = new Date()) {
+        const weekStart = startOfWeek(cursor);
+        const weekEnd = endOfWeek(weekStart);
         const cards = [];
 
         for (let offset = 0; offset < 7; offset += 1) {
@@ -2515,6 +2521,10 @@
         return `${date.getMonth() + 1}/${date.getDate()}`;
       }
 
+      function getPreferredWeekdayKey(date) {
+        return ["sun", "mon", "tue", "wed", "thu", "fri", "sat"][date.getDay()];
+      }
+
       function getBranchScheduleCell(card, branchKey) {
         const source = state.sources.find((item) => normalizeKey(item.key) === branchKey);
         if (!source?.staff?.length) return [];
@@ -2545,7 +2555,7 @@
 
         refs.scheduleList.classList.remove("is-empty");
         const allRecords = getAllRecords(state.periods);
-        const week = getCurrentWeekCards(allRecords);
+        const week = getWeekCards(allRecords, state.scheduleCursor);
         const branchRows = [
           { key: "uptown", label: "Uptown" },
           { key: "downtown", label: "Downtown" }
@@ -2603,7 +2613,7 @@
         }).format(cursor);
 
         if (hasProfile) {
-          refs.calendarSummary.textContent = `${state.currentStaff.name} 기준 안되는 날 ${state.unavailableDates.size}일 저장됨`;
+          refs.calendarSummary.textContent = `${state.currentStaff.name} 기준 안되는 날 ${state.unavailableDates.size}일 · 선호 요일 ${state.preferredDays.size}개`;
         } else {
           refs.calendarSummary.textContent = "";
         }
@@ -2617,10 +2627,12 @@
           const isoDate = toIsoDate(date);
           const isToday = isSameDate(date, today);
           const isBlocked = state.unavailableDates.has(isoDate);
+          const isPreferred = state.preferredDays.has(getPreferredWeekdayKey(date));
           const classes = ["calendar-day"];
           if (!hasProfile) classes.push("is-disabled");
           if (isToday) classes.push("is-today");
           if (isBlocked) classes.push("is-blocked");
+          if (isPreferred) classes.push("is-preferred");
 
           cells.push(`
             <button
@@ -2648,7 +2660,7 @@
           const selected = state.preferredDays.has(day.key);
           return `
             <button
-              class="weekday-toggle ${selected ? "is-selected" : ""}"
+              class="calendar-weekday-button ${selected ? "is-selected" : ""}"
               type="button"
               data-preferred-day="${day.key}"
               ${hasProfile ? "" : "disabled"}
@@ -2806,6 +2818,7 @@
           state.currentAccess = access;
           state.periods = periods;
           state.openPeriodKey = defaultOpenPeriod ? defaultOpenPeriod.id : null;
+          state.scheduleCursor = startOfWeek(new Date());
           state.calendarCursor = startOfMonth(new Date());
           saveRefCode(input);
           loadUnavailableDates();
@@ -2852,8 +2865,7 @@
         }
 
         state.availabilityDirty = true;
-        renderPreferredWeekdays();
-        setAvailabilityStatus("Unsaved");
+        renderCalendar();
       }
 
       function submitAvailability() {
@@ -2895,6 +2907,16 @@
           button.addEventListener("click", () => {
             setActiveTab(button.dataset.tab);
           });
+        });
+
+        refs.schedulePrev.addEventListener("click", () => {
+          state.scheduleCursor = addDays(state.scheduleCursor, -7);
+          renderScheduleView();
+        });
+
+        refs.scheduleNext.addEventListener("click", () => {
+          state.scheduleCursor = addDays(state.scheduleCursor, 7);
+          renderScheduleView();
         });
 
         refs.periodList.addEventListener("click", (event) => {
