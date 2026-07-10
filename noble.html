@@ -1128,12 +1128,19 @@
 
     .calendar-day.is-blocked {
       border-color: rgba(200, 104, 111, 0.36);
-      background: linear-gradient(180deg, rgba(255, 245, 245, 0.98), rgba(255, 236, 238, 0.98));
+      background:
+        linear-gradient(45deg, transparent calc(50% - 2px), rgba(143, 36, 56, 0.76) calc(50% - 2px), rgba(143, 36, 56, 0.76) calc(50% + 2px), transparent calc(50% + 2px)),
+        linear-gradient(-45deg, transparent calc(50% - 2px), rgba(143, 36, 56, 0.76) calc(50% - 2px), rgba(143, 36, 56, 0.76) calc(50% + 2px), transparent calc(50% + 2px)),
+        linear-gradient(180deg, rgba(255, 245, 245, 0.98), rgba(255, 229, 232, 0.98));
+      color: #7f1d2f;
     }
 
     .calendar-day.is-preferred:not(.is-blocked) {
-      border-color: rgba(46, 124, 103, 0.28);
-      background: linear-gradient(180deg, rgba(245, 255, 250, 0.98), rgba(232, 248, 240, 0.98));
+      border-color: rgba(46, 124, 103, 0.36);
+      background:
+        radial-gradient(circle at 50% 78%, rgba(255, 255, 255, 0.54) 0 12px, transparent 13px),
+        linear-gradient(180deg, rgba(237, 255, 246, 0.98), rgba(214, 244, 230, 0.98));
+      color: #14513f;
     }
 
     .calendar-day.has-detail::after {
@@ -1159,38 +1166,12 @@
       display: none;
     }
 
-    .calendar-mark {
-      position: absolute;
-      left: 50%;
-      top: 52%;
-      transform: translateX(-50%);
-      pointer-events: none;
-    }
-
-    .calendar-mark-unavailable {
-      color: rgba(143, 36, 56, 0.82);
-      font-size: clamp(1.55rem, 6vw, 2.4rem);
-      font-weight: 900;
-      line-height: 1;
-    }
-
-    .calendar-mark-preferred {
-      min-width: 30px;
-      padding: 4px 7px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, rgba(46, 124, 103, 0.94), rgba(194, 154, 74, 0.9));
-      color: #fffaf2;
-      font-size: 0.62rem;
-      font-weight: 900;
-      letter-spacing: 0.04em;
-    }
-
     .calendar-state-label {
       position: absolute;
       left: 50%;
       bottom: 5px;
       transform: translateX(-50%);
-      color: var(--muted);
+      color: currentColor;
       font-size: 0.58rem;
       font-weight: 900;
       line-height: 1;
@@ -1239,6 +1220,23 @@
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 8px;
+    }
+
+    .date-time-panel {
+      display: none;
+      gap: 10px;
+    }
+
+    .date-time-panel.is-visible {
+      display: grid;
+    }
+
+    .date-time-help {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 800;
+      line-height: 1.45;
     }
 
     .bottom-nav {
@@ -1522,10 +1520,6 @@
         font-size: 0.82rem;
       }
 
-      .calendar-day em {
-        bottom: 5px;
-      }
-
       .calendar-actions {
         align-items: stretch;
       }
@@ -1801,14 +1795,17 @@
             <option value="preferred">선호 날짜</option>
           </select>
         </div>
-        <div class="date-time-row">
-          <div class="request-field">
-            <label for="dateDetailStart">From</label>
-            <input id="dateDetailStart" name="startTime" type="time" />
-          </div>
-          <div class="request-field">
-            <label for="dateDetailEnd">To</label>
-            <input id="dateDetailEnd" name="endTime" type="time" />
+        <div class="date-time-panel" id="dateTimePanel">
+          <p class="date-time-help">시간을 따로 설정하지 않으면 오픈 - 마감 전체 출근 가능으로 저장됩니다.</p>
+          <div class="date-time-row">
+            <div class="request-field">
+              <label for="dateDetailStart">From</label>
+              <input id="dateDetailStart" name="startTime" type="time" placeholder="오픈" />
+            </div>
+            <div class="request-field">
+              <label for="dateDetailEnd">To</label>
+              <input id="dateDetailEnd" name="endTime" type="time" placeholder="마감" />
+            </div>
           </div>
         </div>
         <div class="request-field">
@@ -1919,6 +1916,7 @@
           "dateDetailDate",
           "dateDetailMeta",
           "dateDetailStatus",
+          "dateTimePanel",
           "dateDetailStart",
           "dateDetailEnd",
           "dateDetailNote",
@@ -2373,6 +2371,7 @@
         refs.dateDetailEnd.value = detail.endTime || "";
         refs.dateDetailNote.value = detail.note || "";
         refs.dateDetailStatusText.textContent = "";
+        updateDateTimePanel();
         refs.dateDetailModal.hidden = false;
         refs.dateDetailModal.setAttribute("aria-hidden", "false");
         document.body.classList.add("modal-open");
@@ -2383,6 +2382,17 @@
         refs.dateDetailModal.hidden = true;
         refs.dateDetailModal.setAttribute("aria-hidden", "true");
         document.body.classList.remove("modal-open");
+      }
+
+      function updateDateTimePanel() {
+        const showTime = refs.dateDetailStatus.value === "preferred";
+        refs.dateTimePanel.classList.toggle("is-visible", showTime);
+        refs.dateDetailStart.disabled = !showTime;
+        refs.dateDetailEnd.disabled = !showTime;
+        if (!showTime) {
+          refs.dateDetailStart.value = "";
+          refs.dateDetailEnd.value = "";
+        }
       }
 
       function saveAccessRequest(payload) {
@@ -2836,8 +2846,8 @@
             >
               <strong>${day}</strong>
               <small>${escapeHtml(formatLongDate(date))}</small>
-              ${isBlocked ? '<span class="calendar-mark calendar-mark-unavailable">X</span><span class="calendar-state-label">안됨</span>' : ""}
-              ${isPreferred ? '<span class="calendar-mark calendar-mark-preferred">OK</span><span class="calendar-state-label">선호</span>' : ""}
+              ${isBlocked ? '<span class="calendar-state-label">안됨</span>' : ""}
+              ${isPreferred ? '<span class="calendar-state-label">선호</span>' : ""}
             </button>
           `);
         }
@@ -3049,10 +3059,11 @@
         if (!isoDate) return;
 
         const status = refs.dateDetailStatus.value;
+        const allowsTime = status === "preferred";
         const detail = {
           status,
-          startTime: refs.dateDetailStart.value,
-          endTime: refs.dateDetailEnd.value,
+          startTime: allowsTime ? refs.dateDetailStart.value : "",
+          endTime: allowsTime ? refs.dateDetailEnd.value : "",
           note: refs.dateDetailNote.value.trim()
         };
 
@@ -3126,6 +3137,8 @@
           event.preventDefault();
           saveDateDetail();
         });
+
+        refs.dateDetailStatus.addEventListener("change", updateDateTimePanel);
 
         document.addEventListener("keydown", (event) => {
           if (event.key !== "Escape") return;
