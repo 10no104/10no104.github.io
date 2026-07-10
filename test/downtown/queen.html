@@ -2419,7 +2419,7 @@
         <div class="field">
           <label for="${prefix}PeopleDisplay">Guests</label>
           <button class="picker-trigger" id="${prefix}PeopleDisplay" type="button" data-picker="people" data-prefix="${prefix}">4 guests</button>
-          <input id="${prefix}PeopleCustom" class="guest-custom-input" type="number" inputmode="numeric" min="2" placeholder="Enter guest count" />
+          <input id="${prefix}PeopleCustom" class="guest-custom-input" type="number" inputmode="numeric" min="2" placeholder="Number of guests" />
           <input id="${prefix}People" name="people" type="hidden" value="4 guests" required />
         </div>
         <div class="field">
@@ -2656,18 +2656,18 @@
       sheetTitle.textContent = type === "time" ? "Select time" : "Select guests";
       const options = type === "time"
         ? ["6:00 PM","6:30 PM","7:00 PM","7:30 PM","8:00 PM","8:30 PM","9:00 PM","9:30 PM","10:00 PM","10:30 PM","11:00 PM","11:30 PM","12:00 AM","12:30 AM","1:00 AM"]
-        : ["Custom","2 guests","3 guests","4 guests","5 guests","6 guests","7 guests","8 guests"];
+        : ["2 guests","3 guests","4 guests","5 guests","6 guests","7 guests","8 guests","Enter manually"];
 
       options.forEach((option) => {
         const button = document.createElement("button");
         button.type = "button";
         button.className = "sheet-option";
-        if (type === "people" && option === "Custom") button.classList.add("is-custom");
+        if (type === "people" && option === "Enter manually") button.classList.add("is-custom");
         button.textContent = option;
         const currentValue = type === "time" ? refs.timeInput.value : refs.peopleInput.value;
         if (currentValue === option) button.classList.add("is-active");
         button.addEventListener("click", () => {
-          if (type === "people" && option === "Custom") {
+          if (type === "people" && option === "Enter manually") {
             closeSheet();
             refs.peopleDisplay.style.display = "none";
             refs.peopleCustomInput.classList.add("is-open");

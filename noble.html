@@ -685,95 +685,122 @@
 
     .schedule-list {
       display: grid;
-      grid-template-columns: repeat(7, minmax(118px, 1fr));
-      gap: 8px;
-      overflow-x: auto;
-      padding: 2px 2px 6px;
-      scroll-snap-type: x proximity;
+      gap: 10px;
     }
 
-    .schedule-list.is-empty {
-      display: block;
-      overflow-x: visible;
+    .branch-schedule-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
     }
 
-    .schedule-day-card {
-      min-height: 150px;
+    .branch-schedule-column {
+      min-width: 0;
       padding: 10px;
       border: 1px solid rgba(113, 67, 50, 0.12);
-      border-radius: 14px;
-      background: rgba(255, 252, 247, 0.94);
-      color: #241714;
+      border-radius: 16px;
+      background: rgba(255, 252, 247, 0.88);
       box-shadow: 0 10px 20px rgba(52, 29, 22, 0.06);
-      scroll-snap-align: start;
     }
 
-    .schedule-day-card.is-today {
-      border-color: rgba(224, 177, 95, 0.62);
-      box-shadow: inset 0 0 0 2px rgba(224, 177, 95, 0.18), 0 10px 20px rgba(52, 29, 22, 0.06);
+    .branch-schedule-column.is-uptown {
+      border-color: rgba(143, 36, 56, 0.18);
+      background: linear-gradient(180deg, rgba(255, 248, 242, 0.96), rgba(255, 242, 232, 0.88));
     }
 
-    .schedule-day-head {
+    .branch-schedule-column.is-downtown {
+      border-color: rgba(46, 124, 103, 0.18);
+      background: linear-gradient(180deg, rgba(249, 255, 249, 0.96), rgba(241, 250, 246, 0.88));
+    }
+
+    .branch-schedule-title {
       display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 8px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid rgba(113, 67, 50, 0.1);
-    }
-
-    .schedule-day-head strong {
+      align-items: center;
+      justify-content: center;
+      min-height: 36px;
+      margin: 0 0 9px;
+      border-radius: 12px;
+      color: #fffaf2;
       font-size: 0.95rem;
-      line-height: 1;
+      font-weight: 900;
+      line-height: 1.1;
     }
 
-    .schedule-day-head span {
-      color: var(--muted);
-      font-size: 0.75rem;
-      font-weight: 800;
+    .is-uptown .branch-schedule-title {
+      background: linear-gradient(135deg, #8f2438, #c08931);
+      box-shadow: 0 10px 18px rgba(143, 36, 56, 0.16);
     }
 
-    .schedule-branch-list {
+    .is-downtown .branch-schedule-title {
+      background: linear-gradient(135deg, #245f51, #b28b42);
+      box-shadow: 0 10px 18px rgba(46, 124, 103, 0.16);
+    }
+
+    .branch-day-list {
       display: grid;
       gap: 7px;
-      margin-top: 10px;
     }
 
-    .schedule-branch {
+    .branch-day {
       display: grid;
-      gap: 4px;
-      min-height: 44px;
-      padding: 8px;
-      border-radius: 10px;
-      background: rgba(143, 36, 56, 0.06);
+      gap: 7px;
+      min-height: 76px;
+      padding: 9px;
+      border: 1px solid rgba(113, 67, 50, 0.1);
+      border-radius: 12px;
+      background: rgba(255, 250, 244, 0.9);
     }
 
-    .schedule-branch.is-work {
-      background: linear-gradient(135deg, rgba(255, 229, 168, 0.95), rgba(255, 244, 218, 0.96));
-      box-shadow: inset 0 0 0 1px rgba(143, 36, 56, 0.2);
+    .branch-day.is-today {
+      border-color: rgba(224, 177, 95, 0.58);
+      box-shadow: inset 0 0 0 2px rgba(224, 177, 95, 0.16);
     }
 
-    .schedule-branch.is-unavailable {
-      background: rgba(200, 104, 111, 0.16);
+    .branch-day-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      color: #291915;
+      font-weight: 900;
     }
 
-    .schedule-branch span {
+    .branch-day-head span {
       color: var(--muted);
-      font-size: 0.68rem;
+      font-size: 0.72rem;
       font-weight: 800;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
     }
 
-    .schedule-branch strong {
-      min-height: 1.1em;
-      color: #211310;
-      font-size: 0.9rem;
+    .server-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .server-chip {
+      max-width: 100%;
+      min-height: 25px;
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(143, 36, 56, 0.08);
+      color: #4c211d;
+      font-size: 0.76rem;
       font-weight: 800;
-      line-height: 1.15;
+      line-height: 1.1;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+
+    .server-chip.is-me {
+      background: linear-gradient(135deg, rgba(143, 36, 56, 0.94), rgba(224, 177, 95, 0.92));
+      color: #fffaf2;
+    }
+
+    .server-empty {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
     }
 
     .calendar-meta {
@@ -928,6 +955,71 @@
       color: transparent;
       font-size: 0;
       transform: translateX(-50%);
+    }
+
+    .preference-panel {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(113, 67, 50, 0.12);
+    }
+
+    .preference-panel h3 {
+      margin: 0;
+      color: #231613;
+      font-size: 1rem;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .weekday-picker {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .weekday-toggle {
+      min-height: 42px;
+      border: 1px solid rgba(113, 67, 50, 0.14);
+      border-radius: 12px;
+      background: rgba(255, 251, 246, 0.94);
+      color: #261713;
+      font-size: 0.84rem;
+      font-weight: 900;
+    }
+
+    .weekday-toggle.is-selected {
+      border-color: rgba(143, 36, 56, 0.34);
+      background: linear-gradient(135deg, rgba(143, 36, 56, 0.92), rgba(224, 177, 95, 0.86));
+      color: #fffaf2;
+      box-shadow: 0 10px 20px rgba(143, 36, 56, 0.18);
+    }
+
+    .calendar-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .availability-save {
+      min-height: 44px;
+      padding: 0 16px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), #c08931);
+      color: #fffaf2;
+      font-weight: 900;
+      box-shadow: 0 14px 24px rgba(143, 36, 56, 0.22);
+    }
+
+    .availability-status {
+      min-height: 1.3em;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 800;
     }
 
     .bottom-nav {
@@ -1122,25 +1214,32 @@
         padding: 0 12px 12px;
       }
 
-      .schedule-list {
-        grid-template-columns: repeat(7, minmax(118px, 128px));
-        gap: 7px;
-        margin-inline: -2px;
+      .branch-schedule-grid {
+        gap: 8px;
       }
 
-      .schedule-day-card {
-        min-height: 138px;
-        padding: 9px;
-        border-radius: 12px;
+      .branch-schedule-column {
+        padding: 8px;
+        border-radius: 14px;
       }
 
-      .schedule-branch {
-        min-height: 40px;
+      .branch-schedule-title {
+        font-size: 0.86rem;
+      }
+
+      .branch-day {
+        min-height: 70px;
         padding: 7px;
       }
 
-      .schedule-branch strong {
+      .branch-day-head {
         font-size: 0.82rem;
+      }
+
+      .server-chip {
+        min-height: 23px;
+        padding: 5px 7px;
+        font-size: 0.7rem;
       }
 
       .calendar-meta {
@@ -1188,6 +1287,24 @@
 
       .calendar-day em {
         bottom: 5px;
+      }
+
+      .weekday-picker {
+        gap: 4px;
+      }
+
+      .weekday-toggle {
+        min-height: 36px;
+        border-radius: 10px;
+        font-size: 0.76rem;
+      }
+
+      .calendar-actions {
+        align-items: stretch;
+      }
+
+      .availability-save {
+        width: 100%;
       }
 
       .bottom-nav {
@@ -1354,6 +1471,15 @@
                   <span>Sun</span>
                 </div>
                 <div class="calendar-grid" id="calendarGrid"></div>
+
+                <div class="preference-panel">
+                  <h3>Preferred Days</h3>
+                  <div class="weekday-picker" id="preferredWeekdays"></div>
+                  <div class="calendar-actions">
+                    <button class="availability-save" id="saveAvailabilityButton" type="button">Submit</button>
+                    <div class="availability-status" id="availabilityStatus"></div>
+                  </div>
+                </div>
               </div>
             </article>
           </section>
@@ -1420,6 +1546,15 @@
       const CALENDAR_KEY_PREFIX = "ehwa:noble:calendar:";
       const BASE_COLUMN_COUNT = 7;
       const TAB_ORDER = ["wage", "schedule", "calendar"];
+      const PREFERRED_WEEKDAYS = [
+        { key: "mon", label: "월" },
+        { key: "tue", label: "화" },
+        { key: "wed", label: "수" },
+        { key: "thu", label: "목" },
+        { key: "fri", label: "금" },
+        { key: "sat", label: "토" },
+        { key: "sun", label: "일" }
+      ];
       const MONEY_FORMAT = new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       const HOUR_FORMAT = new Intl.NumberFormat("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
@@ -1437,7 +1572,9 @@
         currentStaff: null,
         currentAccess: null,
         calendarCursor: startOfMonth(new Date()),
-        unavailableDates: new Set()
+        unavailableDates: new Set(),
+        preferredDays: new Set(),
+        availabilityDirty: false
       };
 
       function byId(id) {
@@ -1466,7 +1603,10 @@
           "calendarLabel",
           "calendarPrev",
           "calendarNext",
-          "calendarGrid"
+          "calendarGrid",
+          "preferredWeekdays",
+          "saveAvailabilityButton",
+          "availabilityStatus"
         ].forEach((id) => {
           refs[id] = byId(id);
         });
@@ -1902,18 +2042,28 @@
       function loadUnavailableDates() {
         const key = getUnavailableStorageKey();
         state.unavailableDates = new Set();
+        state.preferredDays = new Set();
+        state.availabilityDirty = false;
         if (!key) return;
 
         try {
           const raw = window.localStorage.getItem(key);
-          const parsed = raw ? JSON.parse(raw) : [];
-          if (Array.isArray(parsed)) {
-            parsed
+          const parsed = raw ? JSON.parse(raw) : null;
+          const unavailableDates = Array.isArray(parsed) ? parsed : parsed?.unavailableDates;
+          const preferredDays = Array.isArray(parsed?.preferredDays) ? parsed.preferredDays : [];
+
+          if (Array.isArray(unavailableDates)) {
+            unavailableDates
               .filter((value) => /^\d{4}-\d{2}-\d{2}$/.test(String(value)))
               .forEach((value) => state.unavailableDates.add(String(value)));
           }
+
+          preferredDays
+            .filter((value) => PREFERRED_WEEKDAYS.some((day) => day.key === value))
+            .forEach((value) => state.preferredDays.add(String(value)));
         } catch (error) {
           state.unavailableDates = new Set();
+          state.preferredDays = new Set();
         }
       }
 
@@ -1922,11 +2072,20 @@
         if (!key) return;
 
         try {
-          const values = Array.from(state.unavailableDates).sort();
-          window.localStorage.setItem(key, JSON.stringify(values));
+          const payload = {
+            unavailableDates: Array.from(state.unavailableDates).sort(),
+            preferredDays: Array.from(state.preferredDays),
+            submittedAt: new Date().toISOString()
+          };
+          window.localStorage.setItem(key, JSON.stringify(payload));
+          state.availabilityDirty = false;
         } catch (error) {
           // Ignore storage errors.
         }
+      }
+
+      function setAvailabilityStatus(message = "") {
+        refs.availabilityStatus.textContent = message;
       }
 
       function resetProfileState(message) {
@@ -1935,6 +2094,8 @@
         state.periods = [];
         state.openPeriodKey = null;
         state.unavailableDates = new Set();
+        state.preferredDays = new Set();
+        state.availabilityDirty = false;
         renderIdentity();
         renderWageView();
         renderScheduleView();
@@ -2100,13 +2261,23 @@
       }
 
       function getBranchScheduleCell(card, branchKey) {
-        const branchRecords = card.records.filter((record) => normalizeKey(formatRecordBranch(record)) === branchKey);
-        const worked = branchRecords.some((record) => record.hours > 0 || record.tip > 0);
-        return {
-          name: worked ? state.currentStaff?.name || "" : "",
-          worked,
-          blocked: card.blocked
-        };
+        const source = state.sources.find((item) => normalizeKey(item.key) === branchKey);
+        if (!source?.staff?.length) return [];
+
+        const currentKey = normalizeKey(state.currentStaff?.name || state.currentAccess?.staff_key || "");
+        return source.staff
+          .map((staff) => {
+            const record = getDailyRecords(staff).find((item) => isSameDate(item.dateObj, card.date));
+            const worked = record && (record.hours > 0 || record.tip > 0);
+            if (!worked) return null;
+
+            return {
+              name: staff.name,
+              isMe: normalizeKey(staff.name) === currentKey || normalizeKey(staff.id) === currentKey
+            };
+          })
+          .filter(Boolean)
+          .sort((a, b) => Number(b.isMe) - Number(a.isMe) || a.name.localeCompare(b.name));
       }
 
       function renderScheduleView() {
@@ -2121,41 +2292,44 @@
         const allRecords = getAllRecords(state.periods);
         const week = getCurrentWeekCards(allRecords);
         const branchRows = [
-          { key: "uptown", label: "업타운" },
-          { key: "downtown", label: "다운타운" }
+          { key: "uptown", label: "Uptown" },
+          { key: "downtown", label: "Downtown" }
         ];
 
         refs.weekRangeLabel.textContent = `${formatLongDate(week.weekStart)} - ${formatLongDate(week.weekEnd)}`;
 
-        refs.scheduleList.innerHTML = week.cards.map((card) => {
-          const branches = branchRows.map((branch) => {
-            const cell = getBranchScheduleCell(card, branch.key);
-            const classes = [
-              "schedule-branch",
-              cell.worked ? "is-work" : "",
-              !cell.worked && cell.blocked ? "is-unavailable" : ""
-            ].filter(Boolean).join(" ");
-            return `
-              <div class="${classes}">
-                <span>${branch.label}</span>
-                <strong>${escapeHtml(cell.name)}</strong>
-              </div>
-            `;
-          }).join("");
-          const cardClasses = [
-            "schedule-day-card",
-            isSameDate(card.date, new Date()) ? "is-today" : ""
-          ].filter(Boolean).join(" ");
-          return `
-            <article class="${cardClasses}">
-              <div class="schedule-day-head">
-                <strong>${escapeHtml(formatScheduleDay(card.date))}</strong>
-                <span>${escapeHtml(formatScheduleMonthDay(card.date))}</span>
-              </div>
-              <div class="schedule-branch-list">${branches}</div>
-            </article>
-          `;
-        }).join("");
+        refs.scheduleList.innerHTML = `
+          <div class="branch-schedule-grid">
+            ${branchRows.map((branch) => {
+              const days = week.cards.map((card) => {
+                const servers = getBranchScheduleCell(card, branch.key);
+                const serverMarkup = servers.length
+                  ? servers.map((server) => `<span class="server-chip ${server.isMe ? "is-me" : ""}">${escapeHtml(server.name)}</span>`).join("")
+                  : `<span class="server-empty">-</span>`;
+                const dayClasses = [
+                  "branch-day",
+                  isSameDate(card.date, new Date()) ? "is-today" : ""
+                ].filter(Boolean).join(" ");
+                return `
+                  <article class="${dayClasses}">
+                    <div class="branch-day-head">
+                      <strong>${escapeHtml(formatScheduleDay(card.date))}</strong>
+                      <span>${escapeHtml(formatScheduleMonthDay(card.date))}</span>
+                    </div>
+                    <div class="server-list">${serverMarkup}</div>
+                  </article>
+                `;
+              }).join("");
+
+              return `
+                <section class="branch-schedule-column is-${branch.key}">
+                  <h3 class="branch-schedule-title">${branch.label}</h3>
+                  <div class="branch-day-list">${days}</div>
+                </section>
+              `;
+            }).join("")}
+          </div>
+        `;
       }
 
       function renderCalendar() {
@@ -2209,6 +2383,24 @@
         }
 
         refs.calendarGrid.innerHTML = cells.join("");
+        renderPreferredWeekdays();
+        setAvailabilityStatus(state.availabilityDirty ? "Unsaved" : "");
+      }
+
+      function renderPreferredWeekdays() {
+        const hasProfile = Boolean(state.currentStaff && state.currentAccess);
+        refs.preferredWeekdays.innerHTML = PREFERRED_WEEKDAYS.map((day) => {
+          const selected = state.preferredDays.has(day.key);
+          return `
+            <button
+              class="weekday-toggle ${selected ? "is-selected" : ""}"
+              type="button"
+              data-preferred-day="${day.key}"
+              ${hasProfile ? "" : "disabled"}
+              aria-pressed="${selected ? "true" : "false"}"
+            >${day.label}</button>
+          `;
+        }).join("");
       }
 
       function renderAll() {
@@ -2389,10 +2581,36 @@
           state.unavailableDates.add(isoDate);
         }
 
-        saveUnavailableDates();
+        state.availabilityDirty = true;
         renderScheduleView();
         renderCalendar();
-        setStatus("Unavailable dates updated");
+        setStatus("Availability updated");
+      }
+
+      function togglePreferredDay(dayKey) {
+        if (!state.currentStaff || !state.currentAccess) return;
+
+        if (state.preferredDays.has(dayKey)) {
+          state.preferredDays.delete(dayKey);
+        } else {
+          state.preferredDays.add(dayKey);
+        }
+
+        state.availabilityDirty = true;
+        renderPreferredWeekdays();
+        setAvailabilityStatus("Unsaved");
+      }
+
+      function submitAvailability() {
+        if (!state.currentStaff || !state.currentAccess) {
+          setAvailabilityStatus("Enter code first");
+          return;
+        }
+
+        saveUnavailableDates();
+        renderCalendar();
+        setAvailabilityStatus("Saved");
+        setStatus("Availability saved");
       }
 
       function bindEvents() {
@@ -2430,6 +2648,14 @@
           if (!button || button.disabled) return;
           toggleUnavailableDate(button.dataset.date);
         });
+
+        refs.preferredWeekdays.addEventListener("click", (event) => {
+          const button = event.target.closest("[data-preferred-day]");
+          if (!button || button.disabled) return;
+          togglePreferredDay(button.dataset.preferredDay);
+        });
+
+        refs.saveAvailabilityButton.addEventListener("click", submitAvailability);
       }
 
       cacheRefs();

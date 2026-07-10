@@ -641,7 +641,7 @@
           <div class="field">
             <label for="peopleDisplay">Guests</label>
             <button class="picker-trigger" id="peopleDisplay" type="button" data-picker="people">4 guests</button>
-            <input id="peopleCustomInput" class="guest-custom-input" type="number" inputmode="numeric" min="2" placeholder="Enter guest count" />
+            <input id="peopleCustomInput" class="guest-custom-input" type="number" inputmode="numeric" min="2" placeholder="Number of guests" />
             <input id="people" name="people" type="hidden" value="4 guests" required />
           </div>
 
@@ -761,14 +761,14 @@
           input: peopleInput,
           display: peopleDisplay,
           options: [
-            "Custom",
             "2 guests",
             "3 guests",
             "4 guests",
             "5 guests",
             "6 guests",
             "7 guests",
-            "8 guests"
+            "8 guests",
+            "Enter manually"
           ]
         }
       };
@@ -958,7 +958,7 @@
           const button = document.createElement("button");
           button.type = "button";
           button.className = "sheet-option";
-          if (key === "people" && option === "Custom") {
+          if (key === "people" && option === "Enter manually") {
             button.classList.add("is-custom");
           }
           button.textContent = option;
@@ -966,7 +966,7 @@
             button.classList.add("is-active");
           }
           button.addEventListener("click", () => {
-            if (key === "people" && option === "Custom") {
+            if (key === "people" && option === "Enter manually") {
               closeSheet();
               peopleDisplay.style.display = "none";
               peopleCustomInput.classList.add("is-open");
