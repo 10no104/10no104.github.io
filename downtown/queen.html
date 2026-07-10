@@ -504,13 +504,15 @@
       grid-column: span 2;
     }
 
-    .online-grid {
+    .online-grid,
+    .note-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 12px;
     }
 
-    .online-card {
+    .online-card,
+    .note-card {
       min-height: 148px;
       padding: 16px;
       border-radius: 20px;
@@ -521,11 +523,15 @@
 
     .online-card span,
     .online-card strong,
-    .online-card small {
+    .online-card small,
+    .note-card span,
+    .note-card strong,
+    .note-card small {
       display: block;
     }
 
-    .online-card span {
+    .online-card span,
+    .note-card span {
       width: fit-content;
       margin-bottom: 18px;
       padding: 6px 10px;
@@ -538,13 +544,15 @@
       text-transform: uppercase;
     }
 
-    .online-card strong {
+    .online-card strong,
+    .note-card strong {
       margin-bottom: 6px;
       font-size: 1.12rem;
       letter-spacing: -0.03em;
     }
 
-    .online-card small {
+    .online-card small,
+    .note-card small {
       color: var(--muted);
       line-height: 1.55;
     }
@@ -555,9 +563,9 @@
       bottom: calc(12px + env(safe-area-inset-bottom, 0px));
       z-index: 90;
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 10px;
-      width: min(760px, calc(100% - 22px));
+      width: min(860px, calc(100% - 22px));
       padding: 10px;
       transform: translateX(-50%);
       border-radius: 28px;
@@ -1768,6 +1776,7 @@
       }
 
       .online-grid,
+      .note-grid,
       .table-map-preview {
         grid-template-columns: 1fr;
       }
@@ -1790,7 +1799,7 @@
       }
 
       .nav-tab span {
-        font-size: 0.72rem;
+        font-size: 0.68rem;
       }
 
       .action-btn {
@@ -2054,6 +2063,35 @@
       </section>
     </section>
 
+    <section class="app-view placeholder-view" data-view="notes">
+      <section class="purpose-hero">
+        <p class="purpose-kicker">Staff notes</p>
+        <h2>Notes</h2>
+        <p>Work tips, cocktail recipes, service notes, and quick references can live here.</p>
+      </section>
+
+      <section class="purpose-panel">
+        <h3>Quick Notes</h3>
+        <div class="note-grid">
+          <article class="note-card">
+            <span>Tips</span>
+            <strong>Service Reminders</strong>
+            <small>Opening, closing, and shift notes for the team.</small>
+          </article>
+          <article class="note-card">
+            <span>Bar</span>
+            <strong>Cocktail Recipes</strong>
+            <small>Recipe cards, garnish notes, and build steps.</small>
+          </article>
+          <article class="note-card">
+            <span>Reference</span>
+            <strong>House Rules</strong>
+            <small>Common answers, policy notes, and manager updates.</small>
+          </article>
+        </div>
+      </section>
+    </section>
+
     <nav class="bottom-nav" aria-label="Queen sections">
       <button class="nav-tab is-active" type="button" data-queen-tab="reservation" aria-pressed="true">
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -2083,6 +2121,15 @@
           <path d="M9 13h6"></path>
         </svg>
         <span>온라인</span>
+      </button>
+      <button class="nav-tab" type="button" data-queen-tab="notes" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 4h9l3 3v13H6z"></path>
+          <path d="M14 4v4h4"></path>
+          <path d="M9 12h6"></path>
+          <path d="M9 16h5"></path>
+        </svg>
+        <span>노트</span>
       </button>
     </nav>
   </div>
