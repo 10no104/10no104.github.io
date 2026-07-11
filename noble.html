@@ -788,7 +788,7 @@
     .period-details {
       display: none;
       overflow-x: auto;
-      padding: 0 10px 10px;
+      padding: 0 6px 8px;
     }
 
     .period-card.is-open .period-details {
@@ -807,10 +807,10 @@
 
     .history-table th,
     .history-table td {
-      padding: 8px 7px;
+      padding: 7px 4px;
       border-bottom: 1px solid rgba(113, 67, 50, 0.1);
       text-align: left;
-      font-size: 0.78rem;
+      font-size: 0.72rem;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -818,7 +818,7 @@
 
     .history-table th {
       color: var(--muted);
-      font-size: 0.64rem;
+      font-size: 0.56rem;
       font-weight: 800;
       letter-spacing: 0.04em;
       text-transform: uppercase;
@@ -1444,17 +1444,18 @@
       }
 
       .period-details {
-        padding: 0 8px 8px;
+        padding: 0 4px 8px;
       }
 
       .history-table th,
       .history-table td {
-        padding: 7px 5px;
-        font-size: 0.7rem;
+        padding: 6px 3px;
+        font-size: 0.64rem;
       }
 
       .history-table th {
-        font-size: 0.58rem;
+        font-size: 0.52rem;
+        letter-spacing: 0.01em;
       }
 
       .branch-schedule-grid {
@@ -2121,8 +2122,20 @@
         return [record.day, dateLabel].filter(Boolean).join(" ");
       }
 
+      function formatTinyRecordDate(record) {
+        const parsed = parseKoreanMonthDay(record.date);
+        return parsed ? `${parsed.month}/${parsed.day}` : record.date;
+      }
+
       function formatRecordBranch(record) {
         return record.branch || DEFAULT_BRANCH;
+      }
+
+      function formatShortBranch(record) {
+        const branch = normalizeKey(formatRecordBranch(record));
+        if (branch.includes("uptown")) return "UP";
+        if (branch.includes("downtown")) return "DT";
+        return formatRecordBranch(record);
       }
 
       function getDailyRecords(staff) {
@@ -2569,11 +2582,11 @@
           const isOpen = state.openPeriodKey === period.id;
           const detailRows = period.records.map((record) => `
             <tr>
-              <td>${escapeHtml(formatCompactRecordDate(record))}</td>
+              <td>${escapeHtml(formatTinyRecordDate(record))}</td>
               <td>${formatHours(record.hours)}</td>
               <td>${formatMoney(record.tip)}</td>
               <td>${formatMoney(record.hours > 0 ? record.tip / record.hours : 0)}</td>
-              <td>${escapeHtml(formatRecordBranch(record))}</td>
+              <td>${escapeHtml(formatShortBranch(record))}</td>
             </tr>
           `).join("");
 
@@ -2594,11 +2607,11 @@
               <div class="period-details">
                 <table class="history-table">
                   <colgroup>
+                    <col style="width: 18%;" />
+                    <col style="width: 18%;" />
                     <col style="width: 24%;" />
-                    <col style="width: 16%;" />
                     <col style="width: 22%;" />
                     <col style="width: 18%;" />
-                    <col style="width: 20%;" />
                   </colgroup>
                   <thead>
                     <tr>
@@ -2606,7 +2619,7 @@
                       <th>Hours</th>
                       <th>Tips</th>
                       <th>Tip/h</th>
-                      <th>Branch</th>
+                      <th>Br</th>
                     </tr>
                   </thead>
                   <tbody>${detailRows || `<tr><td colspan="5">No records</td></tr>`}</tbody>
