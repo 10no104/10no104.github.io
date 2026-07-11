@@ -2131,13 +2131,6 @@
         return record.branch || DEFAULT_BRANCH;
       }
 
-      function formatShortBranch(record) {
-        const branch = normalizeKey(formatRecordBranch(record));
-        if (branch.includes("uptown")) return "UP";
-        if (branch.includes("downtown")) return "DT";
-        return formatRecordBranch(record);
-      }
-
       function getDailyRecords(staff) {
         const rows = staff.rows || state.rows;
         const tracker = createDateTracker(rows);
@@ -2586,7 +2579,7 @@
               <td>${formatHours(record.hours)}</td>
               <td>${formatMoney(record.tip)}</td>
               <td>${formatMoney(record.hours > 0 ? record.tip / record.hours : 0)}</td>
-              <td>${escapeHtml(formatShortBranch(record))}</td>
+              <td>${escapeHtml(formatRecordBranch(record))}</td>
             </tr>
           `).join("");
 
@@ -2607,11 +2600,11 @@
               <div class="period-details">
                 <table class="history-table">
                   <colgroup>
-                    <col style="width: 18%;" />
-                    <col style="width: 18%;" />
-                    <col style="width: 24%;" />
+                    <col style="width: 16%;" />
+                    <col style="width: 16%;" />
                     <col style="width: 22%;" />
-                    <col style="width: 18%;" />
+                    <col style="width: 20%;" />
+                    <col style="width: 26%;" />
                   </colgroup>
                   <thead>
                     <tr>
@@ -2619,7 +2612,7 @@
                       <th>Hours</th>
                       <th>Tips</th>
                       <th>Tip/h</th>
-                      <th>Br</th>
+                      <th>Branch</th>
                     </tr>
                   </thead>
                   <tbody>${detailRows || `<tr><td colspan="5">No records</td></tr>`}</tbody>
