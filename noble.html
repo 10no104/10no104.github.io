@@ -812,6 +812,8 @@
       text-align: left;
       font-size: 0.78rem;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .history-table th {
@@ -2571,6 +2573,7 @@
               <td>${formatHours(record.hours)}</td>
               <td>${formatMoney(record.tip)}</td>
               <td>${formatMoney(record.hours > 0 ? record.tip / record.hours : 0)}</td>
+              <td>${escapeHtml(formatRecordBranch(record))}</td>
             </tr>
           `).join("");
 
@@ -2591,10 +2594,11 @@
               <div class="period-details">
                 <table class="history-table">
                   <colgroup>
-                    <col style="width: 30%;" />
+                    <col style="width: 24%;" />
+                    <col style="width: 16%;" />
+                    <col style="width: 22%;" />
+                    <col style="width: 18%;" />
                     <col style="width: 20%;" />
-                    <col style="width: 25%;" />
-                    <col style="width: 25%;" />
                   </colgroup>
                   <thead>
                     <tr>
@@ -2602,9 +2606,10 @@
                       <th>Hours</th>
                       <th>Tips</th>
                       <th>Tip/h</th>
+                      <th>Branch</th>
                     </tr>
                   </thead>
-                  <tbody>${detailRows || `<tr><td colspan="4">No records</td></tr>`}</tbody>
+                  <tbody>${detailRows || `<tr><td colspan="5">No records</td></tr>`}</tbody>
                 </table>
               </div>
             </article>
