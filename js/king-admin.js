@@ -1294,8 +1294,9 @@
   }
 
   function getScheduleWeekOptions() {
-    const base = toSafeDate(state.scheduleWeekWindowStart) || addWeeks(startOfWeek(new Date()), -1);
-    return Array.from({ length: 8 }, (_unused, index) => {
+    const base = addWeeks(startOfWeek(new Date()), -1);
+    const labels = ["저번주", "이번주", "다음주"];
+    return Array.from({ length: 3 }, (_unused, index) => {
       const start = addWeeks(base, index);
       const end = addDays(start, 6);
       const weekStart = formatInputDate(start);
@@ -1304,6 +1305,7 @@
         weekStart,
         start,
         end,
+        label: labels[index],
         status: dbWeek?.status || "empty"
       };
     });
@@ -1334,7 +1336,8 @@
       ].filter(Boolean).join(" ");
       return `
         <button class="${classes}" type="button" data-schedule-week="${option.weekStart}">
-          <strong>${escapeHtml(formatWeekRangeLabel(option.start, option.end))}</strong>
+          <strong>${escapeHtml(option.label || formatWeekRangeLabel(option.start, option.end))}</strong>
+          <span>${escapeHtml(formatWeekRangeLabel(option.start, option.end))}</span>
           <span>${escapeHtml(statusLabel)}</span>
         </button>
       `;
@@ -1453,7 +1456,7 @@
     }
 
     refs.scheduleStaffList.innerHTML = staff.map((item) => `
-      <span class="staff-pill">
+      <span class="staff-pill is-${escapeHtml(normalizeBranchScope(item.branch_scope))}">
         ${escapeHtml(item.name)}
         <small>${escapeHtml(formatBranchLabel(item.branch_scope))}</small>
       </span>
@@ -1484,14 +1487,14 @@
     }
 
     refs.scheduleBoard.innerHTML = branches.map((branch) => `
-      <section class="schedule-branch">
+      <section class="schedule-branch is-${branch.key}">
         <h4>${escapeHtml(branch.label)}</h4>
         <div class="schedule-day-grid">
           ${dates.map((date) => {
             const dateValue = formatInputDate(date);
             const names = shiftMap.get(getScheduleCellKey(branch.key, dateValue)) || [];
             return `
-              <article class="schedule-day-card ${isSameDate(date, today) ? "is-today" : ""}">
+              <article class="schedule-day-card is-${branch.key} ${isSameDate(date, today) ? "is-today" : ""}">
                 <header>
                   <strong>${escapeHtml(formatScheduleDayLabel(date))}</strong>
                   <span>${escapeHtml(branch.label)}</span>
@@ -1522,7 +1525,7 @@
       : "주간 선택";
 
     refs.scheduleBoard.innerHTML = branches.map((branch) => `
-      <section class="schedule-branch">
+      <section class="schedule-branch is-${branch.key}">
         <h4>${escapeHtml(branch.label)}</h4>
         <div class="schedule-day-grid">
           ${dates.map((date) => {
@@ -1531,7 +1534,7 @@
             const names = shiftMap.get(cellKey) || [];
             const targetCount = Math.max(getDefaultServerCount(date), names.length);
             return `
-              <article class="schedule-day-card ${isSameDate(date, today) ? "is-today" : ""}">
+              <article class="schedule-day-card is-${branch.key} ${isSameDate(date, today) ? "is-today" : ""}">
                 <div class="schedule-day-top">
                   <header>
                     <strong>${escapeHtml(formatScheduleDayLabel(date))}</strong>

@@ -1066,7 +1066,7 @@
 
     .week-chip-list {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 8px;
     }
 
@@ -1170,6 +1170,24 @@
       font-weight: 900;
     }
 
+    .staff-pill.is-uptown {
+      border-color: rgba(143, 36, 56, 0.2);
+      background: linear-gradient(135deg, rgba(143, 36, 56, 0.12), rgba(212, 175, 55, 0.12));
+      color: #742238;
+    }
+
+    .staff-pill.is-downtown {
+      border-color: rgba(36, 95, 81, 0.2);
+      background: linear-gradient(135deg, rgba(36, 95, 81, 0.12), rgba(212, 175, 55, 0.1));
+      color: #245f51;
+    }
+
+    .staff-pill.is-both {
+      border-color: rgba(123, 31, 47, 0.18);
+      background: linear-gradient(135deg, rgba(123, 31, 47, 0.1), rgba(36, 95, 81, 0.1));
+      color: #4c3328;
+    }
+
     .staff-pill small {
       color: var(--muted);
       font-size: 0.72rem;
@@ -1221,10 +1239,32 @@
         url("assets/pattern.webp") center / 420px auto;
     }
 
+    .schedule-branch.is-uptown {
+      border-color: rgba(143, 36, 56, 0.2);
+      background:
+        linear-gradient(180deg, rgba(255, 247, 243, 0.96), rgba(252, 238, 230, 0.92)),
+        url("assets/pattern.webp") center / 420px auto;
+    }
+
+    .schedule-branch.is-downtown {
+      border-color: rgba(36, 95, 81, 0.2);
+      background:
+        linear-gradient(180deg, rgba(247, 255, 251, 0.96), rgba(237, 248, 243, 0.92)),
+        url("assets/pattern.webp") center / 420px auto;
+    }
+
     .schedule-branch h4 {
       margin: 0 0 11px;
       font-size: 1rem;
       letter-spacing: -0.02em;
+    }
+
+    .schedule-branch.is-uptown h4 {
+      color: #742238;
+    }
+
+    .schedule-branch.is-downtown h4 {
+      color: #245f51;
     }
 
     .schedule-day-grid {
@@ -1244,6 +1284,16 @@
       border: 1px solid rgba(113, 88, 60, 0.12);
       border-radius: 17px;
       background: rgba(255, 255, 255, 0.74);
+    }
+
+    .schedule-day-card.is-uptown {
+      border-color: rgba(143, 36, 56, 0.14);
+      background: rgba(255, 250, 246, 0.82);
+    }
+
+    .schedule-day-card.is-downtown {
+      border-color: rgba(36, 95, 81, 0.14);
+      background: rgba(250, 255, 252, 0.82);
     }
 
     .schedule-day-card.is-today {
@@ -1361,7 +1411,7 @@
       .field-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .field.full { grid-column: 1 / -1; }
       .schedule-week-row { grid-template-columns: minmax(360px, 1.15fr) minmax(0, 0.85fr); align-items: end; }
-      .week-chip-list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .week-chip-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       .schedule-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .menu-preview-card {
         grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
@@ -1618,9 +1668,9 @@
             <div class="week-picker">
               <input id="scheduleWeekStart" type="hidden" />
               <div class="week-picker-head">
-                <button class="chip-btn" id="scheduleWeekPrevBtn" type="button">이전</button>
+                <button class="chip-btn" id="scheduleWeekPrevBtn" type="button" hidden>이전</button>
                 <strong>주간 선택</strong>
-                <button class="chip-btn" id="scheduleWeekNextBtn" type="button">다음</button>
+                <button class="chip-btn" id="scheduleWeekNextBtn" type="button" hidden>다음</button>
               </div>
               <div class="week-chip-list" id="scheduleWeekChips"></div>
             </div>
@@ -1641,6 +1691,11 @@
               <div class="empty-state">데이터 없음</div>
             </div>
           </div>
+        </div>
+
+        <div class="schedule-board" id="scheduleBoard"></div>
+
+        <div class="schedule-summary-grid schedule-availability-grid">
           <div class="availability-card">
             <h4>안되는 날</h4>
             <div class="availability-list" id="unavailableList">
@@ -1654,8 +1709,6 @@
             </div>
           </div>
         </div>
-
-        <div class="schedule-board" id="scheduleBoard"></div>
       </section>
     </main>
   </div>
@@ -1752,6 +1805,6 @@
     </div>
   </div>
 
-  <script src="js/king-admin.js?v=20260711-3"></script>
+  <script src="js/king-admin.js?v=20260711-4"></script>
 </body>
 </html>
