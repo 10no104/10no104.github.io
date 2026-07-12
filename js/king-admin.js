@@ -84,7 +84,7 @@
   const ASSET_PREFIX = window.location.pathname.includes("/test/") ? "../" : "";
   const FALLBACK_IMAGE = `${ASSET_PREFIX}assets/edited/ehwa.png`;
   const SORT_BASE_STEP = 1000;
-  const SCREENSHOT_SERVER_REFS = [
+  const FALLBACK_SERVER_REFS = [
     { staff_key: "우진", name: "우진", branch_scope: "uptown", job_role: "server" },
     { staff_key: "예림", name: "예림", branch_scope: "downtown", job_role: "server" },
     { staff_key: "소정", name: "소정", branch_scope: "downtown", job_role: "server" },
@@ -121,6 +121,7 @@
     scheduleWeeks: [],
     scheduleAvailability: [],
     scheduleStaff: [],
+    scheduleUsingFallbackStaff: false,
     scheduleWeek: null,
     scheduleShifts: [],
     sortables: {
@@ -1795,12 +1796,15 @@
       return;
     }
 
-    refs.scheduleStaffList.innerHTML = staff.map((item) => `
-      <span class="staff-pill is-${escapeHtml(normalizeBranchScope(item.branch_scope))}">
-        ${escapeHtml(item.name)}
-        <small>${escapeHtml(formatBranchLabel(item.branch_scope))}</small>
-      </span>
-    `).join("");
+    refs.scheduleStaffList.innerHTML = `
+      ${state.scheduleUsingFallbackStaff ? '<div class="empty-state">employee_refs가 비어 있어 임시 서버 목록을 표시 중입니다.</div>' : ""}
+      ${staff.map((item) => `
+        <span class="staff-pill is-${escapeHtml(normalizeBranchScope(item.branch_scope))}">
+          ${escapeHtml(item.name)}
+          <small>${escapeHtml(formatBranchLabel(item.branch_scope))}</small>
+        </span>
+      `).join("")}
+    `;
   }
 
   function renderScheduleBoard() {
@@ -1993,13 +1997,18 @@
       .filter((staff) => staff.active !== false)
       .filter((staff) => normalizeScheduleStaffKey(staff.job_role) !== "kitchen")
       .map(applyStaffPreferences);
+
+    const staffSource = dbStaff.length
+      ? dbStaff
+      : FALLBACK_SERVER_REFS.map(normalizeStaffRef).filter(Boolean).map(applyStaffPreferences);
     const mergedStaff = new Map();
-    [...SCREENSHOT_SERVER_REFS.map(normalizeStaffRef).filter(Boolean).map(applyStaffPreferences), ...dbStaff]
+    staffSource
       .filter(Boolean)
       .forEach((staff) => {
         mergedStaff.set(normalizeScheduleStaffKey(staff.staff_key || staff.name), staff);
       });
     state.scheduleStaff = Array.from(mergedStaff.values());
+    state.scheduleUsingFallbackStaff = !dbStaff.length;
     state.scheduleWeek = weekResult.data || null;
     state.scheduleShifts = [];
 
@@ -2581,7 +2590,8 @@
     }).format(new Date());
     state.scheduleWeekStart = formatInputDate(startOfWeek(new Date()));
     state.scheduleWeekWindowStart = formatInputDate(addWeeks(startOfWeek(new Date()), -1));
-    state.scheduleStaff = SCREENSHOT_SERVER_REFS.map(normalizeStaffRef).filter(Boolean);
+    state.scheduleStaff = FALLBACK_SERVER_REFS.map(normalizeStaffRef).filter(Boolean);
+    state.scheduleUsingFallbackStaff = true;
     refs.scheduleWeekStart.value = state.scheduleWeekStart;
     bindEvents();
     renderReservationDayChips();
