@@ -103,6 +103,7 @@
     supportsAllSortOrder: true,
     scheduleWeekStart: "",
     scheduleAvailability: [],
+    scheduleStaff: [],
     scheduleWeek: null,
     scheduleShifts: [],
     sortables: {
@@ -180,7 +181,9 @@
       "scheduleWeekStart",
       "scheduleLoadBtn",
       "schedulePublishBtn",
+      "scheduleAutoFillBtn",
       "scheduleStatus",
+      "scheduleStaffList",
       "unavailableList",
       "preferredList",
       "scheduleBoard"
@@ -1281,6 +1284,63 @@
     return String(name || "").trim().toLowerCase().replace(/\s+/g, "");
   }
 
+  function normalizeBranchScope(value = "") {
+    const normalized = String(value || "").trim().toLowerCase();
+    if (normalized.includes("down")) return "downtown";
+    if (normalized.includes("up")) return "uptown";
+    if (normalized === "all" || normalized === "both" || normalized.includes("both")) return "both";
+    return normalized || "both";
+  }
+
+  function getDefaultServerCount(date) {
+    const day = date.getDay();
+    return day === 5 || day === 6 ? 3 : 2;
+  }
+
+  function normalizeStaffRef(item = {}) {
+    const rawName = item.staff_name || item.name || item.display_name || item.employee_name || item.server_name || item.staff_key || item.ref_code || "";
+    const staffKey = item.staff_key || item.key || item.employee_key || rawName;
+    const branchScope = normalizeBranchScope(item.branch_scope || item.branches || item.branch || item.location || "both");
+    const name = String(rawName || staffKey || "").trim();
+    if (!name) return null;
+    return {
+      ...item,
+      name,
+      staff_key: String(staffKey || name).trim(),
+      normalized: normalizeScheduleStaffKey(staffKey || name),
+      branch_scope: branchScope,
+      job_role: item.job_role || item.role || "server"
+    };
+  }
+
+  function getScheduleStaffPool() {
+    const fromRefs = state.scheduleStaff || [];
+    if (fromRefs.length) return fromRefs;
+
+    const byKey = new Map();
+    state.scheduleAvailability.forEach((item) => {
+      const staff = normalizeStaffRef(item);
+      if (staff && !byKey.has(staff.normalized)) byKey.set(staff.normalized, staff);
+    });
+    return Array.from(byKey.values());
+  }
+
+  function branchMatchesStaff(staff, branch) {
+    const scope = normalizeBranchScope(staff.branch_scope);
+    return scope === "both" || scope === branch;
+  }
+
+  function getAvailabilityForStaff(staff, isoDate) {
+    const key = normalizeScheduleStaffKey(staff.staff_key || staff.name);
+    const nameKey = normalizeScheduleStaffKey(staff.name);
+    return state.scheduleAvailability.find((item) => {
+      if (item.availability_date !== isoDate) return false;
+      const itemKey = normalizeScheduleStaffKey(item.staff_key || item.staff_name);
+      const itemName = normalizeScheduleStaffKey(item.staff_name || item.staff_key);
+      return itemKey === key || itemKey === nameKey || itemName === key || itemName === nameKey;
+    }) || null;
+  }
+
   function getScheduleCellKey(branch, dateValue) {
     return `${branch}|${dateValue}`;
   }
@@ -1321,6 +1381,24 @@
     }).join("");
   }
 
+  function renderScheduleStaffList() {
+    const staff = getScheduleStaffPool()
+      .slice()
+      .sort((a, b) => a.branch_scope.localeCompare(b.branch_scope) || a.name.localeCompare(b.name));
+
+    if (!staff.length) {
+      refs.scheduleStaffList.innerHTML = '<div class="empty-state">서버 목록이 없습니다.</div>';
+      return;
+    }
+
+    refs.scheduleStaffList.innerHTML = staff.map((item) => `
+      <span class="staff-pill">
+        ${escapeHtml(item.name)}
+        <small>${escapeHtml(formatBranchLabel(item.branch_scope))}</small>
+      </span>
+    `).join("");
+  }
+
   function renderScheduleBoard() {
     const branches = [
       { key: "uptown", label: "Uptown" },
@@ -1359,6 +1437,53 @@
     renderAvailabilityList("preferred", refs.preferredList);
   }
 
+  function renderScheduleBoard() {
+    const branches = [
+      { key: "uptown", label: "Uptown" },
+      { key: "downtown", label: "Downtown" }
+    ];
+    const dates = getScheduleWeekDates();
+    const shiftMap = getShiftNamesByCell();
+    const today = startOfDay(new Date());
+
+    refs.scheduleWeekLabel.textContent = state.scheduleWeekStart
+      ? `${formatScheduleDayLabel(dates[0])} - ${formatScheduleDayLabel(dates[6])}`
+      : "주간 선택";
+
+    refs.scheduleBoard.innerHTML = branches.map((branch) => `
+      <section class="schedule-branch">
+        <h4>${escapeHtml(branch.label)}</h4>
+        <div class="schedule-day-grid">
+          ${dates.map((date) => {
+            const dateValue = formatInputDate(date);
+            const cellKey = getScheduleCellKey(branch.key, dateValue);
+            const names = shiftMap.get(cellKey) || [];
+            const targetCount = Math.max(getDefaultServerCount(date), names.length);
+            return `
+              <article class="schedule-day-card ${isSameDate(date, today) ? "is-today" : ""}">
+                <div class="schedule-day-top">
+                  <header>
+                    <strong>${escapeHtml(formatScheduleDayLabel(date))}</strong>
+                    <span>${escapeHtml(branch.label)}</span>
+                  </header>
+                  <label class="server-count-field">
+                    <span>인원</span>
+                    <input data-schedule-target="${escapeHtml(cellKey)}" type="number" min="0" max="8" value="${targetCount}" inputmode="numeric" />
+                  </label>
+                </div>
+                <textarea data-schedule-cell="${escapeHtml(cellKey)}" placeholder="서버 이름&#10;한 줄에 한 명">${escapeHtml(names.join("\n"))}</textarea>
+              </article>
+            `;
+          }).join("")}
+        </div>
+      </section>
+    `).join("");
+
+    renderAvailabilityList("unavailable", refs.unavailableList);
+    renderAvailabilityList("preferred", refs.preferredList);
+    renderScheduleStaffList();
+  }
+
   async function fetchScheduleData() {
     if (!supabaseClient || !state.menuSession) {
       setScheduleStatus("메뉴변경 탭에서 관리자 로그인 후 사용할 수 있습니다.", "error");
@@ -1384,6 +1509,14 @@
       return;
     }
 
+    const staffResult = await supabaseClient
+      .from("employee_refs")
+      .select("*");
+
+    if (staffResult.error) {
+      console.warn("Could not load employee refs", staffResult.error);
+    }
+
     const weekResult = await supabaseClient
       .from("noble_schedule_weeks")
       .select("id,week_start,status,note")
@@ -1396,6 +1529,10 @@
     }
 
     state.scheduleAvailability = availabilityResult.data || [];
+    state.scheduleStaff = (staffResult.data || [])
+      .map(normalizeStaffRef)
+      .filter(Boolean)
+      .filter((staff) => normalizeScheduleStaffKey(staff.job_role) !== "kitchen");
     state.scheduleWeek = weekResult.data || null;
     state.scheduleShifts = [];
 
@@ -1421,6 +1558,7 @@
 
   function collectScheduleRows(weekId) {
     const rows = [];
+    const staffPool = getScheduleStaffPool();
     refs.scheduleBoard.querySelectorAll("[data-schedule-cell]").forEach((textarea) => {
       const [branch, shiftDate] = String(textarea.dataset.scheduleCell || "").split("|");
       if (!branch || !shiftDate) return;
@@ -1429,17 +1567,88 @@
         .map((name) => name.trim())
         .filter(Boolean)
         .forEach((name, index) => {
+          const staff = staffPool.find((item) => normalizeScheduleStaffKey(item.name) === normalizeScheduleStaffKey(name) || normalizeScheduleStaffKey(item.staff_key) === normalizeScheduleStaffKey(name));
           rows.push({
             week_id: weekId,
             shift_date: shiftDate,
             branch,
-            staff_key: normalizeScheduleStaffKey(name),
-            staff_name: name,
+            staff_key: staff?.staff_key || normalizeScheduleStaffKey(name),
+            staff_name: staff?.name || name,
+            job_role: staff?.job_role || "server",
             sort_order: index
           });
         });
     });
     return rows;
+  }
+
+  function getCurrentNames(textarea) {
+    return String(textarea.value || "")
+      .split(/\r?\n/)
+      .map((name) => name.trim())
+      .filter(Boolean);
+  }
+
+  function getTargetCountForCell(cellKey, date) {
+    const input = Array.from(refs.scheduleBoard.querySelectorAll("[data-schedule-target]"))
+      .find((item) => item.dataset.scheduleTarget === cellKey);
+    const value = Number.parseInt(input?.value || "", 10);
+    return Number.isFinite(value) ? Math.max(0, value) : getDefaultServerCount(date);
+  }
+
+  function seededShuffle(items = []) {
+    return items
+      .map((item) => ({ item, roll: Math.random() }))
+      .sort((a, b) => a.roll - b.roll)
+      .map(({ item }) => item);
+  }
+
+  function getCandidatesForCell(branch, isoDate, existingNames = []) {
+    const existingKeys = new Set(existingNames.map(normalizeScheduleStaffKey));
+    const pool = getScheduleStaffPool();
+
+    return seededShuffle(pool)
+      .map((staff) => {
+        const availability = getAvailabilityForStaff(staff, isoDate);
+        return {
+          ...staff,
+          availability,
+          score: availability?.status === "preferred" ? 2 : 1
+        };
+      })
+      .filter((staff) => branchMatchesStaff(staff, branch))
+      .filter((staff) => !existingKeys.has(normalizeScheduleStaffKey(staff.name)) && !existingKeys.has(normalizeScheduleStaffKey(staff.staff_key)))
+      .filter((staff) => staff.availability?.status !== "unavailable")
+      .sort((a, b) => b.score - a.score);
+  }
+
+  function autoFillSchedule() {
+    const pool = getScheduleStaffPool();
+    if (!pool.length) {
+      setScheduleStatus("서버 목록이 없어서 자동배정을 할 수 없습니다.", "error");
+      return;
+    }
+
+    let added = 0;
+    refs.scheduleBoard.querySelectorAll("[data-schedule-cell]").forEach((textarea) => {
+      const [branch, isoDate] = String(textarea.dataset.scheduleCell || "").split("|");
+      const date = toSafeDate(isoDate);
+      if (!branch || !isoDate || !date) return;
+
+      const names = getCurrentNames(textarea);
+      const target = getTargetCountForCell(textarea.dataset.scheduleCell, date);
+      const needed = Math.max(0, target - names.length);
+      if (!needed) return;
+
+      const candidates = getCandidatesForCell(branch, isoDate, names);
+      const selected = candidates.slice(0, needed).map((staff) => staff.name);
+      if (!selected.length) return;
+
+      textarea.value = [...names, ...selected].join("\n");
+      added += selected.length;
+    });
+
+    setScheduleStatus(added ? `빈자리 ${added}개를 자동배정했습니다.` : "채울 수 있는 빈자리가 없습니다.", added ? "success" : "");
   }
 
   async function ensureScheduleWeek() {
@@ -1537,6 +1746,7 @@
     });
     refs.reservationRefreshBtn.addEventListener("click", () => void fetchReservations());
     refs.scheduleLoadBtn.addEventListener("click", () => void fetchScheduleData());
+    refs.scheduleAutoFillBtn.addEventListener("click", autoFillSchedule);
     refs.schedulePublishBtn.addEventListener("click", () => void saveScheduleWeek());
     refs.scheduleWeekStart.addEventListener("change", () => {
       state.scheduleWeekStart = getScheduleWeekStart();

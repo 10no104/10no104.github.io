@@ -1072,6 +1072,37 @@
       letter-spacing: -0.02em;
     }
 
+    .schedule-staff-card {
+      grid-column: 1 / -1;
+    }
+
+    .staff-roster-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .staff-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 34px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(113, 88, 60, 0.12);
+      background: rgba(255, 252, 247, 0.82);
+      color: #322419;
+      font-size: 0.82rem;
+      font-weight: 900;
+    }
+
+    .staff-pill small {
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
     .availability-list {
       display: grid;
       gap: 7px;
@@ -1153,6 +1184,35 @@
       gap: 8px;
       color: #3a291d;
       font-size: 0.82rem;
+      font-weight: 900;
+    }
+
+    .schedule-day-top {
+      display: grid;
+      gap: 8px;
+    }
+
+    .server-count-field {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 7px 8px;
+      border-radius: 12px;
+      background: rgba(247, 239, 228, 0.72);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 900;
+    }
+
+    .server-count-field input {
+      width: 58px;
+      min-height: 32px;
+      border: 1px solid rgba(113, 88, 60, 0.14);
+      border-radius: 10px;
+      background: rgba(255, 252, 247, 0.92);
+      color: var(--ink);
+      text-align: center;
       font-weight: 900;
     }
 
@@ -1486,14 +1546,21 @@
             </div>
             <div class="schedule-actions">
               <button class="pill-btn" id="scheduleLoadBtn" type="button">불러오기</button>
+              <button class="pill-btn" id="scheduleAutoFillBtn" type="button">빈자리 자동배정</button>
               <button class="pill-btn primary" id="schedulePublishBtn" type="button">저장 / 게시</button>
             </div>
           </div>
-          <div class="schedule-helper">각 칸에는 서버 이름을 한 줄에 한 명씩 입력하면 됩니다. Noble에는 가장 최근 게시된 주간 스케줄이 표시됩니다.</div>
+          <div class="schedule-helper">주간은 월-일 기준입니다. 각 칸에 직접 적은 서버는 고정되고, 자동배정은 남은 자리만 채웁니다.</div>
           <div class="status-line" id="scheduleStatus"></div>
         </div>
 
         <div class="schedule-summary-grid">
+          <div class="availability-card schedule-staff-card">
+            <h4>서버 목록</h4>
+            <div class="staff-roster-list" id="scheduleStaffList">
+              <div class="empty-state">데이터 없음</div>
+            </div>
+          </div>
           <div class="availability-card">
             <h4>안되는 날</h4>
             <div class="availability-list" id="unavailableList">
@@ -1605,6 +1672,6 @@
     </div>
   </div>
 
-  <script src="js/king-admin.js?v=20260711-1"></script>
+  <script src="js/king-admin.js?v=20260711-2"></script>
 </body>
 </html>

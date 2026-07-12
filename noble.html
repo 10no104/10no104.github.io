@@ -2468,7 +2468,7 @@
 
         try {
           if (!supabaseClient) throw new Error("Supabase client is not available.");
-          const { error } = await supabaseClient.rpc("noble_submit_access_request", {
+          const { error } = await supabaseClient.rpc("noble_submit_access_request_v2", {
             p_name: payload.name,
             p_branch_scope: normalizeKey(payload.branch),
             p_smart_server_number: payload.smartServerNumber
@@ -3232,7 +3232,7 @@
 
         try {
           if (!supabaseClient) throw new Error("Supabase client is not available.");
-          const { error } = await supabaseClient.rpc("noble_submit_availability", {
+          const { error } = await supabaseClient.rpc("noble_submit_availability_v2", {
             input_ref: state.savedRefCode || refs.staffIdInput.value,
             p_unavailable_dates: Array.from(state.unavailableDates).sort(),
             p_preferred_dates: Array.from(state.preferredDates).sort(),
