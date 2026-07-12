@@ -604,22 +604,28 @@
 
   async function fetchEmployeeRefRows() {
     const rpcResult = await supabaseClient.rpc("king_get_employee_refs");
-    if (!rpcResult.error) return rpcResult;
+    if (!rpcResult.error && Array.isArray(rpcResult.data) && rpcResult.data.length) return rpcResult;
 
-    return supabaseClient
+    const directResult = await supabaseClient
       .from("employee_refs")
       .select("*");
+    if (!directResult.error && Array.isArray(directResult.data) && directResult.data.length) return directResult;
+
+    return rpcResult.error ? directResult : rpcResult;
   }
 
   async function fetchAccessRequestRows() {
     const rpcResult = await supabaseClient.rpc("king_get_access_requests");
-    if (!rpcResult.error) return rpcResult;
+    if (!rpcResult.error && Array.isArray(rpcResult.data) && rpcResult.data.length) return rpcResult;
 
-    return supabaseClient
+    const directResult = await supabaseClient
       .from("noble_access_requests")
       .select("id,name,branch_scope,phone_number,smart_server_number,status,note,created_at")
       .in("status", ["pending", "approved"])
       .order("created_at", { ascending: false });
+    if (!directResult.error && Array.isArray(directResult.data) && directResult.data.length) return directResult;
+
+    return rpcResult.error ? directResult : rpcResult;
   }
 
   async function deleteAccessRequest(id = "") {

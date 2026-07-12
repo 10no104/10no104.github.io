@@ -5,14 +5,31 @@ create extension if not exists pgcrypto;
 create schema if not exists staff;
 
 do $$
+declare
+  public_employee_kind text;
+  public_request_kind text;
 begin
+  select c.relkind
+    into public_employee_kind
+  from pg_class c
+  join pg_namespace n on n.oid = c.relnamespace
+  where n.nspname = 'public'
+    and c.relname = 'employee_refs';
+
+  select c.relkind
+    into public_request_kind
+  from pg_class c
+  join pg_namespace n on n.oid = c.relnamespace
+  where n.nspname = 'public'
+    and c.relname = 'noble_access_requests';
+
   if to_regclass('staff.noble_access_requests') is not null then
     alter table staff.noble_access_requests
       add column if not exists phone_number text;
   end if;
 
   if to_regclass('public.noble_access_requests') is not null
-     and to_regclass('staff.noble_access_requests') is null then
+     and public_request_kind in ('r', 'p') then
     alter table public.noble_access_requests
       add column if not exists phone_number text;
   end if;
@@ -22,16 +39,18 @@ begin
       add column if not exists sin_number text,
       add column if not exists phone_number text,
       add column if not exists active boolean not null default true,
+      add column if not exists created_at timestamptz not null default now(),
       add column if not exists inactive_at timestamptz,
       add column if not exists updated_at timestamptz not null default now();
   end if;
 
   if to_regclass('public.employee_refs') is not null
-     and to_regclass('staff.employee_refs') is null then
+     and public_employee_kind in ('r', 'p') then
     alter table public.employee_refs
       add column if not exists sin_number text,
       add column if not exists phone_number text,
       add column if not exists active boolean not null default true,
+      add column if not exists created_at timestamptz not null default now(),
       add column if not exists inactive_at timestamptz,
       add column if not exists updated_at timestamptz not null default now();
   end if;
@@ -59,23 +78,58 @@ begin
 end;
 $$;
 
-drop view if exists public.employee_refs;
-create view public.employee_refs
-with (security_invoker = true)
-as select * from staff.employee_refs;
+do $$
+declare
+  public_employee_kind text;
+  public_request_kind text;
+begin
+  select c.relkind
+    into public_employee_kind
+  from pg_class c
+  join pg_namespace n on n.oid = c.relnamespace
+  where n.nspname = 'public'
+    and c.relname = 'employee_refs';
 
-drop view if exists public.noble_access_requests;
-create view public.noble_access_requests
-with (security_invoker = true)
-as select * from staff.noble_access_requests;
+  select c.relkind
+    into public_request_kind
+  from pg_class c
+  join pg_namespace n on n.oid = c.relnamespace
+  where n.nspname = 'public'
+    and c.relname = 'noble_access_requests';
 
-grant select, insert, update, delete on public.employee_refs to authenticated;
-grant select, insert, update, delete on public.noble_access_requests to authenticated;
-grant usage on schema staff to authenticated;
-grant select, insert, update, delete on staff.employee_refs to authenticated;
-grant select, insert, update, delete on staff.noble_access_requests to authenticated;
-revoke all on public.employee_refs from anon;
-revoke all on public.noble_access_requests from anon;
+  if to_regclass('staff.employee_refs') is not null
+     and (public_employee_kind is null or public_employee_kind = 'v') then
+    execute 'drop view if exists public.employee_refs';
+    execute 'create view public.employee_refs with (security_invoker = true) as select * from staff.employee_refs';
+  end if;
+
+  if to_regclass('staff.noble_access_requests') is not null
+     and (public_request_kind is null or public_request_kind = 'v') then
+    execute 'drop view if exists public.noble_access_requests';
+    execute 'create view public.noble_access_requests with (security_invoker = true) as select * from staff.noble_access_requests';
+  end if;
+
+  if to_regclass('public.employee_refs') is not null then
+    execute 'grant select, insert, update, delete on public.employee_refs to authenticated';
+    execute 'revoke all on public.employee_refs from anon';
+  end if;
+
+  if to_regclass('public.noble_access_requests') is not null then
+    execute 'grant select, insert, update, delete on public.noble_access_requests to authenticated';
+    execute 'revoke all on public.noble_access_requests from anon';
+  end if;
+
+  execute 'grant usage on schema staff to authenticated';
+
+  if to_regclass('staff.employee_refs') is not null then
+    execute 'grant select, insert, update, delete on staff.employee_refs to authenticated';
+  end if;
+
+  if to_regclass('staff.noble_access_requests') is not null then
+    execute 'grant select, insert, update, delete on staff.noble_access_requests to authenticated';
+  end if;
+end;
+$$;
 
 do $$
 begin
@@ -142,7 +196,7 @@ as $$
     e.inactive_at,
     e.created_at,
     e.updated_at
-  from staff.employee_refs e
+  from public.employee_refs e
   order by e.active desc, e.branch_scope, e.staff_key;
 $$;
 
@@ -170,7 +224,7 @@ as $$
     r.status,
     r.note,
     r.created_at
-  from staff.noble_access_requests r
+  from public.noble_access_requests r
   where r.status in ('pending', 'approved')
   order by r.created_at desc;
 $$;
@@ -209,7 +263,7 @@ begin
     raise exception 'phone_number is required';
   end if;
 
-  insert into staff.noble_access_requests (
+  insert into public.noble_access_requests (
     name,
     branch_scope,
     smart_server_number,
