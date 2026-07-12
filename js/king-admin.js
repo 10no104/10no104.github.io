@@ -1373,8 +1373,48 @@
       staff_key: String(staffKey || name).trim(),
       normalized: normalizeScheduleStaffKey(staffKey || name),
       branch_scope: branchScope,
-      job_role: item.job_role || item.role || "server"
+      job_role: item.job_role || item.role || "server",
+      preferred_branch: normalizeBranchScope(item.preferred_branch || item.preferredBranch || item.favorite_branch || ""),
+      work_style: String(item.work_style || item.workStyle || item.preference_style || "").trim().toLowerCase(),
+      fixed_unavailable_weekdays: normalizeWeekdayList(item.fixed_unavailable_weekdays || item.fixedUnavailableWeekdays),
+      fixed_preferred_weekdays: normalizeWeekdayList(item.fixed_preferred_weekdays || item.fixedPreferredWeekdays)
     };
+  }
+
+  function normalizeWeekdayList(value) {
+    const weekdayMap = {
+      sun: 0,
+      sunday: 0,
+      일: 0,
+      mon: 1,
+      monday: 1,
+      월: 1,
+      tue: 2,
+      tuesday: 2,
+      화: 2,
+      wed: 3,
+      wednesday: 3,
+      수: 3,
+      thu: 4,
+      thursday: 4,
+      목: 4,
+      fri: 5,
+      friday: 5,
+      금: 5,
+      sat: 6,
+      saturday: 6,
+      토: 6
+    };
+    const raw = Array.isArray(value) ? value : String(value || "").split(/[,\s|/]+/);
+    return raw
+      .map((item) => {
+        const text = String(item).trim().toLowerCase();
+        if (!text) return null;
+        const number = Number.parseInt(text, 10);
+        if (Number.isInteger(number) && number >= 0 && number <= 6) return number;
+        return weekdayMap[text] ?? null;
+      })
+      .filter((item) => item !== null);
   }
 
   function getScheduleStaffPool() {
@@ -1679,11 +1719,58 @@
     return rows;
   }
 
+  function findSameDayDoubleBookings() {
+    const context = getBoardAssignments();
+    const conflicts = [];
+    context.byStaff.forEach((assignments) => {
+      const byDate = new Map();
+      assignments.forEach((item) => {
+        const rows = byDate.get(item.isoDate) || [];
+        rows.push(item);
+        byDate.set(item.isoDate, rows);
+      });
+      byDate.forEach((rows, isoDate) => {
+        const branches = new Set(rows.map((item) => item.branch));
+        if (branches.size > 1) {
+          conflicts.push(`${rows[0].name} ${isoDate}`);
+        }
+      });
+    });
+    return conflicts;
+  }
+
   function getCurrentNames(textarea) {
     return String(textarea.value || "")
       .split(/\r?\n/)
       .map((name) => name.trim())
       .filter(Boolean);
+  }
+
+  function getStaffIdentity(name, staffPool = getScheduleStaffPool()) {
+    const normalized = normalizeScheduleStaffKey(name);
+    const staff = staffPool.find((item) => normalizeScheduleStaffKey(item.name) === normalized || normalizeScheduleStaffKey(item.staff_key) === normalized);
+    return staff ? normalizeScheduleStaffKey(staff.staff_key || staff.name) : normalized;
+  }
+
+  function getBoardAssignments() {
+    const staffPool = getScheduleStaffPool();
+    const byStaff = new Map();
+    const byDate = new Map();
+    refs.scheduleBoard.querySelectorAll("[data-schedule-cell]").forEach((textarea) => {
+      const [branch, isoDate] = String(textarea.dataset.scheduleCell || "").split("|");
+      if (!branch || !isoDate) return;
+      getCurrentNames(textarea).forEach((name) => {
+        const staffId = getStaffIdentity(name, staffPool);
+        const staffRows = byStaff.get(staffId) || [];
+        staffRows.push({ branch, isoDate, name });
+        byStaff.set(staffId, staffRows);
+
+        const dateSet = byDate.get(isoDate) || new Set();
+        dateSet.add(staffId);
+        byDate.set(isoDate, dateSet);
+      });
+    });
+    return { byStaff, byDate };
   }
 
   function getTargetCountForCell(cellKey, date) {
@@ -1700,22 +1787,74 @@
       .map(({ item }) => item);
   }
 
-  function getCandidatesForCell(branch, isoDate, existingNames = []) {
+  function scoreScheduleCandidate(staff, branch, isoDate, context) {
+    const staffId = normalizeScheduleStaffKey(staff.staff_key || staff.name);
+    const date = toSafeDate(isoDate);
+    const weekday = date ? date.getDay() : null;
+    const availability = getAvailabilityForStaff(staff, isoDate);
+    const currentDays = new Set((context.byStaff.get(staffId) || []).map((item) => item.isoDate));
+    let score = Math.random() * 0.2;
+
+    if (currentDays.size === 0) score += 80;
+    else if (currentDays.size === 1) score += 60;
+    else score += Math.max(0, 24 - currentDays.size * 4);
+
+    if (availability?.status === "preferred") score += 32;
+    if (staff.fixed_preferred_weekdays?.includes(weekday)) score += 24;
+    if (normalizeBranchScope(staff.preferred_branch) === branch) score += 16;
+
+    const workStyle = staff.work_style || "";
+    const hasAdjacentDay = Array.from(currentDays).some((dateValue) => {
+      const assignedDate = toSafeDate(dateValue);
+      if (!assignedDate || !date) return false;
+      return Math.abs((assignedDate.getTime() - date.getTime()) / 86400000) === 1;
+    });
+    const hasGapDay = Array.from(currentDays).every((dateValue) => {
+      const assignedDate = toSafeDate(dateValue);
+      if (!assignedDate || !date) return true;
+      return Math.abs((assignedDate.getTime() - date.getTime()) / 86400000) > 1;
+    });
+
+    if (workStyle.includes("몰") || workStyle.includes("cluster") || workStyle.includes("together")) {
+      score += hasAdjacentDay ? 12 : 0;
+    }
+    if (workStyle.includes("띄") || workStyle.includes("spread") || workStyle.includes("space")) {
+      score += hasGapDay ? 12 : -8;
+    }
+
+    if (workStyle.includes("\uBAB0")) {
+      score += hasAdjacentDay ? 12 : 0;
+    }
+    if (workStyle.includes("\uB760")) {
+      score += hasGapDay ? 12 : -8;
+    }
+
+    return score;
+  }
+
+  function getCandidatesForCell(branch, isoDate, existingNames = [], context = getBoardAssignments()) {
     const existingKeys = new Set(existingNames.map(normalizeScheduleStaffKey));
     const pool = getScheduleStaffPool();
+    const alreadyWorkingThisDate = context.byDate.get(isoDate) || new Set();
+    const date = toSafeDate(isoDate);
+    const weekday = date ? date.getDay() : null;
 
     return seededShuffle(pool)
       .map((staff) => {
         const availability = getAvailabilityForStaff(staff, isoDate);
+        const staffId = normalizeScheduleStaffKey(staff.staff_key || staff.name);
         return {
           ...staff,
           availability,
-          score: availability?.status === "preferred" ? 2 : 1
+          staffId,
+          score: scoreScheduleCandidate(staff, branch, isoDate, context)
         };
       })
       .filter((staff) => branchMatchesStaff(staff, branch))
       .filter((staff) => !existingKeys.has(normalizeScheduleStaffKey(staff.name)) && !existingKeys.has(normalizeScheduleStaffKey(staff.staff_key)))
+      .filter((staff) => !alreadyWorkingThisDate.has(staff.staffId))
       .filter((staff) => staff.availability?.status !== "unavailable")
+      .filter((staff) => !staff.fixed_unavailable_weekdays?.includes(weekday))
       .sort((a, b) => b.score - a.score);
   }
 
@@ -1727,6 +1866,7 @@
     }
 
     let added = 0;
+    let context = getBoardAssignments();
     refs.scheduleBoard.querySelectorAll("[data-schedule-cell]").forEach((textarea) => {
       const [branch, isoDate] = String(textarea.dataset.scheduleCell || "").split("|");
       const date = toSafeDate(isoDate);
@@ -1737,15 +1877,57 @@
       const needed = Math.max(0, target - names.length);
       if (!needed) return;
 
-      const candidates = getCandidatesForCell(branch, isoDate, names);
+      const candidates = getCandidatesForCell(branch, isoDate, names, context);
       const selected = candidates.slice(0, needed).map((staff) => staff.name);
       if (!selected.length) return;
 
       textarea.value = [...names, ...selected].join("\n");
       added += selected.length;
+      context = getBoardAssignments();
     });
 
     setScheduleStatus(added ? `빈자리 ${added}개를 자동배정했습니다.` : "채울 수 있는 빈자리가 없습니다.", added ? "success" : "");
+  }
+
+  function autoFillScheduleV2() {
+    const pool = getScheduleStaffPool();
+    if (!pool.length) {
+      setScheduleStatus("서버 목록이 없어서 자동배정을 할 수 없습니다.", "error");
+      return;
+    }
+
+    let added = 0;
+    let context = getBoardAssignments();
+    refs.scheduleBoard.querySelectorAll("[data-schedule-cell]").forEach((textarea) => {
+      const [branch, isoDate] = String(textarea.dataset.scheduleCell || "").split("|");
+      const date = toSafeDate(isoDate);
+      if (!branch || !isoDate || !date) return;
+
+      const names = getCurrentNames(textarea);
+      const target = getTargetCountForCell(textarea.dataset.scheduleCell, date);
+      const needed = Math.max(0, target - names.length);
+      if (!needed) return;
+
+      const candidates = getCandidatesForCell(branch, isoDate, names, context);
+      const selected = candidates.slice(0, needed).map((staff) => staff.name);
+      if (!selected.length) return;
+
+      textarea.value = [...names, ...selected].join("\n");
+      added += selected.length;
+      context = getBoardAssignments();
+    });
+
+    const finalContext = getBoardAssignments();
+    const underTwo = pool
+      .filter((staff) => {
+        const staffId = normalizeScheduleStaffKey(staff.staff_key || staff.name);
+        const days = new Set((finalContext.byStaff.get(staffId) || []).map((item) => item.isoDate));
+        return days.size > 0 && days.size < 2;
+      })
+      .map((staff) => staff.name);
+    const baseMessage = added ? `빈자리 ${added}개를 자동배정했습니다.` : "채울 수 있는 빈자리가 없습니다.";
+    const suffix = underTwo.length ? ` 2일 미만: ${underTwo.slice(0, 5).join(", ")}` : "";
+    setScheduleStatus(`${baseMessage}${suffix}`, added ? "success" : "");
   }
 
   async function ensureScheduleWeek() {
@@ -1784,6 +1966,11 @@
 
     state.scheduleWeekStart = getScheduleWeekStart();
     refs.scheduleWeekStart.value = state.scheduleWeekStart;
+    const conflicts = findSameDayDoubleBookings();
+    if (conflicts.length) {
+      setScheduleStatus(`같은 날 두 지점 배정이 있습니다: ${conflicts.slice(0, 3).join(", ")}`, "error");
+      return;
+    }
     setScheduleStatus("스케줄을 저장하는 중...");
 
     try {
@@ -1847,7 +2034,7 @@
     });
     refs.reservationRefreshBtn.addEventListener("click", () => void fetchReservations());
     refs.scheduleLoadBtn.addEventListener("click", () => void fetchScheduleData());
-    refs.scheduleAutoFillBtn.addEventListener("click", autoFillSchedule);
+    refs.scheduleAutoFillBtn.addEventListener("click", autoFillScheduleV2);
     refs.schedulePublishBtn.addEventListener("click", () => void saveScheduleWeek());
     refs.scheduleWeekStart.addEventListener("change", () => {
       state.scheduleWeekStart = getScheduleWeekStart();
