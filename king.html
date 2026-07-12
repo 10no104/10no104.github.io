@@ -1046,6 +1046,80 @@
       min-height: 48px;
     }
 
+    .week-picker {
+      display: grid;
+      gap: 9px;
+      min-width: 0;
+    }
+
+    .week-picker-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .week-picker-head strong {
+      font-size: 0.95rem;
+      letter-spacing: -0.02em;
+    }
+
+    .week-chip-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .week-chip {
+      display: grid;
+      gap: 4px;
+      min-height: 70px;
+      padding: 10px;
+      border: 1px solid rgba(113, 88, 60, 0.14);
+      border-radius: 16px;
+      background: rgba(255, 252, 247, 0.82);
+      color: #302217;
+      text-align: left;
+      box-shadow: 0 8px 18px rgba(32, 20, 13, 0.04);
+    }
+
+    .week-chip strong,
+    .week-chip span {
+      display: block;
+    }
+
+    .week-chip strong {
+      font-size: 0.92rem;
+      line-height: 1.15;
+    }
+
+    .week-chip span {
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 900;
+    }
+
+    .week-chip.is-confirmed {
+      border-color: rgba(36, 95, 81, 0.24);
+      background: linear-gradient(135deg, rgba(36, 95, 81, 0.13), rgba(212, 175, 55, 0.12));
+    }
+
+    .week-chip.is-empty {
+      border-style: dashed;
+      background: rgba(255, 252, 247, 0.6);
+    }
+
+    .week-chip.is-active {
+      color: #fffaf2;
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--wine), #b9871f);
+      box-shadow: 0 16px 28px rgba(123, 31, 47, 0.18);
+    }
+
+    .week-chip.is-active span {
+      color: rgba(255, 250, 242, 0.8);
+    }
+
     .schedule-actions {
       display: flex;
       flex-wrap: wrap;
@@ -1286,7 +1360,8 @@
     @media (min-width: 720px) {
       .field-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .field.full { grid-column: 1 / -1; }
-      .schedule-week-row { grid-template-columns: minmax(220px, 0.7fr) minmax(0, 1fr); align-items: end; }
+      .schedule-week-row { grid-template-columns: minmax(360px, 1.15fr) minmax(0, 0.85fr); align-items: end; }
+      .week-chip-list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
       .schedule-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .menu-preview-card {
         grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
@@ -1540,9 +1615,14 @@
 
         <div class="schedule-toolbar">
           <div class="schedule-week-row">
-            <div class="field">
-              <label for="scheduleWeekStart">주간 시작일</label>
-              <input id="scheduleWeekStart" type="date" />
+            <div class="week-picker">
+              <input id="scheduleWeekStart" type="hidden" />
+              <div class="week-picker-head">
+                <button class="chip-btn" id="scheduleWeekPrevBtn" type="button">이전</button>
+                <strong>주간 선택</strong>
+                <button class="chip-btn" id="scheduleWeekNextBtn" type="button">다음</button>
+              </div>
+              <div class="week-chip-list" id="scheduleWeekChips"></div>
             </div>
             <div class="schedule-actions">
               <button class="pill-btn" id="scheduleLoadBtn" type="button">불러오기</button>
@@ -1672,6 +1752,6 @@
     </div>
   </div>
 
-  <script src="js/king-admin.js?v=20260711-2"></script>
+  <script src="js/king-admin.js?v=20260711-3"></script>
 </body>
 </html>

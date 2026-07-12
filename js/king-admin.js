@@ -84,6 +84,18 @@
   const ASSET_PREFIX = window.location.pathname.includes("/test/") ? "../" : "";
   const FALLBACK_IMAGE = `${ASSET_PREFIX}assets/edited/ehwa.png`;
   const SORT_BASE_STEP = 1000;
+  const SCREENSHOT_SERVER_REFS = [
+    { staff_key: "우진", name: "우진", branch_scope: "uptown", job_role: "server" },
+    { staff_key: "예림", name: "예림", branch_scope: "downtown", job_role: "server" },
+    { staff_key: "소정", name: "소정", branch_scope: "downtown", job_role: "server" },
+    { staff_key: "영채", name: "영채", branch_scope: "both", job_role: "server" },
+    { staff_key: "은성", name: "은성", branch_scope: "both", job_role: "server" },
+    { staff_key: "주은", name: "주은", branch_scope: "both", job_role: "server" },
+    { staff_key: "제윤", name: "제윤", branch_scope: "both", job_role: "server" },
+    { staff_key: "진아", name: "진아", branch_scope: "uptown", job_role: "server" },
+    { staff_key: "현영", name: "현영", branch_scope: "uptown", job_role: "server" },
+    { staff_key: "서윤", name: "서윤", branch_scope: "downtown", job_role: "server" }
+  ];
   const refs = {};
 
   const state = {
@@ -102,6 +114,8 @@
     categoryOrder: [],
     supportsAllSortOrder: true,
     scheduleWeekStart: "",
+    scheduleWeekWindowStart: "",
+    scheduleWeeks: [],
     scheduleAvailability: [],
     scheduleStaff: [],
     scheduleWeek: null,
@@ -179,6 +193,9 @@
       "menuEditorCancel",
       "scheduleWeekLabel",
       "scheduleWeekStart",
+      "scheduleWeekPrevBtn",
+      "scheduleWeekNextBtn",
+      "scheduleWeekChips",
       "scheduleLoadBtn",
       "schedulePublishBtn",
       "scheduleAutoFillBtn",
@@ -215,6 +232,10 @@
     const next = new Date(date);
     next.setDate(next.getDate() + amount);
     return next;
+  }
+
+  function addWeeks(date, amount) {
+    return addDays(date, amount * 7);
   }
 
   function isSameDate(a, b) {
@@ -1272,12 +1293,52 @@
     return Array.from({ length: 7 }, (_unused, index) => addDays(weekStart, index));
   }
 
+  function getScheduleWeekOptions() {
+    const base = toSafeDate(state.scheduleWeekWindowStart) || addWeeks(startOfWeek(new Date()), -1);
+    return Array.from({ length: 8 }, (_unused, index) => {
+      const start = addWeeks(base, index);
+      const end = addDays(start, 6);
+      const weekStart = formatInputDate(start);
+      const dbWeek = state.scheduleWeeks.find((week) => week.week_start === weekStart);
+      return {
+        weekStart,
+        start,
+        end,
+        status: dbWeek?.status || "empty"
+      };
+    });
+  }
+
   function formatScheduleDayLabel(date) {
     return new Intl.DateTimeFormat("ko-KR", {
       weekday: "short",
       month: "numeric",
       day: "numeric"
     }).format(date);
+  }
+
+  function formatWeekRangeLabel(start, end) {
+    return `${start.getMonth() + 1}/${start.getDate()} - ${end.getMonth() + 1}/${end.getDate()}`;
+  }
+
+  function renderScheduleWeekChips() {
+    const options = getScheduleWeekOptions();
+    refs.scheduleWeekChips.innerHTML = options.map((option) => {
+      const isActive = option.weekStart === state.scheduleWeekStart;
+      const confirmed = option.status === "published";
+      const statusLabel = confirmed ? "확정" : "미작성";
+      const classes = [
+        "week-chip",
+        isActive ? "is-active" : "",
+        confirmed ? "is-confirmed" : "is-empty"
+      ].filter(Boolean).join(" ");
+      return `
+        <button class="${classes}" type="button" data-schedule-week="${option.weekStart}">
+          <strong>${escapeHtml(formatWeekRangeLabel(option.start, option.end))}</strong>
+          <span>${escapeHtml(statusLabel)}</span>
+        </button>
+      `;
+    }).join("");
   }
 
   function normalizeScheduleStaffKey(name = "") {
@@ -1412,6 +1473,16 @@
       ? `${formatScheduleDayLabel(dates[0])} - ${formatScheduleDayLabel(dates[6])}`
       : "주간 선택";
 
+    if (state.scheduleWeekStart) {
+      const weekStateLabel = state.scheduleWeek?.status === "published" ? "확정" : "미작성";
+      refs.scheduleWeekLabel.textContent = `${formatScheduleDayLabel(dates[0])} - ${formatScheduleDayLabel(dates[6])} / ${weekStateLabel}`;
+    }
+
+    if (state.scheduleWeekStart) {
+      const weekStateLabel = state.scheduleWeek?.status === "published" ? "확정" : "미작성";
+      refs.scheduleWeekLabel.textContent = `${formatScheduleDayLabel(dates[0])} - ${formatScheduleDayLabel(dates[6])} / ${weekStateLabel}`;
+    }
+
     refs.scheduleBoard.innerHTML = branches.map((branch) => `
       <section class="schedule-branch">
         <h4>${escapeHtml(branch.label)}</h4>
@@ -1482,6 +1553,7 @@
     renderAvailabilityList("unavailable", refs.unavailableList);
     renderAvailabilityList("preferred", refs.preferredList);
     renderScheduleStaffList();
+    renderScheduleWeekChips();
   }
 
   async function fetchScheduleData() {
@@ -1495,6 +1567,9 @@
     refs.scheduleWeekStart.value = state.scheduleWeekStart;
     const dates = getScheduleWeekDates();
     const weekEnd = formatInputDate(dates[6]);
+    const weekOptions = getScheduleWeekOptions();
+    const weekWindowFrom = weekOptions[0]?.weekStart || state.scheduleWeekStart;
+    const weekWindowTo = weekOptions[weekOptions.length - 1]?.weekStart || state.scheduleWeekStart;
     setScheduleStatus("스케줄 데이터를 불러오는 중...");
 
     const availabilityResult = await supabaseClient
@@ -1517,6 +1592,17 @@
       console.warn("Could not load employee refs", staffResult.error);
     }
 
+    const weeksResult = await supabaseClient
+      .from("noble_schedule_weeks")
+      .select("id,week_start,status,note")
+      .gte("week_start", weekWindowFrom)
+      .lte("week_start", weekWindowTo)
+      .order("week_start", { ascending: true });
+
+    if (!weeksResult.error) {
+      state.scheduleWeeks = weeksResult.data || [];
+    }
+
     const weekResult = await supabaseClient
       .from("noble_schedule_weeks")
       .select("id,week_start,status,note")
@@ -1529,10 +1615,18 @@
     }
 
     state.scheduleAvailability = availabilityResult.data || [];
-    state.scheduleStaff = (staffResult.data || [])
+    const dbStaff = (staffResult.data || [])
       .map(normalizeStaffRef)
       .filter(Boolean)
+      .filter((staff) => staff.active !== false)
       .filter((staff) => normalizeScheduleStaffKey(staff.job_role) !== "kitchen");
+    const mergedStaff = new Map();
+    [...SCREENSHOT_SERVER_REFS.map(normalizeStaffRef), ...dbStaff]
+      .filter(Boolean)
+      .forEach((staff) => {
+        mergedStaff.set(normalizeScheduleStaffKey(staff.staff_key || staff.name), staff);
+      });
+    state.scheduleStaff = Array.from(mergedStaff.values());
     state.scheduleWeek = weekResult.data || null;
     state.scheduleShifts = [];
 
@@ -1706,6 +1800,10 @@
       }
 
       state.scheduleWeek = week;
+      state.scheduleWeeks = [
+        ...state.scheduleWeeks.filter((item) => item.week_start !== week.week_start),
+        week
+      ];
       state.scheduleShifts = rows;
       renderScheduleBoard();
       setScheduleStatus("스케줄을 게시했습니다.", "success");
@@ -1751,6 +1849,26 @@
     refs.scheduleWeekStart.addEventListener("change", () => {
       state.scheduleWeekStart = getScheduleWeekStart();
       refs.scheduleWeekStart.value = state.scheduleWeekStart;
+      void fetchScheduleData();
+    });
+    refs.scheduleWeekPrevBtn.addEventListener("click", () => {
+      const current = toSafeDate(state.scheduleWeekWindowStart) || addWeeks(startOfWeek(new Date()), -1);
+      state.scheduleWeekWindowStart = formatInputDate(addWeeks(current, -4));
+      renderScheduleWeekChips();
+      if (state.activeTab === "schedule") void fetchScheduleData();
+    });
+    refs.scheduleWeekNextBtn.addEventListener("click", () => {
+      const current = toSafeDate(state.scheduleWeekWindowStart) || addWeeks(startOfWeek(new Date()), -1);
+      state.scheduleWeekWindowStart = formatInputDate(addWeeks(current, 4));
+      renderScheduleWeekChips();
+      if (state.activeTab === "schedule") void fetchScheduleData();
+    });
+    refs.scheduleWeekChips.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-schedule-week]");
+      if (!button) return;
+      state.scheduleWeekStart = button.dataset.scheduleWeek;
+      refs.scheduleWeekStart.value = state.scheduleWeekStart;
+      renderScheduleWeekChips();
       void fetchScheduleData();
     });
 
@@ -1854,6 +1972,8 @@
       year: "numeric"
     }).format(new Date());
     state.scheduleWeekStart = formatInputDate(startOfWeek(new Date()));
+    state.scheduleWeekWindowStart = formatInputDate(addWeeks(startOfWeek(new Date()), -1));
+    state.scheduleStaff = SCREENSHOT_SERVER_REFS.map(normalizeStaffRef).filter(Boolean);
     refs.scheduleWeekStart.value = state.scheduleWeekStart;
     bindEvents();
     renderReservationDayChips();
