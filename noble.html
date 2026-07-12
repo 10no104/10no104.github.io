@@ -1207,6 +1207,136 @@
       font-weight: 800;
     }
 
+    .preference-panel {
+      margin-top: 14px;
+      padding: 14px;
+      border: 1px solid rgba(143, 36, 56, 0.12);
+      border-radius: 20px;
+      background:
+        radial-gradient(circle at 100% 0%, rgba(224, 177, 95, 0.12), transparent 32%),
+        rgba(255, 252, 247, 0.9);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .preference-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .preference-head h3 {
+      margin: 0;
+      color: var(--ink);
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .preference-head p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 800;
+      line-height: 1.4;
+    }
+
+    .preference-block {
+      display: grid;
+      gap: 7px;
+      margin-top: 12px;
+    }
+
+    .preference-label {
+      color: #7a4d4f;
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .weekday-toggle-group {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 5px;
+    }
+
+    .weekday-chip {
+      min-height: 34px;
+      border: 1px solid rgba(143, 36, 56, 0.12);
+      border-radius: 11px;
+      background: rgba(255, 255, 255, 0.74);
+      color: #7a4d4f;
+      font-size: 0.78rem;
+      font-weight: 900;
+    }
+
+    .weekday-chip.is-active.is-unavailable {
+      border-color: rgba(143, 36, 56, 0.34);
+      background:
+        linear-gradient(45deg, transparent calc(50% - 1px), rgba(143, 36, 56, 0.55) calc(50% - 1px), rgba(143, 36, 56, 0.55) calc(50% + 1px), transparent calc(50% + 1px)),
+        linear-gradient(-45deg, transparent calc(50% - 1px), rgba(143, 36, 56, 0.55) calc(50% - 1px), rgba(143, 36, 56, 0.55) calc(50% + 1px), transparent calc(50% + 1px)),
+        #fff1f2;
+      color: #7f1d2f;
+    }
+
+    .weekday-chip.is-active.is-preferred {
+      border-color: rgba(46, 124, 103, 0.34);
+      background: linear-gradient(180deg, #edfdf4, #d9f4e5);
+      color: #14513f;
+    }
+
+    .preference-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .preference-field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .preference-field select,
+    .preference-field input {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid rgba(143, 36, 56, 0.14);
+      border-radius: 13px;
+      background: rgba(255, 255, 255, 0.82);
+      color: var(--ink);
+      font: inherit;
+      font-size: 0.84rem;
+      font-weight: 850;
+      outline: none;
+      padding: 0 10px;
+    }
+
+    .preference-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .preference-status {
+      min-height: 1.3em;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 850;
+    }
+
+    .preference-status.is-success {
+      color: #2e7c67;
+    }
+
+    .preference-status.is-error {
+      color: #8f2438;
+    }
+
     .date-detail-dialog {
       width: min(100%, 460px);
     }
@@ -1541,6 +1671,34 @@
         width: 100%;
       }
 
+      .preference-panel {
+        padding: 12px;
+        border-radius: 18px;
+      }
+
+      .preference-head {
+        display: grid;
+        gap: 8px;
+      }
+
+      .weekday-toggle-group {
+        gap: 4px;
+      }
+
+      .weekday-chip {
+        min-height: 32px;
+        border-radius: 9px;
+        font-size: 0.72rem;
+      }
+
+      .preference-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .preference-actions .availability-save {
+        width: 100%;
+      }
+
       .bottom-nav {
         gap: 8px;
         bottom: calc(6px + env(safe-area-inset-bottom, 0px));
@@ -1712,6 +1870,54 @@
                   <button class="availability-save" id="saveAvailabilityButton" type="button">Submit</button>
                   <div class="availability-status" id="availabilityStatus"></div>
                 </div>
+
+                <section class="preference-panel" aria-label="Staff scheduling details">
+                  <div class="preference-head">
+                    <div>
+                      <h3>본인 상세 정보</h3>
+                      <p>고정 요일과 근무 성향은 King 자동배정에 같이 반영됩니다.</p>
+                    </div>
+                  </div>
+
+                  <div class="preference-block">
+                    <span class="preference-label">고정 불가 요일</span>
+                    <div class="weekday-toggle-group" id="fixedUnavailableWeekdays" data-preference-kind="fixedUnavailableWeekdays"></div>
+                  </div>
+
+                  <div class="preference-block">
+                    <span class="preference-label">고정 희망 요일</span>
+                    <div class="weekday-toggle-group" id="fixedPreferredWeekdays" data-preference-kind="fixedPreferredWeekdays"></div>
+                  </div>
+
+                  <div class="preference-grid">
+                    <label class="preference-field">
+                      <span class="preference-label">성향</span>
+                      <select id="workStyleSelect">
+                        <option value="">상관 없음</option>
+                        <option value="cluster">몰아서 일하기</option>
+                        <option value="spread">띄워서 일하기</option>
+                      </select>
+                    </label>
+                    <label class="preference-field">
+                      <span class="preference-label">선호 지점</span>
+                      <select id="preferredBranchSelect">
+                        <option value="">상관 없음</option>
+                        <option value="uptown">Uptown</option>
+                        <option value="downtown">Downtown</option>
+                        <option value="both">Both</option>
+                      </select>
+                    </label>
+                    <label class="preference-field">
+                      <span class="preference-label">주 최대 횟수</span>
+                      <input id="maxWeeklyShiftsInput" type="number" min="1" max="7" inputmode="numeric" placeholder="예: 3" />
+                    </label>
+                  </div>
+
+                  <div class="preference-actions">
+                    <button class="availability-save" id="savePreferencesButton" type="button">Save Details</button>
+                    <div class="preference-status" id="preferenceStatus"></div>
+                  </div>
+                </section>
               </div>
             </article>
           </section>
@@ -1859,6 +2065,25 @@
       const TAB_ORDER = ["wage", "schedule", "calendar"];
       const MONEY_FORMAT = new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       const HOUR_FORMAT = new Intl.NumberFormat("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+      const WEEKDAY_OPTIONS = [
+        { value: 1, label: "월" },
+        { value: 2, label: "화" },
+        { value: 3, label: "수" },
+        { value: 4, label: "목" },
+        { value: 5, label: "금" },
+        { value: 6, label: "토" },
+        { value: 0, label: "일" }
+      ];
+
+      function createEmptyStaffPreferences() {
+        return {
+          fixedUnavailableWeekdays: [],
+          fixedPreferredWeekdays: [],
+          workStyle: "",
+          preferredBranch: "",
+          maxWeeklyShifts: ""
+        };
+      }
 
       const refs = {};
       const supabaseClient = window.supabase?.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
@@ -1882,9 +2107,11 @@
         unavailableDates: new Set(),
         preferredDates: new Set(),
         dateDetails: {},
+        staffPreferences: createEmptyStaffPreferences(),
         calendarPressTimer: null,
         calendarLongPressTriggered: false,
-        availabilityDirty: false
+        availabilityDirty: false,
+        preferencesDirty: false
       };
 
       function byId(id) {
@@ -1926,6 +2153,13 @@
           "calendarGrid",
           "saveAvailabilityButton",
           "availabilityStatus",
+          "fixedUnavailableWeekdays",
+          "fixedPreferredWeekdays",
+          "workStyleSelect",
+          "preferredBranchSelect",
+          "maxWeeklyShiftsInput",
+          "savePreferencesButton",
+          "preferenceStatus",
           "dateDetailModal",
           "dateDetailCloseButton",
           "dateDetailForm",
@@ -2086,6 +2320,24 @@
           console.warn("DB schedule unavailable", error);
           state.dbScheduleRows = [];
           state.dbScheduleWeekStart = "";
+        }
+      }
+
+      async function loadDbPreferences(input = "") {
+        loadPreferenceStorage();
+        const refCode = String(input || "").trim();
+        if (!refCode || !supabaseClient) return;
+
+        try {
+          const { data, error } = await supabaseClient.rpc("noble_get_staff_preferences_v1", { input_ref: refCode });
+          if (error) throw error;
+          const row = Array.isArray(data) ? data[0] : data;
+          if (!row) return;
+          state.staffPreferences = sanitizeStaffPreferences(row);
+          state.preferencesDirty = false;
+          savePreferenceStorage();
+        } catch (error) {
+          console.warn("DB staff preferences unavailable", error);
         }
       }
 
@@ -2549,8 +2801,85 @@
         }
       }
 
+      function getPreferenceStorageKey() {
+        if (!state.currentAccess?.staff_key && !state.currentStaff?.name) return "";
+        return `${CALENDAR_KEY_PREFIX}preferences:${normalizeKey(state.currentAccess?.staff_key || state.currentStaff?.name)}`;
+      }
+
+      function normalizeWeekdayValues(value = []) {
+        const values = Array.isArray(value)
+          ? value
+          : String(value || "").split(/[,\s]+/).filter(Boolean);
+        const unique = new Set();
+
+        values.forEach((item) => {
+          const number = Number.parseInt(item, 10);
+          if (Number.isInteger(number) && number >= 0 && number <= 6) unique.add(number);
+        });
+
+        return Array.from(unique).sort((a, b) => {
+          const orderA = a === 0 ? 7 : a;
+          const orderB = b === 0 ? 7 : b;
+          return orderA - orderB;
+        });
+      }
+
+      function normalizeMaxWeeklyShifts(value) {
+        if (value === "" || value === null || value === undefined) return "";
+        const number = Number.parseInt(value, 10);
+        if (!Number.isFinite(number)) return "";
+        return Math.max(1, Math.min(7, number));
+      }
+
+      function sanitizeStaffPreferences(input = {}) {
+        const workStyle = String(input.workStyle || input.work_style || "").trim().toLowerCase();
+        const preferredBranch = normalizeKey(input.preferredBranch || input.preferred_branch || "");
+
+        return {
+          fixedUnavailableWeekdays: normalizeWeekdayValues(input.fixedUnavailableWeekdays || input.fixed_unavailable_weekdays),
+          fixedPreferredWeekdays: normalizeWeekdayValues(input.fixedPreferredWeekdays || input.fixed_preferred_weekdays),
+          workStyle: ["cluster", "spread"].includes(workStyle) ? workStyle : "",
+          preferredBranch: ["uptown", "downtown", "both"].includes(preferredBranch) ? preferredBranch : "",
+          maxWeeklyShifts: normalizeMaxWeeklyShifts(input.maxWeeklyShifts || input.max_weekly_shifts)
+        };
+      }
+
+      function loadPreferenceStorage() {
+        const key = getPreferenceStorageKey();
+        state.staffPreferences = createEmptyStaffPreferences();
+        state.preferencesDirty = false;
+        if (!key) return;
+
+        try {
+          const raw = window.localStorage.getItem(key);
+          if (!raw) return;
+          state.staffPreferences = sanitizeStaffPreferences(JSON.parse(raw));
+        } catch (error) {
+          state.staffPreferences = createEmptyStaffPreferences();
+        }
+      }
+
+      function savePreferenceStorage() {
+        const key = getPreferenceStorageKey();
+        if (!key) return;
+
+        try {
+          window.localStorage.setItem(key, JSON.stringify({
+            ...state.staffPreferences,
+            submittedAt: new Date().toISOString()
+          }));
+        } catch (error) {
+          // Ignore storage errors.
+        }
+      }
+
       function setAvailabilityStatus(message = "") {
         refs.availabilityStatus.textContent = message;
+      }
+
+      function setPreferenceStatus(message = "", tone = "") {
+        refs.preferenceStatus.textContent = message;
+        refs.preferenceStatus.className = ["preference-status", tone ? `is-${tone}` : ""].filter(Boolean).join(" ");
       }
 
       function resetProfileState(message) {
@@ -2564,14 +2893,17 @@
         state.unavailableDates = new Set();
         state.preferredDates = new Set();
         state.dateDetails = {};
+        state.staffPreferences = createEmptyStaffPreferences();
         window.clearTimeout(state.calendarPressTimer);
         state.calendarPressTimer = null;
         state.calendarLongPressTriggered = false;
         state.availabilityDirty = false;
+        state.preferencesDirty = false;
         renderIdentity();
         renderWageView();
         renderScheduleView();
         renderCalendar();
+        renderPreferenceControls();
         setStatus(message);
       }
 
@@ -2979,11 +3311,84 @@
         setAvailabilityStatus(state.availabilityDirty ? "Unsaved" : "");
       }
 
+      function renderPreferenceWeekdays(target, kind, activeClass) {
+        const activeValues = new Set(state.staffPreferences[kind] || []);
+        const hasProfile = Boolean(state.currentStaff && state.currentAccess);
+
+        target.innerHTML = WEEKDAY_OPTIONS.map((day) => {
+          const isActive = activeValues.has(day.value);
+          return `
+            <button
+              class="weekday-chip ${isActive ? `is-active ${activeClass}` : ""}"
+              type="button"
+              data-weekday="${day.value}"
+              ${hasProfile ? "" : "disabled"}
+              aria-pressed="${isActive ? "true" : "false"}"
+            >${escapeHtml(day.label)}</button>
+          `;
+        }).join("");
+      }
+
+      function renderPreferenceControls() {
+        const hasProfile = Boolean(state.currentStaff && state.currentAccess);
+        const prefs = state.staffPreferences;
+
+        renderPreferenceWeekdays(refs.fixedUnavailableWeekdays, "fixedUnavailableWeekdays", "is-unavailable");
+        renderPreferenceWeekdays(refs.fixedPreferredWeekdays, "fixedPreferredWeekdays", "is-preferred");
+        refs.workStyleSelect.value = prefs.workStyle || "";
+        refs.preferredBranchSelect.value = prefs.preferredBranch || "";
+        refs.maxWeeklyShiftsInput.value = prefs.maxWeeklyShifts || "";
+
+        [
+          refs.workStyleSelect,
+          refs.preferredBranchSelect,
+          refs.maxWeeklyShiftsInput,
+          refs.savePreferencesButton
+        ].forEach((control) => {
+          control.disabled = !hasProfile;
+        });
+
+        if (!hasProfile) {
+          setPreferenceStatus("");
+        } else if (state.preferencesDirty) {
+          setPreferenceStatus("Unsaved");
+        }
+      }
+
+      function readPreferenceControls() {
+        return sanitizeStaffPreferences({
+          ...state.staffPreferences,
+          workStyle: refs.workStyleSelect.value,
+          preferredBranch: refs.preferredBranchSelect.value,
+          maxWeeklyShifts: refs.maxWeeklyShiftsInput.value
+        });
+      }
+
+      function markPreferencesDirty() {
+        state.preferencesDirty = true;
+        savePreferenceStorage();
+        setPreferenceStatus("Unsaved");
+      }
+
+      function togglePreferenceWeekday(kind, value) {
+        if (!state.currentStaff || !state.currentAccess) return;
+        const weekday = Number.parseInt(value, 10);
+        if (!Number.isInteger(weekday) || weekday < 0 || weekday > 6) return;
+
+        const values = new Set(state.staffPreferences[kind] || []);
+        if (values.has(weekday)) values.delete(weekday);
+        else values.add(weekday);
+        state.staffPreferences[kind] = normalizeWeekdayValues(Array.from(values));
+        markPreferencesDirty();
+        renderPreferenceControls();
+      }
+
       function renderAll() {
         renderIdentity();
         renderWageView();
         renderScheduleView();
         renderCalendar();
+        renderPreferenceControls();
       }
 
       function animateViewChange(view, direction) {
@@ -3135,6 +3540,7 @@
           saveRefCode(input);
           await loadDbSchedule(input);
           loadUnavailableDates();
+          await loadDbPreferences(input);
           renderAll();
           setStatus("Ready");
         } catch (error) {
@@ -3248,6 +3654,36 @@
         }
       }
 
+      async function submitStaffPreferences() {
+        if (!state.currentStaff || !state.currentAccess) {
+          setPreferenceStatus("Enter code first", "error");
+          return;
+        }
+
+        state.staffPreferences = readPreferenceControls();
+        savePreferenceStorage();
+        renderPreferenceControls();
+
+        try {
+          if (!supabaseClient) throw new Error("Supabase client is not available.");
+          const { error } = await supabaseClient.rpc("noble_submit_staff_preferences_v1", {
+            input_ref: state.savedRefCode || refs.staffIdInput.value,
+            p_fixed_unavailable_weekdays: state.staffPreferences.fixedUnavailableWeekdays,
+            p_fixed_preferred_weekdays: state.staffPreferences.fixedPreferredWeekdays,
+            p_work_style: state.staffPreferences.workStyle || null,
+            p_preferred_branch: state.staffPreferences.preferredBranch || null,
+            p_max_weekly_shifts: state.staffPreferences.maxWeeklyShifts || null
+          });
+          if (error) throw error;
+          state.preferencesDirty = false;
+          setPreferenceStatus("Saved", "success");
+          setStatus("Details saved");
+        } catch (error) {
+          setPreferenceStatus("Local saved. DB submit failed.", "error");
+          setStatus(error.message || "Details submit failed");
+        }
+      }
+
       function bindEvents() {
         refs.lookupForm.addEventListener("submit", (event) => {
           event.preventDefault();
@@ -3345,6 +3781,27 @@
         });
 
         refs.saveAvailabilityButton.addEventListener("click", () => void submitAvailability());
+
+        refs.fixedUnavailableWeekdays.addEventListener("click", (event) => {
+          const button = event.target.closest("[data-weekday]");
+          if (!button || button.disabled) return;
+          togglePreferenceWeekday("fixedUnavailableWeekdays", button.dataset.weekday);
+        });
+
+        refs.fixedPreferredWeekdays.addEventListener("click", (event) => {
+          const button = event.target.closest("[data-weekday]");
+          if (!button || button.disabled) return;
+          togglePreferenceWeekday("fixedPreferredWeekdays", button.dataset.weekday);
+        });
+
+        [refs.workStyleSelect, refs.preferredBranchSelect, refs.maxWeeklyShiftsInput].forEach((control) => {
+          control.addEventListener("change", () => {
+            state.staffPreferences = readPreferenceControls();
+            markPreferencesDirty();
+          });
+        });
+
+        refs.savePreferencesButton.addEventListener("click", () => void submitStaffPreferences());
       }
 
       cacheRefs();

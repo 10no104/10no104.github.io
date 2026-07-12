@@ -1377,7 +1377,8 @@
       preferred_branch: normalizeBranchScope(item.preferred_branch || item.preferredBranch || item.favorite_branch || ""),
       work_style: String(item.work_style || item.workStyle || item.preference_style || "").trim().toLowerCase(),
       fixed_unavailable_weekdays: normalizeWeekdayList(item.fixed_unavailable_weekdays || item.fixedUnavailableWeekdays),
-      fixed_preferred_weekdays: normalizeWeekdayList(item.fixed_preferred_weekdays || item.fixedPreferredWeekdays)
+      fixed_preferred_weekdays: normalizeWeekdayList(item.fixed_preferred_weekdays || item.fixedPreferredWeekdays),
+      max_weekly_shifts: normalizeMaxWeeklyShifts(item.max_weekly_shifts || item.maxWeeklyShifts)
     };
   }
 
@@ -1415,6 +1416,13 @@
         return weekdayMap[text] ?? null;
       })
       .filter((item) => item !== null);
+  }
+
+  function normalizeMaxWeeklyShifts(value) {
+    if (value === "" || value === null || value === undefined) return null;
+    const number = Number.parseInt(value, 10);
+    if (!Number.isFinite(number)) return null;
+    return Math.max(1, Math.min(7, number));
   }
 
   function getScheduleStaffPool() {
@@ -1635,6 +1643,14 @@
       console.warn("Could not load employee refs", staffResult.error);
     }
 
+    const preferencesResult = await supabaseClient
+      .from("noble_staff_preferences")
+      .select("*");
+
+    if (preferencesResult.error) {
+      console.warn("Could not load staff preferences", preferencesResult.error);
+    }
+
     const weeksResult = await supabaseClient
       .from("noble_schedule_weeks")
       .select("id,week_start,status,note")
@@ -1658,13 +1674,35 @@
     }
 
     state.scheduleAvailability = availabilityResult.data || [];
+    const preferenceByKey = new Map();
+    (preferencesResult.data || [])
+      .map(normalizeStaffRef)
+      .filter(Boolean)
+      .forEach((preference) => {
+        preferenceByKey.set(normalizeScheduleStaffKey(preference.staff_key || preference.name), preference);
+        preferenceByKey.set(normalizeScheduleStaffKey(preference.name), preference);
+      });
+    const applyStaffPreferences = (staff) => {
+      const preference = preferenceByKey.get(normalizeScheduleStaffKey(staff.staff_key || staff.name))
+        || preferenceByKey.get(normalizeScheduleStaffKey(staff.name));
+      if (!preference) return staff;
+      return normalizeStaffRef({
+        ...staff,
+        fixed_unavailable_weekdays: preference.fixed_unavailable_weekdays,
+        fixed_preferred_weekdays: preference.fixed_preferred_weekdays,
+        preferred_branch: preference.preferred_branch,
+        work_style: preference.work_style,
+        max_weekly_shifts: preference.max_weekly_shifts
+      });
+    };
     const dbStaff = (staffResult.data || [])
       .map(normalizeStaffRef)
       .filter(Boolean)
       .filter((staff) => staff.active !== false)
-      .filter((staff) => normalizeScheduleStaffKey(staff.job_role) !== "kitchen");
+      .filter((staff) => normalizeScheduleStaffKey(staff.job_role) !== "kitchen")
+      .map(applyStaffPreferences);
     const mergedStaff = new Map();
-    [...SCREENSHOT_SERVER_REFS.map(normalizeStaffRef), ...dbStaff]
+    [...SCREENSHOT_SERVER_REFS.map(normalizeStaffRef).filter(Boolean).map(applyStaffPreferences), ...dbStaff]
       .filter(Boolean)
       .forEach((staff) => {
         mergedStaff.set(normalizeScheduleStaffKey(staff.staff_key || staff.name), staff);
@@ -1855,6 +1893,12 @@
       .filter((staff) => !alreadyWorkingThisDate.has(staff.staffId))
       .filter((staff) => staff.availability?.status !== "unavailable")
       .filter((staff) => !staff.fixed_unavailable_weekdays?.includes(weekday))
+      .filter((staff) => {
+        const maxWeeklyShifts = normalizeMaxWeeklyShifts(staff.max_weekly_shifts);
+        if (!maxWeeklyShifts) return true;
+        const currentDays = new Set((context.byStaff.get(staff.staffId) || []).map((item) => item.isoDate));
+        return currentDays.size < maxWeeklyShifts;
+      })
       .sort((a, b) => b.score - a.score);
   }
 
