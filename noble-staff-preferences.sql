@@ -36,22 +36,22 @@ for each row execute function schedule.touch_staff_preferences_updated_at();
 
 alter table schedule.staff_preferences enable row level security;
 
+revoke all on schedule.staff_preferences from anon;
+revoke all on schedule.staff_preferences from authenticated;
+grant select on schedule.staff_preferences to authenticated;
+
 drop policy if exists staff_preferences_admin_select on schedule.staff_preferences;
-create policy staff_preferences_admin_select
+drop policy if exists staff_preferences_admin_all on schedule.staff_preferences;
+drop policy if exists staff_preferences_authenticated_select on schedule.staff_preferences;
+create policy staff_preferences_authenticated_select
 on schedule.staff_preferences
 for select
 to authenticated
 using (true);
 
-drop policy if exists staff_preferences_admin_all on schedule.staff_preferences;
-create policy staff_preferences_admin_all
-on schedule.staff_preferences
-for all
-to authenticated
-using (true)
-with check (true);
-
-create or replace view public.noble_staff_preferences as
+create or replace view public.noble_staff_preferences
+with (security_invoker = true)
+as
 select
   staff_key,
   staff_name,

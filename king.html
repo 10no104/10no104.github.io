@@ -386,6 +386,7 @@
     .status-line.is-success { color: #2f6f38; }
 
     .reservation-list,
+    .request-list,
     .menu-list,
     .sort-list {
       display: grid;
@@ -394,6 +395,7 @@
     }
 
     .reservation-card,
+    .request-card,
     .menu-card,
     .sort-row {
       border: 1px solid rgba(113, 88, 60, 0.13);
@@ -402,13 +404,15 @@
       box-shadow: 0 8px 20px rgba(32, 20, 13, 0.04);
     }
 
-    .reservation-card {
+    .reservation-card,
+    .request-card {
       display: grid;
       gap: 12px;
       padding: 16px;
     }
 
     .reservation-top,
+    .request-top,
     .menu-card-top {
       display: flex;
       align-items: flex-start;
@@ -417,6 +421,7 @@
     }
 
     .reservation-top h4,
+    .request-top h4,
     .menu-title h4 {
       margin: 0 0 4px;
       font-size: 1.12rem;
@@ -424,6 +429,7 @@
     }
 
     .reservation-top p,
+    .request-top p,
     .menu-title p {
       margin: 0;
       color: var(--muted);
@@ -490,6 +496,19 @@
       font-size: 0.94rem;
       font-weight: 700;
       line-height: 1.45;
+    }
+
+    .request-card {
+      background:
+        radial-gradient(circle at top right, rgba(212, 175, 55, 0.12), transparent 40%),
+        linear-gradient(180deg, rgba(255, 249, 240, 0.96), rgba(248, 239, 226, 0.94));
+    }
+
+    .request-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
     .menu-card {
@@ -1536,6 +1555,16 @@
         </svg>
         <span>메뉴변경</span>
       </button>
+      <button class="admin-tab" data-admin-tab="requests" type="button" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 5h16"></path>
+          <path d="M4 12h10"></path>
+          <path d="M4 19h7"></path>
+          <path d="M17 15v6"></path>
+          <path d="M14 18h6"></path>
+        </svg>
+        <span>추가 요청</span>
+      </button>
       <button class="admin-tab" data-admin-tab="schedule" type="button" aria-pressed="false">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M4 7h16"></path>
@@ -1569,6 +1598,22 @@
           <div class="status-line" id="reservationStatus"></div>
         </div>
         <div class="reservation-list" id="reservationList"></div>
+      </section>
+    </main>
+
+    <main class="admin-section" id="accessRequestsAdminPanel">
+      <section class="panel">
+        <div class="panel-head">
+          <h3>추가 요청</h3>
+          <span id="accessRequestCountLabel">로그인 필요</span>
+        </div>
+        <div class="toolbar">
+          <div class="segmented">
+            <button class="pill-btn" id="accessRequestRefreshBtn" type="button">요청 새로고침</button>
+          </div>
+          <div class="status-line" id="accessRequestStatus"></div>
+        </div>
+        <div class="request-list" id="accessRequestList"></div>
       </section>
     </main>
 
@@ -1668,15 +1713,16 @@
             <div class="week-picker">
               <input id="scheduleWeekStart" type="hidden" />
               <div class="week-picker-head">
-                <button class="chip-btn" id="scheduleWeekPrevBtn" type="button" hidden>이전</button>
+                <button class="chip-btn" id="scheduleWeekPrevBtn" type="button">이전</button>
                 <strong>주간 선택</strong>
-                <button class="chip-btn" id="scheduleWeekNextBtn" type="button" hidden>다음</button>
+                <button class="chip-btn" id="scheduleWeekNextBtn" type="button">다음</button>
               </div>
               <div class="week-chip-list" id="scheduleWeekChips"></div>
             </div>
             <div class="schedule-actions">
               <button class="pill-btn" id="scheduleLoadBtn" type="button">불러오기</button>
               <button class="pill-btn" id="scheduleAutoFillBtn" type="button">빈자리 자동배정</button>
+              <button class="pill-btn danger" id="scheduleResetBtn" type="button">주간 초기화</button>
               <button class="pill-btn primary" id="schedulePublishBtn" type="button">저장 / 게시</button>
             </div>
           </div>
@@ -1805,6 +1851,6 @@
     </div>
   </div>
 
-  <script src="js/king-admin.js?v=20260711-6"></script>
+  <script src="js/king-admin.js?v=20260711-7"></script>
 </body>
 </html>

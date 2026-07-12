@@ -104,6 +104,7 @@
     reservationDate: formatInputDate(new Date()),
     reservationBranch: "all",
     reservationSearch: "",
+    accessRequests: [],
     menuSession: null,
     menuItems: [],
     menuSearch: "",
@@ -156,6 +157,10 @@
       "reservationRefreshBtn",
       "reservationStatus",
       "reservationList",
+      "accessRequestCountLabel",
+      "accessRequestRefreshBtn",
+      "accessRequestStatus",
+      "accessRequestList",
       "menuSessionLabel",
       "menuAuthCard",
       "menuWorkspace",
@@ -199,6 +204,7 @@
       "scheduleLoadBtn",
       "schedulePublishBtn",
       "scheduleAutoFillBtn",
+      "scheduleResetBtn",
       "scheduleStatus",
       "scheduleStaffList",
       "unavailableList",
@@ -439,6 +445,99 @@
   function setReservationStatus(message = "", type = "") {
     refs.reservationStatus.textContent = message;
     refs.reservationStatus.className = `status-line${type ? ` is-${type}` : ""}`;
+  }
+
+  function setAccessRequestStatus(message = "", type = "") {
+    refs.accessRequestStatus.textContent = message;
+    refs.accessRequestStatus.className = `status-line${type ? ` is-${type}` : ""}`;
+  }
+
+  function formatDateTimeLabel(value = "") {
+    const date = value ? new Date(value) : null;
+    if (!date || Number.isNaN(date.getTime())) return value || "-";
+    return new Intl.DateTimeFormat("ko-KR", {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit"
+    }).format(date);
+  }
+
+  function renderAccessRequestCard(item) {
+    return `
+      <article class="request-card">
+        <div class="request-top">
+          <div>
+            <p>${escapeHtml(formatDateTimeLabel(item.created_at))}</p>
+            <h4>${escapeHtml(item.name || "이름 없음")}</h4>
+          </div>
+          <div class="badge-row">
+            <span class="status-badge ${escapeHtml(item.branch_scope || "both")}">${escapeHtml(formatBranchLabel(item.branch_scope || "both"))}</span>
+            <span class="status-badge hidden">${escapeHtml(item.status || "pending")}</span>
+          </div>
+        </div>
+        <div class="reservation-meta">
+          <div class="meta-box"><span>Smart Server</span><strong>${escapeHtml(item.smart_server_number || "-")}</strong></div>
+          <div class="meta-box"><span>요청 ID</span><strong>${escapeHtml(String(item.id || "").slice(0, 8) || "-")}</strong></div>
+        </div>
+        ${item.note ? `<div class="reservation-notes">${escapeHtml(item.note)}</div>` : ""}
+        <div class="request-actions">
+          <button class="pill-btn danger" type="button" data-delete-access-request="${escapeHtml(item.id)}">확인 후 삭제</button>
+        </div>
+      </article>
+    `;
+  }
+
+  function renderAccessRequests() {
+    refs.accessRequestCountLabel.textContent = `요청 ${state.accessRequests.length}개`;
+    refs.accessRequestList.innerHTML = state.accessRequests.length
+      ? state.accessRequests.map(renderAccessRequestCard).join("")
+      : '<div class="empty-state">추가 요청이 없습니다.</div>';
+  }
+
+  async function fetchAccessRequests() {
+    if (!supabaseClient || !state.menuSession) {
+      setAccessRequestStatus("관리자 로그인 후 사용할 수 있습니다.", "error");
+      refs.accessRequestCountLabel.textContent = "로그인 필요";
+      refs.accessRequestList.innerHTML = '<div class="empty-state">로그인이 필요합니다.</div>';
+      return;
+    }
+
+    setAccessRequestStatus("요청을 불러오는 중...");
+    const { data, error } = await supabaseClient
+      .from("noble_access_requests")
+      .select("id,name,branch_scope,smart_server_number,status,note,created_at")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      setAccessRequestStatus(error.message || "요청을 불러오지 못했습니다.", "error");
+      return;
+    }
+
+    state.accessRequests = data || [];
+    renderAccessRequests();
+    setAccessRequestStatus(`요청 ${state.accessRequests.length}개를 불러왔습니다.`, "success");
+  }
+
+  async function deleteAccessRequest(id = "") {
+    if (!id || !supabaseClient || !state.menuSession) return;
+    const ok = window.confirm("이 추가 요청을 확인 후 삭제할까요?");
+    if (!ok) return;
+
+    setAccessRequestStatus("요청을 삭제하는 중...");
+    const { error } = await supabaseClient
+      .from("noble_access_requests")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      setAccessRequestStatus(error.message || "요청 삭제에 실패했습니다.", "error");
+      return;
+    }
+
+    state.accessRequests = state.accessRequests.filter((item) => item.id !== id);
+    renderAccessRequests();
+    setAccessRequestStatus("요청을 삭제했습니다.", "success");
   }
 
   function formatBranchLabel(branch = "") {
@@ -1294,8 +1393,9 @@
   }
 
   function getScheduleWeekOptions() {
-    const base = addWeeks(startOfWeek(new Date()), -1);
-    const labels = ["저번주", "이번주", "다음주"];
+    const todayWeek = startOfWeek(new Date());
+    const defaultBase = addWeeks(todayWeek, -1);
+    const base = toSafeDate(state.scheduleWeekWindowStart) || defaultBase;
     return Array.from({ length: 3 }, (_unused, index) => {
       const start = addWeeks(base, index);
       const end = addDays(start, 6);
@@ -1305,10 +1405,19 @@
         weekStart,
         start,
         end,
-        label: labels[index],
+        label: getScheduleWeekRelativeLabel(start, todayWeek),
         status: dbWeek?.status || "empty"
       };
     });
+  }
+
+  function getScheduleWeekRelativeLabel(weekStart, todayWeek = startOfWeek(new Date())) {
+    const diffWeeks = Math.round((startOfDay(weekStart).getTime() - startOfDay(todayWeek).getTime()) / 604800000);
+    if (diffWeeks === -1) return "저번주";
+    if (diffWeeks === 0) return "이번주";
+    if (diffWeeks === 1) return "다음주";
+    if (diffWeeks < 0) return `${Math.abs(diffWeeks)}주 전`;
+    return `${diffWeeks}주 후`;
   }
 
   function formatScheduleDayLabel(date) {
@@ -2046,6 +2155,53 @@
     }
   }
 
+  async function resetScheduleWeek() {
+    if (!supabaseClient || !state.menuSession) {
+      setScheduleStatus("메뉴변경 탭에서 관리자 로그인 후 사용할 수 있습니다.", "error");
+      return;
+    }
+
+    state.scheduleWeekStart = getScheduleWeekStart();
+    refs.scheduleWeekStart.value = state.scheduleWeekStart;
+    const ok = window.confirm("해당 주간 스케줄을 초기화할까요? 저장된 서버 배정이 모두 지워집니다.");
+    if (!ok) return;
+
+    setScheduleStatus("주간 스케줄을 초기화하는 중...");
+
+    try {
+      if (state.scheduleWeek?.id) {
+        const deleteResult = await supabaseClient
+          .from("noble_schedule_shifts")
+          .delete()
+          .eq("week_id", state.scheduleWeek.id);
+        if (deleteResult.error) throw deleteResult.error;
+
+        const updateResult = await supabaseClient
+          .from("noble_schedule_weeks")
+          .update({ status: "draft" })
+          .eq("id", state.scheduleWeek.id)
+          .select("id,week_start,status,note")
+          .single();
+        if (updateResult.error) throw updateResult.error;
+
+        state.scheduleWeek = updateResult.data;
+        state.scheduleWeeks = [
+          ...state.scheduleWeeks.filter((item) => item.week_start !== updateResult.data.week_start),
+          updateResult.data
+        ];
+      }
+
+      state.scheduleShifts = [];
+      refs.scheduleBoard.querySelectorAll("[data-schedule-cell]").forEach((textarea) => {
+        textarea.value = "";
+      });
+      renderScheduleBoard();
+      setScheduleStatus("해당 주간을 초기화했습니다.", "success");
+    } catch (error) {
+      setScheduleStatus(error.message || "주간 초기화에 실패했습니다.", "error");
+    }
+  }
+
   function setActiveTab(tabName) {
     state.activeTab = tabName;
     document.querySelectorAll("[data-admin-tab]").forEach((button) => {
@@ -2053,9 +2209,11 @@
       button.setAttribute("aria-pressed", button.dataset.adminTab === tabName ? "true" : "false");
     });
     byId("reservationsAdminPanel").classList.toggle("is-active", tabName === "reservations");
+    byId("accessRequestsAdminPanel").classList.toggle("is-active", tabName === "requests");
     byId("menuAdminPanel").classList.toggle("is-active", tabName === "menu");
     byId("scheduleAdminPanel").classList.toggle("is-active", tabName === "schedule");
     if (tabName === "menu") void refreshMenuSession();
+    if (tabName === "requests") void fetchAccessRequests();
     if (tabName === "schedule") void fetchScheduleData();
   }
 
@@ -2077,8 +2235,15 @@
       renderReservations();
     });
     refs.reservationRefreshBtn.addEventListener("click", () => void fetchReservations());
+    refs.accessRequestRefreshBtn.addEventListener("click", () => void fetchAccessRequests());
+    refs.accessRequestList.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-delete-access-request]");
+      if (!button) return;
+      void deleteAccessRequest(button.dataset.deleteAccessRequest);
+    });
     refs.scheduleLoadBtn.addEventListener("click", () => void fetchScheduleData());
     refs.scheduleAutoFillBtn.addEventListener("click", autoFillScheduleV2);
+    refs.scheduleResetBtn.addEventListener("click", () => void resetScheduleWeek());
     refs.schedulePublishBtn.addEventListener("click", () => void saveScheduleWeek());
     refs.scheduleWeekStart.addEventListener("change", () => {
       state.scheduleWeekStart = getScheduleWeekStart();
@@ -2087,13 +2252,19 @@
     });
     refs.scheduleWeekPrevBtn.addEventListener("click", () => {
       const current = toSafeDate(state.scheduleWeekWindowStart) || addWeeks(startOfWeek(new Date()), -1);
-      state.scheduleWeekWindowStart = formatInputDate(addWeeks(current, -4));
+      state.scheduleWeekWindowStart = formatInputDate(addWeeks(current, -3));
+      const options = getScheduleWeekOptions();
+      state.scheduleWeekStart = options[1]?.weekStart || options[0]?.weekStart || state.scheduleWeekStart;
+      refs.scheduleWeekStart.value = state.scheduleWeekStart;
       renderScheduleWeekChips();
       if (state.activeTab === "schedule") void fetchScheduleData();
     });
     refs.scheduleWeekNextBtn.addEventListener("click", () => {
       const current = toSafeDate(state.scheduleWeekWindowStart) || addWeeks(startOfWeek(new Date()), -1);
-      state.scheduleWeekWindowStart = formatInputDate(addWeeks(current, 4));
+      state.scheduleWeekWindowStart = formatInputDate(addWeeks(current, 3));
+      const options = getScheduleWeekOptions();
+      state.scheduleWeekStart = options[1]?.weekStart || options[0]?.weekStart || state.scheduleWeekStart;
+      refs.scheduleWeekStart.value = state.scheduleWeekStart;
       renderScheduleWeekChips();
       if (state.activeTab === "schedule") void fetchScheduleData();
     });
@@ -2213,6 +2384,7 @@
     renderReservationDayChips();
     renderReservationBranchChips();
     renderReservationMetrics([]);
+    renderAccessRequests();
     renderScheduleBoard();
     updateMenuAuthView();
     setActiveTab("reservations");
@@ -2221,6 +2393,7 @@
         state.menuSession = session;
         updateMenuAuthView();
         if (session && state.activeTab === "menu" && !state.menuItems.length) void fetchMenuItems();
+        if (session && state.activeTab === "requests") void fetchAccessRequests();
         if (session && state.activeTab === "schedule") void fetchScheduleData();
       });
       void refreshMenuSession();

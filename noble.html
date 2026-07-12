@@ -1233,14 +1233,6 @@
       letter-spacing: -0.02em;
     }
 
-    .preference-head p {
-      margin: 3px 0 0;
-      color: var(--muted);
-      font-size: 0.76rem;
-      font-weight: 800;
-      line-height: 1.4;
-    }
-
     .preference-block {
       display: grid;
       gap: 7px;
@@ -1875,7 +1867,6 @@
                   <div class="preference-head">
                     <div>
                       <h3>본인 상세 정보</h3>
-                      <p>고정 요일과 근무 성향은 King 자동배정에 같이 반영됩니다.</p>
                     </div>
                   </div>
 
@@ -2834,10 +2825,13 @@
       function sanitizeStaffPreferences(input = {}) {
         const workStyle = String(input.workStyle || input.work_style || "").trim().toLowerCase();
         const preferredBranch = normalizeKey(input.preferredBranch || input.preferred_branch || "");
+        const fixedUnavailableWeekdays = normalizeWeekdayValues(input.fixedUnavailableWeekdays || input.fixed_unavailable_weekdays);
+        const unavailableSet = new Set(fixedUnavailableWeekdays);
 
         return {
-          fixedUnavailableWeekdays: normalizeWeekdayValues(input.fixedUnavailableWeekdays || input.fixed_unavailable_weekdays),
-          fixedPreferredWeekdays: normalizeWeekdayValues(input.fixedPreferredWeekdays || input.fixed_preferred_weekdays),
+          fixedUnavailableWeekdays,
+          fixedPreferredWeekdays: normalizeWeekdayValues(input.fixedPreferredWeekdays || input.fixed_preferred_weekdays)
+            .filter((weekday) => !unavailableSet.has(weekday)),
           workStyle: ["cluster", "spread"].includes(workStyle) ? workStyle : "",
           preferredBranch: ["uptown", "downtown", "both"].includes(preferredBranch) ? preferredBranch : "",
           maxWeeklyShifts: normalizeMaxWeeklyShifts(input.maxWeeklyShifts || input.max_weekly_shifts)
@@ -3379,6 +3373,11 @@
         if (values.has(weekday)) values.delete(weekday);
         else values.add(weekday);
         state.staffPreferences[kind] = normalizeWeekdayValues(Array.from(values));
+
+        const pairedKind = kind === "fixedUnavailableWeekdays" ? "fixedPreferredWeekdays" : "fixedUnavailableWeekdays";
+        state.staffPreferences[pairedKind] = normalizeWeekdayValues(state.staffPreferences[pairedKind])
+          .filter((item) => item !== weekday);
+
         markPreferencesDirty();
         renderPreferenceControls();
       }
