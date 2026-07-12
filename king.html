@@ -204,10 +204,10 @@
       left: 50%;
       bottom: calc(12px + env(safe-area-inset-bottom, 0px));
       z-index: 60;
-      width: min(calc(100% - 18px), 560px);
+      width: min(calc(100% - 18px), 680px);
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 7px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
       padding: 7px;
       border: 1px solid rgba(113, 88, 60, 0.14);
       border-radius: 25px;
@@ -218,8 +218,8 @@
     }
 
     .admin-tab {
-      min-height: 62px;
-      padding: 7px 8px;
+      min-height: 58px;
+      padding: 7px 6px;
       border: 1px solid rgba(113, 88, 60, 0.16);
       border-radius: 19px;
       background: rgba(255, 251, 245, 0.86);
@@ -241,8 +241,8 @@
     }
 
     .admin-tab svg {
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
       fill: none;
       stroke: currentColor;
       stroke-width: 2;
@@ -251,7 +251,7 @@
     }
 
     .admin-tab span {
-      font-size: 0.78rem;
+      font-size: 0.72rem;
       line-height: 1;
     }
 
@@ -505,6 +505,78 @@
     }
 
     .request-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .employee-panel-grid {
+      display: grid;
+      gap: 14px;
+      padding: 18px;
+    }
+
+    .employee-section {
+      display: grid;
+      gap: 10px;
+    }
+
+    .employee-section h4 {
+      margin: 0;
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .employee-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .employee-card {
+      display: grid;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid rgba(113, 88, 60, 0.13);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.76);
+      box-shadow: 0 8px 20px rgba(32, 20, 13, 0.04);
+    }
+
+    .employee-card.is-inactive {
+      background:
+        radial-gradient(circle at top right, rgba(139, 30, 46, 0.1), transparent 42%),
+        linear-gradient(180deg, rgba(255, 248, 247, 0.95), rgba(246, 236, 232, 0.92));
+      border-color: rgba(139, 30, 46, 0.18);
+    }
+
+    .employee-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .employee-top h4 {
+      margin: 0 0 4px;
+      font-size: 1.12rem;
+      letter-spacing: -0.03em;
+    }
+
+    .employee-top p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+
+    .employee-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .employee-actions {
       display: flex;
       justify-content: flex-end;
       gap: 8px;
@@ -1476,12 +1548,17 @@
       }
 
       .admin-tab {
-        min-height: 58px;
+        min-height: 54px;
         border-radius: 16px;
       }
 
+      .admin-tab svg {
+        width: 18px;
+        height: 18px;
+      }
+
       .admin-tab span {
-        font-size: 0.72rem;
+        font-size: 0.64rem;
       }
 
       .panel-head,
@@ -1555,7 +1632,7 @@
         </svg>
         <span>메뉴변경</span>
       </button>
-      <button class="admin-tab" data-admin-tab="requests" type="button" aria-pressed="false">
+      <button class="admin-tab" data-admin-tab="staff" type="button" aria-pressed="false">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M4 5h16"></path>
           <path d="M4 12h10"></path>
@@ -1563,7 +1640,7 @@
           <path d="M17 15v6"></path>
           <path d="M14 18h6"></path>
         </svg>
-        <span>추가 요청</span>
+        <span>직원</span>
       </button>
       <button class="admin-tab" data-admin-tab="schedule" type="button" aria-pressed="false">
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -1601,19 +1678,29 @@
       </section>
     </main>
 
-    <main class="admin-section" id="accessRequestsAdminPanel">
+    <main class="admin-section" id="staffAdminPanel">
       <section class="panel">
         <div class="panel-head">
-          <h3>추가 요청</h3>
-          <span id="accessRequestCountLabel">로그인 필요</span>
+          <h3>직원</h3>
+          <span id="employeeCountLabel">로그인 필요</span>
         </div>
         <div class="toolbar">
           <div class="segmented">
-            <button class="pill-btn" id="accessRequestRefreshBtn" type="button">요청 새로고침</button>
+            <button class="pill-btn" id="employeeRefreshBtn" type="button">직원 새로고침</button>
+            <button class="pill-btn" id="employeeShowInactiveBtn" type="button" aria-pressed="false">그만둔 서버 보기</button>
           </div>
-          <div class="status-line" id="accessRequestStatus"></div>
+          <div class="status-line" id="employeeStatus"></div>
         </div>
-        <div class="request-list" id="accessRequestList"></div>
+        <div class="employee-panel-grid">
+          <section class="employee-section">
+            <h4>추가 요청</h4>
+            <div class="request-list" id="accessRequestList"></div>
+          </section>
+          <section class="employee-section">
+            <h4>직원 목록</h4>
+            <div class="employee-list" id="employeeList"></div>
+          </section>
+        </div>
       </section>
     </main>
 
@@ -1851,6 +1938,56 @@
     </div>
   </div>
 
-  <script src="js/king-admin.js?v=20260711-7"></script>
+  <div class="modal-backdrop" id="employeeEditorModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="employeeEditorTitle">
+      <div class="modal-head">
+        <h3 id="employeeEditorTitle">직원 편집</h3>
+        <button class="icon-btn" id="employeeEditorClose" type="button" aria-label="닫기">X</button>
+      </div>
+      <form class="modal-form" id="employeeEditorForm">
+        <input id="employeeEditId" type="hidden" />
+        <input id="employeeEditRequestId" type="hidden" />
+        <div class="field-grid">
+          <div class="field">
+            <label for="employeeEditName">이름</label>
+            <input id="employeeEditName" name="staff_key" type="text" required />
+          </div>
+          <div class="field">
+            <label for="employeeEditRefCode">Reference Code</label>
+            <input id="employeeEditRefCode" name="ref_code" type="text" required />
+          </div>
+          <div class="field">
+            <label for="employeeEditPhone">전화번호</label>
+            <input id="employeeEditPhone" name="phone_number" type="tel" inputmode="tel" />
+          </div>
+          <div class="field">
+            <label for="employeeEditSin">SIN Number</label>
+            <input id="employeeEditSin" name="sin_number" type="text" inputmode="numeric" />
+          </div>
+          <div class="field">
+            <label for="employeeEditBranch">근무 위치</label>
+            <select id="employeeEditBranch" name="branch_scope">
+              <option value="uptown">Uptown</option>
+              <option value="downtown">Downtown</option>
+              <option value="both">Both</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="employeeEditStatus">근무 여부</label>
+            <select id="employeeEditStatus" name="active">
+              <option value="true">아직 서버</option>
+              <option value="false">그만둠</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="pill-btn" id="employeeEditorCancel" type="button">취소</button>
+          <button class="pill-btn primary" type="submit">직원 저장</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/king-admin.js?v=20260711-8"></script>
 </body>
 </html>

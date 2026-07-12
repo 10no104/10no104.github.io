@@ -105,6 +105,8 @@
     reservationBranch: "all",
     reservationSearch: "",
     accessRequests: [],
+    employees: [],
+    employeeShowInactive: false,
     menuSession: null,
     menuItems: [],
     menuSearch: "",
@@ -157,10 +159,25 @@
       "reservationRefreshBtn",
       "reservationStatus",
       "reservationList",
-      "accessRequestCountLabel",
-      "accessRequestRefreshBtn",
-      "accessRequestStatus",
+      "employeeCountLabel",
+      "employeeRefreshBtn",
+      "employeeShowInactiveBtn",
+      "employeeStatus",
       "accessRequestList",
+      "employeeList",
+      "employeeEditorModal",
+      "employeeEditorTitle",
+      "employeeEditorForm",
+      "employeeEditId",
+      "employeeEditRequestId",
+      "employeeEditName",
+      "employeeEditRefCode",
+      "employeeEditPhone",
+      "employeeEditSin",
+      "employeeEditBranch",
+      "employeeEditStatus",
+      "employeeEditorClose",
+      "employeeEditorCancel",
       "menuSessionLabel",
       "menuAuthCard",
       "menuWorkspace",
@@ -447,9 +464,9 @@
     refs.reservationStatus.className = `status-line${type ? ` is-${type}` : ""}`;
   }
 
-  function setAccessRequestStatus(message = "", type = "") {
-    refs.accessRequestStatus.textContent = message;
-    refs.accessRequestStatus.className = `status-line${type ? ` is-${type}` : ""}`;
+  function setEmployeeStatus(message = "", type = "") {
+    refs.employeeStatus.textContent = message;
+    refs.employeeStatus.className = `status-line${type ? ` is-${type}` : ""}`;
   }
 
   function formatDateTimeLabel(value = "") {
@@ -477,46 +494,112 @@
           </div>
         </div>
         <div class="reservation-meta">
+          <div class="meta-box"><span>전화번호</span><strong>${escapeHtml(item.phone_number || "-")}</strong></div>
           <div class="meta-box"><span>Smart Server</span><strong>${escapeHtml(item.smart_server_number || "-")}</strong></div>
-          <div class="meta-box"><span>요청 ID</span><strong>${escapeHtml(String(item.id || "").slice(0, 8) || "-")}</strong></div>
         </div>
         ${item.note ? `<div class="reservation-notes">${escapeHtml(item.note)}</div>` : ""}
         <div class="request-actions">
-          <button class="pill-btn danger" type="button" data-delete-access-request="${escapeHtml(item.id)}">확인 후 삭제</button>
+          <button class="pill-btn primary" type="button" data-edit-access-request="${escapeHtml(item.id)}">확인 + Edit</button>
+          <button class="pill-btn danger" type="button" data-delete-access-request="${escapeHtml(item.id)}">삭제</button>
         </div>
       </article>
     `;
   }
 
-  function renderAccessRequests() {
-    refs.accessRequestCountLabel.textContent = `요청 ${state.accessRequests.length}개`;
+  function getVisibleEmployees() {
+    const list = state.employeeShowInactive
+      ? state.employees.slice()
+      : state.employees.filter((item) => item.active !== false);
+
+    return list.sort((a, b) => {
+      const inactiveA = a.active === false;
+      const inactiveB = b.active === false;
+      if (inactiveA !== inactiveB) return inactiveA ? -1 : 1;
+      if (inactiveA && inactiveB) {
+        const dateA = new Date(a.inactive_at || a.updated_at || a.created_at || 0).getTime();
+        const dateB = new Date(b.inactive_at || b.updated_at || b.created_at || 0).getTime();
+        return dateB - dateA;
+      }
+      return normalizeBranchScope(a.branch_scope).localeCompare(normalizeBranchScope(b.branch_scope))
+        || String(a.staff_key || "").localeCompare(String(b.staff_key || ""));
+    });
+  }
+
+  function renderEmployeeCard(item) {
+    const isActive = item.active !== false;
+    const name = item.staff_key || item.name || item.ref_code || "-";
+    return `
+      <article class="employee-card ${isActive ? "" : "is-inactive"}">
+        <div class="employee-top">
+          <div>
+            <p>${escapeHtml(item.phone_number || "전화번호 없음")}</p>
+            <h4>${escapeHtml(name)}</h4>
+          </div>
+          <div class="badge-row">
+            <span class="status-badge ${escapeHtml(normalizeBranchScope(item.branch_scope))}">${escapeHtml(formatBranchLabel(item.branch_scope))}</span>
+            <span class="status-badge ${isActive ? "active" : "hidden"}">${isActive ? "아직 서버" : "그만둠"}</span>
+          </div>
+        </div>
+        <div class="employee-meta-grid">
+          <div class="meta-box"><span>전화번호</span><strong>${escapeHtml(item.phone_number || "-")}</strong></div>
+          <div class="meta-box"><span>근무 위치</span><strong>${escapeHtml(formatBranchLabel(item.branch_scope))}</strong></div>
+        </div>
+        ${!isActive ? `<div class="reservation-notes">근무 아님${item.inactive_at ? ` · ${escapeHtml(formatDateTimeLabel(item.inactive_at))}` : ""}</div>` : ""}
+        <div class="employee-actions">
+          <button class="pill-btn" type="button" data-edit-employee="${escapeHtml(item.id || item.ref_code || item.staff_key)}">Edit</button>
+        </div>
+      </article>
+    `;
+  }
+
+  function renderEmployees() {
+    const visibleEmployees = getVisibleEmployees();
+    refs.employeeCountLabel.textContent = `직원 ${visibleEmployees.length}명 / 요청 ${state.accessRequests.length}개`;
+    refs.employeeShowInactiveBtn.classList.toggle("is-active", state.employeeShowInactive);
+    refs.employeeShowInactiveBtn.setAttribute("aria-pressed", state.employeeShowInactive ? "true" : "false");
+    refs.employeeShowInactiveBtn.textContent = state.employeeShowInactive ? "근무중만 보기" : "그만둔 서버 보기";
     refs.accessRequestList.innerHTML = state.accessRequests.length
       ? state.accessRequests.map(renderAccessRequestCard).join("")
       : '<div class="empty-state">추가 요청이 없습니다.</div>';
+    refs.employeeList.innerHTML = visibleEmployees.length
+      ? visibleEmployees.map(renderEmployeeCard).join("")
+      : '<div class="empty-state">직원 데이터가 없습니다.</div>';
   }
 
-  async function fetchAccessRequests() {
+  async function fetchEmployees() {
     if (!supabaseClient || !state.menuSession) {
-      setAccessRequestStatus("관리자 로그인 후 사용할 수 있습니다.", "error");
-      refs.accessRequestCountLabel.textContent = "로그인 필요";
+      setEmployeeStatus("관리자 로그인 후 사용할 수 있습니다.", "error");
+      refs.employeeCountLabel.textContent = "로그인 필요";
       refs.accessRequestList.innerHTML = '<div class="empty-state">로그인이 필요합니다.</div>';
+      refs.employeeList.innerHTML = '<div class="empty-state">로그인이 필요합니다.</div>';
       return;
     }
 
-    setAccessRequestStatus("요청을 불러오는 중...");
-    const { data, error } = await supabaseClient
+    setEmployeeStatus("직원 데이터를 불러오는 중...");
+    const requestResult = await supabaseClient
       .from("noble_access_requests")
-      .select("id,name,branch_scope,smart_server_number,status,note,created_at")
+      .select("id,name,branch_scope,phone_number,smart_server_number,status,note,created_at")
+      .in("status", ["pending", "approved"])
       .order("created_at", { ascending: false });
 
-    if (error) {
-      setAccessRequestStatus(error.message || "요청을 불러오지 못했습니다.", "error");
+    if (requestResult.error) {
+      setEmployeeStatus(requestResult.error.message || "요청을 불러오지 못했습니다.", "error");
       return;
     }
 
-    state.accessRequests = data || [];
-    renderAccessRequests();
-    setAccessRequestStatus(`요청 ${state.accessRequests.length}개를 불러왔습니다.`, "success");
+    const employeeResult = await supabaseClient
+      .from("employee_refs")
+      .select("*");
+
+    if (employeeResult.error) {
+      setEmployeeStatus(employeeResult.error.message || "직원 목록을 불러오지 못했습니다.", "error");
+      return;
+    }
+
+    state.accessRequests = requestResult.data || [];
+    state.employees = employeeResult.data || [];
+    renderEmployees();
+    setEmployeeStatus("직원 데이터를 불러왔습니다.", "success");
   }
 
   async function deleteAccessRequest(id = "") {
@@ -524,20 +607,120 @@
     const ok = window.confirm("이 추가 요청을 확인 후 삭제할까요?");
     if (!ok) return;
 
-    setAccessRequestStatus("요청을 삭제하는 중...");
+    setEmployeeStatus("요청을 삭제하는 중...");
     const { error } = await supabaseClient
       .from("noble_access_requests")
       .delete()
       .eq("id", id);
 
     if (error) {
-      setAccessRequestStatus(error.message || "요청 삭제에 실패했습니다.", "error");
+      setEmployeeStatus(error.message || "요청 삭제에 실패했습니다.", "error");
       return;
     }
 
     state.accessRequests = state.accessRequests.filter((item) => item.id !== id);
-    renderAccessRequests();
-    setAccessRequestStatus("요청을 삭제했습니다.", "success");
+    renderEmployees();
+    setEmployeeStatus("요청을 삭제했습니다.", "success");
+  }
+
+  function closeEmployeeEditor() {
+    refs.employeeEditorModal.setAttribute("aria-hidden", "true");
+    refs.employeeEditorModal.classList.remove("is-open");
+    refs.employeeEditorForm.reset();
+  }
+
+  function openEmployeeEditorFromRequest(id = "") {
+    const request = state.accessRequests.find((item) => item.id === id);
+    if (!request) return;
+
+    refs.employeeEditorTitle.textContent = "요청 확인 + 직원 등록";
+    refs.employeeEditId.value = "";
+    refs.employeeEditRequestId.value = request.id || "";
+    refs.employeeEditName.value = request.name || "";
+    refs.employeeEditRefCode.value = request.smart_server_number || "";
+    refs.employeeEditPhone.value = request.phone_number || "";
+    refs.employeeEditSin.value = request.smart_server_number || "";
+    refs.employeeEditBranch.value = normalizeBranchScope(request.branch_scope || "both");
+    refs.employeeEditStatus.value = "true";
+    refs.employeeEditorModal.setAttribute("aria-hidden", "false");
+    refs.employeeEditorModal.classList.add("is-open");
+    refs.employeeEditName.focus();
+  }
+
+  function openEmployeeEditor(id = "") {
+    const employee = state.employees.find((item) => {
+      const values = [item.id, item.ref_code, item.staff_key].map((value) => String(value || ""));
+      return values.includes(String(id || ""));
+    });
+    if (!employee) return;
+
+    refs.employeeEditorTitle.textContent = "직원 편집";
+    refs.employeeEditId.value = employee.id || "";
+    refs.employeeEditRequestId.value = "";
+    refs.employeeEditName.value = employee.staff_key || "";
+    refs.employeeEditRefCode.value = employee.ref_code || "";
+    refs.employeeEditPhone.value = employee.phone_number || "";
+    refs.employeeEditSin.value = employee.sin_number || "";
+    refs.employeeEditBranch.value = normalizeBranchScope(employee.branch_scope || "both");
+    refs.employeeEditStatus.value = employee.active === false ? "false" : "true";
+    refs.employeeEditorModal.setAttribute("aria-hidden", "false");
+    refs.employeeEditorModal.classList.add("is-open");
+    refs.employeeEditName.focus();
+  }
+
+  function getEmployeeEditorPayload() {
+    const active = refs.employeeEditStatus.value !== "false";
+    const current = state.employees.find((item) => String(item.id || "") === refs.employeeEditId.value);
+    return {
+      ref_code: refs.employeeEditRefCode.value.trim(),
+      staff_key: refs.employeeEditName.value.trim(),
+      job_role: "server",
+      branch_scope: normalizeBranchScope(refs.employeeEditBranch.value || "both"),
+      phone_number: refs.employeeEditPhone.value.trim() || null,
+      sin_number: refs.employeeEditSin.value.trim() || null,
+      active,
+      inactive_at: active ? null : (current?.active === false && current?.inactive_at ? current.inactive_at : new Date().toISOString())
+    };
+  }
+
+  async function saveEmployeeEditor(event) {
+    event.preventDefault();
+    if (!supabaseClient || !state.menuSession) {
+      setEmployeeStatus("관리자 로그인 후 사용할 수 있습니다.", "error");
+      return;
+    }
+
+    const payload = getEmployeeEditorPayload();
+    if (!payload.ref_code || !payload.staff_key) {
+      setEmployeeStatus("이름과 Reference Code는 필요합니다.", "error");
+      return;
+    }
+
+    setEmployeeStatus("직원을 저장하는 중...");
+    const employeeId = refs.employeeEditId.value;
+    const requestId = refs.employeeEditRequestId.value;
+    const result = employeeId
+      ? await supabaseClient.from("employee_refs").update(payload).eq("id", employeeId).select("*").single()
+      : await supabaseClient.from("employee_refs").insert(payload).select("*").single();
+
+    if (result.error) {
+      setEmployeeStatus(result.error.message || "직원 저장에 실패했습니다.", "error");
+      return;
+    }
+
+    if (requestId) {
+      const requestUpdate = await supabaseClient
+        .from("noble_access_requests")
+        .update({ status: "done" })
+        .eq("id", requestId);
+      if (requestUpdate.error) {
+        setEmployeeStatus(requestUpdate.error.message || "직원은 저장됐지만 요청 상태 변경에 실패했습니다.", "error");
+      }
+    }
+
+    closeEmployeeEditor();
+    await fetchEmployees();
+    setEmployeeStatus("직원을 저장했습니다.", "success");
   }
 
   function formatBranchLabel(branch = "") {
@@ -2209,11 +2392,11 @@
       button.setAttribute("aria-pressed", button.dataset.adminTab === tabName ? "true" : "false");
     });
     byId("reservationsAdminPanel").classList.toggle("is-active", tabName === "reservations");
-    byId("accessRequestsAdminPanel").classList.toggle("is-active", tabName === "requests");
+    byId("staffAdminPanel").classList.toggle("is-active", tabName === "staff");
     byId("menuAdminPanel").classList.toggle("is-active", tabName === "menu");
     byId("scheduleAdminPanel").classList.toggle("is-active", tabName === "schedule");
     if (tabName === "menu") void refreshMenuSession();
-    if (tabName === "requests") void fetchAccessRequests();
+    if (tabName === "staff") void fetchEmployees();
     if (tabName === "schedule") void fetchScheduleData();
   }
 
@@ -2235,12 +2418,32 @@
       renderReservations();
     });
     refs.reservationRefreshBtn.addEventListener("click", () => void fetchReservations());
-    refs.accessRequestRefreshBtn.addEventListener("click", () => void fetchAccessRequests());
+    refs.employeeRefreshBtn.addEventListener("click", () => void fetchEmployees());
+    refs.employeeShowInactiveBtn.addEventListener("click", () => {
+      state.employeeShowInactive = !state.employeeShowInactive;
+      renderEmployees();
+    });
     refs.accessRequestList.addEventListener("click", (event) => {
+      const editButton = event.target.closest("[data-edit-access-request]");
+      if (editButton) {
+        openEmployeeEditorFromRequest(editButton.dataset.editAccessRequest);
+        return;
+      }
       const button = event.target.closest("[data-delete-access-request]");
       if (!button) return;
       void deleteAccessRequest(button.dataset.deleteAccessRequest);
     });
+    refs.employeeList.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-edit-employee]");
+      if (!button) return;
+      openEmployeeEditor(button.dataset.editEmployee);
+    });
+    refs.employeeEditorClose.addEventListener("click", closeEmployeeEditor);
+    refs.employeeEditorCancel.addEventListener("click", closeEmployeeEditor);
+    refs.employeeEditorModal.addEventListener("click", (event) => {
+      if (event.target === refs.employeeEditorModal) closeEmployeeEditor();
+    });
+    refs.employeeEditorForm.addEventListener("submit", (event) => void saveEmployeeEditor(event));
     refs.scheduleLoadBtn.addEventListener("click", () => void fetchScheduleData());
     refs.scheduleAutoFillBtn.addEventListener("click", autoFillScheduleV2);
     refs.scheduleResetBtn.addEventListener("click", () => void resetScheduleWeek());
@@ -2384,7 +2587,7 @@
     renderReservationDayChips();
     renderReservationBranchChips();
     renderReservationMetrics([]);
-    renderAccessRequests();
+    renderEmployees();
     renderScheduleBoard();
     updateMenuAuthView();
     setActiveTab("reservations");
@@ -2393,7 +2596,7 @@
         state.menuSession = session;
         updateMenuAuthView();
         if (session && state.activeTab === "menu" && !state.menuItems.length) void fetchMenuItems();
-        if (session && state.activeTab === "requests") void fetchAccessRequests();
+        if (session && state.activeTab === "staff") void fetchEmployees();
         if (session && state.activeTab === "schedule") void fetchScheduleData();
       });
       void refreshMenuSession();

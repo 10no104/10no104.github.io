@@ -1975,6 +1975,10 @@
           </select>
         </div>
         <div class="request-field">
+          <label for="requestPhone">Phone</label>
+          <input id="requestPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required />
+        </div>
+        <div class="request-field">
           <label for="requestSmartServerNumber">Smart Server Number</label>
           <input id="requestSmartServerNumber" name="smartServerNumber" type="text" inputmode="numeric" autocomplete="off" required />
         </div>
@@ -2120,6 +2124,7 @@
           "requestForm",
           "requestName",
           "requestBranch",
+          "requestPhone",
           "requestSmartServerNumber",
           "requestStatus",
           "appUserName",
@@ -2698,12 +2703,13 @@
         const payload = {
           name: refs.requestName.value.trim(),
           branch: refs.requestBranch.value,
+          phone: refs.requestPhone.value.trim(),
           smartServerNumber: refs.requestSmartServerNumber.value.trim(),
           submittedAt: new Date().toISOString()
         };
 
-        if (!payload.name || !payload.branch || !payload.smartServerNumber) {
-          refs.requestStatus.textContent = "Name, branch, server number are required.";
+        if (!payload.name || !payload.branch || !payload.phone || !payload.smartServerNumber) {
+          refs.requestStatus.textContent = "Name, branch, phone, server number are required.";
           return;
         }
 
@@ -2714,7 +2720,8 @@
           const { error } = await supabaseClient.rpc("noble_submit_access_request_v2", {
             p_name: payload.name,
             p_branch_scope: normalizeKey(payload.branch),
-            p_smart_server_number: payload.smartServerNumber
+            p_smart_server_number: payload.smartServerNumber,
+            p_phone_number: payload.phone
           });
           if (error) throw error;
           refs.requestStatus.textContent = "Request sent.";
