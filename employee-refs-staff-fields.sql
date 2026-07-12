@@ -77,6 +77,107 @@ grant select, insert, update, delete on staff.noble_access_requests to authentic
 revoke all on public.employee_refs from anon;
 revoke all on public.noble_access_requests from anon;
 
+do $$
+begin
+  if to_regclass('staff.employee_refs') is not null then
+    execute 'alter table staff.employee_refs enable row level security';
+
+    execute 'drop policy if exists employee_refs_authenticated_all on staff.employee_refs';
+    execute 'create policy employee_refs_authenticated_all
+      on staff.employee_refs
+      for all
+      to authenticated
+      using (true)
+      with check (true)';
+  end if;
+
+  if to_regclass('staff.noble_access_requests') is not null then
+    execute 'alter table staff.noble_access_requests enable row level security';
+
+    execute 'drop policy if exists noble_access_requests_anon_insert on staff.noble_access_requests';
+    execute 'create policy noble_access_requests_anon_insert
+      on staff.noble_access_requests
+      for insert
+      to anon
+      with check (true)';
+
+    execute 'drop policy if exists noble_access_requests_authenticated_all on staff.noble_access_requests';
+    execute 'create policy noble_access_requests_authenticated_all
+      on staff.noble_access_requests
+      for all
+      to authenticated
+      using (true)
+      with check (true)';
+  end if;
+end;
+$$;
+
+create or replace function public.king_get_employee_refs()
+returns table (
+  id uuid,
+  ref_code text,
+  staff_key text,
+  job_role text,
+  branch_scope text,
+  active boolean,
+  sin_number text,
+  phone_number text,
+  inactive_at timestamptz,
+  created_at timestamptz,
+  updated_at timestamptz
+)
+language sql
+security definer
+set search_path = public, staff
+as $$
+  select
+    e.id,
+    e.ref_code,
+    e.staff_key,
+    e.job_role,
+    e.branch_scope,
+    e.active,
+    e.sin_number,
+    e.phone_number,
+    e.inactive_at,
+    e.created_at,
+    e.updated_at
+  from staff.employee_refs e
+  order by e.active desc, e.branch_scope, e.staff_key;
+$$;
+
+create or replace function public.king_get_access_requests()
+returns table (
+  id uuid,
+  name text,
+  branch_scope text,
+  phone_number text,
+  smart_server_number text,
+  status text,
+  note text,
+  created_at timestamptz
+)
+language sql
+security definer
+set search_path = public, staff
+as $$
+  select
+    r.id,
+    r.name,
+    r.branch_scope,
+    r.phone_number,
+    r.smart_server_number,
+    r.status,
+    r.note,
+    r.created_at
+  from staff.noble_access_requests r
+  where r.status in ('pending', 'approved')
+  order by r.created_at desc;
+$$;
+
+grant execute on function public.king_get_employee_refs() to authenticated;
+grant execute on function public.king_get_access_requests() to authenticated;
+
 create or replace function public.noble_submit_access_request_v2(
   p_name text,
   p_branch_scope text,

@@ -577,20 +577,14 @@
     }
 
     setEmployeeStatus("직원 데이터를 불러오는 중...");
-    const requestResult = await supabaseClient
-      .from("noble_access_requests")
-      .select("id,name,branch_scope,phone_number,smart_server_number,status,note,created_at")
-      .in("status", ["pending", "approved"])
-      .order("created_at", { ascending: false });
+    const requestResult = await fetchAccessRequestRows();
 
     if (requestResult.error) {
       setEmployeeStatus(requestResult.error.message || "요청을 불러오지 못했습니다.", "error");
       return;
     }
 
-    const employeeResult = await supabaseClient
-      .from("employee_refs")
-      .select("*");
+    const employeeResult = await fetchEmployeeRefRows();
 
     if (employeeResult.error) {
       setEmployeeStatus(employeeResult.error.message || "직원 목록을 불러오지 못했습니다.", "error");
@@ -600,7 +594,32 @@
     state.accessRequests = requestResult.data || [];
     state.employees = employeeResult.data || [];
     renderEmployees();
-    setEmployeeStatus("직원 데이터를 불러왔습니다.", "success");
+    setEmployeeStatus(
+      state.employees.length
+        ? "직원 데이터를 불러왔습니다."
+        : "직원 데이터 0건입니다. Supabase SQL/RLS 권한을 확인해주세요.",
+      state.employees.length ? "success" : ""
+    );
+  }
+
+  async function fetchEmployeeRefRows() {
+    const rpcResult = await supabaseClient.rpc("king_get_employee_refs");
+    if (!rpcResult.error) return rpcResult;
+
+    return supabaseClient
+      .from("employee_refs")
+      .select("*");
+  }
+
+  async function fetchAccessRequestRows() {
+    const rpcResult = await supabaseClient.rpc("king_get_access_requests");
+    if (!rpcResult.error) return rpcResult;
+
+    return supabaseClient
+      .from("noble_access_requests")
+      .select("id,name,branch_scope,phone_number,smart_server_number,status,note,created_at")
+      .in("status", ["pending", "approved"])
+      .order("created_at", { ascending: false });
   }
 
   async function deleteAccessRequest(id = "") {
@@ -1931,9 +1950,7 @@
       return;
     }
 
-    const staffResult = await supabaseClient
-      .from("employee_refs")
-      .select("*");
+    const staffResult = await fetchEmployeeRefRows();
 
     if (staffResult.error) {
       console.warn("Could not load employee refs", staffResult.error);
