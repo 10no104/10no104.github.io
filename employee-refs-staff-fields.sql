@@ -68,11 +68,28 @@ end;
 $$;
 
 do $$
+declare
+  public_employee_kind text;
 begin
+  select c.relkind
+    into public_employee_kind
+  from pg_class c
+  join pg_namespace n on n.oid = c.relnamespace
+  where n.nspname = 'public'
+    and c.relname = 'employee_refs';
+
   if to_regclass('staff.employee_refs') is not null then
     drop trigger if exists employee_refs_touch_updated_at on staff.employee_refs;
     create trigger employee_refs_touch_updated_at
     before update on staff.employee_refs
+    for each row execute function staff.touch_employee_refs_updated_at();
+  end if;
+
+  if to_regclass('public.employee_refs') is not null
+     and public_employee_kind in ('r', 'p') then
+    drop trigger if exists employee_refs_touch_updated_at on public.employee_refs;
+    create trigger employee_refs_touch_updated_at
+    before update on public.employee_refs
     for each row execute function staff.touch_employee_refs_updated_at();
   end if;
 end;
@@ -132,13 +149,43 @@ end;
 $$;
 
 do $$
+declare
+  public_employee_kind text;
+  public_request_kind text;
 begin
+  select c.relkind
+    into public_employee_kind
+  from pg_class c
+  join pg_namespace n on n.oid = c.relnamespace
+  where n.nspname = 'public'
+    and c.relname = 'employee_refs';
+
+  select c.relkind
+    into public_request_kind
+  from pg_class c
+  join pg_namespace n on n.oid = c.relnamespace
+  where n.nspname = 'public'
+    and c.relname = 'noble_access_requests';
+
   if to_regclass('staff.employee_refs') is not null then
     execute 'alter table staff.employee_refs enable row level security';
 
     execute 'drop policy if exists employee_refs_authenticated_all on staff.employee_refs';
     execute 'create policy employee_refs_authenticated_all
       on staff.employee_refs
+      for all
+      to authenticated
+      using (true)
+      with check (true)';
+  end if;
+
+  if to_regclass('public.employee_refs') is not null
+     and public_employee_kind in ('r', 'p') then
+    execute 'alter table public.employee_refs enable row level security';
+
+    execute 'drop policy if exists employee_refs_authenticated_all on public.employee_refs';
+    execute 'create policy employee_refs_authenticated_all
+      on public.employee_refs
       for all
       to authenticated
       using (true)
@@ -158,6 +205,26 @@ begin
     execute 'drop policy if exists noble_access_requests_authenticated_all on staff.noble_access_requests';
     execute 'create policy noble_access_requests_authenticated_all
       on staff.noble_access_requests
+      for all
+      to authenticated
+      using (true)
+      with check (true)';
+  end if;
+
+  if to_regclass('public.noble_access_requests') is not null
+     and public_request_kind in ('r', 'p') then
+    execute 'alter table public.noble_access_requests enable row level security';
+
+    execute 'drop policy if exists noble_access_requests_anon_insert on public.noble_access_requests';
+    execute 'create policy noble_access_requests_anon_insert
+      on public.noble_access_requests
+      for insert
+      to anon
+      with check (true)';
+
+    execute 'drop policy if exists noble_access_requests_authenticated_all on public.noble_access_requests';
+    execute 'create policy noble_access_requests_authenticated_all
+      on public.noble_access_requests
       for all
       to authenticated
       using (true)
@@ -231,6 +298,68 @@ $$;
 
 grant execute on function public.king_get_employee_refs() to authenticated;
 grant execute on function public.king_get_access_requests() to authenticated;
+
+create or replace function public.noble_get_latest_schedule(input_ref text)
+returns table (
+  shift_date date,
+  branch text,
+  staff_key text,
+  staff_name text,
+  job_role text,
+  shift_label text,
+  start_time time,
+  end_time time,
+  note text,
+  week_start date
+)
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  employee record;
+  latest_week date;
+begin
+  select *
+    into employee
+  from public.lookup_employee_ref(input_ref)
+  limit 1;
+
+  if employee.staff_key is null then
+    raise exception 'invalid reference code';
+  end if;
+
+  select max(w.week_start)
+    into latest_week
+  from public.noble_schedule_weeks w
+  where w.status = 'published';
+
+  if latest_week is null then
+    return;
+  end if;
+
+  return query
+    select
+      s.shift_date,
+      s.branch,
+      s.staff_key,
+      s.staff_name,
+      s.job_role,
+      s.shift_label,
+      s.start_time,
+      s.end_time,
+      s.note,
+      w.week_start
+    from public.noble_schedule_shifts s
+    join public.noble_schedule_weeks w on w.id = s.week_id
+    where w.week_start = latest_week
+      and w.status = 'published'
+    order by s.branch, s.shift_date, s.sort_order, s.staff_name;
+end;
+$$;
+
+revoke all on function public.noble_get_latest_schedule(text) from public;
+grant execute on function public.noble_get_latest_schedule(text) to anon, authenticated;
 
 create or replace function public.noble_submit_access_request_v2(
   p_name text,

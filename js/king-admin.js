@@ -1787,9 +1787,12 @@
   }
 
   function renderAvailabilityList(status, target) {
-    const items = state.scheduleAvailability
+    const dateItems = state.scheduleAvailability
       .filter((item) => item.status === status)
-      .sort((a, b) => String(a.availability_date).localeCompare(String(b.availability_date)));
+      .map((item) => ({ ...item, source: "date" }));
+    const fixedItems = getFixedPreferenceItems(status);
+    const items = [...dateItems, ...fixedItems]
+      .sort((a, b) => String(a.availability_date).localeCompare(String(b.availability_date)) || String(a.staff_name || a.staff_key).localeCompare(String(b.staff_name || b.staff_key)));
 
     if (!items.length) {
       target.innerHTML = '<div class="empty-state">데이터 없음</div>';
@@ -1801,7 +1804,8 @@
       const time = item.available_start || item.available_end
         ? `${item.available_start || "open"} - ${item.available_end || "close"}`
         : "";
-      const meta = [item.branch_scope, time, item.note].filter(Boolean).join(" / ");
+      const sourceLabel = item.source === "fixed" ? "고정 설정" : "";
+      const meta = [item.branch_scope, time, sourceLabel, item.note].filter(Boolean).join(" / ");
       return `
         <div class="availability-row is-${escapeHtml(status)}">
           <span>${escapeHtml(item.staff_name || item.staff_key || "-")}</span>
@@ -1809,6 +1813,33 @@
         </div>
       `;
     }).join("");
+  }
+
+  function getFixedPreferenceItems(status) {
+    const dates = getScheduleWeekDates();
+    const weekdayField = status === "unavailable" ? "fixed_unavailable_weekdays" : "fixed_preferred_weekdays";
+    const statusNote = status === "unavailable" ? "고정 불가" : "고정 선호";
+    const items = [];
+
+    getScheduleStaffPool().forEach((staff) => {
+      const weekdays = normalizeWeekdayList(staff[weekdayField]);
+      if (!weekdays.length) return;
+
+      dates.forEach((date) => {
+        if (!weekdays.includes(date.getDay())) return;
+        items.push({
+          staff_key: staff.staff_key,
+          staff_name: staff.name,
+          branch_scope: staff.branch_scope,
+          availability_date: formatInputDate(date),
+          status,
+          note: statusNote,
+          source: "fixed"
+        });
+      });
+    });
+
+    return items;
   }
 
   function renderScheduleStaffList() {
