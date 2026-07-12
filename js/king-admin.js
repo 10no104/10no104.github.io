@@ -101,6 +101,10 @@
     menuOrderView: "all",
     categoryOrder: [],
     supportsAllSortOrder: true,
+    scheduleWeekStart: "",
+    scheduleAvailability: [],
+    scheduleWeek: null,
+    scheduleShifts: [],
     sortables: {
       visual: null,
       all: null,
@@ -171,7 +175,15 @@
       "menuEditorForm",
       "menuDeleteBtn",
       "menuEditorClose",
-      "menuEditorCancel"
+      "menuEditorCancel",
+      "scheduleWeekLabel",
+      "scheduleWeekStart",
+      "scheduleLoadBtn",
+      "schedulePublishBtn",
+      "scheduleStatus",
+      "unavailableList",
+      "preferredList",
+      "scheduleBoard"
     ].forEach((id) => {
       refs[id] = byId(id);
     });
@@ -182,6 +194,32 @@
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
+  }
+
+  function startOfDay(date) {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  }
+
+  function startOfWeek(date) {
+    const result = startOfDay(date);
+    const day = result.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
+    result.setDate(result.getDate() + diff);
+    return result;
+  }
+
+  function addDays(date, amount) {
+    const next = new Date(date);
+    next.setDate(next.getDate() + amount);
+    return next;
+  }
+
+  function isSameDate(a, b) {
+    return a instanceof Date &&
+      b instanceof Date &&
+      a.getFullYear() === b.getFullYear() &&
+      a.getMonth() === b.getMonth() &&
+      a.getDate() === b.getDate();
   }
 
   function toSafeDate(dateString = "") {
@@ -1216,14 +1254,268 @@
     setMenuStatus("메뉴를 삭제했습니다.", "success");
   }
 
+  function setScheduleStatus(message = "", type = "") {
+    refs.scheduleStatus.textContent = message;
+    refs.scheduleStatus.className = `status-line${type ? ` is-${type}` : ""}`;
+  }
+
+  function getScheduleWeekStart() {
+    const selected = toSafeDate(refs.scheduleWeekStart.value);
+    return formatInputDate(startOfWeek(selected || new Date()));
+  }
+
+  function getScheduleWeekDates() {
+    const weekStart = toSafeDate(state.scheduleWeekStart || getScheduleWeekStart()) || startOfWeek(new Date());
+    return Array.from({ length: 7 }, (_unused, index) => addDays(weekStart, index));
+  }
+
+  function formatScheduleDayLabel(date) {
+    return new Intl.DateTimeFormat("ko-KR", {
+      weekday: "short",
+      month: "numeric",
+      day: "numeric"
+    }).format(date);
+  }
+
+  function normalizeScheduleStaffKey(name = "") {
+    return String(name || "").trim().toLowerCase().replace(/\s+/g, "");
+  }
+
+  function getScheduleCellKey(branch, dateValue) {
+    return `${branch}|${dateValue}`;
+  }
+
+  function getShiftNamesByCell() {
+    const map = new Map();
+    state.scheduleShifts.forEach((shift) => {
+      const key = getScheduleCellKey(shift.branch, shift.shift_date);
+      const list = map.get(key) || [];
+      list.push(shift.staff_name || shift.staff_key || "");
+      map.set(key, list.filter(Boolean));
+    });
+    return map;
+  }
+
+  function renderAvailabilityList(status, target) {
+    const items = state.scheduleAvailability
+      .filter((item) => item.status === status)
+      .sort((a, b) => String(a.availability_date).localeCompare(String(b.availability_date)));
+
+    if (!items.length) {
+      target.innerHTML = '<div class="empty-state">데이터 없음</div>';
+      return;
+    }
+
+    target.innerHTML = items.map((item) => {
+      const date = toSafeDate(item.availability_date);
+      const time = item.available_start || item.available_end
+        ? `${item.available_start || "open"} - ${item.available_end || "close"}`
+        : "";
+      const meta = [item.branch_scope, time, item.note].filter(Boolean).join(" / ");
+      return `
+        <div class="availability-row is-${escapeHtml(status)}">
+          <span>${escapeHtml(item.staff_name || item.staff_key || "-")}</span>
+          <span>${escapeHtml(date ? formatScheduleDayLabel(date) : item.availability_date || "-")}${meta ? ` · ${escapeHtml(meta)}` : ""}</span>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function renderScheduleBoard() {
+    const branches = [
+      { key: "uptown", label: "Uptown" },
+      { key: "downtown", label: "Downtown" }
+    ];
+    const dates = getScheduleWeekDates();
+    const shiftMap = getShiftNamesByCell();
+    const today = startOfDay(new Date());
+
+    refs.scheduleWeekLabel.textContent = state.scheduleWeekStart
+      ? `${formatScheduleDayLabel(dates[0])} - ${formatScheduleDayLabel(dates[6])}`
+      : "주간 선택";
+
+    refs.scheduleBoard.innerHTML = branches.map((branch) => `
+      <section class="schedule-branch">
+        <h4>${escapeHtml(branch.label)}</h4>
+        <div class="schedule-day-grid">
+          ${dates.map((date) => {
+            const dateValue = formatInputDate(date);
+            const names = shiftMap.get(getScheduleCellKey(branch.key, dateValue)) || [];
+            return `
+              <article class="schedule-day-card ${isSameDate(date, today) ? "is-today" : ""}">
+                <header>
+                  <strong>${escapeHtml(formatScheduleDayLabel(date))}</strong>
+                  <span>${escapeHtml(branch.label)}</span>
+                </header>
+                <textarea data-schedule-cell="${escapeHtml(getScheduleCellKey(branch.key, dateValue))}" placeholder="서버 이름&#10;한 줄에 한 명">${escapeHtml(names.join("\n"))}</textarea>
+              </article>
+            `;
+          }).join("")}
+        </div>
+      </section>
+    `).join("");
+
+    renderAvailabilityList("unavailable", refs.unavailableList);
+    renderAvailabilityList("preferred", refs.preferredList);
+  }
+
+  async function fetchScheduleData() {
+    if (!supabaseClient || !state.menuSession) {
+      setScheduleStatus("메뉴변경 탭에서 관리자 로그인 후 사용할 수 있습니다.", "error");
+      renderScheduleBoard();
+      return;
+    }
+
+    state.scheduleWeekStart = getScheduleWeekStart();
+    refs.scheduleWeekStart.value = state.scheduleWeekStart;
+    const dates = getScheduleWeekDates();
+    const weekEnd = formatInputDate(dates[6]);
+    setScheduleStatus("스케줄 데이터를 불러오는 중...");
+
+    const availabilityResult = await supabaseClient
+      .from("noble_staff_availability")
+      .select("staff_key,staff_name,branch_scope,availability_date,status,available_start,available_end,note")
+      .gte("availability_date", state.scheduleWeekStart)
+      .lte("availability_date", weekEnd)
+      .order("availability_date", { ascending: true });
+
+    if (availabilityResult.error) {
+      setScheduleStatus(availabilityResult.error.message, "error");
+      return;
+    }
+
+    const weekResult = await supabaseClient
+      .from("noble_schedule_weeks")
+      .select("id,week_start,status,note")
+      .eq("week_start", state.scheduleWeekStart)
+      .maybeSingle();
+
+    if (weekResult.error) {
+      setScheduleStatus(weekResult.error.message, "error");
+      return;
+    }
+
+    state.scheduleAvailability = availabilityResult.data || [];
+    state.scheduleWeek = weekResult.data || null;
+    state.scheduleShifts = [];
+
+    if (state.scheduleWeek?.id) {
+      const shiftsResult = await supabaseClient
+        .from("noble_schedule_shifts")
+        .select("id,week_id,shift_date,branch,staff_key,staff_name,job_role,shift_label,start_time,end_time,sort_order,note")
+        .eq("week_id", state.scheduleWeek.id)
+        .order("branch", { ascending: true })
+        .order("shift_date", { ascending: true })
+        .order("sort_order", { ascending: true });
+
+      if (shiftsResult.error) {
+        setScheduleStatus(shiftsResult.error.message, "error");
+        return;
+      }
+      state.scheduleShifts = shiftsResult.data || [];
+    }
+
+    renderScheduleBoard();
+    setScheduleStatus("스케줄 데이터를 불러왔습니다.", "success");
+  }
+
+  function collectScheduleRows(weekId) {
+    const rows = [];
+    refs.scheduleBoard.querySelectorAll("[data-schedule-cell]").forEach((textarea) => {
+      const [branch, shiftDate] = String(textarea.dataset.scheduleCell || "").split("|");
+      if (!branch || !shiftDate) return;
+      String(textarea.value || "")
+        .split(/\r?\n/)
+        .map((name) => name.trim())
+        .filter(Boolean)
+        .forEach((name, index) => {
+          rows.push({
+            week_id: weekId,
+            shift_date: shiftDate,
+            branch,
+            staff_key: normalizeScheduleStaffKey(name),
+            staff_name: name,
+            sort_order: index
+          });
+        });
+    });
+    return rows;
+  }
+
+  async function ensureScheduleWeek() {
+    const existing = await supabaseClient
+      .from("noble_schedule_weeks")
+      .select("id,week_start,status,note")
+      .eq("week_start", state.scheduleWeekStart)
+      .maybeSingle();
+
+    if (existing.error) throw existing.error;
+    if (existing.data?.id) {
+      const updated = await supabaseClient
+        .from("noble_schedule_weeks")
+        .update({ status: "published" })
+        .eq("id", existing.data.id)
+        .select("id,week_start,status,note")
+        .single();
+      if (updated.error) throw updated.error;
+      return updated.data;
+    }
+
+    const inserted = await supabaseClient
+      .from("noble_schedule_weeks")
+      .insert({ week_start: state.scheduleWeekStart, status: "published" })
+      .select("id,week_start,status,note")
+      .single();
+    if (inserted.error) throw inserted.error;
+    return inserted.data;
+  }
+
+  async function saveScheduleWeek() {
+    if (!supabaseClient || !state.menuSession) {
+      setScheduleStatus("메뉴변경 탭에서 관리자 로그인 후 사용할 수 있습니다.", "error");
+      return;
+    }
+
+    state.scheduleWeekStart = getScheduleWeekStart();
+    refs.scheduleWeekStart.value = state.scheduleWeekStart;
+    setScheduleStatus("스케줄을 저장하는 중...");
+
+    try {
+      const week = await ensureScheduleWeek();
+      const deleteResult = await supabaseClient
+        .from("noble_schedule_shifts")
+        .delete()
+        .eq("week_id", week.id);
+      if (deleteResult.error) throw deleteResult.error;
+
+      const rows = collectScheduleRows(week.id);
+      if (rows.length) {
+        const insertResult = await supabaseClient
+          .from("noble_schedule_shifts")
+          .insert(rows);
+        if (insertResult.error) throw insertResult.error;
+      }
+
+      state.scheduleWeek = week;
+      state.scheduleShifts = rows;
+      renderScheduleBoard();
+      setScheduleStatus("스케줄을 게시했습니다.", "success");
+    } catch (error) {
+      setScheduleStatus(error.message || "스케줄 저장에 실패했습니다.", "error");
+    }
+  }
+
   function setActiveTab(tabName) {
     state.activeTab = tabName;
     document.querySelectorAll("[data-admin-tab]").forEach((button) => {
       button.classList.toggle("is-active", button.dataset.adminTab === tabName);
+      button.setAttribute("aria-pressed", button.dataset.adminTab === tabName ? "true" : "false");
     });
     byId("reservationsAdminPanel").classList.toggle("is-active", tabName === "reservations");
     byId("menuAdminPanel").classList.toggle("is-active", tabName === "menu");
+    byId("scheduleAdminPanel").classList.toggle("is-active", tabName === "schedule");
     if (tabName === "menu") void refreshMenuSession();
+    if (tabName === "schedule") void fetchScheduleData();
   }
 
   function bindEvents() {
@@ -1244,6 +1536,13 @@
       renderReservations();
     });
     refs.reservationRefreshBtn.addEventListener("click", () => void fetchReservations());
+    refs.scheduleLoadBtn.addEventListener("click", () => void fetchScheduleData());
+    refs.schedulePublishBtn.addEventListener("click", () => void saveScheduleWeek());
+    refs.scheduleWeekStart.addEventListener("change", () => {
+      state.scheduleWeekStart = getScheduleWeekStart();
+      refs.scheduleWeekStart.value = state.scheduleWeekStart;
+      void fetchScheduleData();
+    });
 
     refs.menuSignInBtn.addEventListener("click", () => void signInMenuAdmin());
     refs.menuAdminPassword.addEventListener("keydown", (event) => {
@@ -1344,10 +1643,13 @@
       day: "numeric",
       year: "numeric"
     }).format(new Date());
+    state.scheduleWeekStart = formatInputDate(startOfWeek(new Date()));
+    refs.scheduleWeekStart.value = state.scheduleWeekStart;
     bindEvents();
     renderReservationDayChips();
     renderReservationBranchChips();
     renderReservationMetrics([]);
+    renderScheduleBoard();
     updateMenuAuthView();
     setActiveTab("reservations");
     if (supabaseClient) {
@@ -1355,6 +1657,7 @@
         state.menuSession = session;
         updateMenuAuthView();
         if (session && state.activeTab === "menu" && !state.menuItems.length) void fetchMenuItems();
+        if (session && state.activeTab === "schedule") void fetchScheduleData();
       });
       void refreshMenuSession();
     } else {

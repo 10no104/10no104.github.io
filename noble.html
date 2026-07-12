@@ -1870,9 +1870,12 @@
         periods: [],
         openPeriodKey: null,
         loaded: false,
+        savedRefCode: "",
         activeTab: "wage",
         currentStaff: null,
         currentAccess: null,
+        dbScheduleRows: [],
+        dbScheduleWeekStart: "",
         scheduleCursor: startOfWeek(new Date()),
         latestScheduleWeekStart: startOfWeek(new Date()),
         calendarCursor: startOfMonth(new Date()),
@@ -2062,6 +2065,28 @@
         const { data, error } = await supabaseClient.rpc("lookup_employee_ref", { input_ref: refCode });
         if (error) throw error;
         return Array.isArray(data) ? data[0] : data;
+      }
+
+      async function loadDbSchedule(input = "") {
+        state.dbScheduleRows = [];
+        state.dbScheduleWeekStart = "";
+        const refCode = String(input || "").trim();
+        if (!refCode || !supabaseClient) return;
+
+        try {
+          const { data, error } = await supabaseClient.rpc("noble_get_latest_schedule", { input_ref: refCode });
+          if (error) throw error;
+          state.dbScheduleRows = Array.isArray(data) ? data : [];
+          state.dbScheduleWeekStart = state.dbScheduleRows[0]?.week_start || "";
+          if (state.dbScheduleWeekStart) {
+            state.scheduleCursor = startOfWeek(new Date(`${state.dbScheduleWeekStart}T00:00:00`));
+            state.latestScheduleWeekStart = state.scheduleCursor;
+          }
+        } catch (error) {
+          console.warn("DB schedule unavailable", error);
+          state.dbScheduleRows = [];
+          state.dbScheduleWeekStart = "";
+        }
       }
 
       function isPeriodSummaryRow(row = []) {
@@ -2426,7 +2451,7 @@
         }
       }
 
-      function submitAccessRequest() {
+      async function submitAccessRequest() {
         const payload = {
           name: refs.requestName.value.trim(),
           branch: refs.requestBranch.value,
@@ -2439,9 +2464,22 @@
           return;
         }
 
-        const saved = saveAccessRequest(payload);
-        refs.requestStatus.textContent = saved ? "Request saved." : "Could not save request.";
-        if (!saved) return;
+        refs.requestStatus.textContent = "Sending...";
+
+        try {
+          if (!supabaseClient) throw new Error("Supabase client is not available.");
+          const { error } = await supabaseClient.rpc("noble_submit_access_request", {
+            p_name: payload.name,
+            p_branch_scope: normalizeKey(payload.branch),
+            p_smart_server_number: payload.smartServerNumber
+          });
+          if (error) throw error;
+          refs.requestStatus.textContent = "Request sent.";
+        } catch (error) {
+          const saved = saveAccessRequest(payload);
+          refs.requestStatus.textContent = saved ? "Saved on this device. Try again if manager cannot see it." : "Could not save request.";
+          if (!saved) return;
+        }
 
         refs.requestForm.reset();
         window.setTimeout(closeRequestModal, 650);
@@ -2518,6 +2556,8 @@
       function resetProfileState(message) {
         state.currentStaff = null;
         state.currentAccess = null;
+        state.dbScheduleRows = [];
+        state.dbScheduleWeekStart = "";
         state.periods = [];
         state.openPeriodKey = null;
         state.scheduleCursor = state.latestScheduleWeekStart || startOfWeek(new Date());
@@ -2756,6 +2796,69 @@
           .sort((a, b) => Number(b.isMe) - Number(a.isMe) || a.name.localeCompare(b.name));
       }
 
+      function renderDbScheduleView() {
+        const rows = state.dbScheduleRows || [];
+        if (!rows.length || !state.dbScheduleWeekStart) return false;
+
+        const weekStart = startOfWeek(new Date(`${state.dbScheduleWeekStart}T00:00:00`));
+        const weekEnd = endOfWeek(weekStart);
+        const branchRows = [
+          { key: "uptown", label: "Uptown" },
+          { key: "downtown", label: "Downtown" }
+        ];
+        const currentKey = normalizeKey(state.currentAccess?.staff_key || state.currentStaff?.name || "");
+
+        refs.weekRangeLabel.textContent = `${formatLongDate(weekStart)} - ${formatLongDate(weekEnd)}`;
+        refs.schedulePrev.disabled = true;
+        refs.scheduleNext.disabled = true;
+        refs.scheduleList.innerHTML = `
+          <div class="branch-schedule-grid">
+            ${branchRows.map((branch) => {
+              const days = Array.from({ length: 7 }, (_unused, index) => {
+                const date = addDays(weekStart, index);
+                const isoDate = toIsoDate(date);
+                const servers = rows
+                  .filter((row) => normalizeKey(row.branch) === branch.key && row.shift_date === isoDate)
+                  .map((row) => {
+                    const isMe = normalizeKey(row.staff_key) === currentKey || normalizeKey(row.staff_name) === currentKey;
+                    return {
+                      name: row.staff_name || row.staff_key || "-",
+                      isMe
+                    };
+                  });
+                const isMyWork = servers.some((server) => server.isMe);
+                const serverMarkup = servers.length
+                  ? servers.map((server) => `<span class="server-chip ${server.isMe ? "is-me" : ""}">${escapeHtml(server.name)}</span>`).join("")
+                  : `<span class="server-empty">-</span>`;
+                const dayClasses = [
+                  "branch-day",
+                  isSameDate(date, new Date()) ? "is-today" : "",
+                  isMyWork ? "is-my-work" : ""
+                ].filter(Boolean).join(" ");
+
+                return `
+                  <article class="${dayClasses}">
+                    <div class="branch-day-head">
+                      <strong>${escapeHtml(formatScheduleDay(date))}</strong>
+                      <span>${escapeHtml(formatScheduleMonthDay(date))}</span>
+                    </div>
+                    <div class="server-list">${serverMarkup}</div>
+                  </article>
+                `;
+              }).join("");
+
+              return `
+                <section class="branch-schedule-column is-${branch.key}">
+                  <h3 class="branch-schedule-title">${branch.label}</h3>
+                  <div class="branch-day-list">${days}</div>
+                </section>
+              `;
+            }).join("")}
+          </div>
+        `;
+        return true;
+      }
+
       function renderScheduleView() {
         if (!state.currentStaff || !state.currentAccess) {
           refs.weekRangeLabel.textContent = "";
@@ -2765,6 +2868,8 @@
         }
 
         refs.scheduleList.classList.remove("is-empty");
+        if (renderDbScheduleView()) return;
+
         const allRecords = getAllRecords(state.periods);
         state.scheduleCursor = clampScheduleCursor(state.scheduleCursor);
         const week = getWeekCards(allRecords, state.scheduleCursor);
@@ -2774,6 +2879,7 @@
         ];
 
         refs.weekRangeLabel.textContent = `${formatLongDate(week.weekStart)} - ${formatLongDate(week.weekEnd)}`;
+        refs.schedulePrev.disabled = false;
         refs.scheduleNext.disabled = isSameDate(week.weekStart, state.latestScheduleWeekStart);
 
         refs.scheduleList.innerHTML = `
@@ -3025,7 +3131,9 @@
           state.openPeriodKey = defaultOpenPeriod ? defaultOpenPeriod.id : null;
           state.scheduleCursor = state.latestScheduleWeekStart || getLatestScheduleWeekStart();
           state.calendarCursor = startOfMonth(new Date());
+          state.savedRefCode = input;
           saveRefCode(input);
+          await loadDbSchedule(input);
           loadUnavailableDates();
           renderAll();
           setStatus("Ready");
@@ -3113,7 +3221,7 @@
         state.calendarPressTimer = null;
       }
 
-      function submitAvailability() {
+      async function submitAvailability() {
         if (!state.currentStaff || !state.currentAccess) {
           setAvailabilityStatus("Enter code first");
           return;
@@ -3121,8 +3229,23 @@
 
         saveUnavailableDates();
         renderCalendar();
-        setAvailabilityStatus("Saved");
-        setStatus("Availability saved");
+
+        try {
+          if (!supabaseClient) throw new Error("Supabase client is not available.");
+          const { error } = await supabaseClient.rpc("noble_submit_availability", {
+            input_ref: state.savedRefCode || refs.staffIdInput.value,
+            p_unavailable_dates: Array.from(state.unavailableDates).sort(),
+            p_preferred_dates: Array.from(state.preferredDates).sort(),
+            p_date_details: state.dateDetails
+          });
+          if (error) throw error;
+          state.availabilityDirty = false;
+          setAvailabilityStatus("Saved");
+          setStatus("Availability saved");
+        } catch (error) {
+          setAvailabilityStatus("Local saved. DB submit failed.");
+          setStatus(error.message || "Availability submit failed");
+        }
       }
 
       function bindEvents() {
@@ -3147,7 +3270,7 @@
 
         refs.requestForm.addEventListener("submit", (event) => {
           event.preventDefault();
-          submitAccessRequest();
+          void submitAccessRequest();
         });
 
         refs.dateDetailForm.addEventListener("submit", (event) => {
@@ -3221,7 +3344,7 @@
           if (event.target.closest("[data-date]")) event.preventDefault();
         });
 
-        refs.saveAvailabilityButton.addEventListener("click", submitAvailability);
+        refs.saveAvailabilityButton.addEventListener("click", () => void submitAvailability());
       }
 
       cacheRefs();

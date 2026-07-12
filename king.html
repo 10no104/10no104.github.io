@@ -62,7 +62,7 @@
     .shell {
       width: min(100% - 18px, 1240px);
       margin: 0 auto;
-      padding: 16px 0 44px;
+      padding: 16px 0 calc(106px + env(safe-area-inset-bottom, 0px));
     }
 
     .topbar {
@@ -200,24 +200,37 @@
     }
 
     .admin-tabs {
-      display: flex;
-      gap: 10px;
-      margin: 0 0 16px;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
+      position: fixed;
+      left: 50%;
+      bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+      z-index: 60;
+      width: min(calc(100% - 18px), 560px);
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 7px;
+      padding: 7px;
+      border: 1px solid rgba(113, 88, 60, 0.14);
+      border-radius: 25px;
+      background: rgba(255, 250, 243, 0.9);
+      box-shadow: 0 20px 45px rgba(45, 29, 18, 0.18);
+      backdrop-filter: blur(18px);
+      transform: translateX(-50%);
     }
 
     .admin-tab {
-      min-height: 46px;
-      padding: 0 18px;
+      min-height: 62px;
+      padding: 7px 8px;
       border: 1px solid rgba(113, 88, 60, 0.16);
-      border-radius: 999px;
+      border-radius: 19px;
       background: rgba(255, 251, 245, 0.86);
       color: #2c2016;
       font: inherit;
       font-weight: 800;
       white-space: nowrap;
       box-shadow: 0 10px 22px rgba(32, 20, 13, 0.05);
+      display: grid;
+      place-items: center;
+      gap: 3px;
     }
 
     .admin-tab.is-active {
@@ -225,6 +238,21 @@
       border-color: transparent;
       background: linear-gradient(135deg, var(--wine), #b9871f);
       box-shadow: 0 18px 30px rgba(123, 31, 47, 0.18);
+    }
+
+    .admin-tab svg {
+      width: 22px;
+      height: 22px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .admin-tab span {
+      font-size: 0.78rem;
+      line-height: 1;
     }
 
     .admin-section { display: none; }
@@ -1003,6 +1031,150 @@
       letter-spacing: -0.02em;
     }
 
+    .schedule-toolbar {
+      display: grid;
+      gap: 12px;
+      padding: 16px 18px 0;
+    }
+
+    .schedule-week-row {
+      display: grid;
+      gap: 10px;
+    }
+
+    .schedule-week-row .field input {
+      min-height: 48px;
+    }
+
+    .schedule-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .schedule-summary-grid {
+      display: grid;
+      gap: 10px;
+      padding: 16px 18px 0;
+    }
+
+    .availability-card {
+      min-width: 0;
+      padding: 13px;
+      border: 1px solid rgba(113, 88, 60, 0.13);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.68);
+    }
+
+    .availability-card h4 {
+      margin: 0 0 9px;
+      font-size: 0.96rem;
+      letter-spacing: -0.02em;
+    }
+
+    .availability-list {
+      display: grid;
+      gap: 7px;
+    }
+
+    .availability-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 9px;
+      border-radius: 13px;
+      background: rgba(247, 239, 228, 0.68);
+      color: #3a291d;
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .availability-row.is-unavailable {
+      background: rgba(123, 31, 47, 0.1);
+      color: #7b1f2f;
+    }
+
+    .availability-row.is-preferred {
+      background: rgba(36, 95, 81, 0.1);
+      color: #245f51;
+    }
+
+    .schedule-board {
+      display: grid;
+      gap: 14px;
+      padding: 18px;
+    }
+
+    .schedule-branch {
+      min-width: 0;
+      padding: 12px;
+      border: 1px solid rgba(113, 88, 60, 0.13);
+      border-radius: 22px;
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.92), rgba(249, 243, 233, 0.92)),
+        url("assets/pattern.webp") center / 420px auto;
+    }
+
+    .schedule-branch h4 {
+      margin: 0 0 11px;
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .schedule-day-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(138px, 1fr));
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 3px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .schedule-day-card {
+      display: grid;
+      gap: 8px;
+      min-width: 138px;
+      padding: 10px;
+      border: 1px solid rgba(113, 88, 60, 0.12);
+      border-radius: 17px;
+      background: rgba(255, 255, 255, 0.74);
+    }
+
+    .schedule-day-card.is-today {
+      border-color: rgba(36, 95, 81, 0.32);
+      box-shadow: 0 0 0 3px rgba(36, 95, 81, 0.08);
+    }
+
+    .schedule-day-card header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: #3a291d;
+      font-size: 0.82rem;
+      font-weight: 900;
+    }
+
+    .schedule-day-card textarea {
+      width: 100%;
+      min-height: 94px;
+      border: 1px solid rgba(113, 88, 60, 0.14);
+      border-radius: 13px;
+      padding: 10px;
+      background: rgba(255, 252, 247, 0.88);
+      color: var(--ink);
+      resize: vertical;
+      font-size: 0.88rem;
+      line-height: 1.4;
+    }
+
+    .schedule-helper {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
     .all-order-list,
     .category-order-list,
     .menu-order-list {
@@ -1054,6 +1226,8 @@
     @media (min-width: 720px) {
       .field-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .field.full { grid-column: 1 / -1; }
+      .schedule-week-row { grid-template-columns: minmax(220px, 0.7fr) minmax(0, 1fr); align-items: end; }
+      .schedule-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .menu-preview-card {
         grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
         align-items: start;
@@ -1075,6 +1249,48 @@
       .metric-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
       .toolbar .field-grid { grid-template-columns: 1.2fr 0.8fr 0.8fr; }
       .order-layout { grid-template-columns: 0.75fr 1.25fr; align-items: start; }
+    }
+
+    @media (max-width: 560px) {
+      .topbar {
+        align-items: flex-start;
+      }
+
+      .topbar > .pill-btn {
+        min-height: 38px;
+        padding: 0 11px;
+        font-size: 0.78rem;
+      }
+
+      .hero {
+        padding: 16px;
+      }
+
+      .admin-tabs {
+        bottom: calc(7px + env(safe-area-inset-bottom, 0px));
+        border-radius: 22px;
+      }
+
+      .admin-tab {
+        min-height: 58px;
+        border-radius: 16px;
+      }
+
+      .admin-tab span {
+        font-size: 0.72rem;
+      }
+
+      .panel-head,
+      .toolbar,
+      .schedule-toolbar,
+      .schedule-summary-grid,
+      .schedule-board,
+      .reservation-list,
+      .menu-list,
+      .sort-list {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
     }
   </style>
 </head>
@@ -1116,8 +1332,37 @@
     </section>
 
     <nav class="admin-tabs" aria-label="관리 섹션">
-      <button class="admin-tab is-active" data-admin-tab="reservations" type="button">예약</button>
-      <button class="admin-tab" data-admin-tab="menu" type="button">Menu Manager</button>
+      <button class="admin-tab is-active" data-admin-tab="reservations" type="button" aria-pressed="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8 3v4"></path>
+          <path d="M16 3v4"></path>
+          <path d="M4 8h16"></path>
+          <path d="M6 12h5"></path>
+          <path d="M6 16h7"></path>
+        </svg>
+        <span>예약</span>
+      </button>
+      <button class="admin-tab" data-admin-tab="menu" type="button" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 5h14"></path>
+          <path d="M5 12h14"></path>
+          <path d="M5 19h14"></path>
+          <path d="M9 5v14"></path>
+        </svg>
+        <span>메뉴변경</span>
+      </button>
+      <button class="admin-tab" data-admin-tab="schedule" type="button" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 7h16"></path>
+          <path d="M7 4v4"></path>
+          <path d="M17 4v4"></path>
+          <path d="M7 12h3"></path>
+          <path d="M14 12h3"></path>
+          <path d="M7 17h3"></path>
+          <path d="M14 17h3"></path>
+        </svg>
+        <span>스케줄</span>
+      </button>
     </nav>
 
     <main class="admin-section is-active" id="reservationsAdminPanel">
@@ -1225,6 +1470,47 @@
         </div>
       </section>
     </main>
+
+    <main class="admin-section" id="scheduleAdminPanel">
+      <section class="panel">
+        <div class="panel-head">
+          <h3>스케줄 짜기</h3>
+          <span id="scheduleWeekLabel">로그인 필요</span>
+        </div>
+
+        <div class="schedule-toolbar">
+          <div class="schedule-week-row">
+            <div class="field">
+              <label for="scheduleWeekStart">주간 시작일</label>
+              <input id="scheduleWeekStart" type="date" />
+            </div>
+            <div class="schedule-actions">
+              <button class="pill-btn" id="scheduleLoadBtn" type="button">불러오기</button>
+              <button class="pill-btn primary" id="schedulePublishBtn" type="button">저장 / 게시</button>
+            </div>
+          </div>
+          <div class="schedule-helper">각 칸에는 서버 이름을 한 줄에 한 명씩 입력하면 됩니다. Noble에는 가장 최근 게시된 주간 스케줄이 표시됩니다.</div>
+          <div class="status-line" id="scheduleStatus"></div>
+        </div>
+
+        <div class="schedule-summary-grid">
+          <div class="availability-card">
+            <h4>안되는 날</h4>
+            <div class="availability-list" id="unavailableList">
+              <div class="empty-state">데이터 없음</div>
+            </div>
+          </div>
+          <div class="availability-card">
+            <h4>선호 날짜</h4>
+            <div class="availability-list" id="preferredList">
+              <div class="empty-state">데이터 없음</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="schedule-board" id="scheduleBoard"></div>
+      </section>
+    </main>
   </div>
 
   <div class="modal-backdrop" id="menuEditorModal" aria-hidden="true">
@@ -1319,6 +1605,6 @@
     </div>
   </div>
 
-  <script src="js/king-admin.js?v=20260511-3"></script>
+  <script src="js/king-admin.js?v=20260711-1"></script>
 </body>
 </html>
