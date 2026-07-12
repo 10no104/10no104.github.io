@@ -1124,8 +1124,29 @@
     }
 
     .calendar-day.is-today {
-      border-color: rgba(224, 177, 95, 0.58);
-      background: linear-gradient(180deg, rgba(255, 250, 242, 0.96), rgba(255, 245, 225, 0.98));
+      border-color: rgba(24, 92, 130, 0.72);
+      background: linear-gradient(180deg, rgba(236, 249, 255, 0.98), rgba(209, 235, 248, 0.98));
+      box-shadow: 0 0 0 2px rgba(24, 92, 130, 0.16), 0 12px 22px rgba(24, 92, 130, 0.14);
+    }
+
+    .calendar-day.is-today::before {
+      content: "오늘";
+      position: absolute;
+      top: 5px;
+      left: 6px;
+      padding: 2px 5px;
+      border-radius: 999px;
+      background: rgba(24, 92, 130, 0.92);
+      color: #fff;
+      font-size: 0.52rem;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .calendar-day.is-today.is-blocked {
+      border-color: rgba(24, 92, 130, 0.78);
+      box-shadow: 0 0 0 2px rgba(24, 92, 130, 0.2), 0 12px 22px rgba(143, 36, 56, 0.13);
     }
 
     .calendar-day.is-blocked {
@@ -1146,15 +1167,20 @@
     }
 
     .calendar-day.has-detail::after {
-      content: "";
+      content: "note";
       position: absolute;
       top: 6px;
       right: 6px;
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--gold);
-      box-shadow: 0 0 0 3px rgba(224, 177, 95, 0.18);
+      padding: 2px 5px;
+      border-radius: 999px;
+      background: rgba(255, 251, 246, 0.94);
+      color: #7f1d2f;
+      border: 1px solid rgba(143, 36, 56, 0.22);
+      box-shadow: 0 6px 12px rgba(52, 29, 22, 0.09);
+      font-size: 0.5rem;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: 0.02em;
     }
 
     .calendar-day strong {
@@ -1338,29 +1364,6 @@
       color: var(--muted);
       font-size: 0.88rem;
       font-weight: 800;
-    }
-
-    .date-time-row {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-    }
-
-    .date-time-panel {
-      display: none;
-      gap: 10px;
-    }
-
-    .date-time-panel.is-visible {
-      display: grid;
-    }
-
-    .date-time-help {
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.76rem;
-      font-weight: 800;
-      line-height: 1.45;
     }
 
     .bottom-nav {
@@ -2001,30 +2004,10 @@
       <p class="date-detail-meta" id="dateDetailMeta"></p>
       <form class="request-form" id="dateDetailForm">
         <input id="dateDetailDate" name="date" type="hidden" />
-        <div class="request-field">
-          <label for="dateDetailStatus">Status</label>
-          <select id="dateDetailStatus" name="status">
-            <option value="default">Default</option>
-            <option value="unavailable">안되는 날</option>
-            <option value="preferred">선호 날짜</option>
-          </select>
-        </div>
-        <div class="date-time-panel" id="dateTimePanel">
-          <p class="date-time-help">시간을 따로 설정하지 않으면 오픈 - 마감 전체 출근 가능으로 저장됩니다.</p>
-          <div class="date-time-row">
-            <div class="request-field">
-              <label for="dateDetailStart">From</label>
-              <input id="dateDetailStart" name="startTime" type="time" placeholder="오픈" />
-            </div>
-            <div class="request-field">
-              <label for="dateDetailEnd">To</label>
-              <input id="dateDetailEnd" name="endTime" type="time" placeholder="마감" />
-            </div>
-          </div>
-        </div>
+        <input id="dateDetailStatus" name="status" type="hidden" value="unavailable" />
         <div class="request-field">
           <label for="dateDetailNote">Note</label>
-          <textarea id="dateDetailNote" name="note" placeholder="가능 시간, 요청사항 등을 남겨주세요."></textarea>
+          <textarea id="dateDetailNote" name="note" placeholder="ex. 9시 출근 가능. 요청사항 등,"></textarea>
         </div>
         <button class="request-submit" type="submit">Save Detail</button>
         <p class="request-status" id="dateDetailStatusText"></p>
@@ -2162,9 +2145,6 @@
           "dateDetailDate",
           "dateDetailMeta",
           "dateDetailStatus",
-          "dateTimePanel",
-          "dateDetailStart",
-          "dateDetailEnd",
           "dateDetailNote",
           "dateDetailStatusText"
         ].forEach((id) => {
@@ -2657,33 +2637,19 @@
         const detail = state.dateDetails[isoDate] || {};
         refs.dateDetailDate.value = isoDate;
         refs.dateDetailMeta.textContent = formatLongDate(new Date(`${isoDate}T00:00:00`));
-        refs.dateDetailStatus.value = getCalendarDateStatus(isoDate);
-        refs.dateDetailStart.value = detail.startTime || "";
-        refs.dateDetailEnd.value = detail.endTime || "";
+        refs.dateDetailStatus.value = "unavailable";
         refs.dateDetailNote.value = detail.note || "";
         refs.dateDetailStatusText.textContent = "";
-        updateDateTimePanel();
         refs.dateDetailModal.hidden = false;
         refs.dateDetailModal.setAttribute("aria-hidden", "false");
         document.body.classList.add("modal-open");
-        refs.dateDetailStatus.focus();
+        refs.dateDetailNote.focus();
       }
 
       function closeDateDetailModal() {
         refs.dateDetailModal.hidden = true;
         refs.dateDetailModal.setAttribute("aria-hidden", "true");
         document.body.classList.remove("modal-open");
-      }
-
-      function updateDateTimePanel() {
-        const showTime = refs.dateDetailStatus.value === "preferred";
-        refs.dateTimePanel.classList.toggle("is-visible", showTime);
-        refs.dateDetailStart.disabled = !showTime;
-        refs.dateDetailEnd.disabled = !showTime;
-        if (!showTime) {
-          refs.dateDetailStart.value = "";
-          refs.dateDetailEnd.value = "";
-        }
       }
 
       function saveAccessRequest(payload) {
@@ -3289,7 +3255,7 @@
           if (isToday) classes.push("is-today");
           if (isBlocked) classes.push("is-blocked");
           if (isPreferred) classes.push("is-preferred");
-          if (detail?.startTime || detail?.endTime || detail?.note) classes.push("has-detail");
+          if (detail?.note) classes.push("has-detail");
 
           cells.push(`
             <button
@@ -3595,12 +3561,11 @@
         const isoDate = refs.dateDetailDate.value;
         if (!isoDate) return;
 
-        const status = refs.dateDetailStatus.value;
-        const allowsTime = status === "preferred";
+        const status = "unavailable";
         const detail = {
           status,
-          startTime: allowsTime ? refs.dateDetailStart.value : "",
-          endTime: allowsTime ? refs.dateDetailEnd.value : "",
+          startTime: "",
+          endTime: "",
           note: refs.dateDetailNote.value.trim()
         };
 
@@ -3719,8 +3684,6 @@
           event.preventDefault();
           saveDateDetail();
         });
-
-        refs.dateDetailStatus.addEventListener("change", updateDateTimePanel);
 
         document.addEventListener("keydown", (event) => {
           if (event.key !== "Escape") return;
