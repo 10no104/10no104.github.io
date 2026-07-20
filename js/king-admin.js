@@ -96,6 +96,10 @@
     { staff_key: "현영", name: "현영", branch_scope: "uptown", job_role: "server" },
     { staff_key: "서윤", name: "서윤", branch_scope: "downtown", job_role: "server" }
   ];
+  const SCHEDULE_BRANCHES = [
+    { key: "uptown", label: "Uptown", color: "#8f2438", bg: "#fff3ed", border: "#e6b9b0" },
+    { key: "downtown", label: "Downtown", color: "#245f51", bg: "#f1fbf5", border: "#b9d8c9" }
+  ];
   const refs = {};
 
   const state = {
@@ -222,6 +226,7 @@
       "scheduleLoadBtn",
       "schedulePublishBtn",
       "scheduleAutoFillBtn",
+      "scheduleCopyImageBtn",
       "scheduleResetBtn",
       "scheduleStatus",
       "scheduleStaffList",
@@ -2112,6 +2117,222 @@
     return rows;
   }
 
+  function collectScheduleNamesByCellFromBoard() {
+    const map = new Map();
+    refs.scheduleBoard.querySelectorAll("[data-schedule-cell]").forEach((textarea) => {
+      map.set(String(textarea.dataset.scheduleCell || ""), getCurrentNames(textarea));
+    });
+    return map;
+  }
+
+  function drawRoundRect(ctx, x, y, width, height, radius) {
+    const safeRadius = Math.min(radius, width / 2, height / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + safeRadius, y);
+    ctx.lineTo(x + width - safeRadius, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + safeRadius);
+    ctx.lineTo(x + width, y + height - safeRadius);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - safeRadius, y + height);
+    ctx.lineTo(x + safeRadius, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - safeRadius);
+    ctx.lineTo(x, y + safeRadius);
+    ctx.quadraticCurveTo(x, y, x + safeRadius, y);
+    ctx.closePath();
+  }
+
+  function fillRoundRect(ctx, x, y, width, height, radius, fillStyle) {
+    drawRoundRect(ctx, x, y, width, height, radius);
+    ctx.fillStyle = fillStyle;
+    ctx.fill();
+  }
+
+  function strokeRoundRect(ctx, x, y, width, height, radius, strokeStyle, lineWidth = 1) {
+    drawRoundRect(ctx, x, y, width, height, radius);
+    ctx.strokeStyle = strokeStyle;
+    ctx.lineWidth = lineWidth;
+    ctx.stroke();
+  }
+
+  function drawFittedText(ctx, text, x, y, maxWidth, options = {}) {
+    const {
+      size = 24,
+      minSize = 13,
+      weight = 800,
+      color = "#2f2118",
+      align = "center",
+      baseline = "middle"
+    } = options;
+    let fontSize = size;
+    ctx.textAlign = align;
+    ctx.textBaseline = baseline;
+    ctx.fillStyle = color;
+    do {
+      ctx.font = `${weight} ${fontSize}px "Malgun Gothic", "Apple SD Gothic Neo", Arial, sans-serif`;
+      if (ctx.measureText(text).width <= maxWidth || fontSize <= minSize) break;
+      fontSize -= 1;
+    } while (fontSize > minSize);
+    ctx.fillText(text, x, y);
+  }
+
+  function buildScheduleClipboardCanvas() {
+    const dates = getScheduleWeekDates();
+    const namesByCell = collectScheduleNamesByCellFromBoard();
+    const branchWidth = 164;
+    const dayWidth = 190;
+    const margin = 44;
+    const titleHeight = 96;
+    const headerHeight = 62;
+    const rowGap = 12;
+    const maxNames = Math.max(
+      2,
+      ...SCHEDULE_BRANCHES.flatMap((branch) => dates.map((date) => {
+        const cellKey = getScheduleCellKey(branch.key, formatInputDate(date));
+        return (namesByCell.get(cellKey) || []).length;
+      }))
+    );
+    const rowHeight = Math.max(126, 58 + maxNames * 31);
+    const width = margin * 2 + branchWidth + dayWidth * dates.length;
+    const height = margin * 2 + titleHeight + headerHeight + SCHEDULE_BRANCHES.length * rowHeight + (SCHEDULE_BRANCHES.length - 1) * rowGap + 22;
+    const canvas = document.createElement("canvas");
+    const scale = Math.min(Math.max(window.devicePixelRatio || 1, 1), 2);
+    canvas.width = Math.round(width * scale);
+    canvas.height = Math.round(height * scale);
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+
+    const ctx = canvas.getContext("2d");
+    ctx.scale(scale, scale);
+    ctx.fillStyle = "#fbf4ea";
+    ctx.fillRect(0, 0, width, height);
+
+    fillRoundRect(ctx, margin - 14, margin - 14, width - (margin - 14) * 2, height - (margin - 14) * 2, 28, "#fffaf3");
+    strokeRoundRect(ctx, margin - 14, margin - 14, width - (margin - 14) * 2, height - (margin - 14) * 2, 28, "rgba(113, 88, 60, 0.18)", 2);
+
+    const weekTitle = dates.length
+      ? `${formatScheduleDayLabel(dates[0])} - ${formatScheduleDayLabel(dates[6])}`
+      : "주간 스케줄";
+    drawFittedText(ctx, "Noble Server Schedule", margin, margin + 16, width - margin * 2, {
+      size: 36,
+      minSize: 24,
+      weight: 900,
+      align: "left",
+      baseline: "top",
+      color: "#2b1b15"
+    });
+    drawFittedText(ctx, weekTitle, margin, margin + 60, width - margin * 2, {
+      size: 24,
+      minSize: 16,
+      weight: 900,
+      align: "left",
+      baseline: "top",
+      color: "#7b1f2f"
+    });
+
+    const tableX = margin;
+    const headerY = margin + titleHeight;
+    fillRoundRect(ctx, tableX, headerY, branchWidth, headerHeight, 16, "#f3e6d5");
+    drawFittedText(ctx, "Branch", tableX + branchWidth / 2, headerY + headerHeight / 2, branchWidth - 24, {
+      size: 20,
+      weight: 900,
+      color: "#6c4e3a"
+    });
+
+    dates.forEach((date, index) => {
+      const x = tableX + branchWidth + index * dayWidth;
+      fillRoundRect(ctx, x + 4, headerY, dayWidth - 8, headerHeight, 16, "#f3e6d5");
+      drawFittedText(ctx, formatScheduleDayLabel(date), x + dayWidth / 2, headerY + headerHeight / 2, dayWidth - 24, {
+        size: 20,
+        weight: 900,
+        color: "#2f2118"
+      });
+    });
+
+    SCHEDULE_BRANCHES.forEach((branch, branchIndex) => {
+      const y = headerY + headerHeight + rowGap + branchIndex * (rowHeight + rowGap);
+      fillRoundRect(ctx, tableX, y, branchWidth, rowHeight, 18, branch.bg);
+      strokeRoundRect(ctx, tableX, y, branchWidth, rowHeight, 18, branch.border, 2);
+      drawFittedText(ctx, branch.label, tableX + branchWidth / 2, y + rowHeight / 2, branchWidth - 22, {
+        size: 25,
+        weight: 900,
+        color: branch.color
+      });
+
+      dates.forEach((date, index) => {
+        const x = tableX + branchWidth + index * dayWidth;
+        const cellKey = getScheduleCellKey(branch.key, formatInputDate(date));
+        const names = namesByCell.get(cellKey) || [];
+        fillRoundRect(ctx, x + 4, y, dayWidth - 8, rowHeight, 18, branch.bg);
+        strokeRoundRect(ctx, x + 4, y, dayWidth - 8, rowHeight, 18, branch.border, 2);
+
+        if (!names.length) {
+          drawFittedText(ctx, "-", x + dayWidth / 2, y + rowHeight / 2, dayWidth - 30, {
+            size: 22,
+            weight: 800,
+            color: "rgba(47, 33, 24, 0.42)"
+          });
+          return;
+        }
+
+        const lineHeight = Math.min(32, Math.max(25, (rowHeight - 44) / names.length));
+        const firstLineY = y + rowHeight / 2 - ((names.length - 1) * lineHeight) / 2;
+        names.forEach((name, nameIndex) => {
+          drawFittedText(ctx, name, x + dayWidth / 2, firstLineY + nameIndex * lineHeight, dayWidth - 32, {
+            size: 24,
+            minSize: 13,
+            weight: 900,
+            color: branch.color
+          });
+        });
+      });
+    });
+
+    return canvas;
+  }
+
+  function canvasToBlob(canvas) {
+    return new Promise((resolve) => {
+      canvas.toBlob((blob) => resolve(blob), "image/png");
+    });
+  }
+
+  function downloadScheduleCanvas(canvas) {
+    const link = document.createElement("a");
+    link.download = `noble-schedule-${state.scheduleWeekStart || "week"}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  }
+
+  async function copyScheduleImageToClipboard() {
+    const hasBoard = Boolean(refs.scheduleBoard.querySelector("[data-schedule-cell]"));
+    if (!hasBoard) {
+      setScheduleStatus("복사할 스케줄 표가 없습니다.", "error");
+      return;
+    }
+
+    setScheduleStatus("스케줄 이미지를 만드는 중...");
+    const canvas = buildScheduleClipboardCanvas();
+    const blob = await canvasToBlob(canvas);
+    if (!blob) {
+      setScheduleStatus("이미지 생성에 실패했습니다.", "error");
+      return;
+    }
+
+    try {
+      if (!navigator.clipboard?.write || typeof ClipboardItem === "undefined") {
+        downloadScheduleCanvas(canvas);
+        setScheduleStatus("이 브라우저는 이미지 클립보드를 지원하지 않아 PNG로 저장했습니다.", "success");
+        return;
+      }
+
+      await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+      setScheduleStatus("스케줄 이미지를 클립보드에 복사했습니다.", "success");
+    } catch (error) {
+      console.warn("Schedule clipboard copy failed", error);
+      downloadScheduleCanvas(canvas);
+      setScheduleStatus("클립보드 복사가 막혀 PNG로 저장했습니다.", "error");
+    }
+  }
+
   function findSameDayDoubleBookings() {
     const context = getBoardAssignments();
     const conflicts = [];
@@ -2509,6 +2730,7 @@
     refs.employeeEditorForm.addEventListener("submit", (event) => void saveEmployeeEditor(event));
     refs.scheduleLoadBtn.addEventListener("click", () => void fetchScheduleData());
     refs.scheduleAutoFillBtn.addEventListener("click", autoFillScheduleV2);
+    refs.scheduleCopyImageBtn.addEventListener("click", () => void copyScheduleImageToClipboard());
     refs.scheduleResetBtn.addEventListener("click", () => void resetScheduleWeek());
     refs.schedulePublishBtn.addEventListener("click", () => void saveScheduleWeek());
     refs.scheduleWeekStart.addEventListener("change", () => {
