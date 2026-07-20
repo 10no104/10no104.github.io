@@ -17,6 +17,8 @@
       --ivory: #f4eadc;
       --paper: #fbf4e7;
       --paper-shadow: rgba(63, 39, 19, 0.16);
+      --brand-mark-width: clamp(30px, 7vw, 44px);
+      --brand-title-size: clamp(0.95rem, 3vw, 1.35rem);
     }
 
     * {
@@ -31,6 +33,268 @@
         radial-gradient(circle at top, #1d0f0d 0%, #0b0605 45%, #050303 100%);
       color: #fff6ea;
       font-family: "Noto Sans KR", system-ui, sans-serif;
+    }
+
+    .print-controls {
+      width: min(94vw, 1120px);
+      margin: 24px auto 0;
+      padding: 20px 22px;
+      border: 1px solid rgba(201, 154, 71, 0.55);
+      background: linear-gradient(145deg, rgba(45, 22, 18, 0.96), rgba(12, 7, 6, 0.98));
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.34), inset 0 0 0 1px rgba(255, 232, 188, 0.06);
+    }
+
+    .print-controls-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .print-controls-title {
+      margin: 0;
+      color: var(--ivory);
+      font-size: 1.08rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    .print-controls-note {
+      margin: 5px 0 0;
+      color: rgba(244, 234, 220, 0.66);
+      font-size: 0.72rem;
+      line-height: 1.55;
+    }
+
+    .print-capacity {
+      flex: 0 0 auto;
+      padding: 7px 10px;
+      border: 1px solid rgba(201, 154, 71, 0.42);
+      color: var(--gold);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .print-controls-grid {
+      display: grid;
+      grid-template-columns: minmax(170px, 0.72fr) minmax(320px, 1.28fr);
+      gap: 18px;
+    }
+
+    .print-controls fieldset {
+      min-width: 0;
+      margin: 0;
+      padding: 14px;
+      border: 1px solid rgba(201, 154, 71, 0.28);
+    }
+
+    .print-controls legend,
+    .qr-settings-title {
+      padding: 0 6px;
+      color: var(--gold);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .side-picker {
+      display: grid;
+      gap: 8px;
+    }
+
+    .side-choice {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-height: 38px;
+      padding: 0 10px;
+      border: 1px solid rgba(244, 234, 220, 0.12);
+      color: var(--ivory);
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    .side-choice:has(input:checked) {
+      border-color: rgba(201, 154, 71, 0.72);
+      background: rgba(201, 154, 71, 0.12);
+    }
+
+    .side-choice input {
+      accent-color: var(--gold);
+    }
+
+    .qr-settings-wrap {
+      min-width: 0;
+    }
+
+    .qr-settings[hidden] {
+      display: none;
+    }
+
+    .qr-settings-title {
+      display: block;
+      margin: 0 0 10px;
+      padding: 0;
+    }
+
+    .qr-setting-row {
+      display: grid;
+      grid-template-columns: 92px minmax(0, 1fr);
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .qr-setting-row label {
+      color: rgba(244, 234, 220, 0.72);
+      font-size: 0.7rem;
+    }
+
+    .qr-setting-row input {
+      width: 100%;
+      min-width: 0;
+      border: 1px solid rgba(244, 234, 220, 0.18);
+      border-radius: 2px;
+      padding: 8px 9px;
+      background: rgba(7, 4, 3, 0.64);
+      color: var(--ivory);
+      font: inherit;
+      font-size: 0.72rem;
+      outline: none;
+    }
+
+    .qr-setting-row input:focus {
+      border-color: rgba(201, 154, 71, 0.82);
+      box-shadow: 0 0 0 2px rgba(201, 154, 71, 0.12);
+    }
+
+    .qr-setting-row input[type="file"] {
+      padding: 5px;
+      color: rgba(244, 234, 220, 0.66);
+    }
+
+    .qr-setting-row input[type="file"]::file-selector-button {
+      margin-right: 8px;
+      border: 1px solid rgba(201, 154, 71, 0.5);
+      padding: 5px 8px;
+      background: rgba(201, 154, 71, 0.12);
+      color: var(--gold);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .print-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .print-status {
+      color: rgba(244, 234, 220, 0.62);
+      font-size: 0.7rem;
+      line-height: 1.4;
+    }
+
+    .print-button {
+      border: 1px solid rgba(226, 183, 94, 0.9);
+      padding: 10px 18px;
+      background: linear-gradient(180deg, #d9aa57, #a9762c);
+      color: #1a0c08;
+      font: inherit;
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.24);
+    }
+
+    .print-button:hover {
+      filter: brightness(1.08);
+    }
+
+    .print-preview-label {
+      width: min(94vw, 1120px);
+      margin: 18px auto 8px;
+      color: rgba(244, 234, 220, 0.68);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .print-sheet {
+      width: min(94vw, 1120px);
+      aspect-ratio: 297 / 210;
+      margin: 0 auto 22px;
+      overflow: hidden;
+      border: 1px solid rgba(201, 154, 71, 0.46);
+      background: #f5eee2;
+      box-shadow: 0 18px 46px rgba(0, 0, 0, 0.36);
+    }
+
+    .print-sheet-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 20.202%);
+      grid-auto-rows: 57.143%;
+      column-gap: 0.5%;
+      align-content: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+    }
+
+    .print-copy {
+      min-width: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .print-sheet-grid .print-copy {
+      padding: 0;
+      position: relative;
+      border: 1px solid rgba(201, 154, 71, 0.6);
+      background: linear-gradient(145deg, rgba(39, 20, 16, 0.94), rgba(9, 5, 4, 0.98));
+      box-shadow: inset 0 0 0 1px rgba(255, 232, 188, 0.08);
+    }
+
+    .print-copy::before {
+      display: none;
+    }
+
+    .print-sheet-grid .print-copy::before {
+      content: "";
+      display: block;
+      position: absolute;
+      inset: 4px;
+      z-index: 20;
+      border: 1px solid rgba(201, 154, 71, 0.22);
+      pointer-events: none;
+    }
+
+    .print-sheet-grid .print-copy.print-copy--raster-frame {
+      padding: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .print-sheet-grid .print-copy.print-copy--raster-frame::before {
+      display: none;
+    }
+
+    .print-copy .poster {
+      width: 100%;
+      height: 100%;
+      box-shadow: none;
     }
 
     .poster-stage {
@@ -63,13 +327,16 @@
       position: relative;
       width: min(38vw, 400px, calc((100vh - 56px) * 0.5));
       aspect-ratio: 1 / 2;
+      container-type: inline-size;
       overflow: hidden;
       isolation: isolate;
       background:
         radial-gradient(circle at 50% 38%, rgba(96, 21, 18, 0.26), transparent 26%),
         radial-gradient(circle at 72% 72%, rgba(92, 12, 18, 0.18), transparent 22%),
         linear-gradient(180deg, #140b09 0%, #100807 48%, #120707 100%);
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.36);
+      box-shadow: 0 3.6cqw 9.6cqw rgba(0, 0, 0, 0.36);
+      --brand-mark-width: clamp(24px, 13.25cqw, 44px);
+      --brand-title-size: clamp(0.82rem, 6.5cqw, 1.35rem);
     }
 
     .poster--front {
@@ -77,6 +344,50 @@
         radial-gradient(ellipse at 50% 7%, rgba(220, 72, 45, 0.44), rgba(132, 24, 32, 0.16) 36%, transparent 62%),
         radial-gradient(circle at 10% 0%, rgba(126, 19, 31, 0.58), transparent 36%),
         linear-gradient(180deg, #50141b 0%, #2a0d12 22%, #110807 54%, #120707 100%);
+    }
+
+    .poster-raster-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: fill;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .poster--raster-frame {
+      aspect-ratio: auto;
+    }
+
+    .poster--raster-frame .qr-wrap {
+      top: 21.29%;
+      width: 61.14%;
+    }
+
+    .poster--raster::before,
+    .poster--raster::after {
+      display: none;
+    }
+
+    .poster--raster > *:not(.poster-raster-image):not(.qr-wrap) {
+      display: none;
+    }
+
+    .poster--raster .qr-frame {
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .poster--raster .qr-frame::before,
+    .poster--raster .qr-frame::after {
+      display: none;
+    }
+
+    .poster--raster .qr-paper {
+      background: transparent;
+      box-shadow: none;
     }
 
     .poster::before {
@@ -133,27 +444,36 @@
     }
 
     .brand-mark {
-      width: clamp(30px, 7vw, 44px);
+      width: var(--brand-mark-width);
       height: auto;
-      filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.34));
+      filter: drop-shadow(0 3cqw 5.4cqw rgba(0, 0, 0, 0.34));
     }
 
     .brand-name {
-      margin-top: 3px;
+      margin-top: 0.9cqw;
       color: var(--ivory);
       font-family: "Pretendard", "Noto Sans KR", system-ui, sans-serif;
-      font-size: clamp(0.95rem, 3vw, 1.35rem);
+      font-size: var(--brand-title-size);
       line-height: 0.95;
       letter-spacing: 0.22em;
       font-weight: 500;
-      text-shadow: 0 6px 18px rgba(0, 0, 0, 0.36);
+      text-shadow: 0 1.8cqw 5.4cqw rgba(0, 0, 0, 0.36);
+    }
+
+    .brand-location {
+      margin-top: 0.6cqw;
+      color: rgba(244, 234, 220, 0.7);
+      font-size: clamp(0.38rem, 2.8cqw, 0.58rem);
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      line-height: 0.82;
     }
 
     .qr-wrap {
       position: absolute;
-      top: 19.8%;
+      top: 20.5%;
       left: 50%;
-      width: 58%;
+      width: 64.5%;
       transform: translateX(-50%);
       z-index: 13;
     }
@@ -163,29 +483,29 @@
       padding: 5.8%;
       background:
         linear-gradient(180deg, rgba(21, 13, 10, 0.72), rgba(15, 10, 8, 0.84));
-      border: 1px solid rgba(199, 155, 66, 0.74);
+      border: 0.3cqw solid rgba(199, 155, 66, 0.74);
       box-shadow:
-        inset 0 0 0 1px rgba(199, 155, 66, 0.2),
-        0 20px 40px rgba(0, 0, 0, 0.24);
+        inset 0 0 0 0.3cqw rgba(199, 155, 66, 0.2),
+        0 6cqw 12cqw rgba(0, 0, 0, 0.24);
     }
 
     .qr-frame::before,
     .qr-frame::after {
       content: "";
       position: absolute;
-      inset: -9px;
-      border: 1px solid rgba(199, 155, 66, 0.8);
+      inset: -2.7cqw;
+      border: 0.3cqw solid rgba(199, 155, 66, 0.8);
       clip-path: polygon(
-        0 0, 12% 0, 12% 8px, 8px 8px, 8px 12%, 0 12%,
-        0 88%, 8px 88%, 8px calc(100% - 8px), 12% calc(100% - 8px), 12% 100%, 0 100%,
-        88% 100%, 88% calc(100% - 8px), calc(100% - 8px) calc(100% - 8px), calc(100% - 8px) 88%, 100% 88%,
-        100% 12%, calc(100% - 8px) 12%, calc(100% - 8px) 8px, 88% 8px, 88% 0, 100% 0
+        0 0, 12% 0, 12% 2.4cqw, 2.4cqw 2.4cqw, 2.4cqw 12%, 0 12%,
+        0 88%, 2.4cqw 88%, 2.4cqw calc(100% - 2.4cqw), 12% calc(100% - 2.4cqw), 12% 100%, 0 100%,
+        88% 100%, 88% calc(100% - 2.4cqw), calc(100% - 2.4cqw) calc(100% - 2.4cqw), calc(100% - 2.4cqw) 88%, 100% 88%,
+        100% 12%, calc(100% - 2.4cqw) 12%, calc(100% - 2.4cqw) 2.4cqw, 88% 2.4cqw, 88% 0, 100% 0
       );
       pointer-events: none;
     }
 
     .qr-frame::after {
-      inset: -15px;
+      inset: -4.5cqw;
       opacity: 0.5;
     }
 
@@ -200,8 +520,42 @@
         linear-gradient(180deg, rgba(255, 250, 242, 0.96), rgba(250, 241, 225, 0.96)),
         url("assets/@UnSiBcGoZXjyPzA.webp") center / cover;
       box-shadow:
-        inset 0 0 0 1px rgba(73, 49, 24, 0.08),
-        0 0 18px rgba(255, 246, 232, 0.1);
+        inset 0 0 0 0.3cqw rgba(73, 49, 24, 0.08),
+        0 0 5.4cqw rgba(255, 246, 232, 0.1);
+    }
+
+    .qr-paper img {
+      position: relative;
+      z-index: 1;
+    }
+
+    .qr-center-number {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      z-index: 2;
+      display: grid;
+      place-items: center;
+      min-width: 19%;
+      min-height: 19%;
+      max-width: 38%;
+      padding: 0.2em 0.35em;
+      transform: translate(-50%, -50%);
+      border: 0.3cqw solid rgba(55, 35, 18, 0.18);
+      border-radius: 999px;
+      background: rgba(251, 244, 231, 0.97);
+      color: #26160f;
+      font-family: "Pretendard", "Noto Sans KR", system-ui, sans-serif;
+      font-size: clamp(0.42rem, 3.95cqw, 0.82rem);
+      font-weight: 800;
+      line-height: 1;
+      white-space: nowrap;
+      box-shadow: 0 0.3cqw 1.2cqw rgba(38, 22, 15, 0.18);
+      pointer-events: none;
+    }
+
+    .qr-center-number[hidden] {
+      display: none;
     }
 
     .qr-paper img {
@@ -213,26 +567,9 @@
       filter: contrast(1.02);
     }
 
-    .qr-placeholder {
-      width: 100%;
-      height: 100%;
-      display: grid;
-      place-items: center;
-      padding: 12%;
-      border: 2px dashed rgba(77, 52, 28, 0.26);
-      color: rgba(77, 52, 28, 0.72);
-      text-align: center;
-      font-size: clamp(1rem, 2vw, 1.35rem);
-      font-weight: 800;
-      line-height: 1.5;
-      background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.02)),
-        rgba(255, 255, 255, 0.28);
-    }
-
     .caption {
       position: absolute;
-      top: 54.8%;
+      top: 59%;
       left: 50%;
       transform: translateX(-50%);
       display: grid;
@@ -246,29 +583,29 @@
     .caption-title {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 2.4cqw;
       white-space: nowrap;
       font-family: "Noto Sans KR", system-ui, sans-serif;
-      font-size: clamp(0.52rem, 1.55vw, 0.72rem);
+      font-size: clamp(0.42rem, 3.47cqw, 0.72rem);
       line-height: 1.2;
       font-weight: 700;
-      letter-spacing: 0.28em;
+      letter-spacing: 0.24em;
       text-transform: uppercase;
-      text-shadow: 0 3px 10px rgba(0, 0, 0, 0.34);
+      text-shadow: 0 0.9cqw 3cqw rgba(0, 0, 0, 0.34);
     }
 
     .caption-title::before,
     .caption-title::after {
       content: "";
-      width: 30px;
-      height: 6px;
+      width: 9cqw;
+      height: 1.8cqw;
       background:
         linear-gradient(90deg, transparent, var(--gold-soft)),
         linear-gradient(90deg, transparent, transparent 42%, var(--gold) 42%, var(--gold) 58%, transparent 58%);
       mask:
         linear-gradient(90deg, transparent 0 12%, #000 12% 88%, transparent 88%),
-        radial-gradient(circle at 18% 50%, #000 0 4px, transparent 5px),
-        radial-gradient(circle at 82% 50%, #000 0 4px, transparent 5px);
+        radial-gradient(circle at 18% 50%, #000 0 1.2cqw, transparent 1.5cqw),
+        radial-gradient(circle at 82% 50%, #000 0 1.2cqw, transparent 1.5cqw);
       mask-composite: add;
       opacity: 0.95;
     }
@@ -286,7 +623,7 @@
       object-fit: cover;
       object-position: center 48%;
       opacity: 0.2;
-      filter: brightness(0.58) saturate(0.74) sepia(0.26) drop-shadow(0 3px 6px rgba(0, 0, 0, 0.38));
+      filter: brightness(0.58) saturate(0.74) sepia(0.26) drop-shadow(0 0.9cqw 1.8cqw rgba(0, 0, 0, 0.38));
       mix-blend-mode: screen;
       mask-image: linear-gradient(180deg, transparent, #000 18%, #000 82%, transparent);
       pointer-events: none;
@@ -301,8 +638,8 @@
       height: 32%;
       object-fit: cover;
       object-position: center 62%;
-      opacity: 0.66;
-      filter: grayscale(0.12) sepia(0.76) saturate(1.12) brightness(0.78) contrast(1.1);
+      opacity: 0.76;
+      filter: grayscale(0.06) sepia(0.68) saturate(1.38) brightness(0.92) contrast(1.16);
       mix-blend-mode: screen;
       mask-image: linear-gradient(180deg, transparent 0%, transparent 14%, #000 32%, #000 82%, transparent 100%);
       pointer-events: none;
@@ -319,8 +656,8 @@
     .petal-drift span {
       position: absolute;
       display: block;
-      width: 12px;
-      height: 20px;
+      width: 3.6cqw;
+      height: 6cqw;
       border-radius: 100% 0 100% 0;
       background: linear-gradient(135deg, #d04a72, #8e1746);
       box-shadow: 0 3px 8px rgba(0, 0, 0, 0.24);
@@ -372,6 +709,27 @@
       opacity: 0.54;
     }
 
+    .petal-drift .petal-eight {
+      top: 25%;
+      left: 7%;
+      transform: rotate(18deg) scale(0.42);
+      opacity: 0.48;
+    }
+
+    .petal-drift .petal-nine {
+      top: 44%;
+      right: 6%;
+      transform: rotate(-26deg) scale(0.5);
+      opacity: 0.5;
+    }
+
+    .petal-drift .petal-ten {
+      top: 67%;
+      left: 10%;
+      transform: rotate(52deg) scale(0.46);
+      opacity: 0.46;
+    }
+
     .ground {
       position: absolute;
       left: -4%;
@@ -388,10 +746,10 @@
     .woman {
       position: absolute;
       left: auto;
-      right: -7%;
+      right: -3%;
       bottom: 0;
-      width: 58%;
-      filter: drop-shadow(-18px 22px 30px rgba(0, 0, 0, 0.4));
+      width: 50%;
+      filter: drop-shadow(-5.4cqw 6.6cqw 9cqw rgba(0, 0, 0, 0.4));
       z-index: 12;
     }
 
@@ -408,27 +766,26 @@
 
     .back-heading {
       position: absolute;
-      top: 4.8%;
+      top: 3.8%;
       left: 50%;
       transform: translateX(-50%);
+      display: grid;
+      justify-items: center;
+      gap: 0;
       width: 84%;
       text-align: center;
       z-index: 13;
     }
 
     .back-heading .brand-mark {
-      width: clamp(34px, 8vw, 50px);
-    }
-
-    .back-heading .brand-name {
-      margin-top: 4px;
-      font-size: clamp(1.05rem, 3.4vw, 1.55rem);
+      display: block;
+      margin: 0;
     }
 
     .back-kicker {
-      margin-top: 8px;
+      margin-top: 1.8cqw;
       color: var(--gold);
-      font-size: clamp(0.52rem, 1.55vw, 0.72rem);
+      font-size: clamp(0.42rem, 3.47cqw, 0.72rem);
       font-weight: 700;
       letter-spacing: 0.28em;
       text-transform: uppercase;
@@ -449,22 +806,22 @@
       position: relative;
       padding: 5%;
       background: rgba(17, 10, 8, 0.72);
-      border: 1px solid rgba(199, 155, 66, 0.68);
-      box-shadow: inset 0 0 0 1px rgba(199, 155, 66, 0.16), 0 14px 28px rgba(0, 0, 0, 0.24);
+      border: 0.3cqw solid rgba(199, 155, 66, 0.68);
+      box-shadow: inset 0 0 0 0.3cqw rgba(199, 155, 66, 0.16), 0 4.2cqw 8.4cqw rgba(0, 0, 0, 0.24);
     }
 
     .back-qr-card::before {
       content: "";
       position: absolute;
-      inset: 5px;
-      border: 1px solid rgba(199, 155, 66, 0.28);
+      inset: 1.5cqw;
+      border: 0.3cqw solid rgba(199, 155, 66, 0.28);
       pointer-events: none;
     }
 
     .back-qr-label {
       margin-bottom: 4%;
       color: var(--gold);
-      font-size: clamp(0.52rem, 1.7vw, 0.8rem);
+      font-size: clamp(0.42rem, 3.86cqw, 0.8rem);
       font-weight: 700;
       letter-spacing: 0.2em;
       text-align: center;
@@ -473,39 +830,6 @@
 
     .back-qr-paper {
       padding: 5%;
-    }
-
-    .back-qr-paper .qr-placeholder {
-      padding: 8%;
-      font-size: clamp(0.48rem, 1.5vw, 0.72rem);
-      line-height: 1.35;
-    }
-
-    .back-note {
-      position: absolute;
-      top: 59.5%;
-      left: 11%;
-      width: 78%;
-      color: var(--ivory);
-      text-align: center;
-      z-index: 7;
-    }
-
-    .back-note-title {
-      color: var(--gold);
-      font-family: "Pretendard", "Noto Sans KR", system-ui, sans-serif;
-      font-size: clamp(0.9rem, 2.8vw, 1.3rem);
-      font-weight: 700;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-    }
-
-    .back-note-copy {
-      margin-top: 9px;
-      color: rgba(244, 234, 220, 0.68);
-      font-size: clamp(0.52rem, 1.55vw, 0.72rem);
-      letter-spacing: 0.08em;
-      line-height: 1.6;
     }
 
     .back-petals {
@@ -521,36 +845,47 @@
     }
 
     @page {
-      size: 80mm 160mm;
+      size: A4 landscape;
       margin: 0;
     }
 
     @media print {
       body {
         min-height: auto;
-        background: transparent;
+        background: #fff;
       }
 
-      .poster-frame {
+      .print-controls,
+      .print-preview-label,
+      .poster-stage {
+        display: none !important;
+      }
+
+      .print-sheet {
+        display: block;
+        width: 297mm;
+        height: 210mm;
+        margin: 0;
+        border: 0;
+        box-shadow: none;
+        background: #fff;
+      }
+
+      .print-sheet-grid {
+        width: 297mm;
+        height: 210mm;
+      }
+
+      .print-copy {
         padding: 0;
         border: 0;
         background: transparent;
         box-shadow: none;
       }
 
-      .poster-stage {
-        display: block;
-        min-height: auto;
-        padding: 0;
-      }
-
-      .poster-frame + .poster-frame {
-        page-break-before: always;
-      }
-
-      .poster {
-        width: 80mm;
-        height: 160mm;
+      .print-copy .poster {
+        width: 60mm;
+        height: 120mm;
         box-shadow: none;
       }
     }
@@ -575,30 +910,62 @@
         width: min(42vw, 320px, calc((100vh - 48px) * 0.5));
       }
 
+      .print-controls {
+        margin-top: 16px;
+        padding: 16px;
+      }
+
+      .print-controls-header {
+        display: block;
+      }
+
+      .print-capacity {
+        display: inline-block;
+        margin-top: 12px;
+      }
+
+      .print-controls-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .print-actions {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .print-button {
+        width: 100%;
+      }
+
+      .print-sheet {
+        width: 94vw;
+      }
+
       .qr-wrap {
-        top: 20%;
-        width: 58%;
+        top: 21%;
+        width: 64.5%;
       }
 
       .caption {
-        top: 55.3%;
+        top: 59.5%;
       }
 
       .caption-title {
-        gap: 6px;
-        font-size: 0.52rem;
-        letter-spacing: 0.24em;
+        gap: 1.8cqw;
+        font-size: 3.47cqw;
+        letter-spacing: 0.22em;
       }
 
       .caption-title::before,
       .caption-title::after {
-        width: 20px;
+        width: 6cqw;
       }
 
       .woman {
-        width: 60%;
+        width: 50%;
         left: auto;
-        right: -9%;
+        right: -3%;
       }
 
       .back-qr-grid {
@@ -608,12 +975,8 @@
         gap: 3.5%;
       }
 
-      .back-note {
-        top: 61%;
-      }
-
       .back-heading {
-        top: 5.5%;
+        top: 1.2%;
       }
 
       .brand {
@@ -621,16 +984,98 @@
       }
 
       .back-kicker {
-        margin-top: 8px;
-        font-size: 0.46rem;
+        margin-top: 1.8cqw;
+        font-size: 2.8cqw;
       }
     }
   </style>
 </head>
 <body>
+  <section class="print-controls" aria-label="A4 print settings">
+    <div class="print-controls-header">
+      <div>
+        <h1 class="print-controls-title">A4 PRINT SETUP</h1>
+        <p class="print-controls-note">앞면 또는 뒷면 한 종류만 선택해 A4 가로 용지에 4장씩 배치합니다. 포스터 규격은 6×12cm입니다.</p>
+      </div>
+      <div class="print-capacity">A4 LANDSCAPE · 4 COPIES</div>
+    </div>
+
+    <div class="print-controls-grid">
+      <fieldset>
+        <legend>Print side</legend>
+        <div class="side-picker">
+          <label class="side-choice">
+            <input type="radio" name="printSide" value="front" checked />
+            <span>앞면만 인쇄</span>
+          </label>
+          <label class="side-choice">
+            <input type="radio" name="printSide" value="back" />
+            <span>뒷면만 인쇄</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <div class="qr-settings-wrap">
+        <div class="qr-settings" data-side-settings="front">
+          <span class="qr-settings-title">Front QR</span>
+          <div class="qr-setting-row">
+            <label for="qrFrontUrl">이미지 주소</label>
+            <input id="qrFrontUrl" type="url" placeholder="QR 이미지 URL 또는 data URL" autocomplete="off" />
+          </div>
+          <div class="qr-setting-row">
+            <label for="qrFrontFile">이미지 파일</label>
+            <input id="qrFrontFile" type="file" accept="image/*" />
+          </div>
+          <div class="qr-setting-row">
+            <label for="qrFrontNumber">중앙 숫자</label>
+            <input id="qrFrontNumber" type="text" inputmode="numeric" maxlength="3" placeholder="예: 01" autocomplete="off" />
+          </div>
+        </div>
+
+        <div class="qr-settings" data-side-settings="back" hidden>
+          <span class="qr-settings-title">Back QR</span>
+          <div class="qr-setting-row">
+            <label for="qrBackMenuUrl">Menu 주소</label>
+            <input id="qrBackMenuUrl" type="url" placeholder="Menu QR 이미지 URL" autocomplete="off" />
+          </div>
+          <div class="qr-setting-row">
+            <label for="qrBackMenuFile">Menu 파일</label>
+            <input id="qrBackMenuFile" type="file" accept="image/*" />
+          </div>
+          <div class="qr-setting-row">
+            <label for="qrBackMenuNumber">Menu 숫자</label>
+            <input id="qrBackMenuNumber" type="text" inputmode="numeric" maxlength="3" placeholder="예: 01" autocomplete="off" />
+          </div>
+          <div class="qr-setting-row">
+            <label for="qrBackStoryUrl">Story 주소</label>
+            <input id="qrBackStoryUrl" type="url" placeholder="Story QR 이미지 URL" autocomplete="off" />
+          </div>
+          <div class="qr-setting-row">
+            <label for="qrBackStoryFile">Story 파일</label>
+            <input id="qrBackStoryFile" type="file" accept="image/*" />
+          </div>
+          <div class="qr-setting-row">
+            <label for="qrBackStoryNumber">Story 숫자</label>
+            <input id="qrBackStoryNumber" type="text" inputmode="numeric" maxlength="3" placeholder="예: 02" autocomplete="off" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="print-actions">
+      <div class="print-status" id="printStatus">앞면 4장이 A4 가로 시트에 배치됩니다. 인쇄 창에서 배율을 100%로 선택하세요.</div>
+      <button class="print-button" id="printButton" type="button">A4 인쇄 미리보기</button>
+    </div>
+  </section>
+
+  <div class="print-preview-label">A4 preview</div>
+  <section class="print-sheet" id="printSheet" aria-label="A4 print preview">
+    <div class="print-sheet-grid" id="printSheetGrid"></div>
+  </section>
+
   <div class="poster-stage">
-    <div class="poster-frame">
-      <main class="poster poster--front" aria-label="EHWA QR poster front">
+    <div class="poster-frame" data-side="front">
+      <main class="poster poster--front" data-side="front" aria-label="EHWA QR poster front">
         <div class="poster-shadow" aria-hidden="true"></div>
         <div class="petal-drift" aria-hidden="true">
           <span class="petal-one"></span>
@@ -640,22 +1085,26 @@
           <span class="petal-five"></span>
           <span class="petal-six"></span>
           <span class="petal-seven"></span>
+          <span class="petal-eight"></span>
+          <span class="petal-nine"></span>
+          <span class="petal-ten"></span>
         </div>
         <div class="brand">
           <img class="brand-mark" src="assets/cropped-logo-white.webp" alt="EHWA" />
           <div class="brand-name">EHWA</div>
+          <div class="brand-location">Downtown</div>
         </div>
 
         <section class="qr-wrap" aria-label="Front QR code">
           <div class="qr-frame">
-            <div class="qr-paper" id="qrPaper">
-              <div class="qr-placeholder" id="qrPlaceholder">QR image<br />assets/qr-code.png<br />or ?qr=...</div>
+            <div class="qr-paper" id="qrPaper" data-qr-slot="front" aria-label="Menu QR code">
+              <span class="qr-center-number" aria-hidden="true" hidden></span>
             </div>
           </div>
         </section>
 
         <div class="caption">
-          <div class="caption-title">Scan Me</div>
+          <div class="caption-title">View Menu</div>
         </div>
 
         <img class="gwanghwamun-scene" src="assets/gwanghwamun-still.png" alt="" />
@@ -665,27 +1114,28 @@
       </main>
     </div>
 
-    <div class="poster-frame">
-      <main class="poster poster--back" aria-label="EHWA QR poster back">
+    <div class="poster-frame" data-side="back">
+      <main class="poster poster--back" data-side="back" aria-label="EHWA QR poster back">
         <div class="poster-shadow" aria-hidden="true"></div>
         <img class="back-petals" src="assets/flower.webp" alt="" />
         <div class="back-heading">
           <img class="brand-mark" src="assets/cropped-logo-white.webp" alt="EHWA" />
           <div class="brand-name">EHWA</div>
+          <div class="brand-location">Downtown</div>
           <div class="back-kicker">Keep in touch with us</div>
         </div>
 
         <section class="back-qr-grid" aria-label="Back QR codes">
           <div class="back-qr-card">
             <div class="back-qr-label">Menu</div>
-            <div class="qr-paper back-qr-paper" id="qrPaperBackOne">
-              <div class="qr-placeholder" id="qrPlaceholderBackOne">QR 01<br />?qr=...</div>
+            <div class="qr-paper back-qr-paper" id="qrPaperBackOne" data-qr-slot="backMenu" aria-label="Menu QR code">
+              <span class="qr-center-number" aria-hidden="true" hidden></span>
             </div>
           </div>
           <div class="back-qr-card">
             <div class="back-qr-label">Story</div>
-            <div class="qr-paper back-qr-paper" id="qrPaperBackTwo">
-              <div class="qr-placeholder" id="qrPlaceholderBackTwo">QR 02<br />?qr2=...</div>
+            <div class="qr-paper back-qr-paper" id="qrPaperBackTwo" data-qr-slot="backStory" aria-label="Story QR code">
+              <span class="qr-center-number" aria-hidden="true" hidden></span>
             </div>
           </div>
         </section>
@@ -698,35 +1148,188 @@
   <script>
     (function () {
       const params = new URLSearchParams(window.location.search);
-      const qrSources = [
-        ["qrPaper", "qrPlaceholder", params.get("qr") || "assets/qr-code.png"],
-        ["qrPaperBackOne", "qrPlaceholderBackOne", params.get("qr2") || "assets/qr-code-2.png"],
-        ["qrPaperBackTwo", "qrPlaceholderBackTwo", params.get("qr3") || "assets/qr-code-3.png"]
-      ];
+      const printSheetGrid = document.getElementById("printSheetGrid");
+      const printStatus = document.getElementById("printStatus");
+      const printButton = document.getElementById("printButton");
+      const sideSettings = Array.from(document.querySelectorAll("[data-side-settings]"));
+      const sideInputs = Array.from(document.querySelectorAll('input[name="printSide"]'));
+      let selectedSide = "front";
 
-      function loadQr(paperId, placeholderId, src) {
-        const paper = document.getElementById(paperId);
-        const placeholder = document.getElementById(placeholderId);
-        const image = new Image();
+      function cloneDefaultPoster(side) {
+        const poster = document.querySelector('.poster-stage .poster[data-side="' + side + '"]');
+        if (!poster) return null;
 
-        image.alt = "EHWA QR code";
-        image.decoding = "async";
-
-        image.onload = function () {
-          placeholder.remove();
-          paper.appendChild(image);
-        };
-
-        image.onerror = function () {
-          placeholder.hidden = false;
-        };
-
-        image.src = src;
+        const clone = poster.cloneNode(true);
+        clone.querySelectorAll("[id]").forEach(function (element) {
+          element.removeAttribute("id");
+        });
+        return clone;
       }
 
-      qrSources.forEach(function (source) {
-        loadQr(source[0], source[1], source[2]);
+      function createRasterPoster(side) {
+        const clone = cloneDefaultPoster(side);
+        if (!clone || side !== "front") return clone;
+
+        clone.classList.add("poster--raster", "poster--raster-frame");
+        const image = document.createElement("img");
+        image.className = "poster-raster-image";
+        image.src = "assets/poster-default-front-6x12-frame.png";
+        image.alt = "";
+        clone.insertBefore(image, clone.firstChild);
+        return clone;
+      }
+
+      const slots = {
+        front: {
+          paperId: "qrPaper",
+          urlId: "qrFrontUrl",
+          fileId: "qrFrontFile",
+          numberId: "qrFrontNumber",
+          source: params.get("qr") || "",
+          number: params.get("qrNumber") || ""
+        },
+        backMenu: {
+          paperId: "qrPaperBackOne",
+          urlId: "qrBackMenuUrl",
+          fileId: "qrBackMenuFile",
+          numberId: "qrBackMenuNumber",
+          source: params.get("qr2") || "",
+          number: params.get("qr2Number") || ""
+        },
+        backStory: {
+          paperId: "qrPaperBackTwo",
+          urlId: "qrBackStoryUrl",
+          fileId: "qrBackStoryFile",
+          numberId: "qrBackStoryNumber",
+          source: params.get("qr3") || "",
+          number: params.get("qr3Number") || ""
+        }
+      };
+
+      // Keep the A4 artwork independent from the live poster. Only QR layers are painted per copy.
+      const defaultPosters = {
+        front: createRasterPoster("front"),
+        back: cloneDefaultPoster("back")
+      };
+
+      function renderQr(paper, slot) {
+        if (!paper) return;
+
+        paper.querySelectorAll("img").forEach(function (image) {
+          image.remove();
+        });
+
+        const number = paper.querySelector(".qr-center-number");
+        if (number) {
+          number.textContent = slot.number;
+          number.hidden = !slot.number;
+        }
+
+        if (!slot.source) return;
+
+        const image = new Image();
+        image.alt = "EHWA QR code";
+        image.decoding = "async";
+        image.src = slot.source;
+        paper.insertBefore(image, paper.querySelector(".qr-center-number"));
+      }
+
+      function updateSlot(slot) {
+        renderQr(document.getElementById(slot.paperId), slot);
+      }
+
+      function buildPrintSheet() {
+        const defaultPoster = defaultPosters[selectedSide];
+        if (!defaultPoster || !printSheetGrid) return;
+
+        printSheetGrid.replaceChildren();
+
+        for (let index = 0; index < 4; index += 1) {
+          const copy = document.createElement("div");
+          copy.className = "poster-frame print-copy" + (selectedSide === "front" ? " print-copy--raster-frame" : "");
+          const clone = defaultPoster.cloneNode(true);
+
+          clone.querySelectorAll("[data-qr-slot]").forEach(function (paper) {
+            const slot = slots[paper.dataset.qrSlot];
+            if (slot) renderQr(paper, slot);
+          });
+
+          copy.appendChild(clone);
+          printSheetGrid.appendChild(copy);
+        }
+
+        const sideName = selectedSide === "front" ? "앞면" : "뒷면";
+        printStatus.textContent = sideName + " 4장이 A4 가로 시트에 배치됩니다. 인쇄 창에서 배율을 100%로 선택하세요.";
+      }
+
+      function showSelectedSettings() {
+        sideSettings.forEach(function (settings) {
+          settings.hidden = settings.dataset.sideSettings !== selectedSide;
+        });
+        buildPrintSheet();
+      }
+
+      function bindSlot(slot) {
+        const urlInput = document.getElementById(slot.urlId);
+        const fileInput = document.getElementById(slot.fileId);
+        const numberInput = document.getElementById(slot.numberId);
+
+        if (urlInput) {
+          urlInput.value = slot.source.startsWith("data:") ? "" : slot.source;
+          urlInput.addEventListener("input", function () {
+            slot.source = urlInput.value.trim();
+            if (fileInput) fileInput.value = "";
+            updateSlot(slot);
+            buildPrintSheet();
+          });
+        }
+
+        if (fileInput) {
+          fileInput.addEventListener("change", function () {
+            const file = fileInput.files && fileInput.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.addEventListener("load", function () {
+              slot.source = typeof reader.result === "string" ? reader.result : "";
+              if (urlInput) urlInput.value = "";
+              updateSlot(slot);
+              buildPrintSheet();
+            });
+            reader.readAsDataURL(file);
+          });
+        }
+
+        if (numberInput) {
+          numberInput.value = slot.number;
+          numberInput.addEventListener("input", function () {
+            slot.number = numberInput.value.replace(/[^0-9]/g, "").slice(0, 3);
+            numberInput.value = slot.number;
+            updateSlot(slot);
+            buildPrintSheet();
+          });
+        }
+
+        updateSlot(slot);
+      }
+
+      Object.values(slots).forEach(bindSlot);
+
+      sideInputs.forEach(function (input) {
+        input.addEventListener("change", function () {
+          if (!input.checked) return;
+          selectedSide = input.value;
+          showSelectedSettings();
+        });
       });
+
+      printButton.addEventListener("click", function () {
+        buildPrintSheet();
+        window.print();
+      });
+
+      window.addEventListener("beforeprint", buildPrintSheet);
+      showSelectedSettings();
     }());
   </script>
 </body>
