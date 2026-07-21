@@ -1071,6 +1071,23 @@
       flex-wrap: wrap;
     }
 
+    .calendar-usage-guide {
+      margin: 0 0 12px;
+      padding: 8px 10px;
+      border: 1px solid rgba(143, 36, 56, 0.14);
+      border-radius: 12px;
+      background: rgba(143, 36, 56, 0.06);
+      color: #6d4750;
+      font-size: 0.74rem;
+      font-weight: 750;
+      line-height: 1.45;
+    }
+
+    .calendar-usage-guide b {
+      color: var(--accent-strong);
+      font-weight: 900;
+    }
+
     .calendar-legend {
       display: flex;
       align-items: center;
@@ -1701,6 +1718,12 @@
         margin-bottom: 10px;
       }
 
+      .calendar-usage-guide {
+        margin-bottom: 10px;
+        padding: 7px 9px;
+        font-size: 0.7rem;
+      }
+
       .calendar-legend {
         gap: 8px;
       }
@@ -1920,6 +1943,7 @@
                 <h2>안되는날 달력</h2>
               </div>
               <div class="card-body">
+                <p class="calendar-usage-guide"><b>탭</b>: 안됨 → 선호 → 해제 · <b>길게 누르기</b>: 노트 추가 · <b>Submit</b>을 눌러야 저장됩니다.</p>
                 <div class="calendar-meta">
                   <div class="calendar-legend">
                     <span class="legend-item"><span class="legend-swatch today"></span>오늘</span>
