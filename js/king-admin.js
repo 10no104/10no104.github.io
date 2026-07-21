@@ -128,6 +128,9 @@
     scheduleUsingFallbackStaff: false,
     scheduleWeek: null,
     scheduleShifts: [],
+    scheduleSelectedStaffKey: "",
+    schedulePointerDrag: null,
+    scheduleSuppressClickUntil: 0,
     sortables: {
       visual: null,
       all: null,
@@ -1760,6 +1763,33 @@
     return Array.from(byKey.values());
   }
 
+  function getScheduleStaffByKey(key = "") {
+    const normalized = normalizeScheduleStaffKey(key);
+    if (!normalized) return null;
+    return getScheduleStaffPool().find((staff) => (
+      normalizeScheduleStaffKey(staff.staff_key || staff.name) === normalized ||
+      normalizeScheduleStaffKey(staff.name) === normalized
+    )) || null;
+  }
+
+  function getSelectedScheduleStaff() {
+    return getScheduleStaffByKey(state.scheduleSelectedStaffKey);
+  }
+
+  function isStaffUnavailableOnDate(staff, isoDate) {
+    if (!staff || !isoDate) return false;
+    const date = toSafeDate(isoDate);
+    if (!date) return false;
+    return getAvailabilityForStaff(staff, isoDate)?.status === "unavailable" ||
+      Boolean(staff.fixed_unavailable_weekdays?.includes(date.getDay()));
+  }
+
+  function getStaffUnavailableLabel(staff, isoDate) {
+    const availability = getAvailabilityForStaff(staff, isoDate);
+    if (availability?.status === "unavailable") return "불가일";
+    return "고정 불가일";
+  }
+
   function branchMatchesStaff(staff, branch) {
     const scope = normalizeBranchScope(staff.branch_scope);
     return scope === "both" || scope === branch;
@@ -1789,6 +1819,72 @@
       map.set(key, list.filter(Boolean));
     });
     return map;
+  }
+
+  function getScheduleNamesByCellFromBoard() {
+    const map = new Map();
+    refs.scheduleBoard?.querySelectorAll("[data-schedule-cell]").forEach((textarea) => {
+      map.set(String(textarea.dataset.scheduleCell || ""), getCurrentNames(textarea));
+    });
+    return map;
+  }
+
+  function getScheduleTargetsByCellFromBoard() {
+    const map = new Map();
+    refs.scheduleBoard?.querySelectorAll("[data-schedule-target]").forEach((input) => {
+      const target = Number.parseInt(input.value || "", 10);
+      if (Number.isFinite(target)) map.set(String(input.dataset.scheduleTarget || ""), Math.max(0, target));
+    });
+    return map;
+  }
+
+  function getScheduleAssignmentContextFromMap(namesByCell) {
+    const staffPool = getScheduleStaffPool();
+    const byStaff = new Map();
+    const byDate = new Map();
+    namesByCell.forEach((names, cellKey) => {
+      const [branch, isoDate] = String(cellKey || "").split("|");
+      if (!branch || !isoDate) return;
+      names.forEach((name) => {
+        const staffId = getStaffIdentity(name, staffPool);
+        const staffRows = byStaff.get(staffId) || [];
+        staffRows.push({ branch, isoDate, name });
+        byStaff.set(staffId, staffRows);
+
+        const dateSet = byDate.get(isoDate) || new Set();
+        dateSet.add(staffId);
+        byDate.set(isoDate, dateSet);
+      });
+    });
+    return { byStaff, byDate };
+  }
+
+  function getScheduleDropStatus(staff, branch, isoDate, names = [], context = getBoardAssignments()) {
+    if (!staff) return { allowed: false, type: "none", label: "서버를 먼저 선택하세요." };
+    if (!branchMatchesStaff(staff, branch)) {
+      return { allowed: false, type: "branch", label: "이 매장에는 배정할 수 없어요." };
+    }
+    if (isStaffUnavailableOnDate(staff, isoDate)) {
+      return { allowed: false, type: "unavailable", label: getStaffUnavailableLabel(staff, isoDate) };
+    }
+
+    const staffKey = normalizeScheduleStaffKey(staff.staff_key || staff.name);
+    const nameKeys = new Set(names.map(normalizeScheduleStaffKey));
+    if (nameKeys.has(staffKey) || nameKeys.has(normalizeScheduleStaffKey(staff.name))) {
+      return { allowed: false, type: "assigned", label: "이미 배정됨" };
+    }
+
+    const sameDayAssignments = context.byStaff.get(staffKey) || [];
+    if (sameDayAssignments.some((item) => item.isoDate === isoDate)) {
+      return { allowed: false, type: "double-booked", label: "같은 날 다른 매장 배정됨" };
+    }
+
+    const maxWeeklyShifts = normalizeMaxWeeklyShifts(staff.max_weekly_shifts);
+    if (maxWeeklyShifts && new Set(sameDayAssignments.map((item) => item.isoDate)).size >= maxWeeklyShifts) {
+      return { allowed: false, type: "weekly-limit", label: `주 ${maxWeeklyShifts}일 한도` };
+    }
+
+    return { allowed: true, type: "ready", label: "여기에 놓기 / 탭하여 배정" };
   }
 
   function renderAvailabilityList(status, target) {
@@ -1851,6 +1947,7 @@
     const staff = getScheduleStaffPool()
       .slice()
       .sort((a, b) => a.branch_scope.localeCompare(b.branch_scope) || a.name.localeCompare(b.name));
+    const selectedKey = normalizeScheduleStaffKey(state.scheduleSelectedStaffKey);
 
     if (!staff.length) {
       refs.scheduleStaffList.innerHTML = '<div class="empty-state">서버 목록이 없습니다.</div>';
@@ -1860,10 +1957,16 @@
     refs.scheduleStaffList.innerHTML = `
       ${state.scheduleUsingFallbackStaff ? '<div class="empty-state">employee_refs가 비어 있어 임시 서버 목록을 표시 중입니다.</div>' : ""}
       ${staff.map((item) => `
-        <span class="staff-pill is-${escapeHtml(normalizeBranchScope(item.branch_scope))}">
-          ${escapeHtml(item.name)}
+        <button
+          class="staff-pill is-${escapeHtml(normalizeBranchScope(item.branch_scope))} ${selectedKey === normalizeScheduleStaffKey(item.staff_key || item.name) ? "is-selected" : ""}"
+          type="button"
+          data-schedule-staff="${escapeHtml(item.staff_key || item.name)}"
+          aria-pressed="${selectedKey === normalizeScheduleStaffKey(item.staff_key || item.name) ? "true" : "false"}"
+          aria-label="${escapeHtml(`${item.name} 선택 또는 길게 눌러 드래그`)}"
+        >
+          <span>${escapeHtml(item.name)}</span>
           <small>${escapeHtml(formatBranchLabel(item.branch_scope))}</small>
-        </span>
+        </button>
       `).join("")}
     `;
   }
@@ -1875,6 +1978,12 @@
     ];
     const dates = getScheduleWeekDates();
     const shiftMap = getShiftNamesByCell();
+    const boardNames = getScheduleNamesByCellFromBoard();
+    const boardTargets = getScheduleTargetsByCellFromBoard();
+    const namesByCell = new Map(shiftMap);
+    boardNames.forEach((names, cellKey) => namesByCell.set(cellKey, names));
+    const assignmentContext = getScheduleAssignmentContextFromMap(namesByCell);
+    const selectedStaff = getSelectedScheduleStaff();
     const today = startOfDay(new Date());
 
     refs.scheduleWeekLabel.textContent = state.scheduleWeekStart
@@ -1885,49 +1994,6 @@
       const weekStateLabel = state.scheduleWeek?.status === "published" ? "확정" : "미작성";
       refs.scheduleWeekLabel.textContent = `${formatScheduleDayLabel(dates[0])} - ${formatScheduleDayLabel(dates[6])} / ${weekStateLabel}`;
     }
-
-    if (state.scheduleWeekStart) {
-      const weekStateLabel = state.scheduleWeek?.status === "published" ? "확정" : "미작성";
-      refs.scheduleWeekLabel.textContent = `${formatScheduleDayLabel(dates[0])} - ${formatScheduleDayLabel(dates[6])} / ${weekStateLabel}`;
-    }
-
-    refs.scheduleBoard.innerHTML = branches.map((branch) => `
-      <section class="schedule-branch is-${branch.key}">
-        <h4>${escapeHtml(branch.label)}</h4>
-        <div class="schedule-day-grid">
-          ${dates.map((date) => {
-            const dateValue = formatInputDate(date);
-            const names = shiftMap.get(getScheduleCellKey(branch.key, dateValue)) || [];
-            return `
-              <article class="schedule-day-card is-${branch.key} ${isSameDate(date, today) ? "is-today" : ""}">
-                <header>
-                  <strong>${escapeHtml(formatScheduleDayLabel(date))}</strong>
-                  <span>${escapeHtml(branch.label)}</span>
-                </header>
-                <textarea data-schedule-cell="${escapeHtml(getScheduleCellKey(branch.key, dateValue))}" placeholder="서버 이름&#10;한 줄에 한 명">${escapeHtml(names.join("\n"))}</textarea>
-              </article>
-            `;
-          }).join("")}
-        </div>
-      </section>
-    `).join("");
-
-    renderAvailabilityList("unavailable", refs.unavailableList);
-    renderAvailabilityList("preferred", refs.preferredList);
-  }
-
-  function renderScheduleBoard() {
-    const branches = [
-      { key: "uptown", label: "Uptown" },
-      { key: "downtown", label: "Downtown" }
-    ];
-    const dates = getScheduleWeekDates();
-    const shiftMap = getShiftNamesByCell();
-    const today = startOfDay(new Date());
-
-    refs.scheduleWeekLabel.textContent = state.scheduleWeekStart
-      ? `${formatScheduleDayLabel(dates[0])} - ${formatScheduleDayLabel(dates[6])}`
-      : "주간 선택";
 
     refs.scheduleBoard.innerHTML = branches.map((branch) => `
       <section class="schedule-branch is-${branch.key}">
@@ -1936,8 +2002,15 @@
           ${dates.map((date) => {
             const dateValue = formatInputDate(date);
             const cellKey = getScheduleCellKey(branch.key, dateValue);
-            const names = shiftMap.get(cellKey) || [];
-            const targetCount = Math.max(getDefaultServerCount(date), names.length);
+            const names = namesByCell.get(cellKey) || [];
+            const targetCount = Math.max(boardTargets.get(cellKey) ?? getDefaultServerCount(date), names.length);
+            const dropStatus = getScheduleDropStatus(selectedStaff, branch.key, dateValue, names, assignmentContext);
+            const dropClasses = [
+              "schedule-dropzone",
+              selectedStaff && dropStatus.allowed ? "is-ready" : "",
+              selectedStaff && dropStatus.type === "unavailable" ? "is-unavailable" : "",
+              selectedStaff && dropStatus.type === "assigned" ? "is-assigned" : ""
+            ].filter(Boolean).join(" ");
             return `
               <article class="schedule-day-card is-${branch.key} ${isSameDate(date, today) ? "is-today" : ""}">
                 <div class="schedule-day-top">
@@ -1950,7 +2023,31 @@
                     <input data-schedule-target="${escapeHtml(cellKey)}" type="number" min="0" max="8" value="${targetCount}" inputmode="numeric" />
                   </label>
                 </div>
-                <textarea data-schedule-cell="${escapeHtml(cellKey)}" placeholder="서버 이름&#10;한 줄에 한 명">${escapeHtml(names.join("\n"))}</textarea>
+                <div
+                  class="${dropClasses}"
+                  data-schedule-dropzone="${escapeHtml(cellKey)}"
+                  role="group"
+                  tabindex="0"
+                  aria-label="${escapeHtml(`${formatScheduleDayLabel(date)} ${branch.label}: ${dropStatus.label}`)}"
+                >
+                  <div class="schedule-assignment-list">
+                    ${names.map((name) => `
+                      <button
+                        class="schedule-assignment"
+                        type="button"
+                        data-remove-schedule-assignment="${escapeHtml(cellKey)}"
+                        data-schedule-name="${escapeHtml(name)}"
+                        aria-label="${escapeHtml(`${name} 배정 삭제`)}"
+                      >
+                        <span>${escapeHtml(name)}</span>
+                        <span class="schedule-assignment-remove" aria-hidden="true">×</span>
+                      </button>
+                    `).join("")}
+                  </div>
+                  <span class="schedule-drop-hint">${escapeHtml(dropStatus.label)}</span>
+                  <span class="schedule-cell-lock" aria-hidden="true">× 불가</span>
+                </div>
+                <textarea class="schedule-value" data-schedule-cell="${escapeHtml(cellKey)}" aria-hidden="true" tabindex="-1">${escapeHtml(names.join("\n"))}</textarea>
               </article>
             `;
           }).join("")}
@@ -2360,6 +2457,155 @@
       .filter(Boolean);
   }
 
+  function selectScheduleStaff(staff, allowToggle = true) {
+    if (!staff) return;
+    const staffKey = normalizeScheduleStaffKey(staff.staff_key || staff.name);
+    state.scheduleSelectedStaffKey = allowToggle && state.scheduleSelectedStaffKey === staffKey ? "" : staffKey;
+    renderScheduleBoard();
+    setScheduleStatus(
+      state.scheduleSelectedStaffKey
+        ? `${staff.name} 선택됨 — 초록색 날짜 칸에 놓을 수 있습니다.`
+        : "서버 선택을 해제했습니다.",
+      ""
+    );
+  }
+
+  function getScheduleTextarea(cellKey) {
+    return Array.from(refs.scheduleBoard.querySelectorAll("[data-schedule-cell]"))
+      .find((textarea) => textarea.dataset.scheduleCell === cellKey) || null;
+  }
+
+  function assignScheduleStaffToCell(staff, cellKey) {
+    const [branch, isoDate] = String(cellKey || "").split("|");
+    const textarea = getScheduleTextarea(cellKey);
+    if (!staff || !branch || !isoDate || !textarea) return;
+
+    const names = getCurrentNames(textarea);
+    const dropStatus = getScheduleDropStatus(staff, branch, isoDate, names, getBoardAssignments());
+    if (!dropStatus.allowed) {
+      renderScheduleBoard();
+      setScheduleStatus(`${staff.name}: ${dropStatus.label}`, "error");
+      return;
+    }
+
+    textarea.value = [...names, staff.name].join("\n");
+    state.scheduleSelectedStaffKey = normalizeScheduleStaffKey(staff.staff_key || staff.name);
+    renderScheduleBoard();
+    setScheduleStatus(`${staff.name} · ${formatScheduleDayLabel(toSafeDate(isoDate))} ${formatBranchLabel(branch)} 배정 완료`, "success");
+  }
+
+  function removeScheduleStaffFromCell(cellKey, name) {
+    const textarea = getScheduleTextarea(cellKey);
+    if (!textarea) return;
+    const nameKey = normalizeScheduleStaffKey(name);
+    const nextNames = getCurrentNames(textarea).filter((item) => normalizeScheduleStaffKey(item) !== nameKey);
+    textarea.value = nextNames.join("\n");
+    renderScheduleBoard();
+    setScheduleStatus(`${name} 배정을 삭제했습니다.`, "");
+  }
+
+  function clearScheduleDrag() {
+    const drag = state.schedulePointerDrag;
+    document.querySelectorAll(".schedule-dropzone.is-drag-over, .schedule-dropzone.is-drag-invalid").forEach((zone) => {
+      zone.classList.remove("is-drag-over", "is-drag-invalid");
+    });
+    drag?.ghost?.remove();
+    document.body.classList.remove("is-schedule-dragging");
+    state.schedulePointerDrag = null;
+  }
+
+  function setScheduleDragTarget(drag, clientX, clientY) {
+    const target = document.elementFromPoint(clientX, clientY);
+    const zone = target?.closest?.("[data-schedule-dropzone]") || null;
+    if (drag.dropzone && drag.dropzone !== zone) {
+      drag.dropzone.classList.remove("is-drag-over", "is-drag-invalid");
+    }
+    drag.dropzone = zone;
+    drag.dropStatus = null;
+    if (!zone) return;
+
+    const [branch, isoDate] = String(zone.dataset.scheduleDropzone || "").split("|");
+    const textarea = getScheduleTextarea(zone.dataset.scheduleDropzone);
+    const names = textarea ? getCurrentNames(textarea) : [];
+    drag.dropStatus = getScheduleDropStatus(drag.staff, branch, isoDate, names, getBoardAssignments());
+    zone.classList.toggle("is-drag-over", drag.dropStatus.allowed);
+    zone.classList.toggle("is-drag-invalid", !drag.dropStatus.allowed);
+  }
+
+  function beginSchedulePointerDrag(event) {
+    const button = event.target.closest("[data-schedule-staff]");
+    if (!button || !event.isPrimary || (event.pointerType === "mouse" && event.button !== 0)) return;
+    const staff = getScheduleStaffByKey(button.dataset.scheduleStaff);
+    if (!staff) return;
+
+    state.schedulePointerDrag = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      staff,
+      source: button,
+      active: false,
+      ghost: null,
+      dropzone: null,
+      dropStatus: null
+    };
+    try {
+      button.setPointerCapture(event.pointerId);
+    } catch (_error) {
+      // Pointer capture is not available in every embedded browser.
+    }
+  }
+
+  function moveSchedulePointerDrag(event) {
+    const drag = state.schedulePointerDrag;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    const moved = Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY);
+    if (!drag.active && moved < 8) return;
+
+    if (!drag.active) {
+      drag.active = true;
+      drag.ghost = document.createElement("div");
+      drag.ghost.className = "schedule-drag-ghost";
+      drag.ghost.textContent = drag.staff.name;
+      document.body.append(drag.ghost);
+      document.body.classList.add("is-schedule-dragging");
+    }
+
+    event.preventDefault();
+    drag.ghost.style.left = `${event.clientX}px`;
+    drag.ghost.style.top = `${event.clientY}px`;
+    setScheduleDragTarget(drag, event.clientX, event.clientY);
+  }
+
+  function endSchedulePointerDrag(event) {
+    const drag = state.schedulePointerDrag;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    const wasDragging = drag.active;
+    const cellKey = drag.dropzone?.dataset.scheduleDropzone || "";
+    const status = drag.dropStatus;
+    clearScheduleDrag();
+    state.scheduleSuppressClickUntil = Date.now() + 350;
+
+    if (!wasDragging) {
+      selectScheduleStaff(drag.staff);
+      return;
+    }
+
+    state.scheduleSelectedStaffKey = normalizeScheduleStaffKey(drag.staff.staff_key || drag.staff.name);
+    if (cellKey && status?.allowed) {
+      assignScheduleStaffToCell(drag.staff, cellKey);
+    } else {
+      renderScheduleBoard();
+      setScheduleStatus(status ? `${drag.staff.name}: ${status.label}` : "날짜 칸 위에 놓아주세요.", "error");
+    }
+  }
+
+  function cancelSchedulePointerDrag(event) {
+    const drag = state.schedulePointerDrag;
+    if (!drag || (event && drag.pointerId !== event.pointerId)) return;
+    clearScheduleDrag();
+  }
+
   function getStaffIdentity(name, staffPool = getScheduleStaffPool()) {
     const normalized = normalizeScheduleStaffKey(name);
     const staff = staffPool.find((item) => normalizeScheduleStaffKey(item.name) === normalized || normalizeScheduleStaffKey(item.staff_key) === normalized);
@@ -2506,6 +2752,7 @@
       context = getBoardAssignments();
     });
 
+    renderScheduleBoard();
     setScheduleStatus(added ? `빈자리 ${added}개를 자동배정했습니다.` : "채울 수 있는 빈자리가 없습니다.", added ? "success" : "");
   }
 
@@ -2547,6 +2794,7 @@
       .map((staff) => staff.name);
     const baseMessage = added ? `빈자리 ${added}개를 자동배정했습니다.` : "채울 수 있는 빈자리가 없습니다.";
     const suffix = underTwo.length ? ` 2일 미만: ${underTwo.slice(0, 5).join(", ")}` : "";
+    renderScheduleBoard();
     setScheduleStatus(`${baseMessage}${suffix}`, added ? "success" : "");
   }
 
@@ -2733,6 +2981,46 @@
     refs.scheduleCopyImageBtn.addEventListener("click", () => void copyScheduleImageToClipboard());
     refs.scheduleResetBtn.addEventListener("click", () => void resetScheduleWeek());
     refs.schedulePublishBtn.addEventListener("click", () => void saveScheduleWeek());
+    refs.scheduleStaffList.addEventListener("pointerdown", beginSchedulePointerDrag);
+    refs.scheduleStaffList.addEventListener("click", (event) => {
+      if (Date.now() < state.scheduleSuppressClickUntil) return;
+      const button = event.target.closest("[data-schedule-staff]");
+      if (!button) return;
+      const staff = getScheduleStaffByKey(button.dataset.scheduleStaff);
+      if (staff) selectScheduleStaff(staff);
+    });
+    refs.scheduleBoard.addEventListener("click", (event) => {
+      if (Date.now() < state.scheduleSuppressClickUntil) return;
+      const removeButton = event.target.closest("[data-remove-schedule-assignment]");
+      if (removeButton) {
+        removeScheduleStaffFromCell(removeButton.dataset.removeScheduleAssignment, removeButton.dataset.scheduleName);
+        return;
+      }
+      const zone = event.target.closest("[data-schedule-dropzone]");
+      if (!zone) return;
+      const staff = getSelectedScheduleStaff();
+      if (!staff) {
+        setScheduleStatus("서버를 먼저 선택한 뒤 날짜 칸을 탭하세요.", "error");
+        return;
+      }
+      assignScheduleStaffToCell(staff, zone.dataset.scheduleDropzone);
+    });
+    refs.scheduleBoard.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      const zone = event.target.closest("[data-schedule-dropzone]");
+      if (!zone) return;
+      event.preventDefault();
+      state.scheduleSuppressClickUntil = Date.now() + 350;
+      const staff = getSelectedScheduleStaff();
+      if (!staff) {
+        setScheduleStatus("서버를 먼저 선택한 뒤 날짜 칸을 탭하세요.", "error");
+        return;
+      }
+      assignScheduleStaffToCell(staff, zone.dataset.scheduleDropzone);
+    });
+    document.addEventListener("pointermove", moveSchedulePointerDrag, { passive: false });
+    document.addEventListener("pointerup", endSchedulePointerDrag);
+    document.addEventListener("pointercancel", cancelSchedulePointerDrag);
     refs.scheduleWeekStart.addEventListener("change", () => {
       state.scheduleWeekStart = getScheduleWeekStart();
       refs.scheduleWeekStart.value = state.scheduleWeekStart;
