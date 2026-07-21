@@ -1523,7 +1523,7 @@
       background: rgba(242, 251, 246, 0.88);
     }
 
-    .schedule-dropzone.is-unavailable {
+    .schedule-dropzone.is-blocked {
       border: 2px solid #a3223b;
       background:
         repeating-linear-gradient(-45deg, rgba(163, 34, 59, 0.1) 0 8px, rgba(255, 242, 243, 0.94) 8px 16px);
@@ -1531,7 +1531,7 @@
       cursor: not-allowed;
     }
 
-    .schedule-dropzone.is-unavailable::after {
+    .schedule-dropzone.is-blocked::after {
       position: absolute;
       inset: 0;
       z-index: 0;
@@ -1546,13 +1546,13 @@
       pointer-events: none;
     }
 
-    .schedule-dropzone.is-unavailable .schedule-assignment-list,
-    .schedule-dropzone.is-unavailable .schedule-drop-hint {
+    .schedule-dropzone.is-blocked .schedule-assignment-list,
+    .schedule-dropzone.is-blocked .schedule-drop-hint {
       position: relative;
       z-index: 1;
     }
 
-    .schedule-dropzone.is-assigned {
+    .schedule-dropzone.is-assigned:not(.is-blocked) {
       border-color: rgba(36, 95, 81, 0.3);
       background: rgba(242, 251, 246, 0.78);
     }
@@ -1620,7 +1620,7 @@
       color: #245f51;
     }
 
-    .schedule-dropzone.is-unavailable .schedule-drop-hint {
+    .schedule-dropzone.is-blocked .schedule-drop-hint {
       color: #8d2739;
       font-weight: 950;
     }
@@ -1774,7 +1774,7 @@
         display: none;
       }
 
-      .schedule-dropzone.is-unavailable::after {
+      .schedule-dropzone.is-blocked::after {
         font-size: 3.5rem;
       }
     }
