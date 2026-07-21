@@ -100,7 +100,6 @@
     { key: "uptown", label: "Uptown", color: "#8f2438", bg: "#fff3ed", border: "#e6b9b0" },
     { key: "downtown", label: "Downtown", color: "#245f51", bg: "#f1fbf5", border: "#b9d8c9" }
   ];
-  const SCHEDULE_CALENDAR_STORAGE_KEY = "ehwa:king:schedule-calendar-events:v1";
   const ontarioHolidayCache = new Map();
   const refs = {};
 
@@ -125,8 +124,8 @@
     scheduleWeekStart: "",
     scheduleWeekWindowStart: "",
     scheduleMonthCursor: null,
+    scheduleMonthSelectedDate: "",
     scheduleCalendarEvents: [],
-    scheduleCalendarEventSource: "local",
     scheduleWeeks: [],
     scheduleAvailability: [],
     scheduleStaff: [],
@@ -236,6 +235,7 @@
       "scheduleMonthNextBtn",
       "scheduleMonthLabel",
       "scheduleMonthGrid",
+      "scheduleWeekCalendarNotices",
       "scheduleCalendarEventForm",
       "scheduleCalendarEventDate",
       "scheduleCalendarEventTitle",
@@ -1005,8 +1005,7 @@
     await supabaseClient.auth.signOut();
     state.menuSession = null;
     state.menuItems = [];
-    state.scheduleCalendarEvents = readLocalScheduleCalendarEvents();
-    state.scheduleCalendarEventSource = "local";
+    state.scheduleCalendarEvents = [];
     updateMenuAuthView();
     renderMenu();
     renderScheduleBoard();
@@ -1748,37 +1747,15 @@
   }
 
   function normalizeScheduleCalendarEvent(item = {}) {
+    const id = String(item.id || "").trim();
     const eventDate = String(item.event_date || item.date || "").slice(0, 10);
     const title = String(item.title || "").trim().slice(0, 80);
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(eventDate) || !title) return null;
+    if (!id || !/^\d{4}-\d{2}-\d{2}$/.test(eventDate) || !title) return null;
     return {
-      id: String(item.id || `local-${eventDate}-${title}`),
+      id,
       event_date: eventDate,
-      title,
-      isLocal: Boolean(item.isLocal || String(item.id || "").startsWith("local-"))
+      title
     };
-  }
-
-  function readLocalScheduleCalendarEvents() {
-    try {
-      const stored = JSON.parse(window.localStorage.getItem(SCHEDULE_CALENDAR_STORAGE_KEY) || "[]");
-      return Array.isArray(stored) ? stored.map(normalizeScheduleCalendarEvent).filter(Boolean) : [];
-    } catch (_error) {
-      return [];
-    }
-  }
-
-  function saveLocalScheduleCalendarEvents(events = state.scheduleCalendarEvents) {
-    try {
-      window.localStorage.setItem(SCHEDULE_CALENDAR_STORAGE_KEY, JSON.stringify(events.map((item) => ({
-        id: item.id,
-        event_date: item.event_date,
-        title: item.title,
-        isLocal: true
-      }))));
-    } catch (_error) {
-      // Local storage is only a fallback for a database that has not received the migration yet.
-    }
   }
 
   function getScheduleDateCalendarInfo(isoDate = "") {
@@ -1796,6 +1773,28 @@
       ...events.map((item) => `Event: ${item.title}`)
     ].filter(Boolean);
     return { holiday, events, labels };
+  }
+
+  function renderScheduleWeekCalendarNotices() {
+    if (!refs.scheduleWeekCalendarNotices) return;
+    const notices = getScheduleWeekDates().flatMap((date) => {
+      const isoDate = formatInputDate(date);
+      const info = getScheduleDateCalendarInfo(isoDate);
+      const dateLabel = `${date.getMonth() + 1}/${date.getDate()} ${formatScheduleDayCompactLabel(date).weekday}`;
+      return [
+        info.holiday ? { dateLabel, kind: "holiday", marker: "H", title: info.holiday.title } : null,
+        ...info.events.map((item) => ({ dateLabel, kind: "event", marker: "E", title: item.title }))
+      ].filter(Boolean);
+    });
+
+    refs.scheduleWeekCalendarNotices.hidden = !notices.length;
+    refs.scheduleWeekCalendarNotices.innerHTML = notices.map((item) => `
+      <span class="schedule-week-calendar-notice is-${item.kind}" title="${escapeHtml(`${item.dateLabel} ${item.title}`)}">
+        <i aria-hidden="true">${item.marker}</i>
+        <b>${escapeHtml(item.dateLabel)}</b>
+        <strong>${escapeHtml(item.title)}</strong>
+      </span>
+    `).join("");
   }
 
   function setScheduleCalendarEventStatus(message = "", type = "") {
@@ -1844,10 +1843,8 @@
   }
 
   async function fetchScheduleCalendarEvents() {
-    const localEvents = readLocalScheduleCalendarEvents();
     if (!supabaseClient || !state.menuSession) {
-      state.scheduleCalendarEvents = localEvents;
-      state.scheduleCalendarEventSource = "local";
+      state.scheduleCalendarEvents = [];
       renderScheduleMonthCalendar();
       return;
     }
@@ -1859,14 +1856,13 @@
       .order("created_at", { ascending: true });
 
     if (error) {
-      state.scheduleCalendarEvents = localEvents;
-      state.scheduleCalendarEventSource = "local";
+      state.scheduleCalendarEvents = [];
+      setScheduleCalendarEventStatus(error.message, "error");
       renderScheduleMonthCalendar();
       return;
     }
 
     state.scheduleCalendarEvents = (data || []).map(normalizeScheduleCalendarEvent).filter(Boolean);
-    state.scheduleCalendarEventSource = "database";
     renderScheduleMonthCalendar();
   }
 
@@ -1879,38 +1875,26 @@
       return;
     }
 
-    const localItem = normalizeScheduleCalendarEvent({
-      id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      event_date: eventDate,
-      title,
-      isLocal: true
-    });
-    let savedItem = localItem;
-    let savedToDatabase = false;
-
-    if (supabaseClient && state.menuSession) {
-      const { data, error } = await supabaseClient
-        .from("king_schedule_calendar_events")
-        .insert({ event_date: eventDate, title, created_by: state.menuSession.user?.id || null })
-        .select("id,event_date,title")
-        .single();
-      if (!error && data) {
-        savedItem = normalizeScheduleCalendarEvent(data);
-        savedToDatabase = true;
-        state.scheduleCalendarEventSource = "database";
-      }
+    if (!supabaseClient || !state.menuSession) {
+      setScheduleCalendarEventStatus("관리자 로그인 후 이벤트를 저장할 수 있습니다.", "error");
+      return;
     }
 
+    const { data, error } = await supabaseClient
+      .from("king_schedule_calendar_events")
+      .insert({ event_date: eventDate, title, created_by: state.menuSession.user?.id || null })
+      .select("id,event_date,title")
+      .single();
+    if (error || !data) {
+      setScheduleCalendarEventStatus(error?.message || "이벤트를 저장하지 못했습니다.", "error");
+      return;
+    }
+
+    const savedItem = normalizeScheduleCalendarEvent(data);
     state.scheduleCalendarEvents = [...state.scheduleCalendarEvents, savedItem]
       .filter(Boolean)
       .sort((a, b) => a.event_date.localeCompare(b.event_date) || a.title.localeCompare(b.title));
-    if (!savedToDatabase) {
-      state.scheduleCalendarEventSource = "local";
-      saveLocalScheduleCalendarEvents();
-      setScheduleCalendarEventStatus("이 기기에 이벤트를 저장했습니다.", "success");
-    } else {
-      setScheduleCalendarEventStatus("이벤트를 저장했습니다.", "success");
-    }
+    setScheduleCalendarEventStatus("이벤트를 저장했습니다.", "success");
     refs.scheduleCalendarEventTitle.value = "";
     renderScheduleBoard();
   }
@@ -1918,19 +1902,21 @@
   async function deleteScheduleCalendarEvent(id = "") {
     const target = state.scheduleCalendarEvents.find((item) => item.id === id);
     if (!target) return;
-    if (!target.isLocal && supabaseClient && state.menuSession) {
-      const { error } = await supabaseClient
-        .from("king_schedule_calendar_events")
-        .delete()
-        .eq("id", id);
-      if (error) {
-        setScheduleCalendarEventStatus(error.message, "error");
-        return;
-      }
+    if (!supabaseClient || !state.menuSession) {
+      setScheduleCalendarEventStatus("관리자 로그인 후 이벤트를 삭제할 수 있습니다.", "error");
+      return;
+    }
+
+    const { error } = await supabaseClient
+      .from("king_schedule_calendar_events")
+      .delete()
+      .eq("id", id);
+    if (error) {
+      setScheduleCalendarEventStatus(error.message, "error");
+      return;
     }
 
     state.scheduleCalendarEvents = state.scheduleCalendarEvents.filter((item) => item.id !== id);
-    if (target.isLocal || state.scheduleCalendarEventSource === "local") saveLocalScheduleCalendarEvents();
     setScheduleCalendarEventStatus("이벤트를 삭제했습니다.", "success");
     renderScheduleBoard();
   }
@@ -1959,14 +1945,12 @@
   function renderScheduleMonthCalendar() {
     if (!refs.scheduleMonthGrid || !refs.scheduleMonthLabel) return;
     const selectedWeekStart = toSafeDate(state.scheduleWeekStart);
+    const selectedDate = toSafeDate(state.scheduleMonthSelectedDate) || selectedWeekStart;
     const cursor = state.scheduleMonthCursor instanceof Date
       ? startOfMonth(state.scheduleMonthCursor)
       : startOfMonth(selectedWeekStart || new Date());
     const monthEnd = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0);
     const today = startOfDay(new Date());
-    const selectedDates = new Set(selectedWeekStart
-      ? Array.from({ length: 7 }, (_unused, index) => formatInputDate(addDays(selectedWeekStart, index)))
-      : []);
     const assignments = getScheduleNamesByCellFromBoard();
     const leadingBlanks = (cursor.getDay() + 6) % 7;
     const cells = [];
@@ -1989,7 +1973,7 @@
       const classes = [
         "calendar-day",
         isSameDate(date, today) ? "is-today" : "",
-        selectedDates.has(isoDate) ? "is-selected" : "",
+        selectedDate && isSameDate(date, selectedDate) ? "is-selected" : "",
         hasSchedule ? "has-schedule" : "",
         calendarInfo.holiday ? "is-holiday" : "",
         calendarInfo.events.length ? "has-calendar-event" : ""
@@ -2402,6 +2386,7 @@
       </section>
     `).join("");
 
+    renderScheduleWeekCalendarNotices();
     renderAvailabilityList("unavailable", refs.unavailableList);
     renderAvailabilityList("preferred", refs.preferredList);
     renderScheduleStaffList();
@@ -3452,6 +3437,7 @@
       const date = toSafeDate(button.dataset.scheduleMonthDate);
       if (!date) return;
       refs.scheduleCalendarEventDate.value = formatInputDate(date);
+      state.scheduleMonthSelectedDate = formatInputDate(date);
       const weekStart = startOfWeek(date);
       state.scheduleWeekStart = formatInputDate(weekStart);
       state.scheduleWeekWindowStart = formatInputDate(addWeeks(weekStart, -1));
@@ -3462,6 +3448,7 @@
     });
     refs.scheduleWeekStart.addEventListener("change", () => {
       state.scheduleWeekStart = getScheduleWeekStart();
+      state.scheduleMonthSelectedDate = state.scheduleWeekStart;
       state.scheduleMonthCursor = startOfMonth(toSafeDate(state.scheduleWeekStart) || new Date());
       refs.scheduleWeekStart.value = state.scheduleWeekStart;
       void fetchScheduleData();
@@ -3471,6 +3458,7 @@
       state.scheduleWeekWindowStart = formatInputDate(addWeeks(current, -3));
       const options = getScheduleWeekOptions();
       state.scheduleWeekStart = options[1]?.weekStart || options[0]?.weekStart || state.scheduleWeekStart;
+      state.scheduleMonthSelectedDate = state.scheduleWeekStart;
       state.scheduleMonthCursor = startOfMonth(toSafeDate(state.scheduleWeekStart) || new Date());
       refs.scheduleWeekStart.value = state.scheduleWeekStart;
       renderScheduleWeekChips();
@@ -3481,6 +3469,7 @@
       state.scheduleWeekWindowStart = formatInputDate(addWeeks(current, 3));
       const options = getScheduleWeekOptions();
       state.scheduleWeekStart = options[1]?.weekStart || options[0]?.weekStart || state.scheduleWeekStart;
+      state.scheduleMonthSelectedDate = state.scheduleWeekStart;
       state.scheduleMonthCursor = startOfMonth(toSafeDate(state.scheduleWeekStart) || new Date());
       refs.scheduleWeekStart.value = state.scheduleWeekStart;
       renderScheduleWeekChips();
@@ -3490,6 +3479,7 @@
       const button = event.target.closest("[data-schedule-week]");
       if (!button) return;
       state.scheduleWeekStart = button.dataset.scheduleWeek;
+      state.scheduleMonthSelectedDate = state.scheduleWeekStart;
       state.scheduleMonthCursor = startOfMonth(toSafeDate(state.scheduleWeekStart) || new Date());
       refs.scheduleWeekStart.value = state.scheduleWeekStart;
       renderScheduleWeekChips();
@@ -3597,6 +3587,7 @@
     }).format(new Date());
     state.scheduleWeekStart = formatInputDate(addWeeks(startOfWeek(new Date()), 1));
     state.scheduleWeekWindowStart = formatInputDate(startOfWeek(new Date()));
+    state.scheduleMonthSelectedDate = state.scheduleWeekStart;
     state.scheduleMonthCursor = startOfMonth(toSafeDate(state.scheduleWeekStart) || new Date());
     state.scheduleStaff = FALLBACK_SERVER_REFS.map(normalizeStaffRef).filter(Boolean);
     state.scheduleUsingFallbackStaff = true;

@@ -1391,7 +1391,10 @@
 
     .schedule-month-calendar .calendar-day.is-selected.is-holiday,
     .schedule-month-calendar .calendar-day.is-selected.has-calendar-event {
-      box-shadow: inset 0 0 0 2px rgba(255, 249, 231, 0.78), 0 10px 20px rgba(123, 31, 47, 0.2);
+      color: #fffaf2;
+      border-color: #7b1f2f;
+      background: linear-gradient(135deg, var(--wine), #b9871f);
+      box-shadow: inset 0 0 0 2px rgba(255, 249, 231, 0.42), 0 10px 20px rgba(123, 31, 47, 0.2);
     }
 
     .schedule-month-calendar .calendar-day-markers {
@@ -1766,6 +1769,7 @@
     }
 
     .schedule-day-card {
+      position: relative;
       display: grid;
       gap: 8px;
       min-width: 138px;
@@ -1791,21 +1795,79 @@
     }
 
     .schedule-day-card.is-holiday {
-      border-color: rgba(184, 119, 25, 0.56);
-      background: linear-gradient(180deg, rgba(255, 251, 235, 0.98), rgba(255, 237, 184, 0.92));
-      box-shadow: inset 0 3px 0 #d39a30;
+      border: 2px solid #c88821;
+      background: linear-gradient(180deg, #fff9df, #ffe5a8);
+      box-shadow: inset 0 4px 0 #d39a30, 0 0 0 2px rgba(211, 154, 48, 0.12);
     }
 
     .schedule-day-card.has-calendar-event {
-      border-color: rgba(75, 97, 158, 0.54);
-      background: linear-gradient(180deg, rgba(248, 250, 255, 0.98), rgba(221, 230, 251, 0.92));
-      box-shadow: inset 0 3px 0 #5a70b0;
+      border: 2px solid #5169ba;
+      background: linear-gradient(180deg, #f4f7ff, #d7e3ff);
+      box-shadow: inset 0 4px 0 #5169ba, 0 0 0 2px rgba(81, 105, 186, 0.14);
     }
 
     .schedule-day-card.is-holiday.has-calendar-event {
-      border-color: rgba(156, 103, 55, 0.56);
-      background: linear-gradient(135deg, rgba(255, 244, 207, 0.98), rgba(223, 230, 252, 0.94));
-      box-shadow: inset 0 3px 0 #a37151;
+      border-color: #8f6d55;
+      background: linear-gradient(135deg, #fff1c8, #dbe5ff);
+      box-shadow: inset 0 4px 0 #8f6d55, 0 0 0 2px rgba(143, 109, 85, 0.15);
+    }
+
+    .schedule-week-calendar-notices {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      margin: 8px 18px 0;
+      padding: 7px 9px;
+      border: 1px solid rgba(113, 88, 60, 0.14);
+      border-radius: 13px;
+      background: rgba(255, 252, 247, 0.72);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .schedule-week-calendar-notice {
+      display: inline-flex;
+      flex: 0 0 auto;
+      align-items: center;
+      gap: 5px;
+      min-height: 27px;
+      padding: 0 8px;
+      border-radius: 9px;
+      font-size: 0.7rem;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .schedule-week-calendar-notice.is-holiday {
+      color: #6f4507;
+      background: rgba(246, 205, 98, 0.3);
+    }
+
+    .schedule-week-calendar-notice.is-event {
+      color: #35457d;
+      background: rgba(96, 119, 181, 0.16);
+    }
+
+    .schedule-week-calendar-notice i {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 15px;
+      height: 15px;
+      border-radius: 5px;
+      color: #fff;
+      background: currentColor;
+      font-size: 0.57rem;
+      font-style: normal;
+      font-weight: 950;
+      line-height: 1;
+    }
+
+    .schedule-week-calendar-notice.is-holiday i { color: #78500c; background: #f6cd62; }
+    .schedule-week-calendar-notice.is-event i { color: #f7f9ff; background: #4d62a0; }
+
+    .schedule-week-calendar-notice b,
+    .schedule-week-calendar-notice strong {
+      font-weight: 900;
     }
 
     .schedule-day-card header {
@@ -2059,6 +2121,43 @@
         scroll-snap-align: none;
       }
 
+      .schedule-day-card.is-holiday::before,
+      .schedule-day-card.has-calendar-event::before {
+        position: absolute;
+        z-index: 3;
+        top: 2px;
+        right: 2px;
+        min-width: 13px;
+        height: 13px;
+        padding: 0 2px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 5px;
+        color: #fff;
+        font-size: 0.5rem;
+        font-weight: 950;
+        line-height: 1;
+      }
+
+      .schedule-day-card.is-holiday::before {
+        content: "H";
+        color: #714807;
+        background: #f6cd62;
+      }
+
+      .schedule-day-card.has-calendar-event::before {
+        content: "E";
+        background: #4d62a0;
+      }
+
+      .schedule-day-card.is-holiday.has-calendar-event::before {
+        min-width: 20px;
+        content: "H/E";
+        color: #fff;
+        background: #765b76;
+      }
+
       .schedule-day-card header {
         display: grid;
         min-height: 28px;
@@ -2105,6 +2204,11 @@
 
       .schedule-month-calendar .calendar-day strong {
         font-size: 0.78rem;
+      }
+
+      .schedule-week-calendar-notices {
+        margin: 8px 8px 0;
+        padding: 6px 7px;
       }
 
       .schedule-month-calendar .calendar-day-markers {
@@ -2573,6 +2677,8 @@
         </div>
 
         <div class="schedule-board" id="scheduleBoard"></div>
+
+        <div class="schedule-week-calendar-notices" id="scheduleWeekCalendarNotices" aria-label="이번 주 공휴일 및 이벤트" hidden></div>
 
         <div class="schedule-summary-grid schedule-availability-grid">
           <div class="availability-card">
