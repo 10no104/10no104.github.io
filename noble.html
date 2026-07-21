@@ -1978,7 +1978,6 @@
                         <option value="">상관 없음</option>
                         <option value="uptown">Uptown</option>
                         <option value="downtown">Downtown</option>
-                        <option value="both">Both</option>
                       </select>
                     </label>
                     <label class="preference-field">
@@ -2890,7 +2889,7 @@
           fixedPreferredWeekdays: normalizeWeekdayValues(input.fixedPreferredWeekdays || input.fixed_preferred_weekdays)
             .filter((weekday) => !unavailableSet.has(weekday)),
           workStyle: ["cluster", "spread"].includes(workStyle) ? workStyle : "",
-          preferredBranch: ["uptown", "downtown", "both"].includes(preferredBranch) ? preferredBranch : "",
+          preferredBranch: ["uptown", "downtown"].includes(preferredBranch) ? preferredBranch : "",
           maxWeeklyShifts: normalizeMaxWeeklyShifts(input.maxWeeklyShifts || input.max_weekly_shifts)
         };
       }
