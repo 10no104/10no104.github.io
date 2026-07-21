@@ -517,30 +517,11 @@
       opacity: 0.72;
     }
 
-    .petal-drift .petal-four {
-      top: 76%;
-      left: 20%;
-      transform: rotate(-18deg) scale(0.7);
-    }
-
-    .petal-drift .petal-five {
-      top: 87%;
-      right: 54%;
-      transform: rotate(22deg) scale(0.64);
-    }
-
     .petal-drift .petal-six {
       top: 62%;
       left: 50%;
       transform: rotate(64deg) scale(0.58);
       opacity: 0.58;
-    }
-
-    .petal-drift .petal-seven {
-      top: 79%;
-      right: 68%;
-      transform: rotate(-42deg) scale(0.52);
-      opacity: 0.54;
     }
 
     .petal-drift .petal-ten {
@@ -564,18 +545,25 @@
       opacity: 0.58;
     }
 
-    .petal-drift .petal-thirteen {
-      top: 84%;
-      left: 6%;
-      transform: rotate(-22deg) scale(0.43);
-      opacity: 0.48;
+    .petal-drift .petal-one {
+      top: 13.2%;
+      left: 3.5%;
+      transform: rotate(28deg) scale(0.58);
+      opacity: 0.58;
     }
 
-    .petal-drift .petal-fourteen {
-      top: 93%;
-      left: 39%;
-      transform: rotate(67deg) scale(0.38);
-      opacity: 0.42;
+    .petal-drift .petal-two {
+      top: 14.2%;
+      right: 3.5%;
+      transform: rotate(-34deg) scale(0.54);
+      opacity: 0.54;
+    }
+
+    .petal-drift .petal-three {
+      top: 11.5%;
+      left: 7%;
+      transform: rotate(46deg) scale(0.38);
+      opacity: 0.44;
     }
 
     .ground {
@@ -609,12 +597,13 @@
 
     .poster--back::before {
       inset: 0;
-      opacity: 0.22;
+      opacity: 0.48;
+      filter: saturate(1.9) brightness(1.24) sepia(0.08) contrast(1.12);
     }
 
     .back-heading {
       position: absolute;
-      top: 3.8%;
+      top: 2.4%;
       left: 50%;
       transform: translateX(-50%);
       display: grid;
@@ -825,27 +814,27 @@
         <div class="qr-settings" data-side-settings="back" hidden>
           <span class="qr-settings-title">Back QR</span>
           <div class="qr-setting-row">
-            <label for="qrBackMenuUrl">Menu 주소</label>
-            <input id="qrBackMenuUrl" type="url" placeholder="Menu QR 이미지 URL" autocomplete="off" />
+            <label for="qrBackMenuUrl">예약 주소</label>
+            <input id="qrBackMenuUrl" type="url" placeholder="예약 QR 이미지 URL" autocomplete="off" />
           </div>
           <div class="qr-setting-row">
-            <label for="qrBackMenuFile">Menu 파일</label>
+            <label for="qrBackMenuFile">예약 파일</label>
             <input id="qrBackMenuFile" type="file" accept="image/*" />
           </div>
           <div class="qr-setting-row">
-            <label for="qrBackMenuNumber">Menu 숫자</label>
+            <label for="qrBackMenuNumber">예약 숫자</label>
             <input id="qrBackMenuNumber" type="text" inputmode="numeric" maxlength="3" placeholder="예: 01" autocomplete="off" />
           </div>
           <div class="qr-setting-row">
-            <label for="qrBackStoryUrl">Story 주소</label>
-            <input id="qrBackStoryUrl" type="url" placeholder="Story QR 이미지 URL" autocomplete="off" />
+            <label for="qrBackStoryUrl">선곡 주소</label>
+            <input id="qrBackStoryUrl" type="url" placeholder="선곡 요청 QR 이미지 URL" autocomplete="off" />
           </div>
           <div class="qr-setting-row">
-            <label for="qrBackStoryFile">Story 파일</label>
+            <label for="qrBackStoryFile">선곡 파일</label>
             <input id="qrBackStoryFile" type="file" accept="image/*" />
           </div>
           <div class="qr-setting-row">
-            <label for="qrBackStoryNumber">Story 숫자</label>
+            <label for="qrBackStoryNumber">선곡 숫자</label>
             <input id="qrBackStoryNumber" type="text" inputmode="numeric" maxlength="3" placeholder="예: 02" autocomplete="off" />
           </div>
         </div>
@@ -859,15 +848,13 @@
       <main class="poster poster--front" data-side="front" aria-label="EHWA QR poster front">
         <div class="poster-shadow" aria-hidden="true"></div>
         <div class="petal-drift" aria-hidden="true">
-          <span class="petal-four"></span>
-          <span class="petal-five"></span>
+          <span class="petal-one"></span>
+          <span class="petal-two"></span>
+          <span class="petal-three"></span>
           <span class="petal-six"></span>
-          <span class="petal-seven"></span>
           <span class="petal-ten"></span>
           <span class="petal-eleven"></span>
           <span class="petal-twelve"></span>
-          <span class="petal-thirteen"></span>
-          <span class="petal-fourteen"></span>
         </div>
         <div class="brand">
           <img class="brand-mark" src="assets/cropped-logo-white.webp" alt="EHWA" />
@@ -907,14 +894,14 @@
 
         <section class="back-qr-grid" aria-label="Back QR codes">
           <div class="back-qr-card">
-            <div class="back-qr-label">Menu</div>
-            <div class="qr-paper back-qr-paper" id="qrPaperBackOne" data-qr-slot="backMenu" aria-label="Menu QR code">
+            <div class="back-qr-label">Reservation</div>
+            <div class="qr-paper back-qr-paper" id="qrPaperBackOne" data-qr-slot="backMenu" aria-label="Reservation QR code">
               <span class="qr-center-number" aria-hidden="true" hidden></span>
             </div>
           </div>
           <div class="back-qr-card">
-            <div class="back-qr-label">Story</div>
-            <div class="qr-paper back-qr-paper" id="qrPaperBackTwo" data-qr-slot="backStory" aria-label="Story QR code">
+            <div class="back-qr-label">Music Request</div>
+            <div class="qr-paper back-qr-paper" id="qrPaperBackTwo" data-qr-slot="backStory" aria-label="Music request QR code">
               <span class="qr-center-number" aria-hidden="true" hidden></span>
             </div>
           </div>
