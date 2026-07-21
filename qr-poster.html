@@ -1136,7 +1136,16 @@
             imageTimeout: 15000,
             logging: false,
             scale: 3,
-            useCORS: true
+            useCORS: true,
+            onclone: function (clonedDocument) {
+              const clonedSource = clonedDocument.querySelector('.poster-frame[data-side="' + side + '"]');
+              if (!clonedSource) return;
+
+              clonedSource.querySelectorAll(".qr-paper").forEach(function (paper) {
+                paper.style.background = "#fbf4e7";
+                paper.style.backgroundImage = "none";
+              });
+            }
           });
         }
 
