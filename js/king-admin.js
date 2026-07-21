@@ -3089,11 +3089,17 @@
       .map((staff) => {
         const availability = getAvailabilityForStaff(staff, isoDate);
         const staffId = normalizeScheduleStaffKey(staff.staff_key || staff.name);
+        const currentShiftDays = new Set((context.byStaff.get(staffId) || []).map((item) => item.isoDate)).size;
+        const branchPreferenceTier = getScheduleBranchPreferenceTier(staff, branch);
         return {
           ...staff,
           availability,
           staffId,
-          branchPreferenceTier: getScheduleBranchPreferenceTier(staff, branch),
+          currentShiftDays,
+          isFixedPreferredWeekday: Boolean(weekday !== null && staff.fixed_preferred_weekdays?.includes(weekday)),
+          branchPreferenceTier,
+          isPreferredBranchMatch: branchPreferenceTier === 2,
+          isNonPreferredBranch: branchPreferenceTier === 0,
           score: scoreScheduleCandidate(staff, branch, isoDate, context)
         };
       })
@@ -3106,9 +3112,16 @@
         const maxWeeklyShifts = normalizeMaxWeeklyShifts(staff.max_weekly_shifts);
         if (!maxWeeklyShifts) return true;
         const currentDays = new Set((context.byStaff.get(staff.staffId) || []).map((item) => item.isoDate));
+        // This is a ceiling only; ranking below still favours the lowest assigned-day count.
         return currentDays.size < maxWeeklyShifts;
       })
-      .sort((a, b) => b.branchPreferenceTier - a.branchPreferenceTier || b.score - a.score);
+      .sort((a, b) => (
+        Number(a.isNonPreferredBranch) - Number(b.isNonPreferredBranch) ||
+        a.currentShiftDays - b.currentShiftDays ||
+        Number(b.isFixedPreferredWeekday) - Number(a.isFixedPreferredWeekday) ||
+        Number(b.isPreferredBranchMatch) - Number(a.isPreferredBranchMatch) ||
+        b.score - a.score
+      ));
   }
 
   function autoFillSchedule() {
