@@ -19,6 +19,7 @@
       --paper-shadow: rgba(63, 39, 19, 0.16);
       --brand-mark-width: clamp(30px, 7vw, 44px);
       --brand-title-size: clamp(0.95rem, 3vw, 1.35rem);
+      --poster-preview-width: min(38vw, 250px, calc((100vh - 56px) * 0.5));
     }
 
     * {
@@ -219,6 +220,12 @@
       filter: brightness(1.08);
     }
 
+    .print-button:disabled {
+      cursor: wait;
+      filter: saturate(0.55);
+      opacity: 0.66;
+    }
+
     .print-preview-label {
       width: min(94vw, 1120px);
       margin: 18px auto 8px;
@@ -230,6 +237,7 @@
     }
 
     .print-sheet {
+      position: relative;
       width: min(94vw, 1120px);
       aspect-ratio: 297 / 210;
       margin: 0 auto 22px;
@@ -239,11 +247,38 @@
       box-shadow: 0 18px 46px rgba(0, 0, 0, 0.36);
     }
 
+    .print-sheet::after {
+      content: "";
+      display: none;
+      position: absolute;
+      inset: 0;
+      place-items: center;
+      background: rgba(245, 238, 226, 0.94);
+      color: #6f4a24;
+      font-size: clamp(0.72rem, 1.4vw, 0.95rem);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-align: center;
+      z-index: 2;
+    }
+
+    .print-sheet.is-capturing::after {
+      content: "CSS 완성본을 이미지로 캡처하는 중…";
+      display: grid;
+    }
+
+    .print-sheet.is-capture-error::after {
+      content: "이미지 캡처 실패 · 위 버튼으로 다시 시도해 주세요";
+      display: grid;
+      color: #8b2f26;
+    }
+
     .print-sheet-grid {
       display: grid;
-      grid-template-columns: repeat(4, 20.202%);
-      grid-auto-rows: 57.143%;
-      column-gap: 0.5%;
+      grid-template-columns: repeat(5, 16.835%);
+      grid-template-rows: repeat(2, 47.619%);
+      column-gap: 0.67%;
+      row-gap: 0.95%;
       align-content: center;
       justify-content: center;
       width: 100%;
@@ -251,50 +286,19 @@
     }
 
     .print-copy {
+      display: block;
+      width: 100%;
+      height: 100%;
       min-width: 0;
       padding: 0;
       border: 0;
       background: transparent;
       box-shadow: none;
+      object-fit: fill;
     }
 
     .print-sheet-grid .print-copy {
-      padding: 0;
-      position: relative;
-      border: 1px solid rgba(201, 154, 71, 0.6);
-      background: linear-gradient(145deg, rgba(39, 20, 16, 0.94), rgba(9, 5, 4, 0.98));
-      box-shadow: inset 0 0 0 1px rgba(255, 232, 188, 0.08);
-    }
-
-    .print-copy::before {
-      display: none;
-    }
-
-    .print-sheet-grid .print-copy::before {
-      content: "";
-      display: block;
-      position: absolute;
-      inset: 4px;
-      z-index: 20;
-      border: 1px solid rgba(201, 154, 71, 0.22);
-      pointer-events: none;
-    }
-
-    .print-sheet-grid .print-copy.print-copy--raster-frame {
-      padding: 0;
-      border: 0;
-      background: transparent;
-      box-shadow: none;
-    }
-
-    .print-sheet-grid .print-copy.print-copy--raster-frame::before {
-      display: none;
-    }
-
-    .print-copy .poster {
-      width: 100%;
-      height: 100%;
-      box-shadow: none;
+      aspect-ratio: 1 / 2;
     }
 
     .poster-stage {
@@ -309,7 +313,9 @@
 
     .poster-frame {
       position: relative;
-      padding: 10px;
+      width: var(--poster-preview-width);
+      aspect-ratio: 1 / 2;
+      padding: 4px 2px;
       border: 1px solid rgba(201, 154, 71, 0.6);
       background: linear-gradient(145deg, rgba(39, 20, 16, 0.94), rgba(9, 5, 4, 0.98));
       box-shadow: 0 24px 72px rgba(0, 0, 0, 0.52), inset 0 0 0 1px rgba(255, 232, 188, 0.08);
@@ -325,8 +331,8 @@
 
     .poster {
       position: relative;
-      width: min(38vw, 400px, calc((100vh - 56px) * 0.5));
-      aspect-ratio: 1 / 2;
+      width: 100%;
+      height: 100%;
       container-type: inline-size;
       overflow: hidden;
       isolation: isolate;
@@ -335,8 +341,8 @@
         radial-gradient(circle at 72% 72%, rgba(92, 12, 18, 0.18), transparent 22%),
         linear-gradient(180deg, #140b09 0%, #100807 48%, #120707 100%);
       box-shadow: 0 3.6cqw 9.6cqw rgba(0, 0, 0, 0.36);
-      --brand-mark-width: clamp(24px, 13.25cqw, 44px);
-      --brand-title-size: clamp(0.82rem, 6.5cqw, 1.35rem);
+      --brand-mark-width: clamp(20px, 10.5cqw, 34px);
+      --brand-title-size: clamp(0.7rem, 5.3cqw, 1.05rem);
     }
 
     .poster--front {
@@ -344,50 +350,6 @@
         radial-gradient(ellipse at 50% 7%, rgba(220, 72, 45, 0.44), rgba(132, 24, 32, 0.16) 36%, transparent 62%),
         radial-gradient(circle at 10% 0%, rgba(126, 19, 31, 0.58), transparent 36%),
         linear-gradient(180deg, #50141b 0%, #2a0d12 22%, #110807 54%, #120707 100%);
-    }
-
-    .poster-raster-image {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: fill;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .poster--raster-frame {
-      aspect-ratio: auto;
-    }
-
-    .poster--raster-frame .qr-wrap {
-      top: 21.29%;
-      width: 61.14%;
-    }
-
-    .poster--raster::before,
-    .poster--raster::after {
-      display: none;
-    }
-
-    .poster--raster > *:not(.poster-raster-image):not(.qr-wrap) {
-      display: none;
-    }
-
-    .poster--raster .qr-frame {
-      border: 0;
-      background: transparent;
-      box-shadow: none;
-    }
-
-    .poster--raster .qr-frame::before,
-    .poster--raster .qr-frame::after {
-      display: none;
-    }
-
-    .poster--raster .qr-paper {
-      background: transparent;
-      box-shadow: none;
     }
 
     .poster::before {
@@ -432,7 +394,7 @@
 
     .brand {
       position: absolute;
-      top: 3.8%;
+      top: 2.4%;
       left: 50%;
       transform: translateX(-50%);
       display: grid;
@@ -471,16 +433,16 @@
 
     .qr-wrap {
       position: absolute;
-      top: 20.5%;
+      top: 16.8%;
       left: 50%;
-      width: 64.5%;
+      width: 80%;
       transform: translateX(-50%);
       z-index: 13;
     }
 
     .qr-frame {
       position: relative;
-      padding: 5.8%;
+      padding: 3.5%;
       background:
         linear-gradient(180deg, rgba(21, 13, 10, 0.72), rgba(15, 10, 8, 0.84));
       border: 0.3cqw solid rgba(199, 155, 66, 0.74);
@@ -514,7 +476,7 @@
       display: grid;
       place-items: center;
       aspect-ratio: 1;
-      padding: 6%;
+      padding: 4%;
       background:
         radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.78), rgba(250, 243, 228, 0.92)),
         linear-gradient(180deg, rgba(255, 250, 242, 0.96), rgba(250, 241, 225, 0.96)),
@@ -569,7 +531,7 @@
 
     .caption {
       position: absolute;
-      top: 59%;
+      top: 59.2%;
       left: 50%;
       transform: translateX(-50%);
       display: grid;
@@ -616,10 +578,10 @@
 
     .cloud-band {
       position: absolute;
-      left: -16%;
-      bottom: 12%;
-      width: 132%;
-      height: 15%;
+      left: -10%;
+      bottom: 7%;
+      width: 120%;
+      height: 18%;
       object-fit: cover;
       object-position: center 48%;
       opacity: 0.2;
@@ -632,14 +594,14 @@
 
     .gwanghwamun-scene {
       position: absolute;
-      left: -24%;
-      bottom: 3%;
-      width: 148%;
-      height: 32%;
+      left: -10%;
+      bottom: 1.5%;
+      width: 120%;
+      height: 29%;
       object-fit: cover;
-      object-position: center 62%;
-      opacity: 0.76;
-      filter: grayscale(0.06) sepia(0.68) saturate(1.38) brightness(0.92) contrast(1.16);
+      object-position: center 57%;
+      opacity: 0.9;
+      filter: grayscale(0.03) sepia(0.5) saturate(1.36) brightness(1.02) contrast(1.12);
       mix-blend-mode: screen;
       mask-image: linear-gradient(180deg, transparent 0%, transparent 14%, #000 32%, #000 82%, transparent 100%);
       pointer-events: none;
@@ -746,9 +708,9 @@
     .woman {
       position: absolute;
       left: auto;
-      right: -3%;
-      bottom: 0;
-      width: 50%;
+      right: 1.5%;
+      bottom: 1%;
+      width: 43%;
       filter: drop-shadow(-5.4cqw 6.6cqw 9cqw rgba(0, 0, 0, 0.4));
       z-index: 12;
     }
@@ -872,20 +834,20 @@
       }
 
       .print-sheet-grid {
+        grid-template-columns: repeat(5, 50mm);
+        grid-template-rows: repeat(2, 100mm);
+        column-gap: 2mm;
+        row-gap: 2mm;
         width: 297mm;
         height: 210mm;
       }
 
       .print-copy {
+        width: 50mm;
+        height: 100mm;
         padding: 0;
         border: 0;
         background: transparent;
-        box-shadow: none;
-      }
-
-      .print-copy .poster {
-        width: 60mm;
-        height: 120mm;
         box-shadow: none;
       }
     }
@@ -903,11 +865,12 @@
       }
 
       .poster-frame {
-        padding: 8px;
+        width: min(42vw, 250px, calc((100vh - 48px) * 0.5));
+        padding: 4px 2px;
       }
 
       .poster {
-        width: min(42vw, 320px, calc((100vh - 48px) * 0.5));
+        width: 100%;
       }
 
       .print-controls {
@@ -943,12 +906,12 @@
       }
 
       .qr-wrap {
-        top: 21%;
-        width: 64.5%;
+        top: 16.8%;
+        width: 80%;
       }
 
       .caption {
-        top: 59.5%;
+        top: 59.2%;
       }
 
       .caption-title {
@@ -963,9 +926,9 @@
       }
 
       .woman {
-        width: 50%;
+        width: 43%;
         left: auto;
-        right: -3%;
+        right: 1.5%;
       }
 
       .back-qr-grid {
@@ -995,9 +958,9 @@
     <div class="print-controls-header">
       <div>
         <h1 class="print-controls-title">A4 PRINT SETUP</h1>
-        <p class="print-controls-note">앞면 또는 뒷면 한 종류만 선택해 A4 가로 용지에 4장씩 배치합니다. 포스터 규격은 6×12cm입니다.</p>
+        <p class="print-controls-note">하단 CSS 완성본을 고해상도 이미지로 캡처해 A4 가로 용지에 10장 배치합니다. 금색 테두리 포함 정확히 5×10cm이며, 앞면 QR은 3×3cm 이상입니다.</p>
       </div>
-      <div class="print-capacity">A4 LANDSCAPE · 4 COPIES</div>
+      <div class="print-capacity">A4 LANDSCAPE · 10 COPIES</div>
     </div>
 
     <div class="print-controls-grid">
@@ -1063,7 +1026,7 @@
     </div>
 
     <div class="print-actions">
-      <div class="print-status" id="printStatus">앞면 4장이 A4 가로 시트에 배치됩니다. 인쇄 창에서 배율을 100%로 선택하세요.</div>
+      <div class="print-status" id="printStatus">하단 CSS 완성본을 캡처해 A4 미리보기를 준비합니다.</div>
       <button class="print-button" id="printButton" type="button">A4 인쇄 미리보기</button>
     </div>
   </section>
@@ -1145,39 +1108,23 @@
     </div>
   </div>
 
+  <script src="assets/html2canvas.min.js"></script>
   <script>
     (function () {
       const params = new URLSearchParams(window.location.search);
+      if (params.get("capture") === "front") {
+        document.documentElement.classList.add("poster-capture-front");
+      }
       const printSheetGrid = document.getElementById("printSheetGrid");
+      const printSheet = document.getElementById("printSheet");
       const printStatus = document.getElementById("printStatus");
       const printButton = document.getElementById("printButton");
       const sideSettings = Array.from(document.querySelectorAll("[data-side-settings]"));
       const sideInputs = Array.from(document.querySelectorAll('input[name="printSide"]'));
       let selectedSide = "front";
-
-      function cloneDefaultPoster(side) {
-        const poster = document.querySelector('.poster-stage .poster[data-side="' + side + '"]');
-        if (!poster) return null;
-
-        const clone = poster.cloneNode(true);
-        clone.querySelectorAll("[id]").forEach(function (element) {
-          element.removeAttribute("id");
-        });
-        return clone;
-      }
-
-      function createRasterPoster(side) {
-        const clone = cloneDefaultPoster(side);
-        if (!clone || side !== "front") return clone;
-
-        clone.classList.add("poster--raster", "poster--raster-frame");
-        const image = document.createElement("img");
-        image.className = "poster-raster-image";
-        image.src = "assets/poster-default-front-6x12-frame.png";
-        image.alt = "";
-        clone.insertBefore(image, clone.firstChild);
-        return clone;
-      }
+      let renderedSide = "";
+      let captureRequest = 0;
+      let captureTimer = 0;
 
       const slots = {
         front: {
@@ -1206,12 +1153,6 @@
         }
       };
 
-      // Keep the A4 artwork independent from the live poster. Only QR layers are painted per copy.
-      const defaultPosters = {
-        front: createRasterPoster("front"),
-        back: cloneDefaultPoster("back")
-      };
-
       function renderQr(paper, slot) {
         if (!paper) return;
 
@@ -1238,34 +1179,119 @@
         renderQr(document.getElementById(slot.paperId), slot);
       }
 
-      function buildPrintSheet() {
-        const defaultPoster = defaultPosters[selectedSide];
-        if (!defaultPoster || !printSheetGrid) return;
+      function waitForArtwork(frame) {
+        const images = Array.from(frame.querySelectorAll("img"));
+        const imageTasks = images.map(function (image) {
+          if (image.complete) {
+            return image.naturalWidth > 0 && typeof image.decode === "function"
+              ? image.decode().catch(function () {})
+              : Promise.resolve();
+          }
 
-        printSheetGrid.replaceChildren();
-
-        for (let index = 0; index < 4; index += 1) {
-          const copy = document.createElement("div");
-          copy.className = "poster-frame print-copy" + (selectedSide === "front" ? " print-copy--raster-frame" : "");
-          const clone = defaultPoster.cloneNode(true);
-
-          clone.querySelectorAll("[data-qr-slot]").forEach(function (paper) {
-            const slot = slots[paper.dataset.qrSlot];
-            if (slot) renderQr(paper, slot);
+          return new Promise(function (resolve) {
+            image.addEventListener("load", resolve, { once: true });
+            image.addEventListener("error", resolve, { once: true });
           });
+        });
 
-          copy.appendChild(clone);
-          printSheetGrid.appendChild(copy);
+        if (document.fonts && document.fonts.ready) {
+          imageTasks.push(Promise.race([
+            document.fonts.ready,
+            new Promise(function (resolve) { window.setTimeout(resolve, 2000); })
+          ]));
         }
 
-        const sideName = selectedSide === "front" ? "앞면" : "뒷면";
-        printStatus.textContent = sideName + " 4장이 A4 가로 시트에 배치됩니다. 인쇄 창에서 배율을 100%로 선택하세요.";
+        return Promise.all(imageTasks);
+      }
+
+      async function captureArtwork(side) {
+        const frame = document.querySelector('.poster-stage .poster-frame[data-side="' + side + '"]');
+        if (!frame) throw new Error("완성본을 찾을 수 없습니다.");
+        if (typeof window.html2canvas !== "function") throw new Error("캡처 모듈을 불러오지 못했습니다.");
+
+        await waitForArtwork(frame);
+        const frameWidth = frame.getBoundingClientRect().width;
+        const captureScale = Math.max(4, 1000 / Math.max(frameWidth, 1));
+
+        const canvas = await window.html2canvas(frame, {
+          backgroundColor: null,
+          scale: captureScale,
+          useCORS: true,
+          allowTaint: false,
+          logging: false,
+          imageTimeout: 15000,
+          removeContainer: true
+        });
+
+        return canvas.toDataURL("image/png");
+      }
+
+      function paintPrintSheet(dataUrl, side) {
+        const fragment = document.createDocumentFragment();
+        const copies = [];
+        const sideName = side === "front" ? "앞면" : "뒷면";
+
+        for (let index = 0; index < 10; index += 1) {
+          const copy = new Image();
+          copy.className = "print-copy";
+          copy.src = dataUrl;
+          copy.alt = sideName + " 포스터 " + (index + 1);
+          copy.decoding = "sync";
+          fragment.appendChild(copy);
+          copies.push(copy);
+        }
+
+        printSheetGrid.replaceChildren(fragment);
+        return Promise.all(copies.map(function (copy) {
+          return typeof copy.decode === "function" ? copy.decode().catch(function () {}) : Promise.resolve();
+        }));
+      }
+
+      async function buildPrintSheet() {
+        if (!printSheetGrid || !printSheet) return false;
+
+        const request = ++captureRequest;
+        const side = selectedSide;
+        const sideName = side === "front" ? "앞면" : "뒷면";
+        if (renderedSide !== side) printSheetGrid.replaceChildren();
+        printSheet.classList.remove("is-capture-error");
+        printSheet.classList.add("is-capturing");
+        printStatus.textContent = sideName + " CSS 완성본을 고해상도로 캡처하는 중입니다…";
+        printButton.disabled = true;
+
+        try {
+          const dataUrl = await captureArtwork(side);
+          if (request !== captureRequest || side !== selectedSide) return false;
+
+          await paintPrintSheet(dataUrl, side);
+          renderedSide = side;
+          printSheet.classList.remove("is-capturing", "is-capture-error");
+          printStatus.textContent = sideName + " 완성본 캡처 10장이 A4에 배치되었습니다. 외곽 금색 테두리 포함 5×10cm입니다.";
+          return true;
+        } catch (error) {
+          if (request !== captureRequest) return false;
+          console.error(error);
+          printSheet.classList.remove("is-capturing");
+          printSheet.classList.add("is-capture-error");
+          const reason = error && error.message ? " (" + error.message + ")" : "";
+          printStatus.textContent = "CSS 완성본 이미지 캡처에 실패했습니다" + reason + ". A4 인쇄 미리보기 버튼으로 다시 시도해 주세요.";
+          return false;
+        } finally {
+          if (request === captureRequest) printButton.disabled = false;
+        }
+      }
+
+      function queuePrintSheet() {
+        window.clearTimeout(captureTimer);
+        captureRequest += 1;
+        captureTimer = window.setTimeout(buildPrintSheet, 160);
       }
 
       function showSelectedSettings() {
         sideSettings.forEach(function (settings) {
           settings.hidden = settings.dataset.sideSettings !== selectedSide;
         });
+        window.clearTimeout(captureTimer);
         buildPrintSheet();
       }
 
@@ -1280,7 +1306,7 @@
             slot.source = urlInput.value.trim();
             if (fileInput) fileInput.value = "";
             updateSlot(slot);
-            buildPrintSheet();
+            queuePrintSheet();
           });
         }
 
@@ -1294,7 +1320,7 @@
               slot.source = typeof reader.result === "string" ? reader.result : "";
               if (urlInput) urlInput.value = "";
               updateSlot(slot);
-              buildPrintSheet();
+              queuePrintSheet();
             });
             reader.readAsDataURL(file);
           });
@@ -1306,7 +1332,7 @@
             slot.number = numberInput.value.replace(/[^0-9]/g, "").slice(0, 3);
             numberInput.value = slot.number;
             updateSlot(slot);
-            buildPrintSheet();
+            queuePrintSheet();
           });
         }
 
@@ -1323,12 +1349,12 @@
         });
       });
 
-      printButton.addEventListener("click", function () {
-        buildPrintSheet();
-        window.print();
+      printButton.addEventListener("click", async function () {
+        window.clearTimeout(captureTimer);
+        const ready = await buildPrintSheet();
+        if (ready) window.print();
       });
 
-      window.addEventListener("beforeprint", buildPrintSheet);
       showSelectedSettings();
     }());
   </script>
