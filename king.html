@@ -1217,6 +1217,45 @@
       gap: 8px;
     }
 
+    .schedule-primary-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      padding: 10px;
+      border: 1px solid rgba(123, 31, 47, 0.16);
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(123, 31, 47, 0.07), rgba(212, 175, 55, 0.1));
+    }
+
+    .schedule-primary-actions .pill-btn {
+      width: 100%;
+      min-width: 0;
+      min-height: 48px;
+      padding: 7px 8px;
+      white-space: normal;
+      line-height: 1.15;
+    }
+
+    .schedule-primary-actions #scheduleAutoFillBtn {
+      color: #fffaf2;
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--wine), #9a3a4c);
+      box-shadow: 0 12px 22px rgba(123, 31, 47, 0.16);
+    }
+
+    .schedule-primary-actions #scheduleCopyImageBtn {
+      color: #6a4a1e;
+      border-color: rgba(166, 119, 31, 0.3);
+      background: rgba(255, 250, 238, 0.88);
+    }
+
+    .schedule-primary-actions #schedulePublishBtn {
+      color: #f8fffb;
+      border-color: transparent;
+      background: linear-gradient(135deg, #245f51, #3f8f76);
+      box-shadow: 0 12px 22px rgba(36, 95, 81, 0.18);
+    }
+
     .schedule-detail-toggle.is-active {
       border-color: rgba(36, 95, 81, 0.42);
       background: rgba(36, 95, 81, 0.12);
@@ -1306,21 +1345,21 @@
     }
 
     .staff-pill.is-uptown {
-      border-color: rgba(143, 36, 56, 0.2);
-      background: linear-gradient(135deg, rgba(143, 36, 56, 0.12), rgba(212, 175, 55, 0.12));
-      color: #742238;
+      border-color: rgba(143, 36, 56, 0.42);
+      background: linear-gradient(135deg, rgba(143, 36, 56, 0.19), rgba(240, 204, 211, 0.66));
+      color: #692036;
     }
 
     .staff-pill.is-downtown {
-      border-color: rgba(36, 95, 81, 0.2);
-      background: linear-gradient(135deg, rgba(36, 95, 81, 0.12), rgba(212, 175, 55, 0.1));
-      color: #245f51;
+      border-color: rgba(36, 95, 81, 0.42);
+      background: linear-gradient(135deg, rgba(36, 95, 81, 0.2), rgba(202, 232, 220, 0.72));
+      color: #1e5549;
     }
 
     .staff-pill.is-both {
-      border-color: rgba(123, 31, 47, 0.18);
-      background: linear-gradient(135deg, rgba(123, 31, 47, 0.1), rgba(36, 95, 81, 0.1));
-      color: #4c3328;
+      border-color: rgba(166, 119, 31, 0.42);
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.24), rgba(255, 242, 202, 0.82));
+      color: #694613;
     }
 
     .staff-pill small {
@@ -1328,6 +1367,28 @@
       font-size: 0.72rem;
       font-weight: 800;
       text-transform: uppercase;
+    }
+
+    .staff-pill.is-uptown:not(.is-selected) small,
+    .staff-pill.is-downtown:not(.is-selected) small,
+    .staff-pill.is-both:not(.is-selected) small {
+      padding: 3px 6px;
+      border-radius: 999px;
+      color: currentColor;
+      font-size: 0.64rem;
+      line-height: 1;
+    }
+
+    .staff-pill.is-uptown:not(.is-selected) small {
+      background: rgba(143, 36, 56, 0.13);
+    }
+
+    .staff-pill.is-downtown:not(.is-selected) small {
+      background: rgba(36, 95, 81, 0.13);
+    }
+
+    .staff-pill.is-both:not(.is-selected) small {
+      background: rgba(166, 119, 31, 0.16);
     }
 
     .staff-pill.is-selected.is-uptown,
@@ -1712,15 +1773,16 @@
         display: inline-flex;
         align-items: baseline;
         gap: 2px;
-        color: #3a291d;
-        font-size: 0.72rem;
+        color: #6f665e;
+        font-size: 0.6rem;
+        font-weight: 800;
         line-height: 1;
       }
 
       .schedule-day-label-compact small {
-        color: var(--muted);
-        font-size: 0.57rem;
-        font-weight: 900;
+        color: #3a291d;
+        font-size: 0.78rem;
+        font-weight: 950;
       }
 
       .schedule-day-top {
@@ -2145,14 +2207,16 @@
               </div>
               <div class="week-chip-list" id="scheduleWeekChips"></div>
             </div>
-            <div class="schedule-actions">
+            <div class="schedule-actions schedule-secondary-actions">
               <button class="pill-btn" id="scheduleLoadBtn" type="button">불러오기</button>
-              <button class="pill-btn" id="scheduleAutoFillBtn" type="button">빈자리 자동배정</button>
               <button class="pill-btn schedule-detail-toggle" id="scheduleDetailToggleBtn" type="button" aria-expanded="false">세부 설정</button>
-              <button class="pill-btn" id="scheduleCopyImageBtn" type="button">이미지 복사</button>
               <button class="pill-btn danger" id="scheduleResetBtn" type="button">주간 초기화</button>
-              <button class="pill-btn primary" id="schedulePublishBtn" type="button">저장 / 게시</button>
             </div>
+          </div>
+          <div class="schedule-primary-actions" aria-label="주요 스케줄 작업">
+            <button class="pill-btn" id="scheduleAutoFillBtn" type="button">빈자리 자동배정</button>
+            <button class="pill-btn" id="scheduleCopyImageBtn" type="button">이미지 복사</button>
+            <button class="pill-btn primary" id="schedulePublishBtn" type="button">확정</button>
           </div>
           <div class="status-line" id="scheduleStatus"></div>
         </div>

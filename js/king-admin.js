@@ -1613,7 +1613,7 @@
 
   function getScheduleWeekOptions() {
     const todayWeek = startOfWeek(new Date());
-    const defaultBase = addWeeks(todayWeek, 1);
+    const defaultBase = todayWeek;
     const base = toSafeDate(state.scheduleWeekWindowStart) || defaultBase;
     return Array.from({ length: 3 }, (_unused, index) => {
       const start = addWeeks(base, index);
@@ -2921,7 +2921,7 @@
       ];
       state.scheduleShifts = rows;
       renderScheduleBoard();
-      setScheduleStatus("스케줄을 게시했습니다.", "success");
+      setScheduleStatus("스케줄을 확정했습니다.", "success");
     } catch (error) {
       setScheduleStatus(error.message || "스케줄 저장에 실패했습니다.", "error");
     }
@@ -3088,7 +3088,7 @@
       void fetchScheduleData();
     });
     refs.scheduleWeekPrevBtn.addEventListener("click", () => {
-      const current = toSafeDate(state.scheduleWeekWindowStart) || addWeeks(startOfWeek(new Date()), -1);
+      const current = toSafeDate(state.scheduleWeekWindowStart) || startOfWeek(new Date());
       state.scheduleWeekWindowStart = formatInputDate(addWeeks(current, -3));
       const options = getScheduleWeekOptions();
       state.scheduleWeekStart = options[1]?.weekStart || options[0]?.weekStart || state.scheduleWeekStart;
@@ -3097,7 +3097,7 @@
       if (state.activeTab === "schedule") void fetchScheduleData();
     });
     refs.scheduleWeekNextBtn.addEventListener("click", () => {
-      const current = toSafeDate(state.scheduleWeekWindowStart) || addWeeks(startOfWeek(new Date()), -1);
+      const current = toSafeDate(state.scheduleWeekWindowStart) || startOfWeek(new Date());
       state.scheduleWeekWindowStart = formatInputDate(addWeeks(current, 3));
       const options = getScheduleWeekOptions();
       state.scheduleWeekStart = options[1]?.weekStart || options[0]?.weekStart || state.scheduleWeekStart;
@@ -3214,7 +3214,7 @@
       year: "numeric"
     }).format(new Date());
     state.scheduleWeekStart = formatInputDate(addWeeks(startOfWeek(new Date()), 1));
-    state.scheduleWeekWindowStart = formatInputDate(addWeeks(startOfWeek(new Date()), 1));
+    state.scheduleWeekWindowStart = formatInputDate(startOfWeek(new Date()));
     state.scheduleStaff = FALLBACK_SERVER_REFS.map(normalizeStaffRef).filter(Boolean);
     state.scheduleUsingFallbackStaff = true;
     refs.scheduleWeekStart.value = state.scheduleWeekStart;
