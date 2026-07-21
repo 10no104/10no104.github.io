@@ -1108,7 +1108,7 @@
     </div>
   </div>
 
-  <script src="assets/html2canvas.min.js"></script>
+  <script src="assets/html-to-image.js"></script>
   <script>
     (function () {
       const params = new URLSearchParams(window.location.search);
@@ -1207,23 +1207,23 @@
       async function captureArtwork(side) {
         const frame = document.querySelector('.poster-stage .poster-frame[data-side="' + side + '"]');
         if (!frame) throw new Error("완성본을 찾을 수 없습니다.");
-        if (typeof window.html2canvas !== "function") throw new Error("캡처 모듈을 불러오지 못했습니다.");
+        if (!window.htmlToImage || typeof window.htmlToImage.toPng !== "function") {
+          throw new Error("캡처 모듈을 불러오지 못했습니다.");
+        }
 
         await waitForArtwork(frame);
-        const frameWidth = frame.getBoundingClientRect().width;
+        const frameBounds = frame.getBoundingClientRect();
+        const frameWidth = frameBounds.width;
         const captureScale = Math.max(4, 1000 / Math.max(frameWidth, 1));
 
-        const canvas = await window.html2canvas(frame, {
-          backgroundColor: null,
-          scale: captureScale,
-          useCORS: true,
-          allowTaint: false,
-          logging: false,
-          imageTimeout: 15000,
-          removeContainer: true
+        return window.htmlToImage.toPng(frame, {
+          cacheBust: true,
+          includeQueryParams: true,
+          pixelRatio: captureScale,
+          width: frameBounds.width,
+          height: frameBounds.height,
+          skipAutoScale: true
         });
-
-        return canvas.toDataURL("image/png");
       }
 
       function paintPrintSheet(dataUrl, side) {
