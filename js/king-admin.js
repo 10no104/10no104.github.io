@@ -1737,6 +1737,16 @@
     return getOntarioPublicHolidays(date.getFullYear()).get(isoDate) || null;
   }
 
+  function getOntarioCalendarObservances(year) {
+    const easterMonday = addDays(getEasterSunday(year), 1);
+    return [
+      { date: formatInputDate(easterMonday), title: "Easter Monday", type: "observance" },
+      { date: formatInputDate(getNthWeekdayOfMonth(year, 7, 1, 1)), title: "Civic Holiday", type: "observance" },
+      { date: formatInputDate(new Date(year, 8, 30)), title: "National Day for Truth and Reconciliation", type: "observance" },
+      { date: formatInputDate(new Date(year, 10, 11)), title: "Remembrance Day", type: "observance" }
+    ];
+  }
+
   function normalizeScheduleCalendarEvent(item = {}) {
     const eventDate = String(item.event_date || item.date || "").slice(0, 10);
     const title = String(item.title || "").trim().slice(0, 80);
@@ -1773,7 +1783,14 @@
 
   function getScheduleDateCalendarInfo(isoDate = "") {
     const holiday = getOntarioPublicHoliday(isoDate);
-    const events = state.scheduleCalendarEvents.filter((item) => item.event_date === isoDate);
+    const date = toSafeDate(isoDate);
+    const observances = date
+      ? getOntarioCalendarObservances(date.getFullYear()).filter((item) => item.date === isoDate)
+      : [];
+    const events = [
+      ...observances,
+      ...state.scheduleCalendarEvents.filter((item) => item.event_date === isoDate)
+    ];
     const labels = [
       holiday ? `Ontario public holiday: ${holiday.title}` : "",
       ...events.map((item) => `Event: ${item.title}`)
@@ -1796,11 +1813,16 @@
     const monthEnd = formatInputDate(new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0));
     const holidayItems = Array.from(getOntarioPublicHolidays(cursor.getFullYear()).values())
       .filter((item) => item.date >= monthStart && item.date <= monthEnd);
+    const observanceItems = getOntarioCalendarObservances(cursor.getFullYear())
+      .filter((item) => item.date >= monthStart && item.date <= monthEnd)
+      .map((item) => ({ ...item, isManual: false }));
     const eventItems = state.scheduleCalendarEvents
       .filter((item) => item.event_date >= monthStart && item.event_date <= monthEnd)
+      .map((item) => ({ ...item, isManual: true }))
       .sort((a, b) => a.event_date.localeCompare(b.event_date) || a.title.localeCompare(b.title));
     const items = [
       ...holidayItems.map((item) => ({ ...item, isHoliday: true })),
+      ...observanceItems.map((item) => ({ ...item, isHoliday: false })),
       ...eventItems.map((item) => ({ ...item, isHoliday: false }))
     ].sort((a, b) => {
       const aDate = a.date || a.event_date;
@@ -1815,7 +1837,7 @@
         <div class="schedule-calendar-event-item ${item.isHoliday ? "is-holiday" : "is-event"}">
           <span>${escapeHtml(dateLabel)}</span>
           <strong>${escapeHtml(item.title)}</strong>
-          ${item.isHoliday ? "" : `<button type="button" data-delete-schedule-calendar-event="${escapeHtml(item.id)}" aria-label="${escapeHtml(`${item.title} 이벤트 삭제`)}">×</button>`}
+          ${item.isManual ? `<button type="button" data-delete-schedule-calendar-event="${escapeHtml(item.id)}" aria-label="${escapeHtml(`${item.title} 이벤트 삭제`)}">×</button>` : ""}
         </div>
       `;
     }).join("") : '<div class="schedule-calendar-empty">이번 달 등록된 이벤트가 없습니다.</div>';
@@ -3034,7 +3056,7 @@
 
     if (availability?.status === "preferred") score += 32;
     if (staff.fixed_preferred_weekdays?.includes(weekday)) score += 24;
-    if (normalizeBranchScope(staff.preferred_branch) === branch) score += 16;
+    if (normalizeBranchScope(staff.preferred_branch) === branch) score += 40;
 
     const workStyle = staff.work_style || "";
     const hasAdjacentDay = Array.from(currentDays).some((dateValue) => {
@@ -3065,6 +3087,12 @@
     return score;
   }
 
+  function getScheduleBranchPreferenceTier(staff, branch) {
+    const preferredBranch = normalizeBranchScope(staff?.preferred_branch);
+    if (!preferredBranch || preferredBranch === "both") return 1;
+    return preferredBranch === branch ? 2 : 0;
+  }
+
   function getCandidatesForCell(branch, isoDate, existingNames = [], context = getBoardAssignments()) {
     const existingKeys = new Set(existingNames.map(normalizeScheduleStaffKey));
     const pool = getScheduleStaffPool();
@@ -3080,6 +3108,7 @@
           ...staff,
           availability,
           staffId,
+          branchPreferenceTier: getScheduleBranchPreferenceTier(staff, branch),
           score: scoreScheduleCandidate(staff, branch, isoDate, context)
         };
       })
@@ -3094,7 +3123,7 @@
         const currentDays = new Set((context.byStaff.get(staff.staffId) || []).map((item) => item.isoDate));
         return currentDays.size < maxWeeklyShifts;
       })
-      .sort((a, b) => b.score - a.score);
+      .sort((a, b) => b.branchPreferenceTier - a.branchPreferenceTier || b.score - a.score);
   }
 
   function autoFillSchedule() {
