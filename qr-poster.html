@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
   <style>
     :root {
       --bg: #120907;
@@ -1049,7 +1050,7 @@
         });
       }
 
-      async function canvasFromPoster(side) {
+      async function canvasFromPosterSvg(side) {
         const source = document.querySelector('.poster-frame[data-side="' + side + '"]');
         if (!source) throw new Error("Poster not found");
 
@@ -1122,6 +1123,24 @@
           };
           image.src = svgUrl;
         });
+      }
+
+      async function canvasFromPoster(side) {
+        const source = document.querySelector('.poster-frame[data-side="' + side + '"]');
+        if (!source) throw new Error("Poster not found");
+
+        if (typeof window.html2canvas === "function") {
+          return window.html2canvas(source, {
+            allowTaint: false,
+            backgroundColor: null,
+            imageTimeout: 15000,
+            logging: false,
+            scale: 3,
+            useCORS: true
+          });
+        }
+
+        return canvasFromPosterSvg(side);
       }
 
       function canvasBlob(canvas) {
