@@ -129,6 +129,7 @@
     scheduleWeek: null,
     scheduleShifts: [],
     scheduleSelectedStaffKey: "",
+    scheduleDetailsOpen: false,
     schedulePointerDrag: null,
     scheduleSuppressClickUntil: 0,
     sortables: {
@@ -229,6 +230,7 @@
       "scheduleLoadBtn",
       "schedulePublishBtn",
       "scheduleAutoFillBtn",
+      "scheduleDetailToggleBtn",
       "scheduleCopyImageBtn",
       "scheduleResetBtn",
       "scheduleStatus",
@@ -1645,6 +1647,11 @@
     }).format(date);
   }
 
+  function formatScheduleDayCompactLabel(date) {
+    const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
+    return { day: String(date.getDate()), weekday: weekdays[date.getDay()] };
+  }
+
   function formatWeekRangeLabel(start, end) {
     return `${start.getMonth() + 1}/${start.getDate()} - ${end.getMonth() + 1}/${end.getDate()}`;
   }
@@ -2004,6 +2011,7 @@
             const cellKey = getScheduleCellKey(branch.key, dateValue);
             const names = namesByCell.get(cellKey) || [];
             const targetCount = Math.max(boardTargets.get(cellKey) ?? getDefaultServerCount(date), names.length);
+            const compactDayLabel = formatScheduleDayCompactLabel(date);
             const dropStatus = getScheduleDropStatus(selectedStaff, branch.key, dateValue, names, assignmentContext);
             const dropClasses = [
               "schedule-dropzone",
@@ -2015,10 +2023,13 @@
               <article class="schedule-day-card is-${branch.key} ${isSameDate(date, today) ? "is-today" : ""}">
                 <div class="schedule-day-top">
                   <header>
-                    <strong>${escapeHtml(formatScheduleDayLabel(date))}</strong>
-                    <span>${escapeHtml(branch.label)}</span>
+                    <strong aria-label="${escapeHtml(formatScheduleDayLabel(date))}">
+                      <span class="schedule-day-label-full" aria-hidden="true">${escapeHtml(formatScheduleDayLabel(date))}</span>
+                      <span class="schedule-day-label-compact" aria-hidden="true">${escapeHtml(compactDayLabel.day)}<small>${escapeHtml(compactDayLabel.weekday)}</small></span>
+                    </strong>
+                    <span class="schedule-branch-label">${escapeHtml(branch.label)}</span>
                   </header>
-                  <label class="server-count-field">
+                  <label class="server-count-field${state.scheduleDetailsOpen ? "" : " is-hidden"}">
                     <span>인원</span>
                     <input data-schedule-target="${escapeHtml(cellKey)}" type="number" min="0" max="8" value="${targetCount}" inputmode="numeric" />
                   </label>
@@ -2058,6 +2069,9 @@
     renderAvailabilityList("preferred", refs.preferredList);
     renderScheduleStaffList();
     renderScheduleWeekChips();
+    refs.scheduleDetailToggleBtn.textContent = state.scheduleDetailsOpen ? "세부 설정 닫기" : "세부 설정";
+    refs.scheduleDetailToggleBtn.classList.toggle("is-active", state.scheduleDetailsOpen);
+    refs.scheduleDetailToggleBtn.setAttribute("aria-expanded", String(state.scheduleDetailsOpen));
   }
 
   async function fetchScheduleData() {
@@ -2977,6 +2991,10 @@
     refs.employeeEditorForm.addEventListener("submit", (event) => void saveEmployeeEditor(event));
     refs.scheduleLoadBtn.addEventListener("click", () => void fetchScheduleData());
     refs.scheduleAutoFillBtn.addEventListener("click", autoFillScheduleV2);
+    refs.scheduleDetailToggleBtn.addEventListener("click", () => {
+      state.scheduleDetailsOpen = !state.scheduleDetailsOpen;
+      renderScheduleBoard();
+    });
     refs.scheduleCopyImageBtn.addEventListener("click", () => void copyScheduleImageToClipboard());
     refs.scheduleResetBtn.addEventListener("click", () => void resetScheduleWeek());
     refs.schedulePublishBtn.addEventListener("click", () => void saveScheduleWeek());

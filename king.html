@@ -1217,6 +1217,12 @@
       gap: 8px;
     }
 
+    .schedule-detail-toggle.is-active {
+      border-color: rgba(36, 95, 81, 0.42);
+      background: rgba(36, 95, 81, 0.12);
+      color: #245f51;
+    }
+
     .schedule-summary-grid {
       display: grid;
       gap: 10px;
@@ -1458,6 +1464,10 @@
       font-weight: 900;
     }
 
+    .server-count-field.is-hidden {
+      display: none;
+    }
+
     .server-count-field input {
       width: 58px;
       min-height: 32px;
@@ -1480,6 +1490,10 @@
       resize: vertical;
       font-size: 0.88rem;
       line-height: 1.4;
+    }
+
+    .schedule-day-label-compact {
+      display: none;
     }
 
     .schedule-value {
@@ -1636,12 +1650,22 @@
     @media (max-width: 719px) {
       .schedule-summary-grid,
       .schedule-board {
-        padding-left: 12px;
-        padding-right: 12px;
+        padding-left: 8px;
+        padding-right: 8px;
+      }
+
+      .schedule-board {
+        gap: 8px;
       }
 
       .schedule-branch {
-        padding: 10px;
+        padding: 7px;
+        border-radius: 16px;
+      }
+
+      .schedule-branch h4 {
+        margin-bottom: 6px;
+        font-size: 0.88rem;
       }
 
       .staff-roster-list {
@@ -1649,79 +1673,109 @@
       }
 
       .schedule-day-grid {
-        grid-template-columns: repeat(7, minmax(96px, 1fr));
-        gap: 6px;
-        padding-bottom: 6px;
-        scroll-snap-type: x mandatory;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 2px;
+        overflow: visible;
+        padding-bottom: 0;
+        scroll-snap-type: none;
       }
 
       .schedule-day-card {
-        min-width: 96px;
-        gap: 6px;
-        padding: 7px;
-        border-radius: 14px;
-        scroll-snap-align: start;
+        min-width: 0;
+        gap: 3px;
+        padding: 3px;
+        border-radius: 8px;
+        scroll-snap-align: none;
       }
 
       .schedule-day-card header {
-        justify-content: center;
-        font-size: 0.72rem;
+        display: grid;
+        min-height: 28px;
+        place-items: center;
         text-align: center;
       }
 
-      .schedule-day-card header span {
+      .schedule-day-label-full,
+      .schedule-branch-label {
         display: none;
       }
 
+      .schedule-day-label-compact {
+        display: grid;
+        gap: 1px;
+        color: #3a291d;
+        font-size: 0.72rem;
+        line-height: 1;
+      }
+
+      .schedule-day-label-compact small {
+        color: var(--muted);
+        font-size: 0.57rem;
+        font-weight: 900;
+      }
+
       .schedule-day-top {
-        gap: 6px;
+        gap: 3px;
       }
 
       .server-count-field {
         justify-content: center;
-        gap: 4px;
-        padding: 5px;
-        font-size: 0.66rem;
+        padding: 2px;
+      }
+
+      .server-count-field > span {
+        display: none;
       }
 
       .server-count-field input {
-        width: 36px;
-        min-height: 26px;
-        border-radius: 8px;
-        font-size: 0.76rem;
+        width: 100%;
+        min-height: 22px;
+        border-radius: 6px;
+        font-size: 0.72rem;
       }
 
       .schedule-dropzone {
-        gap: 5px;
-        min-height: 82px;
-        padding: 6px;
-        border-radius: 10px;
+        gap: 2px;
+        min-height: 72px;
+        padding: 3px;
+        border-radius: 6px;
       }
 
       .schedule-assignment-list {
-        gap: 4px;
-        min-height: 32px;
+        gap: 1px;
+        min-height: 0;
       }
 
       .schedule-assignment {
-        gap: 3px;
-        padding: 5px;
-        border-radius: 7px;
-        font-size: 0.71rem;
+        display: block;
+        overflow: hidden;
+        padding: 1px;
+        border: 0;
+        border-radius: 3px;
+        background: transparent;
+        font-size: 0.65rem;
+        line-height: 1.15;
+        text-align: center;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .schedule-assignment > span:first-child {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       .schedule-assignment-remove {
-        font-size: 0.9rem;
+        display: none;
       }
 
       .schedule-drop-hint {
-        min-height: 28px;
-        font-size: 0.62rem;
-        line-height: 1.2;
+        display: none;
       }
 
       .schedule-dropzone.is-unavailable::after {
-        font-size: 4.4rem;
+        font-size: 3.5rem;
       }
     }
 
@@ -2084,6 +2138,7 @@
             <div class="schedule-actions">
               <button class="pill-btn" id="scheduleLoadBtn" type="button">불러오기</button>
               <button class="pill-btn" id="scheduleAutoFillBtn" type="button">빈자리 자동배정</button>
+              <button class="pill-btn schedule-detail-toggle" id="scheduleDetailToggleBtn" type="button" aria-expanded="false">세부 설정</button>
               <button class="pill-btn" id="scheduleCopyImageBtn" type="button">이미지 복사</button>
               <button class="pill-btn danger" id="scheduleResetBtn" type="button">주간 초기화</button>
               <button class="pill-btn primary" id="schedulePublishBtn" type="button">저장 / 게시</button>
