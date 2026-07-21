@@ -1357,17 +1357,6 @@
       box-shadow: 0 10px 20px rgba(123, 31, 47, 0.2);
     }
 
-    .schedule-month-calendar .calendar-day.has-schedule::after {
-      position: absolute;
-      right: 5px;
-      bottom: 5px;
-      width: 5px;
-      height: 5px;
-      border-radius: 999px;
-      background: #245f51;
-      content: "";
-    }
-
     .schedule-month-calendar .calendar-day.is-holiday {
       border-color: rgba(178, 112, 22, 0.54);
       background: linear-gradient(180deg, rgba(255, 249, 224, 0.99), rgba(255, 232, 165, 0.98));
@@ -1381,6 +1370,16 @@
     .schedule-month-calendar .calendar-day.is-holiday.has-calendar-event {
       border-color: rgba(150, 97, 51, 0.58);
       background: linear-gradient(135deg, rgba(255, 241, 194, 0.99), rgba(221, 229, 255, 0.99));
+    }
+
+    .schedule-month-calendar .calendar-day.is-selected {
+      border-color: rgba(123, 31, 47, 0.72);
+      box-shadow: inset 0 0 0 2px rgba(123, 31, 47, 0.2), 0 10px 18px rgba(52, 29, 22, 0.06);
+    }
+
+    .schedule-month-calendar .calendar-day.is-selected.is-today {
+      border-color: #fff3b3;
+      box-shadow: inset 0 0 0 2px rgba(255, 243, 179, 0.5), 0 10px 20px rgba(123, 31, 47, 0.2);
     }
 
     .schedule-month-calendar .calendar-day.is-today.is-holiday,
@@ -1533,10 +1532,6 @@
       font-weight: 750;
     }
 
-    .schedule-month-calendar .calendar-day.is-today.has-schedule::after {
-      background: #fff3b3;
-    }
-
     .schedule-month-calendar .calendar-day strong {
       display: block;
       font-size: 0.9rem;
@@ -1650,6 +1645,32 @@
       text-transform: uppercase;
     }
 
+    .staff-pill-name {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .staff-pill-meta {
+      display: inline-flex;
+      flex: 0 0 auto;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .staff-pill-count {
+      min-width: 28px;
+      padding: 3px 5px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.58);
+      color: currentColor;
+      font-size: 0.7rem;
+      font-weight: 950;
+      line-height: 1;
+      text-align: center;
+    }
+
     .staff-pill.is-uptown:not(.is-selected) small,
     .staff-pill.is-downtown:not(.is-selected) small,
     .staff-pill.is-both:not(.is-selected) small {
@@ -1679,6 +1700,11 @@
       color: #fffaf2;
       background: linear-gradient(135deg, var(--wine), #b9871f);
       box-shadow: 0 10px 20px rgba(123, 31, 47, 0.2);
+    }
+
+    .staff-pill.is-selected .staff-pill-count {
+      background: rgba(255, 250, 242, 0.2);
+      color: #fffaf2;
     }
 
     .availability-list {
@@ -2858,6 +2884,6 @@
     </div>
   </div>
 
-  <script src="js/king-admin.js?v=20260719-1"></script>
+  <script src="js/king-admin.js?v=20260721-2"></script>
 </body>
 </html>

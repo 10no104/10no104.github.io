@@ -1945,12 +1945,12 @@
   function renderScheduleMonthCalendar() {
     if (!refs.scheduleMonthGrid || !refs.scheduleMonthLabel) return;
     const selectedWeekStart = toSafeDate(state.scheduleWeekStart);
+    const selectedDate = toSafeDate(state.scheduleMonthSelectedDate) || selectedWeekStart;
     const cursor = state.scheduleMonthCursor instanceof Date
       ? startOfMonth(state.scheduleMonthCursor)
       : startOfMonth(selectedWeekStart || new Date());
     const monthEnd = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0);
     const today = startOfDay(new Date());
-    const assignments = getScheduleNamesByCellFromBoard();
     const leadingBlanks = (cursor.getDay() + 6) % 7;
     const cells = [];
 
@@ -1967,12 +1967,11 @@
     for (let day = 1; day <= monthEnd.getDate(); day += 1) {
       const date = new Date(cursor.getFullYear(), cursor.getMonth(), day);
       const isoDate = formatInputDate(date);
-      const hasSchedule = ["uptown", "downtown"].some((branch) => (assignments.get(getScheduleCellKey(branch, isoDate)) || []).length > 0);
       const calendarInfo = getScheduleDateCalendarInfo(isoDate);
       const classes = [
         "calendar-day",
         isSameDate(date, today) ? "is-today" : "",
-        hasSchedule ? "has-schedule" : "",
+        selectedDate && isSameDate(date, selectedDate) ? "is-selected" : "",
         calendarInfo.holiday ? "is-holiday" : "",
         calendarInfo.events.length ? "has-calendar-event" : ""
       ].filter(Boolean).join(" ");
@@ -2056,16 +2055,32 @@
       saturday: 6,
       토: 6
     };
-    const raw = Array.isArray(value) ? value : String(value || "").split(/[,\s|/]+/);
-    return raw
+    let raw;
+    if (Array.isArray(value)) {
+      raw = value;
+    } else if (typeof value === "string") {
+      const text = value.trim();
+      try {
+        const parsed = JSON.parse(text);
+        raw = Array.isArray(parsed) ? parsed : [parsed];
+      } catch (_error) {
+        raw = text
+          .replace(/^[{[(]\s*|\s*[}\])]\s*$/g, "")
+          .split(/[,\s|/]+/);
+      }
+    } else {
+      raw = [value];
+    }
+
+    return Array.from(new Set(raw
       .map((item) => {
-        const text = String(item).trim().toLowerCase();
+        const text = String(item).trim().toLowerCase().replace(/^["']+|["']+$/g, "");
         if (!text) return null;
-        const number = Number.parseInt(text, 10);
-        if (Number.isInteger(number) && number >= 0 && number <= 6) return number;
+        if (/^[0-6]$/.test(text)) return Number(text);
         return weekdayMap[text] ?? null;
       })
-      .filter((item) => item !== null);
+      .filter((item) => item !== null)))
+      .sort((a, b) => a - b);
   }
 
   function normalizeMaxWeeklyShifts(value) {
@@ -2272,6 +2287,7 @@
       .slice()
       .sort((a, b) => a.branch_scope.localeCompare(b.branch_scope) || a.name.localeCompare(b.name));
     const selectedKey = normalizeScheduleStaffKey(state.scheduleSelectedStaffKey);
+    const assignmentContext = getBoardAssignments();
     refs.scheduleStaffList.classList.toggle("is-drag-disabled", state.scheduleDetailsOpen);
 
     if (!staff.length) {
@@ -2281,18 +2297,26 @@
 
     refs.scheduleStaffList.innerHTML = `
       ${state.scheduleUsingFallbackStaff ? '<div class="empty-state">employee_refs가 비어 있어 임시 서버 목록을 표시 중입니다.</div>' : ""}
-      ${staff.map((item) => `
+      ${staff.map((item) => {
+        const staffId = normalizeScheduleStaffKey(item.staff_key || item.name);
+        const assignedDays = new Set((assignmentContext.byStaff.get(staffId) || []).map((assignment) => assignment.isoDate)).size;
+        return `
         <button
           class="staff-pill is-${escapeHtml(normalizeBranchScope(item.branch_scope))} ${selectedKey === normalizeScheduleStaffKey(item.staff_key || item.name) ? "is-selected" : ""}"
           type="button"
           data-schedule-staff="${escapeHtml(item.staff_key || item.name)}"
           aria-pressed="${selectedKey === normalizeScheduleStaffKey(item.staff_key || item.name) ? "true" : "false"}"
-          aria-label="${escapeHtml(state.scheduleDetailsOpen ? `${item.name} 선택` : `${item.name} 선택 또는 길게 눌러 드래그`)}"
+          aria-label="${escapeHtml(state.scheduleDetailsOpen ? `${item.name} 선택, 이번 주 ${assignedDays}일 배정` : `${item.name} 선택 또는 길게 눌러 드래그, 이번 주 ${assignedDays}일 배정`)}"
+          title="${escapeHtml(`${item.name}: 이번 주 ${assignedDays}일 배정`)}"
         >
-          <span>${escapeHtml(item.name)}</span>
-          <small>${escapeHtml(formatBranchLabel(item.branch_scope))}</small>
+          <span class="staff-pill-name">${escapeHtml(item.name)}</span>
+          <span class="staff-pill-meta">
+            <small>${escapeHtml(formatBranchLabel(item.branch_scope))}</small>
+            <b class="staff-pill-count" aria-hidden="true">${assignedDays}일</b>
+          </span>
         </button>
-      `).join("")}
+      `;
+      }).join("")}
     `;
   }
 
@@ -3161,26 +3185,40 @@
       return;
     }
 
-    let added = 0;
-    let context = getBoardAssignments();
-    refs.scheduleBoard.querySelectorAll("[data-schedule-cell]").forEach((textarea) => {
-      const [branch, isoDate] = String(textarea.dataset.scheduleCell || "").split("|");
-      const date = toSafeDate(isoDate);
-      if (!branch || !isoDate || !date) return;
+    const fillOpenSlots = ({ fixedPreferredOnly = false, context = getBoardAssignments() } = {}) => {
+      let added = 0;
+      let nextContext = context;
 
-      const names = getCurrentNames(textarea);
-      const target = getTargetCountForCell(textarea.dataset.scheduleCell, date);
-      const needed = Math.max(0, target - names.length);
-      if (!needed) return;
+      refs.scheduleBoard.querySelectorAll("[data-schedule-cell]").forEach((textarea) => {
+        const [branch, isoDate] = String(textarea.dataset.scheduleCell || "").split("|");
+        const date = toSafeDate(isoDate);
+        if (!branch || !isoDate || !date) return;
 
-      const candidates = getCandidatesForCell(branch, isoDate, names, context);
-      const selected = candidates.slice(0, needed).map((staff) => staff.name);
-      if (!selected.length) return;
+        const names = getCurrentNames(textarea);
+        const target = getTargetCountForCell(textarea.dataset.scheduleCell, date);
+        const needed = Math.max(0, target - names.length);
+        if (!needed) return;
 
-      textarea.value = [...names, ...selected].join("\n");
-      added += selected.length;
-      context = getBoardAssignments();
-    });
+        const candidates = getCandidatesForCell(branch, isoDate, names, nextContext);
+        const eligible = fixedPreferredOnly
+          ? candidates.filter((staff) => staff.isFixedPreferredWeekday)
+          : candidates;
+        const selected = eligible.slice(0, needed).map((staff) => staff.name);
+        if (!selected.length) return;
+
+        textarea.value = [...names, ...selected].join("\n");
+        added += selected.length;
+        nextContext = getBoardAssignments();
+      });
+
+      return { added, context: nextContext };
+    };
+
+    // First reserve eligible open slots for fixed preferred weekdays.
+    // The regular pass then balances all remaining shifts across the staff pool.
+    const fixedPass = fillOpenSlots({ fixedPreferredOnly: true });
+    const regularPass = fillOpenSlots({ context: fixedPass.context });
+    const added = fixedPass.added + regularPass.added;
 
     const finalContext = getBoardAssignments();
     const underTwo = pool
@@ -3191,9 +3229,10 @@
       })
       .map((staff) => staff.name);
     const baseMessage = added ? `빈자리 ${added}개를 자동배정했습니다.` : "채울 수 있는 빈자리가 없습니다.";
+    const fixedSuffix = fixedPass.added ? ` 고정 희망 ${fixedPass.added}개를 우선 반영했습니다.` : "";
     const suffix = underTwo.length ? ` 2일 미만: ${underTwo.slice(0, 5).join(", ")}` : "";
     renderScheduleBoard();
-    setScheduleStatus(`${baseMessage}${suffix}`, added ? "success" : "");
+    setScheduleStatus(`${baseMessage}${fixedSuffix}${suffix}`, added ? "success" : "");
   }
 
   async function ensureScheduleWeek() {
@@ -3384,6 +3423,13 @@
     refs.scheduleResetBtn.addEventListener("click", () => void resetScheduleWeek());
     refs.schedulePublishBtn.addEventListener("click", () => void saveScheduleWeek());
     refs.scheduleCalendarEventForm.addEventListener("submit", (event) => void saveScheduleCalendarEvent(event));
+    refs.scheduleCalendarEventDate.addEventListener("change", () => {
+      const date = toSafeDate(refs.scheduleCalendarEventDate.value);
+      if (!date) return;
+      state.scheduleMonthSelectedDate = formatInputDate(date);
+      state.scheduleMonthCursor = startOfMonth(date);
+      renderScheduleMonthCalendar();
+    });
     refs.scheduleCalendarEventList.addEventListener("click", (event) => {
       const button = event.target.closest("[data-delete-schedule-calendar-event]");
       if (button) void deleteScheduleCalendarEvent(button.dataset.deleteScheduleCalendarEvent);
@@ -3459,7 +3505,6 @@
     });
     refs.scheduleWeekStart.addEventListener("change", () => {
       state.scheduleWeekStart = getScheduleWeekStart();
-      state.scheduleMonthSelectedDate = state.scheduleWeekStart;
       state.scheduleMonthCursor = startOfMonth(toSafeDate(state.scheduleWeekStart) || new Date());
       refs.scheduleWeekStart.value = state.scheduleWeekStart;
       void fetchScheduleData();
@@ -3469,7 +3514,6 @@
       state.scheduleWeekWindowStart = formatInputDate(addWeeks(current, -3));
       const options = getScheduleWeekOptions();
       state.scheduleWeekStart = options[1]?.weekStart || options[0]?.weekStart || state.scheduleWeekStart;
-      state.scheduleMonthSelectedDate = state.scheduleWeekStart;
       state.scheduleMonthCursor = startOfMonth(toSafeDate(state.scheduleWeekStart) || new Date());
       refs.scheduleWeekStart.value = state.scheduleWeekStart;
       renderScheduleWeekChips();
@@ -3480,7 +3524,6 @@
       state.scheduleWeekWindowStart = formatInputDate(addWeeks(current, 3));
       const options = getScheduleWeekOptions();
       state.scheduleWeekStart = options[1]?.weekStart || options[0]?.weekStart || state.scheduleWeekStart;
-      state.scheduleMonthSelectedDate = state.scheduleWeekStart;
       state.scheduleMonthCursor = startOfMonth(toSafeDate(state.scheduleWeekStart) || new Date());
       refs.scheduleWeekStart.value = state.scheduleWeekStart;
       renderScheduleWeekChips();
@@ -3490,7 +3533,6 @@
       const button = event.target.closest("[data-schedule-week]");
       if (!button) return;
       state.scheduleWeekStart = button.dataset.scheduleWeek;
-      state.scheduleMonthSelectedDate = state.scheduleWeekStart;
       state.scheduleMonthCursor = startOfMonth(toSafeDate(state.scheduleWeekStart) || new Date());
       refs.scheduleWeekStart.value = state.scheduleWeekStart;
       renderScheduleWeekChips();
@@ -3598,7 +3640,7 @@
     }).format(new Date());
     state.scheduleWeekStart = formatInputDate(addWeeks(startOfWeek(new Date()), 1));
     state.scheduleWeekWindowStart = formatInputDate(startOfWeek(new Date()));
-    state.scheduleMonthSelectedDate = state.scheduleWeekStart;
+    state.scheduleMonthSelectedDate = formatInputDate(new Date());
     state.scheduleMonthCursor = startOfMonth(toSafeDate(state.scheduleWeekStart) || new Date());
     state.scheduleStaff = FALLBACK_SERVER_REFS.map(normalizeStaffRef).filter(Boolean);
     state.scheduleUsingFallbackStaff = true;

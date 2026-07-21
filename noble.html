@@ -2858,14 +2858,28 @@
       }
 
       function normalizeWeekdayValues(value = []) {
-        const values = Array.isArray(value)
-          ? value
-          : String(value || "").split(/[,\s]+/).filter(Boolean);
+        let values;
+        if (Array.isArray(value)) {
+          values = value;
+        } else if (typeof value === "string") {
+          const text = value.trim();
+          try {
+            const parsed = JSON.parse(text);
+            values = Array.isArray(parsed) ? parsed : [parsed];
+          } catch (_error) {
+            values = text
+              .replace(/^[{[(]\s*|\s*[}\])]\s*$/g, "")
+              .split(/[,\s]+/)
+              .filter(Boolean);
+          }
+        } else {
+          values = [value];
+        }
         const unique = new Set();
 
         values.forEach((item) => {
-          const number = Number.parseInt(item, 10);
-          if (Number.isInteger(number) && number >= 0 && number <= 6) unique.add(number);
+          const text = String(item).trim().replace(/^["']+|["']+$/g, "");
+          if (/^[0-6]$/.test(text)) unique.add(Number(text));
         });
 
         return Array.from(unique).sort((a, b) => {
