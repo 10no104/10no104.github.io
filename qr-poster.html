@@ -19,9 +19,8 @@
       --paper-shadow: rgba(63, 39, 19, 0.16);
       --brand-mark-width: clamp(30px, 7vw, 44px);
       --brand-title-size: clamp(0.95rem, 3vw, 1.35rem);
-      --poster-output-width: 50mm;
-      --poster-output-height: 100mm;
-      --qr-output-size: 30mm;
+      --poster-output-width: 60mm;
+      --poster-output-height: 120mm;
       --poster-preview-width: min(42vw, 300px, calc((100vh - 56px) * 0.5));
     }
 
@@ -73,9 +72,9 @@
 
     .size-summary {
       display: grid;
-      grid-template-columns: repeat(3, minmax(90px, 1fr));
+      grid-template-columns: minmax(120px, 1fr);
       gap: 8px;
-      min-width: min(100%, 360px);
+      min-width: 120px;
     }
 
     .size-card {
@@ -104,7 +103,7 @@
 
     .control-grid {
       display: grid;
-      grid-template-columns: minmax(220px, 0.8fr) minmax(270px, 1fr) minmax(270px, 1fr);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 18px;
       margin-bottom: 18px;
     }
@@ -206,115 +205,6 @@
     .text-setting-row input:focus {
       border-color: rgba(201, 154, 71, 0.82);
       box-shadow: 0 0 0 2px rgba(201, 154, 71, 0.12);
-    }
-
-    .qr-editor-grid {
-      display: grid;
-      grid-template-columns: minmax(170px, 0.72fr) minmax(320px, 1.28fr);
-      gap: 18px;
-    }
-
-    .print-controls fieldset {
-      min-width: 0;
-      margin: 0;
-      padding: 14px;
-      border: 1px solid rgba(201, 154, 71, 0.28);
-    }
-
-    .print-controls legend,
-    .qr-settings-title {
-      padding: 0 6px;
-      color: var(--gold);
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-    }
-
-    .side-picker {
-      display: grid;
-      gap: 8px;
-    }
-
-    .side-choice {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      min-height: 38px;
-      padding: 0 10px;
-      border: 1px solid rgba(244, 234, 220, 0.12);
-      color: var(--ivory);
-      font-size: 0.8rem;
-      cursor: pointer;
-    }
-
-    .side-choice:has(input:checked) {
-      border-color: rgba(201, 154, 71, 0.72);
-      background: rgba(201, 154, 71, 0.12);
-    }
-
-    .side-choice input {
-      accent-color: var(--gold);
-    }
-
-    .qr-settings-wrap {
-      min-width: 0;
-    }
-
-    .qr-settings[hidden] {
-      display: none;
-    }
-
-    .qr-settings-title {
-      display: block;
-      margin: 0 0 10px;
-      padding: 0;
-    }
-
-    .qr-setting-row {
-      display: grid;
-      grid-template-columns: 92px minmax(0, 1fr);
-      align-items: center;
-      gap: 10px;
-      margin-top: 8px;
-    }
-
-    .qr-setting-row label {
-      color: rgba(244, 234, 220, 0.72);
-      font-size: 0.7rem;
-    }
-
-    .qr-setting-row input {
-      width: 100%;
-      min-width: 0;
-      border: 1px solid rgba(244, 234, 220, 0.18);
-      border-radius: 2px;
-      padding: 8px 9px;
-      background: rgba(7, 4, 3, 0.64);
-      color: var(--ivory);
-      font: inherit;
-      font-size: 0.72rem;
-      outline: none;
-    }
-
-    .qr-setting-row input:focus {
-      border-color: rgba(201, 154, 71, 0.82);
-      box-shadow: 0 0 0 2px rgba(201, 154, 71, 0.12);
-    }
-
-    .qr-setting-row input[type="file"] {
-      padding: 5px;
-      color: rgba(244, 234, 220, 0.66);
-    }
-
-    .qr-setting-row input[type="file"]::file-selector-button {
-      margin-right: 8px;
-      border: 1px solid rgba(201, 154, 71, 0.5);
-      padding: 5px 8px;
-      background: rgba(201, 154, 71, 0.12);
-      color: var(--gold);
-      font: inherit;
-      cursor: pointer;
     }
 
     .poster-stage {
@@ -505,35 +395,6 @@
     .qr-paper img {
       position: relative;
       z-index: 1;
-    }
-
-    .qr-center-number {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      z-index: 2;
-      display: grid;
-      place-items: center;
-      min-width: 19%;
-      min-height: 19%;
-      max-width: 38%;
-      padding: 0.2em 0.35em;
-      transform: translate(-50%, -50%);
-      border: 0.3cqw solid rgba(55, 35, 18, 0.18);
-      border-radius: 999px;
-      background: rgba(251, 244, 231, 0.97);
-      color: #26160f;
-      font-family: "Pretendard", "Noto Sans KR", system-ui, sans-serif;
-      font-size: clamp(0.42rem, 3.95cqw, 0.82rem);
-      font-weight: 800;
-      line-height: 1;
-      white-space: nowrap;
-      box-shadow: 0 0.3cqw 1.2cqw rgba(38, 22, 15, 0.18);
-      pointer-events: none;
-    }
-
-    .qr-center-number[hidden] {
-      display: none;
     }
 
     .qr-paper img {
@@ -873,12 +734,11 @@
       }
 
       .size-summary {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: minmax(120px, 1fr);
         margin-top: 12px;
       }
 
-      .control-grid,
-      .qr-editor-grid {
+      .control-grid {
         grid-template-columns: 1fr;
         gap: 12px;
       }
@@ -946,15 +806,7 @@
       <div class="size-summary" aria-label="Poster size information">
         <div class="size-card">
           <span class="size-card-label">Poster</span>
-          <strong class="size-card-value">5 × 10 cm</strong>
-        </div>
-        <div class="size-card">
-          <span class="size-card-label">QR</span>
-          <strong class="size-card-value">3 × 3 cm</strong>
-        </div>
-        <div class="size-card">
-          <span class="size-card-label">A4 landscape</span>
-          <strong class="size-card-value">10 / sheet</strong>
+          <strong class="size-card-value">6 × 12 cm</strong>
         </div>
       </div>
     </div>
@@ -987,72 +839,6 @@
         </div>
       </div>
 
-      <fieldset class="control-panel">
-        <legend>Edit QR</legend>
-        <div class="side-picker">
-          <label class="side-choice">
-            <input type="radio" name="printSide" value="front" checked />
-            <span>앞면 QR 설정</span>
-          </label>
-          <label class="side-choice">
-            <input type="radio" name="printSide" value="back" />
-            <span>뒷면 QR 설정</span>
-          </label>
-        </div>
-      </fieldset>
-    </div>
-
-    <div class="qr-editor-grid">
-      <div class="control-panel">
-        <h2 class="control-panel-title">QR Size</h2>
-        <p class="print-controls-note">앞면 QR은 출력 기준 약 3 × 3cm로 맞춰져 있어 휴대폰 스캔을 우선하면서 포스터 안에서 과하게 커지지 않도록 했습니다.</p>
-      </div>
-
-      <div class="qr-settings-wrap control-panel">
-        <div class="qr-settings" data-side-settings="front">
-          <span class="qr-settings-title">Front QR</span>
-          <div class="qr-setting-row">
-            <label for="qrFrontUrl">이미지 주소</label>
-            <input id="qrFrontUrl" type="url" placeholder="QR 이미지 URL 또는 data URL" autocomplete="off" />
-          </div>
-          <div class="qr-setting-row">
-            <label for="qrFrontFile">이미지 파일</label>
-            <input id="qrFrontFile" type="file" accept="image/*" />
-          </div>
-          <div class="qr-setting-row">
-            <label for="qrFrontNumber">중앙 숫자</label>
-            <input id="qrFrontNumber" type="text" inputmode="numeric" maxlength="3" placeholder="예: 01" autocomplete="off" />
-          </div>
-        </div>
-
-        <div class="qr-settings" data-side-settings="back" hidden>
-          <span class="qr-settings-title">Back QR</span>
-          <div class="qr-setting-row">
-            <label for="qrBackMenuUrl">예약 주소</label>
-            <input id="qrBackMenuUrl" type="url" placeholder="예약 QR 이미지 URL" autocomplete="off" />
-          </div>
-          <div class="qr-setting-row">
-            <label for="qrBackMenuFile">예약 파일</label>
-            <input id="qrBackMenuFile" type="file" accept="image/*" />
-          </div>
-          <div class="qr-setting-row">
-            <label for="qrBackMenuNumber">예약 숫자</label>
-            <input id="qrBackMenuNumber" type="text" inputmode="numeric" maxlength="3" placeholder="예: 01" autocomplete="off" />
-          </div>
-          <div class="qr-setting-row">
-            <label for="qrBackStoryUrl">선곡 주소</label>
-            <input id="qrBackStoryUrl" type="url" placeholder="선곡 요청 QR 이미지 URL" autocomplete="off" />
-          </div>
-          <div class="qr-setting-row">
-            <label for="qrBackStoryFile">선곡 파일</label>
-            <input id="qrBackStoryFile" type="file" accept="image/*" />
-          </div>
-          <div class="qr-setting-row">
-            <label for="qrBackStoryNumber">선곡 숫자</label>
-            <input id="qrBackStoryNumber" type="text" inputmode="numeric" maxlength="3" placeholder="예: 02" autocomplete="off" />
-          </div>
-        </div>
-      </div>
     </div>
   </section>
 
@@ -1078,7 +864,6 @@
         <section class="qr-wrap" aria-label="Front QR code">
           <div class="qr-frame">
             <div class="qr-paper" id="qrPaper" data-qr-slot="front" aria-label="Menu QR code">
-              <span class="qr-center-number" aria-hidden="true" hidden></span>
             </div>
           </div>
         </section>
@@ -1109,13 +894,11 @@
           <div class="back-qr-card">
             <div class="back-qr-label">Reservation</div>
             <div class="qr-paper back-qr-paper" id="qrPaperBackOne" data-qr-slot="backMenu" aria-label="Reservation QR code">
-              <span class="qr-center-number" aria-hidden="true" hidden></span>
             </div>
           </div>
           <div class="back-qr-card">
             <div class="back-qr-label">Music Request</div>
             <div class="qr-paper back-qr-paper" id="qrPaperBackTwo" data-qr-slot="backStory" aria-label="Music request QR code">
-              <span class="qr-center-number" aria-hidden="true" hidden></span>
             </div>
           </div>
         </section>
@@ -1129,39 +912,24 @@
   <script>
     (function () {
       const params = new URLSearchParams(window.location.search);
-      const sideSettings = Array.from(document.querySelectorAll("[data-side-settings]"));
-      const sideInputs = Array.from(document.querySelectorAll('input[name="printSide"]'));
       const copyButtons = {
         front: document.getElementById("copyFrontButton"),
         back: document.getElementById("copyBackButton")
       };
       const copyStatus = document.getElementById("copyStatus");
-      let selectedSide = "front";
 
       const slots = {
         front: {
           paperId: "qrPaper",
-          urlId: "qrFrontUrl",
-          fileId: "qrFrontFile",
-          numberId: "qrFrontNumber",
-          source: params.get("qr") || "",
-          number: params.get("qrNumber") || ""
+          source: params.get("qr") || ""
         },
         backMenu: {
           paperId: "qrPaperBackOne",
-          urlId: "qrBackMenuUrl",
-          fileId: "qrBackMenuFile",
-          numberId: "qrBackMenuNumber",
-          source: params.get("qr2") || "",
-          number: params.get("qr2Number") || ""
+          source: params.get("qr2") || ""
         },
         backStory: {
           paperId: "qrPaperBackTwo",
-          urlId: "qrBackStoryUrl",
-          fileId: "qrBackStoryFile",
-          numberId: "qrBackStoryNumber",
-          source: params.get("qr3") || "",
-          number: params.get("qr3Number") || ""
+          source: params.get("qr3") || ""
         }
       };
 
@@ -1172,29 +940,13 @@
           image.remove();
         });
 
-        const number = paper.querySelector(".qr-center-number");
-        if (number) {
-          number.textContent = slot.number;
-          number.hidden = !slot.number;
-        }
-
         if (!slot.source) return;
 
         const image = new Image();
         image.alt = "EHWA QR code";
         image.decoding = "async";
         image.src = slot.source;
-        paper.insertBefore(image, paper.querySelector(".qr-center-number"));
-      }
-
-      function updateSlot(slot) {
-        renderQr(document.getElementById(slot.paperId), slot);
-      }
-
-      function showSelectedSettings() {
-        sideSettings.forEach(function (settings) {
-          settings.hidden = settings.dataset.sideSettings !== selectedSide;
-        });
+        paper.appendChild(image);
       }
 
       function syncText(inputId, selector) {
@@ -1242,6 +994,61 @@
         });
       }
 
+      function blobToDataUrl(blob) {
+        return new Promise(function (resolve, reject) {
+          const reader = new FileReader();
+          reader.addEventListener("load", function () {
+            resolve(typeof reader.result === "string" ? reader.result : "");
+          });
+          reader.addEventListener("error", reject);
+          reader.readAsDataURL(blob);
+        });
+      }
+
+      async function resourceToDataUrl(source) {
+        const response = await fetch(new URL(source, document.baseURI).href, {
+          credentials: "same-origin"
+        });
+        if (!response.ok) throw new Error("Asset request failed");
+        return blobToDataUrl(await response.blob());
+      }
+
+      async function inlineImageSources(root) {
+        await Promise.all(Array.from(root.querySelectorAll("img")).map(async function (image) {
+          const source = image.getAttribute("src");
+          if (!source || /^(data:|blob:)/i.test(source)) return;
+
+          try {
+            image.setAttribute("src", await resourceToDataUrl(source));
+          } catch (error) {
+            // Keep the absolute source as a fallback for same-origin assets.
+          }
+        }));
+      }
+
+      async function inlineCssUrls(css) {
+        const pattern = /url\(\s*(["']?)([^"')]+)\1\s*\)/g;
+        const sources = Array.from(css.matchAll(pattern))
+          .map(function (match) { return match[2].trim(); })
+          .filter(function (source, index, all) {
+            return source && !/^(data:|blob:|#)/i.test(source) && all.indexOf(source) === index;
+          });
+        const replacements = new Map();
+
+        await Promise.all(sources.map(async function (source) {
+          try {
+            replacements.set(source, await resourceToDataUrl(source));
+          } catch (error) {
+            // Keep the absolute URL if an asset blocks cross-origin fetching.
+          }
+        }));
+
+        return css.replace(pattern, function (match, quote, source) {
+          const replacement = replacements.get(source.trim());
+          return replacement ? "url(" + quote + replacement + quote + ")" : match;
+        });
+      }
+
       async function canvasFromPoster(side) {
         const source = document.querySelector('.poster-frame[data-side="' + side + '"]');
         if (!source) throw new Error("Poster not found");
@@ -1272,11 +1079,13 @@
           element.removeAttribute("id");
         });
         makeAbsoluteImageSources(clone);
+        await inlineImageSources(clone);
 
-        const css = makeAbsoluteCssUrls(Array.from(document.querySelectorAll("style"))
+        const cssText = makeAbsoluteCssUrls(Array.from(document.querySelectorAll("style"))
           .map(function (style) { return style.textContent || ""; })
           .join("\n")
           .replace(/]]>/g, "]]]]><![CDATA[>"));
+        const css = await inlineCssUrls(cssText);
         const markup = new XMLSerializer().serializeToString(clone);
         const svg = [
           '<svg xmlns="http://www.w3.org/2000/svg" width="', width * scale,
@@ -1350,62 +1159,18 @@
           await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
           setCopyStatus(side === "front" ? "앞면 이미지가 클립보드에 복사되었습니다." : "뒷면 이미지가 클립보드에 복사되었습니다.", "success");
         } catch (error) {
-          setCopyStatus("복사하지 못했습니다. 브라우저의 클립보드 권한을 확인해주세요.", "error");
+          const message = error && error.name === "NotAllowedError"
+            ? "복사 권한이 차단되었습니다. 주소창의 클립보드 권한을 허용해주세요."
+            : "이미지를 변환하지 못했습니다. HTTPS 또는 localhost에서 다시 시도해주세요.";
+          setCopyStatus(message, "error");
         } finally {
           button.disabled = false;
           button.textContent = originalLabel;
         }
       }
 
-      function bindSlot(slot) {
-        const urlInput = document.getElementById(slot.urlId);
-        const fileInput = document.getElementById(slot.fileId);
-        const numberInput = document.getElementById(slot.numberId);
-
-        if (urlInput) {
-          urlInput.value = slot.source.startsWith("data:") ? "" : slot.source;
-          urlInput.addEventListener("input", function () {
-            slot.source = urlInput.value.trim();
-            if (fileInput) fileInput.value = "";
-            updateSlot(slot);
-          });
-        }
-
-        if (fileInput) {
-          fileInput.addEventListener("change", function () {
-            const file = fileInput.files && fileInput.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.addEventListener("load", function () {
-              slot.source = typeof reader.result === "string" ? reader.result : "";
-              if (urlInput) urlInput.value = "";
-              updateSlot(slot);
-            });
-            reader.readAsDataURL(file);
-          });
-        }
-
-        if (numberInput) {
-          numberInput.value = slot.number;
-          numberInput.addEventListener("input", function () {
-            slot.number = numberInput.value.replace(/[^0-9]/g, "").slice(0, 3);
-            numberInput.value = slot.number;
-            updateSlot(slot);
-          });
-        }
-
-        updateSlot(slot);
-      }
-
-      Object.values(slots).forEach(bindSlot);
-
-      sideInputs.forEach(function (input) {
-        input.addEventListener("change", function () {
-          if (!input.checked) return;
-          selectedSide = input.value;
-          showSelectedSettings();
-        });
+      Object.values(slots).forEach(function (slot) {
+        renderQr(document.getElementById(slot.paperId), slot);
       });
 
       if (copyButtons.front) {
@@ -1423,8 +1188,6 @@
       syncText("locationInput", ".brand-location");
       syncText("frontMessageInput", ".caption-title");
       syncText("backMessageInput", ".back-kicker");
-
-      showSelectedSettings();
     }());
   </script>
 </body>
