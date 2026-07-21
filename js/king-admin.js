@@ -100,6 +100,8 @@
     { key: "uptown", label: "Uptown", color: "#8f2438", bg: "#fff3ed", border: "#e6b9b0" },
     { key: "downtown", label: "Downtown", color: "#245f51", bg: "#f1fbf5", border: "#b9d8c9" }
   ];
+  const SCHEDULE_CALENDAR_STORAGE_KEY = "ehwa:king:schedule-calendar-events:v1";
+  const ontarioHolidayCache = new Map();
   const refs = {};
 
   const state = {
@@ -123,6 +125,8 @@
     scheduleWeekStart: "",
     scheduleWeekWindowStart: "",
     scheduleMonthCursor: null,
+    scheduleCalendarEvents: [],
+    scheduleCalendarEventSource: "local",
     scheduleWeeks: [],
     scheduleAvailability: [],
     scheduleStaff: [],
@@ -232,6 +236,11 @@
       "scheduleMonthNextBtn",
       "scheduleMonthLabel",
       "scheduleMonthGrid",
+      "scheduleCalendarEventForm",
+      "scheduleCalendarEventDate",
+      "scheduleCalendarEventTitle",
+      "scheduleCalendarEventList",
+      "scheduleCalendarEventStatus",
       "scheduleLoadBtn",
       "schedulePublishBtn",
       "scheduleAutoFillBtn",
@@ -963,6 +972,7 @@
     state.menuSession = data.session;
     updateMenuAuthView();
     if (state.menuSession && !state.menuItems.length) await fetchMenuItems();
+    if (state.menuSession) await fetchScheduleCalendarEvents();
   }
 
   async function signInMenuAdmin() {
@@ -987,6 +997,7 @@
     updateMenuAuthView();
     setMenuAuthStatus("로그인되었습니다.", "success");
     await fetchMenuItems();
+    await fetchScheduleCalendarEvents();
   }
 
   async function signOutMenuAdmin() {
@@ -994,8 +1005,11 @@
     await supabaseClient.auth.signOut();
     state.menuSession = null;
     state.menuItems = [];
+    state.scheduleCalendarEvents = readLocalScheduleCalendarEvents();
+    state.scheduleCalendarEventSource = "local";
     updateMenuAuthView();
     renderMenu();
+    renderScheduleBoard();
     setMenuStatus("");
   }
 
@@ -1665,6 +1679,240 @@
     return `${start.getMonth() + 1}/${start.getDate()} - ${end.getMonth() + 1}/${end.getDate()}`;
   }
 
+  function getNthWeekdayOfMonth(year, month, weekday, occurrence) {
+    const date = new Date(year, month, 1);
+    const offset = (weekday - date.getDay() + 7) % 7;
+    date.setDate(1 + offset + (occurrence - 1) * 7);
+    return date;
+  }
+
+  function getEasterSunday(year) {
+    const a = year % 19;
+    const b = Math.floor(year / 100);
+    const c = year % 100;
+    const d = Math.floor(b / 4);
+    const e = b % 4;
+    const f = Math.floor((b + 8) / 25);
+    const g = Math.floor((b - f + 1) / 3);
+    const h = (19 * a + b - d - g + 15) % 30;
+    const i = Math.floor(c / 4);
+    const k = c % 4;
+    const l = (32 + 2 * e + 2 * i - h - k) % 7;
+    const m = Math.floor((a + 11 * h + 22 * l) / 451);
+    const month = Math.floor((h + l - 7 * m + 114) / 31) - 1;
+    const day = (h + l - 7 * m + 114) % 31 + 1;
+    return new Date(year, month, day);
+  }
+
+  function getOntarioPublicHolidays(year) {
+    if (ontarioHolidayCache.has(year)) return ontarioHolidayCache.get(year);
+
+    const easterSunday = getEasterSunday(year);
+    const goodFriday = addDays(easterSunday, -2);
+    const victoriaDay = new Date(year, 4, 24);
+    victoriaDay.setDate(victoriaDay.getDate() - ((victoriaDay.getDay() + 6) % 7));
+    const holidays = [
+      { date: new Date(year, 0, 1), title: "New Year's Day" },
+      { date: getNthWeekdayOfMonth(year, 1, 1, 3), title: "Family Day" },
+      { date: goodFriday, title: "Good Friday" },
+      { date: victoriaDay, title: "Victoria Day" },
+      { date: new Date(year, 6, 1), title: "Canada Day" },
+      { date: getNthWeekdayOfMonth(year, 8, 1, 1), title: "Labour Day" },
+      { date: getNthWeekdayOfMonth(year, 9, 1, 2), title: "Thanksgiving Day" },
+      { date: new Date(year, 11, 25), title: "Christmas Day" },
+      { date: new Date(year, 11, 26), title: "Boxing Day" }
+    ].map((item) => ({
+      ...item,
+      date: formatInputDate(item.date),
+      type: "holiday"
+    }));
+    const byDate = new Map(holidays.map((item) => [item.date, item]));
+    ontarioHolidayCache.set(year, byDate);
+    return byDate;
+  }
+
+  function getOntarioPublicHoliday(isoDate = "") {
+    const date = toSafeDate(isoDate);
+    if (!date) return null;
+    return getOntarioPublicHolidays(date.getFullYear()).get(isoDate) || null;
+  }
+
+  function normalizeScheduleCalendarEvent(item = {}) {
+    const eventDate = String(item.event_date || item.date || "").slice(0, 10);
+    const title = String(item.title || "").trim().slice(0, 80);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(eventDate) || !title) return null;
+    return {
+      id: String(item.id || `local-${eventDate}-${title}`),
+      event_date: eventDate,
+      title,
+      isLocal: Boolean(item.isLocal || String(item.id || "").startsWith("local-"))
+    };
+  }
+
+  function readLocalScheduleCalendarEvents() {
+    try {
+      const stored = JSON.parse(window.localStorage.getItem(SCHEDULE_CALENDAR_STORAGE_KEY) || "[]");
+      return Array.isArray(stored) ? stored.map(normalizeScheduleCalendarEvent).filter(Boolean) : [];
+    } catch (_error) {
+      return [];
+    }
+  }
+
+  function saveLocalScheduleCalendarEvents(events = state.scheduleCalendarEvents) {
+    try {
+      window.localStorage.setItem(SCHEDULE_CALENDAR_STORAGE_KEY, JSON.stringify(events.map((item) => ({
+        id: item.id,
+        event_date: item.event_date,
+        title: item.title,
+        isLocal: true
+      }))));
+    } catch (_error) {
+      // Local storage is only a fallback for a database that has not received the migration yet.
+    }
+  }
+
+  function getScheduleDateCalendarInfo(isoDate = "") {
+    const holiday = getOntarioPublicHoliday(isoDate);
+    const events = state.scheduleCalendarEvents.filter((item) => item.event_date === isoDate);
+    const labels = [
+      holiday ? `Ontario public holiday: ${holiday.title}` : "",
+      ...events.map((item) => `Event: ${item.title}`)
+    ].filter(Boolean);
+    return { holiday, events, labels };
+  }
+
+  function setScheduleCalendarEventStatus(message = "", type = "") {
+    if (!refs.scheduleCalendarEventStatus) return;
+    refs.scheduleCalendarEventStatus.textContent = message;
+    refs.scheduleCalendarEventStatus.className = `status-line schedule-calendar-event-status${type ? ` is-${type}` : ""}`;
+  }
+
+  function renderScheduleCalendarEventList() {
+    if (!refs.scheduleCalendarEventList) return;
+    const cursor = state.scheduleMonthCursor instanceof Date
+      ? startOfMonth(state.scheduleMonthCursor)
+      : startOfMonth(toSafeDate(state.scheduleWeekStart) || new Date());
+    const monthStart = formatInputDate(cursor);
+    const monthEnd = formatInputDate(new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0));
+    const holidayItems = Array.from(getOntarioPublicHolidays(cursor.getFullYear()).values())
+      .filter((item) => item.date >= monthStart && item.date <= monthEnd);
+    const eventItems = state.scheduleCalendarEvents
+      .filter((item) => item.event_date >= monthStart && item.event_date <= monthEnd)
+      .sort((a, b) => a.event_date.localeCompare(b.event_date) || a.title.localeCompare(b.title));
+    const items = [
+      ...holidayItems.map((item) => ({ ...item, isHoliday: true })),
+      ...eventItems.map((item) => ({ ...item, isHoliday: false }))
+    ].sort((a, b) => {
+      const aDate = a.date || a.event_date;
+      const bDate = b.date || b.event_date;
+      return aDate.localeCompare(bDate) || Number(b.isHoliday) - Number(a.isHoliday);
+    });
+
+    refs.scheduleCalendarEventList.innerHTML = items.length ? items.map((item) => {
+      const date = item.date || item.event_date;
+      const dateLabel = new Intl.DateTimeFormat("ko-KR", { month: "numeric", day: "numeric", weekday: "short" }).format(toSafeDate(date));
+      return `
+        <div class="schedule-calendar-event-item ${item.isHoliday ? "is-holiday" : "is-event"}">
+          <span>${escapeHtml(dateLabel)}</span>
+          <strong>${escapeHtml(item.title)}</strong>
+          ${item.isHoliday ? "" : `<button type="button" data-delete-schedule-calendar-event="${escapeHtml(item.id)}" aria-label="${escapeHtml(`${item.title} 이벤트 삭제`)}">×</button>`}
+        </div>
+      `;
+    }).join("") : '<div class="schedule-calendar-empty">이번 달 등록된 이벤트가 없습니다.</div>';
+  }
+
+  async function fetchScheduleCalendarEvents() {
+    const localEvents = readLocalScheduleCalendarEvents();
+    if (!supabaseClient || !state.menuSession) {
+      state.scheduleCalendarEvents = localEvents;
+      state.scheduleCalendarEventSource = "local";
+      renderScheduleMonthCalendar();
+      return;
+    }
+
+    const { data, error } = await supabaseClient
+      .from("king_schedule_calendar_events")
+      .select("id,event_date,title")
+      .order("event_date", { ascending: true })
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      state.scheduleCalendarEvents = localEvents;
+      state.scheduleCalendarEventSource = "local";
+      renderScheduleMonthCalendar();
+      return;
+    }
+
+    state.scheduleCalendarEvents = (data || []).map(normalizeScheduleCalendarEvent).filter(Boolean);
+    state.scheduleCalendarEventSource = "database";
+    renderScheduleMonthCalendar();
+  }
+
+  async function saveScheduleCalendarEvent(event) {
+    event.preventDefault();
+    const eventDate = refs.scheduleCalendarEventDate.value;
+    const title = refs.scheduleCalendarEventTitle.value.trim().slice(0, 80);
+    if (!eventDate || !title) {
+      setScheduleCalendarEventStatus("날짜와 이벤트 이름을 입력하세요.", "error");
+      return;
+    }
+
+    const localItem = normalizeScheduleCalendarEvent({
+      id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      event_date: eventDate,
+      title,
+      isLocal: true
+    });
+    let savedItem = localItem;
+    let savedToDatabase = false;
+
+    if (supabaseClient && state.menuSession) {
+      const { data, error } = await supabaseClient
+        .from("king_schedule_calendar_events")
+        .insert({ event_date: eventDate, title, created_by: state.menuSession.user?.id || null })
+        .select("id,event_date,title")
+        .single();
+      if (!error && data) {
+        savedItem = normalizeScheduleCalendarEvent(data);
+        savedToDatabase = true;
+        state.scheduleCalendarEventSource = "database";
+      }
+    }
+
+    state.scheduleCalendarEvents = [...state.scheduleCalendarEvents, savedItem]
+      .filter(Boolean)
+      .sort((a, b) => a.event_date.localeCompare(b.event_date) || a.title.localeCompare(b.title));
+    if (!savedToDatabase) {
+      state.scheduleCalendarEventSource = "local";
+      saveLocalScheduleCalendarEvents();
+      setScheduleCalendarEventStatus("이 기기에 이벤트를 저장했습니다.", "success");
+    } else {
+      setScheduleCalendarEventStatus("이벤트를 저장했습니다.", "success");
+    }
+    refs.scheduleCalendarEventTitle.value = "";
+    renderScheduleBoard();
+  }
+
+  async function deleteScheduleCalendarEvent(id = "") {
+    const target = state.scheduleCalendarEvents.find((item) => item.id === id);
+    if (!target) return;
+    if (!target.isLocal && supabaseClient && state.menuSession) {
+      const { error } = await supabaseClient
+        .from("king_schedule_calendar_events")
+        .delete()
+        .eq("id", id);
+      if (error) {
+        setScheduleCalendarEventStatus(error.message, "error");
+        return;
+      }
+    }
+
+    state.scheduleCalendarEvents = state.scheduleCalendarEvents.filter((item) => item.id !== id);
+    if (target.isLocal || state.scheduleCalendarEventSource === "local") saveLocalScheduleCalendarEvents();
+    setScheduleCalendarEventStatus("이벤트를 삭제했습니다.", "success");
+    renderScheduleBoard();
+  }
+
   function renderScheduleWeekChips() {
     const options = getScheduleWeekOptions();
     refs.scheduleWeekChips.innerHTML = options.map((option) => {
@@ -1715,11 +1963,14 @@
       const date = new Date(cursor.getFullYear(), cursor.getMonth(), day);
       const isoDate = formatInputDate(date);
       const hasSchedule = ["uptown", "downtown"].some((branch) => (assignments.get(getScheduleCellKey(branch, isoDate)) || []).length > 0);
+      const calendarInfo = getScheduleDateCalendarInfo(isoDate);
       const classes = [
         "calendar-day",
         isSameDate(date, today) ? "is-today" : "",
         selectedDates.has(isoDate) ? "is-selected" : "",
-        hasSchedule ? "has-schedule" : ""
+        hasSchedule ? "has-schedule" : "",
+        calendarInfo.holiday ? "is-holiday" : "",
+        calendarInfo.events.length ? "has-calendar-event" : ""
       ].filter(Boolean).join(" ");
       const dateLabel = new Intl.DateTimeFormat("ko-KR", {
         weekday: "short",
@@ -1730,11 +1981,13 @@
       cells.push(`
         <button class="${classes}" type="button" data-schedule-month-date="${isoDate}" aria-label="${escapeHtml(`${dateLabel} 주간 스케줄 보기`)}">
           <strong>${day}</strong>
+          ${calendarInfo.labels.length ? `<span class="calendar-day-markers" aria-hidden="true">${calendarInfo.holiday ? '<i class="is-holiday">H</i>' : ""}${calendarInfo.events.length ? '<i class="is-event">E</i>' : ""}</span>` : ""}
         </button>
       `);
     }
 
     refs.scheduleMonthGrid.innerHTML = cells.join("");
+    renderScheduleCalendarEventList();
   }
 
   function normalizeScheduleStaffKey(name = "") {
@@ -2070,6 +2323,7 @@
           ${dates.map((date) => {
             const dateValue = formatInputDate(date);
             const cellKey = getScheduleCellKey(branch.key, dateValue);
+            const calendarInfo = getScheduleDateCalendarInfo(dateValue);
             const names = namesByCell.get(cellKey) || [];
             const targetCount = Math.max(boardTargets.get(cellKey) ?? getDefaultServerCount(date), names.length);
             const compactDayLabel = formatScheduleDayCompactLabel(date);
@@ -2081,7 +2335,7 @@
               selectedStaff && dropStatus.type === "assigned" ? "is-assigned" : ""
             ].filter(Boolean).join(" ");
             return `
-              <article class="schedule-day-card is-${branch.key} ${isSameDate(date, today) ? "is-today" : ""}">
+              <article class="schedule-day-card is-${branch.key} ${isSameDate(date, today) ? "is-today" : ""} ${calendarInfo.holiday ? "is-holiday" : ""} ${calendarInfo.events.length ? "has-calendar-event" : ""}" title="${escapeHtml(calendarInfo.labels.join(" · "))}">
                 <div class="schedule-day-top">
                   <header>
                     <strong aria-label="${escapeHtml(formatScheduleDayLabel(date))}">
@@ -2151,6 +2405,7 @@
     const weekWindowFrom = weekOptions[0]?.weekStart || state.scheduleWeekStart;
     const weekWindowTo = weekOptions[weekOptions.length - 1]?.weekStart || state.scheduleWeekStart;
     setScheduleStatus("스케줄 데이터를 불러오는 중...");
+    await fetchScheduleCalendarEvents();
 
     const availabilityResult = await supabaseClient
       .from("noble_staff_availability")
@@ -3103,6 +3358,11 @@
     refs.scheduleCopyImageBtn.addEventListener("click", () => void copyScheduleImageToClipboard());
     refs.scheduleResetBtn.addEventListener("click", () => void resetScheduleWeek());
     refs.schedulePublishBtn.addEventListener("click", () => void saveScheduleWeek());
+    refs.scheduleCalendarEventForm.addEventListener("submit", (event) => void saveScheduleCalendarEvent(event));
+    refs.scheduleCalendarEventList.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-delete-schedule-calendar-event]");
+      if (button) void deleteScheduleCalendarEvent(button.dataset.deleteScheduleCalendarEvent);
+    });
     refs.scheduleStaffList.addEventListener("pointerdown", beginSchedulePointerDrag);
     refs.scheduleStaffList.addEventListener("click", (event) => {
       if (Date.now() < state.scheduleSuppressClickUntil) return;
@@ -3162,6 +3422,7 @@
       if (!button) return;
       const date = toSafeDate(button.dataset.scheduleMonthDate);
       if (!date) return;
+      refs.scheduleCalendarEventDate.value = formatInputDate(date);
       const weekStart = startOfWeek(date);
       state.scheduleWeekStart = formatInputDate(weekStart);
       state.scheduleWeekWindowStart = formatInputDate(addWeeks(weekStart, -1));
@@ -3311,6 +3572,7 @@
     state.scheduleStaff = FALLBACK_SERVER_REFS.map(normalizeStaffRef).filter(Boolean);
     state.scheduleUsingFallbackStaff = true;
     refs.scheduleWeekStart.value = state.scheduleWeekStart;
+    refs.scheduleCalendarEventDate.value = formatInputDate(new Date());
     bindEvents();
     renderReservationDayChips();
     renderReservationBranchChips();
@@ -3323,6 +3585,7 @@
       supabaseClient.auth.onAuthStateChange((_event, session) => {
         state.menuSession = session;
         updateMenuAuthView();
+        if (session) void fetchScheduleCalendarEvents();
         if (session && state.activeTab === "menu" && !state.menuItems.length) void fetchMenuItems();
         if (session && state.activeTab === "staff") void fetchEmployees();
         if (session && state.activeTab === "schedule") void fetchScheduleData();
@@ -3331,6 +3594,7 @@
     } else {
       setMenuAuthStatus("Supabase 클라이언트를 불러오지 못했습니다.", "error");
     }
+    void fetchScheduleCalendarEvents();
     void fetchReservations();
   }
 

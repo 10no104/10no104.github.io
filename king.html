@@ -1374,6 +1374,168 @@
       content: "";
     }
 
+    .schedule-month-calendar .calendar-day.is-holiday {
+      border-color: rgba(178, 112, 22, 0.54);
+      background: linear-gradient(180deg, rgba(255, 249, 224, 0.99), rgba(255, 232, 165, 0.98));
+    }
+
+    .schedule-month-calendar .calendar-day.has-calendar-event {
+      border-color: rgba(68, 88, 145, 0.52);
+      background: linear-gradient(180deg, rgba(241, 245, 255, 0.99), rgba(215, 226, 250, 0.98));
+    }
+
+    .schedule-month-calendar .calendar-day.is-holiday.has-calendar-event {
+      border-color: rgba(150, 97, 51, 0.58);
+      background: linear-gradient(135deg, rgba(255, 241, 194, 0.99), rgba(221, 229, 255, 0.99));
+    }
+
+    .schedule-month-calendar .calendar-day.is-selected.is-holiday,
+    .schedule-month-calendar .calendar-day.is-selected.has-calendar-event {
+      box-shadow: inset 0 0 0 2px rgba(255, 249, 231, 0.78), 0 10px 20px rgba(123, 31, 47, 0.2);
+    }
+
+    .schedule-month-calendar .calendar-day-markers {
+      position: absolute;
+      left: 5px;
+      bottom: 4px;
+      display: inline-flex;
+      gap: 2px;
+      pointer-events: none;
+    }
+
+    .schedule-month-calendar .calendar-day-markers i,
+    .schedule-calendar-legend i {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 13px;
+      height: 13px;
+      border-radius: 5px;
+      font-size: 0.55rem;
+      font-style: normal;
+      font-weight: 950;
+      line-height: 1;
+    }
+
+    .schedule-month-calendar .calendar-day-markers i.is-holiday,
+    .schedule-calendar-legend i.is-holiday {
+      color: #6e4307;
+      background: #f6cd62;
+    }
+
+    .schedule-month-calendar .calendar-day-markers i.is-event,
+    .schedule-calendar-legend i.is-event {
+      color: #f7f9ff;
+      background: #4d62a0;
+    }
+
+    .schedule-calendar-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: #6f665e;
+      font-size: 0.76rem;
+      font-weight: 850;
+    }
+
+    .schedule-calendar-legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .schedule-calendar-legend i {
+      width: 11px;
+      height: 11px;
+      border-radius: 4px;
+      font-size: 0;
+    }
+
+    .schedule-calendar-event-form {
+      display: grid;
+      grid-template-columns: 132px minmax(0, 1fr) auto;
+      gap: 8px;
+    }
+
+    .schedule-calendar-event-form input {
+      min-width: 0;
+      min-height: 42px;
+      padding: 0 11px;
+      border: 1px solid rgba(113, 88, 60, 0.16);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.82);
+      color: #2b1e14;
+      font: inherit;
+      font-size: 0.84rem;
+      font-weight: 750;
+    }
+
+    .schedule-calendar-event-form .pill-btn {
+      min-height: 42px;
+      white-space: nowrap;
+    }
+
+    .schedule-calendar-event-status {
+      min-height: 0;
+      font-size: 0.78rem;
+    }
+
+    .schedule-calendar-event-list {
+      display: grid;
+      gap: 6px;
+    }
+
+    .schedule-calendar-event-item {
+      display: grid;
+      grid-template-columns: 74px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      min-height: 35px;
+      padding: 7px 9px;
+      border-radius: 11px;
+      font-size: 0.78rem;
+    }
+
+    .schedule-calendar-event-item.is-holiday {
+      color: #69440e;
+      background: rgba(245, 204, 98, 0.22);
+    }
+
+    .schedule-calendar-event-item.is-event {
+      color: #344273;
+      background: rgba(96, 119, 181, 0.13);
+    }
+
+    .schedule-calendar-event-item span {
+      font-weight: 850;
+    }
+
+    .schedule-calendar-event-item strong {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .schedule-calendar-event-item button {
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 0;
+      border-radius: 8px;
+      color: #803346;
+      background: rgba(143, 36, 56, 0.12);
+      font-size: 1rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .schedule-calendar-empty {
+      padding: 8px 0;
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 750;
+    }
+
     .schedule-month-calendar .calendar-day.is-selected.has-schedule::after {
       background: #fff3b3;
     }
@@ -1626,6 +1788,24 @@
     .schedule-day-card.is-today {
       border-color: rgba(36, 95, 81, 0.32);
       box-shadow: 0 0 0 3px rgba(36, 95, 81, 0.08);
+    }
+
+    .schedule-day-card.is-holiday {
+      border-color: rgba(184, 119, 25, 0.56);
+      background: linear-gradient(180deg, rgba(255, 251, 235, 0.98), rgba(255, 237, 184, 0.92));
+      box-shadow: inset 0 3px 0 #d39a30;
+    }
+
+    .schedule-day-card.has-calendar-event {
+      border-color: rgba(75, 97, 158, 0.54);
+      background: linear-gradient(180deg, rgba(248, 250, 255, 0.98), rgba(221, 230, 251, 0.92));
+      box-shadow: inset 0 3px 0 #5a70b0;
+    }
+
+    .schedule-day-card.is-holiday.has-calendar-event {
+      border-color: rgba(156, 103, 55, 0.56);
+      background: linear-gradient(135deg, rgba(255, 244, 207, 0.98), rgba(223, 230, 252, 0.94));
+      box-shadow: inset 0 3px 0 #a37151;
     }
 
     .schedule-day-card header {
@@ -1925,6 +2105,26 @@
 
       .schedule-month-calendar .calendar-day strong {
         font-size: 0.78rem;
+      }
+
+      .schedule-month-calendar .calendar-day-markers {
+        left: 3px;
+        bottom: 3px;
+      }
+
+      .schedule-month-calendar .calendar-day-markers i {
+        width: 10px;
+        height: 10px;
+        border-radius: 4px;
+        font-size: 0.46rem;
+      }
+
+      .schedule-calendar-event-form {
+        grid-template-columns: 134px minmax(0, 1fr);
+      }
+
+      .schedule-calendar-event-form .pill-btn {
+        grid-column: 1 / -1;
       }
 
       .schedule-day-top {
@@ -2400,6 +2600,17 @@
             <span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span><span>일</span>
           </div>
           <div class="calendar-grid" id="scheduleMonthGrid"></div>
+          <div class="schedule-calendar-legend" aria-label="달력 표시 안내">
+            <span><i class="is-holiday"></i>Ontario 공휴일</span>
+            <span><i class="is-event"></i>이벤트</span>
+          </div>
+          <form class="schedule-calendar-event-form" id="scheduleCalendarEventForm">
+            <input id="scheduleCalendarEventDate" type="date" aria-label="이벤트 날짜" required />
+            <input id="scheduleCalendarEventTitle" type="text" maxlength="80" placeholder="이벤트 입력" aria-label="이벤트 이름" required />
+            <button class="pill-btn" type="submit">추가</button>
+          </form>
+          <div class="status-line schedule-calendar-event-status" id="scheduleCalendarEventStatus" aria-live="polite"></div>
+          <div class="schedule-calendar-event-list" id="scheduleCalendarEventList"></div>
         </section>
       </section>
     </main>
