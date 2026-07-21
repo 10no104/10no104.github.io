@@ -1945,7 +1945,6 @@
   function renderScheduleMonthCalendar() {
     if (!refs.scheduleMonthGrid || !refs.scheduleMonthLabel) return;
     const selectedWeekStart = toSafeDate(state.scheduleWeekStart);
-    const selectedDate = toSafeDate(state.scheduleMonthSelectedDate) || selectedWeekStart;
     const cursor = state.scheduleMonthCursor instanceof Date
       ? startOfMonth(state.scheduleMonthCursor)
       : startOfMonth(selectedWeekStart || new Date());
@@ -1973,7 +1972,6 @@
       const classes = [
         "calendar-day",
         isSameDate(date, today) ? "is-today" : "",
-        selectedDate && isSameDate(date, selectedDate) ? "is-selected" : "",
         hasSchedule ? "has-schedule" : "",
         calendarInfo.holiday ? "is-holiday" : "",
         calendarInfo.events.length ? "has-calendar-event" : ""
