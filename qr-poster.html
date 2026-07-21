@@ -19,7 +19,10 @@
       --paper-shadow: rgba(63, 39, 19, 0.16);
       --brand-mark-width: clamp(30px, 7vw, 44px);
       --brand-title-size: clamp(0.95rem, 3vw, 1.35rem);
-      --poster-preview-width: min(38vw, 250px, calc((100vh - 56px) * 0.5));
+      --poster-output-width: 60mm;
+      --poster-output-height: 120mm;
+      --qr-output-size: 40mm;
+      --poster-preview-width: min(42vw, 300px, calc((100vh - 56px) * 0.5));
     }
 
     * {
@@ -187,118 +190,6 @@
       color: var(--gold);
       font: inherit;
       cursor: pointer;
-    }
-
-    .print-actions {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      margin-top: 18px;
-    }
-
-    .print-status {
-      color: rgba(244, 234, 220, 0.62);
-      font-size: 0.7rem;
-      line-height: 1.4;
-    }
-
-    .print-button {
-      border: 1px solid rgba(226, 183, 94, 0.9);
-      padding: 10px 18px;
-      background: linear-gradient(180deg, #d9aa57, #a9762c);
-      color: #1a0c08;
-      font: inherit;
-      font-size: 0.76rem;
-      font-weight: 800;
-      letter-spacing: 0.1em;
-      cursor: pointer;
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.24);
-    }
-
-    .print-button:hover {
-      filter: brightness(1.08);
-    }
-
-    .print-button:disabled {
-      cursor: wait;
-      filter: saturate(0.55);
-      opacity: 0.66;
-    }
-
-    .print-preview-label {
-      width: min(94vw, 1120px);
-      margin: 18px auto 8px;
-      color: rgba(244, 234, 220, 0.68);
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    .print-sheet {
-      position: relative;
-      width: min(94vw, 1120px);
-      aspect-ratio: 297 / 210;
-      margin: 0 auto 22px;
-      overflow: hidden;
-      border: 1px solid rgba(201, 154, 71, 0.46);
-      background: #f5eee2;
-      box-shadow: 0 18px 46px rgba(0, 0, 0, 0.36);
-    }
-
-    .print-sheet::after {
-      content: "";
-      display: none;
-      position: absolute;
-      inset: 0;
-      place-items: center;
-      background: rgba(245, 238, 226, 0.94);
-      color: #6f4a24;
-      font-size: clamp(0.72rem, 1.4vw, 0.95rem);
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-align: center;
-      z-index: 2;
-    }
-
-    .print-sheet.is-capturing::after {
-      content: "CSS 완성본을 이미지로 캡처하는 중…";
-      display: grid;
-    }
-
-    .print-sheet.is-capture-error::after {
-      content: "이미지 캡처 실패 · 위 버튼으로 다시 시도해 주세요";
-      display: grid;
-      color: #8b2f26;
-    }
-
-    .print-sheet-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 16.835%);
-      grid-template-rows: repeat(2, 47.619%);
-      column-gap: 0.67%;
-      row-gap: 0.95%;
-      align-content: center;
-      justify-content: center;
-      width: 100%;
-      height: 100%;
-    }
-
-    .print-copy {
-      display: block;
-      width: 100%;
-      height: 100%;
-      min-width: 0;
-      padding: 0;
-      border: 0;
-      background: transparent;
-      box-shadow: none;
-      object-fit: fill;
-    }
-
-    .print-sheet-grid .print-copy {
-      aspect-ratio: 1 / 2;
     }
 
     .poster-stage {
@@ -806,52 +697,6 @@
       z-index: 8;
     }
 
-    @page {
-      size: A4 landscape;
-      margin: 0;
-    }
-
-    @media print {
-      body {
-        min-height: auto;
-        background: #fff;
-      }
-
-      .print-controls,
-      .print-preview-label,
-      .poster-stage {
-        display: none !important;
-      }
-
-      .print-sheet {
-        display: block;
-        width: 297mm;
-        height: 210mm;
-        margin: 0;
-        border: 0;
-        box-shadow: none;
-        background: #fff;
-      }
-
-      .print-sheet-grid {
-        grid-template-columns: repeat(5, 50mm);
-        grid-template-rows: repeat(2, 100mm);
-        column-gap: 2mm;
-        row-gap: 2mm;
-        width: 297mm;
-        height: 210mm;
-      }
-
-      .print-copy {
-        width: 50mm;
-        height: 100mm;
-        padding: 0;
-        border: 0;
-        background: transparent;
-        box-shadow: none;
-      }
-    }
-
     @media (max-width: 720px) {
       body {
         background: #0a0504;
@@ -865,7 +710,7 @@
       }
 
       .poster-frame {
-        width: min(42vw, 250px, calc((100vh - 48px) * 0.5));
+        width: min(46vw, 300px, calc((100vh - 48px) * 0.5));
         padding: 4px 2px;
       }
 
@@ -890,19 +735,6 @@
       .print-controls-grid {
         grid-template-columns: 1fr;
         gap: 12px;
-      }
-
-      .print-actions {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .print-button {
-        width: 100%;
-      }
-
-      .print-sheet {
-        width: 94vw;
       }
 
       .qr-wrap {
@@ -954,26 +786,26 @@
   </style>
 </head>
 <body>
-  <section class="print-controls" aria-label="A4 print settings">
+  <section class="print-controls" aria-label="Poster settings">
     <div class="print-controls-header">
       <div>
-        <h1 class="print-controls-title">A4 PRINT SETUP</h1>
-        <p class="print-controls-note">하단 CSS 완성본을 고해상도 이미지로 캡처해 A4 가로 용지에 10장 배치합니다. 금색 테두리 포함 정확히 5×10cm이며, 앞면 QR은 3×3cm 이상입니다.</p>
+        <h1 class="print-controls-title">POSTER SETTINGS</h1>
+        <p class="print-controls-note">CSS 포스터 기준 크기는 금색 테두리 포함 6×12cm이며, 앞면 QR은 약 4×4cm입니다.</p>
       </div>
-      <div class="print-capacity">A4 LANDSCAPE · 10 COPIES</div>
+      <div class="print-capacity">6×12 CM · QR ≈ 4×4 CM</div>
     </div>
 
     <div class="print-controls-grid">
       <fieldset>
-        <legend>Print side</legend>
+        <legend>Edit side</legend>
         <div class="side-picker">
           <label class="side-choice">
             <input type="radio" name="printSide" value="front" checked />
-            <span>앞면만 인쇄</span>
+            <span>앞면 QR 설정</span>
           </label>
           <label class="side-choice">
             <input type="radio" name="printSide" value="back" />
-            <span>뒷면만 인쇄</span>
+            <span>뒷면 QR 설정</span>
           </label>
         </div>
       </fieldset>
@@ -1025,15 +857,6 @@
       </div>
     </div>
 
-    <div class="print-actions">
-      <div class="print-status" id="printStatus">하단 CSS 완성본을 캡처해 A4 미리보기를 준비합니다.</div>
-      <button class="print-button" id="printButton" type="button">A4 인쇄 미리보기</button>
-    </div>
-  </section>
-
-  <div class="print-preview-label">A4 preview</div>
-  <section class="print-sheet" id="printSheet" aria-label="A4 print preview">
-    <div class="print-sheet-grid" id="printSheetGrid"></div>
   </section>
 
   <div class="poster-stage">
@@ -1108,23 +931,12 @@
     </div>
   </div>
 
-  <script src="assets/html-to-image.js"></script>
   <script>
     (function () {
       const params = new URLSearchParams(window.location.search);
-      if (params.get("capture") === "front") {
-        document.documentElement.classList.add("poster-capture-front");
-      }
-      const printSheetGrid = document.getElementById("printSheetGrid");
-      const printSheet = document.getElementById("printSheet");
-      const printStatus = document.getElementById("printStatus");
-      const printButton = document.getElementById("printButton");
       const sideSettings = Array.from(document.querySelectorAll("[data-side-settings]"));
       const sideInputs = Array.from(document.querySelectorAll('input[name="printSide"]'));
       let selectedSide = "front";
-      let renderedSide = "";
-      let captureRequest = 0;
-      let captureTimer = 0;
 
       const slots = {
         front: {
@@ -1179,120 +991,10 @@
         renderQr(document.getElementById(slot.paperId), slot);
       }
 
-      function waitForArtwork(frame) {
-        const images = Array.from(frame.querySelectorAll("img"));
-        const imageTasks = images.map(function (image) {
-          if (image.complete) {
-            return image.naturalWidth > 0 && typeof image.decode === "function"
-              ? image.decode().catch(function () {})
-              : Promise.resolve();
-          }
-
-          return new Promise(function (resolve) {
-            image.addEventListener("load", resolve, { once: true });
-            image.addEventListener("error", resolve, { once: true });
-          });
-        });
-
-        if (document.fonts && document.fonts.ready) {
-          imageTasks.push(Promise.race([
-            document.fonts.ready,
-            new Promise(function (resolve) { window.setTimeout(resolve, 2000); })
-          ]));
-        }
-
-        return Promise.all(imageTasks);
-      }
-
-      async function captureArtwork(side) {
-        const frame = document.querySelector('.poster-stage .poster-frame[data-side="' + side + '"]');
-        if (!frame) throw new Error("완성본을 찾을 수 없습니다.");
-        if (!window.htmlToImage || typeof window.htmlToImage.toPng !== "function") {
-          throw new Error("캡처 모듈을 불러오지 못했습니다.");
-        }
-
-        await waitForArtwork(frame);
-        const frameBounds = frame.getBoundingClientRect();
-        const frameWidth = frameBounds.width;
-        const captureScale = Math.max(4, 1000 / Math.max(frameWidth, 1));
-
-        return window.htmlToImage.toPng(frame, {
-          cacheBust: true,
-          includeQueryParams: true,
-          pixelRatio: captureScale,
-          width: frameBounds.width,
-          height: frameBounds.height,
-          skipAutoScale: true
-        });
-      }
-
-      function paintPrintSheet(dataUrl, side) {
-        const fragment = document.createDocumentFragment();
-        const copies = [];
-        const sideName = side === "front" ? "앞면" : "뒷면";
-
-        for (let index = 0; index < 10; index += 1) {
-          const copy = new Image();
-          copy.className = "print-copy";
-          copy.src = dataUrl;
-          copy.alt = sideName + " 포스터 " + (index + 1);
-          copy.decoding = "sync";
-          fragment.appendChild(copy);
-          copies.push(copy);
-        }
-
-        printSheetGrid.replaceChildren(fragment);
-        return Promise.all(copies.map(function (copy) {
-          return typeof copy.decode === "function" ? copy.decode().catch(function () {}) : Promise.resolve();
-        }));
-      }
-
-      async function buildPrintSheet() {
-        if (!printSheetGrid || !printSheet) return false;
-
-        const request = ++captureRequest;
-        const side = selectedSide;
-        const sideName = side === "front" ? "앞면" : "뒷면";
-        if (renderedSide !== side) printSheetGrid.replaceChildren();
-        printSheet.classList.remove("is-capture-error");
-        printSheet.classList.add("is-capturing");
-        printStatus.textContent = sideName + " CSS 완성본을 고해상도로 캡처하는 중입니다…";
-        printButton.disabled = true;
-
-        try {
-          const dataUrl = await captureArtwork(side);
-          if (request !== captureRequest || side !== selectedSide) return false;
-
-          await paintPrintSheet(dataUrl, side);
-          renderedSide = side;
-          printSheet.classList.remove("is-capturing", "is-capture-error");
-          printStatus.textContent = sideName + " 완성본 캡처 10장이 A4에 배치되었습니다. 외곽 금색 테두리 포함 5×10cm입니다.";
-          return true;
-        } catch (error) {
-          if (request !== captureRequest) return false;
-          console.error(error);
-          printSheet.classList.remove("is-capturing");
-          printSheet.classList.add("is-capture-error");
-          const reason = error && error.message ? " (" + error.message + ")" : "";
-          printStatus.textContent = "CSS 완성본 이미지 캡처에 실패했습니다" + reason + ". A4 인쇄 미리보기 버튼으로 다시 시도해 주세요.";
-          return false;
-        } finally {
-          if (request === captureRequest) printButton.disabled = false;
-        }
-      }
-
-      function queuePrintSheet() {
-        window.clearTimeout(captureTimer);
-        captureRequest += 1;
-        captureTimer = window.setTimeout(buildPrintSheet, 160);
-      }
-
       function showSelectedSettings() {
         sideSettings.forEach(function (settings) {
           settings.hidden = settings.dataset.sideSettings !== selectedSide;
         });
-        window.clearTimeout(captureTimer);
-        buildPrintSheet();
       }
 
       function bindSlot(slot) {
@@ -1306,7 +1008,6 @@
             slot.source = urlInput.value.trim();
             if (fileInput) fileInput.value = "";
             updateSlot(slot);
-            queuePrintSheet();
           });
         }
 
@@ -1320,7 +1021,6 @@
               slot.source = typeof reader.result === "string" ? reader.result : "";
               if (urlInput) urlInput.value = "";
               updateSlot(slot);
-              queuePrintSheet();
             });
             reader.readAsDataURL(file);
           });
@@ -1332,7 +1032,6 @@
             slot.number = numberInput.value.replace(/[^0-9]/g, "").slice(0, 3);
             numberInput.value = slot.number;
             updateSlot(slot);
-            queuePrintSheet();
           });
         }
 
@@ -1347,12 +1046,6 @@
           selectedSide = input.value;
           showSelectedSettings();
         });
-      });
-
-      printButton.addEventListener("click", async function () {
-        window.clearTimeout(captureTimer);
-        const ready = await buildPrintSheet();
-        if (ready) window.print();
       });
 
       showSelectedSettings();
