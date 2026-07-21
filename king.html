@@ -1725,6 +1725,63 @@
       font-weight: 800;
     }
 
+    .availability-person {
+      display: inline-flex;
+      align-items: center;
+      min-width: 0;
+      gap: 7px;
+    }
+
+    .availability-source {
+      display: inline-block;
+      flex: 0 0 auto;
+      width: 8px;
+      height: 8px;
+      background: currentColor;
+    }
+
+    .availability-row.is-fixed {
+      box-shadow: inset 4px 0 0 currentColor;
+    }
+
+    .availability-row.is-fixed .availability-source {
+      border-radius: 2px;
+    }
+
+    .availability-row.is-temporary {
+      box-shadow: inset 4px 0 0 #d39a30;
+    }
+
+    .availability-row.is-temporary .availability-source {
+      border-radius: 999px;
+      background: #d39a30;
+    }
+
+    .availability-meta {
+      display: inline-flex;
+      align-items: baseline;
+      justify-content: flex-end;
+      min-width: 0;
+      gap: 5px;
+      text-align: right;
+    }
+
+    .availability-meta b {
+      white-space: nowrap;
+      font-weight: 900;
+    }
+
+    .availability-meta small {
+      overflow: hidden;
+      max-width: 116px;
+      color: currentColor;
+      font-size: 0.72rem;
+      font-weight: 750;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      opacity: 0.8;
+    }
+
     .availability-row.is-unavailable {
       background: rgba(123, 31, 47, 0.1);
       color: #7b1f2f;
@@ -2884,6 +2941,6 @@
     </div>
   </div>
 
-  <script src="js/king-admin.js?v=20260721-2"></script>
+  <script src="js/king-admin.js?v=20260721-3"></script>
 </body>
 </html>

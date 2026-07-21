@@ -2227,9 +2227,18 @@
   }
 
   function renderAvailabilityList(status, target) {
+    const weekDates = getScheduleWeekDates();
+    const weekStart = weekDates[0] ? startOfDay(weekDates[0]).getTime() : null;
+    const weekEnd = weekDates[6] ? startOfDay(weekDates[6]).getTime() : null;
     const dateItems = state.scheduleAvailability
-      .filter((item) => item.status === status)
-      .map((item) => ({ ...item, source: "date" }));
+      .filter((item) => {
+        if (item.status !== status) return false;
+        const date = toSafeDate(item.availability_date);
+        if (!date || weekStart === null || weekEnd === null) return false;
+        const time = startOfDay(date).getTime();
+        return time >= weekStart && time <= weekEnd;
+      })
+      .map((item) => ({ ...item, source: "temporary" }));
     const fixedItems = getFixedPreferenceItems(status);
     const items = [...dateItems, ...fixedItems]
       .sort((a, b) => String(a.availability_date).localeCompare(String(b.availability_date)) || String(a.staff_name || a.staff_key).localeCompare(String(b.staff_name || b.staff_key)));
@@ -2244,12 +2253,15 @@
       const time = item.available_start || item.available_end
         ? `${item.available_start || "open"} - ${item.available_end || "close"}`
         : "";
-      const sourceLabel = item.source === "fixed" ? "고정 설정" : "";
-      const meta = [item.branch_scope, time, sourceLabel, item.note].filter(Boolean).join(" / ");
+      const detail = [time, item.note].filter(Boolean).join(" · ");
+      const sourceLabel = item.source === "fixed" ? "고정" : "일시";
       return `
-        <div class="availability-row is-${escapeHtml(status)}">
-          <span>${escapeHtml(item.staff_name || item.staff_key || "-")}</span>
-          <span>${escapeHtml(date ? formatScheduleDayLabel(date) : item.availability_date || "-")}${meta ? ` · ${escapeHtml(meta)}` : ""}</span>
+        <div class="availability-row is-${escapeHtml(status)} is-${escapeHtml(item.source)}" title="${escapeHtml(`${sourceLabel} ${status === "unavailable" ? "불가" : "선호"}`)}">
+          <span class="availability-person"><i class="availability-source" aria-label="${escapeHtml(sourceLabel)}"></i>${escapeHtml(item.staff_name || item.staff_key || "-")}</span>
+          <span class="availability-meta">
+            <b>${escapeHtml(date ? formatScheduleDayLabel(date) : item.availability_date || "-")}</b>
+            ${detail ? `<small>${escapeHtml(detail)}</small>` : ""}
+          </span>
         </div>
       `;
     }).join("");
@@ -2258,7 +2270,6 @@
   function getFixedPreferenceItems(status) {
     const dates = getScheduleWeekDates();
     const weekdayField = status === "unavailable" ? "fixed_unavailable_weekdays" : "fixed_preferred_weekdays";
-    const statusNote = status === "unavailable" ? "고정 불가" : "고정 선호";
     const items = [];
 
     getScheduleStaffPool().forEach((staff) => {
@@ -2273,7 +2284,6 @@
           branch_scope: staff.branch_scope,
           availability_date: formatInputDate(date),
           status,
-          note: statusNote,
           source: "fixed"
         });
       });
@@ -3042,6 +3052,19 @@
     return Number.isFinite(value) ? Math.max(0, value) : getDefaultServerCount(date);
   }
 
+  function getScheduleShortfalls() {
+    const shortfalls = [];
+    refs.scheduleBoard.querySelectorAll("[data-schedule-cell]").forEach((textarea) => {
+      const [branch, isoDate] = String(textarea.dataset.scheduleCell || "").split("|");
+      const date = toSafeDate(isoDate);
+      if (!branch || !date) return;
+      const target = getTargetCountForCell(textarea.dataset.scheduleCell, date);
+      const missing = Math.max(0, target - getCurrentNames(textarea).length);
+      if (missing) shortfalls.push({ branch, date, missing });
+    });
+    return shortfalls;
+  }
+
   function seededShuffle(items = []) {
     return items
       .map((item) => ({ item, roll: Math.random() }))
@@ -3221,6 +3244,7 @@
     const added = fixedPass.added + regularPass.added;
 
     const finalContext = getBoardAssignments();
+    const shortfalls = getScheduleShortfalls();
     const underTwo = pool
       .filter((staff) => {
         const staffId = normalizeScheduleStaffKey(staff.staff_key || staff.name);
@@ -3228,11 +3252,14 @@
         return days.size > 0 && days.size < 2;
       })
       .map((staff) => staff.name);
-    const baseMessage = added ? `빈자리 ${added}개를 자동배정했습니다.` : "채울 수 있는 빈자리가 없습니다.";
+    const baseMessage = added ? `빈자리 ${added}개를 자동배정했습니다.` : "필요 인원이 이미 모두 채워져 있습니다.";
     const fixedSuffix = fixedPass.added ? ` 고정 희망 ${fixedPass.added}개를 우선 반영했습니다.` : "";
     const suffix = underTwo.length ? ` 2일 미만: ${underTwo.slice(0, 5).join(", ")}` : "";
+    const shortfallSuffix = shortfalls.length
+      ? ` 미충족: ${shortfalls.slice(0, 3).map((item) => `${formatScheduleDayLabel(item.date)} ${formatBranchLabel(item.branch)} ${item.missing}명`).join(", ")}`
+      : " 필요 인원을 모두 채웠습니다.";
     renderScheduleBoard();
-    setScheduleStatus(`${baseMessage}${fixedSuffix}${suffix}`, added ? "success" : "");
+    setScheduleStatus(`${baseMessage}${fixedSuffix}${suffix}${shortfallSuffix}`, shortfalls.length ? "error" : "success");
   }
 
   async function ensureScheduleWeek() {
