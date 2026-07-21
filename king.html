@@ -1241,14 +1241,6 @@
       grid-column: 1 / -1;
     }
 
-    .schedule-staff-helper {
-      margin: -2px 0 11px;
-      color: var(--muted);
-      font-size: 0.8rem;
-      font-weight: 750;
-      line-height: 1.45;
-    }
-
     .staff-roster-list {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(126px, 1fr));
@@ -1518,9 +1510,32 @@
     }
 
     .schedule-dropzone.is-unavailable {
-      border-color: rgba(123, 31, 47, 0.34);
-      background: rgba(255, 242, 243, 0.9);
+      border: 2px solid #a3223b;
+      background:
+        repeating-linear-gradient(-45deg, rgba(163, 34, 59, 0.1) 0 8px, rgba(255, 242, 243, 0.94) 8px 16px);
+      box-shadow: inset 0 0 0 2px rgba(163, 34, 59, 0.08);
       cursor: not-allowed;
+    }
+
+    .schedule-dropzone.is-unavailable::after {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      display: grid;
+      place-items: center;
+      content: "×";
+      color: #a3223b;
+      font-size: 5.4rem;
+      font-weight: 900;
+      line-height: 1;
+      opacity: 0.52;
+      pointer-events: none;
+    }
+
+    .schedule-dropzone.is-unavailable .schedule-assignment-list,
+    .schedule-dropzone.is-unavailable .schedule-drop-hint {
+      position: relative;
+      z-index: 1;
     }
 
     .schedule-dropzone.is-assigned {
@@ -1593,26 +1608,7 @@
 
     .schedule-dropzone.is-unavailable .schedule-drop-hint {
       color: #8d2739;
-    }
-
-    .schedule-cell-lock {
-      position: absolute;
-      right: 7px;
-      bottom: 7px;
-      display: none;
-      align-items: center;
-      gap: 3px;
-      padding: 3px 5px;
-      border-radius: 999px;
-      background: #8d2739;
-      color: #fff;
-      font-size: 0.68rem;
-      font-weight: 900;
-      line-height: 1;
-    }
-
-    .schedule-dropzone.is-unavailable .schedule-cell-lock {
-      display: inline-flex;
+      font-weight: 950;
     }
 
     .schedule-drag-ghost {
@@ -1635,12 +1631,6 @@
     body.is-schedule-dragging {
       user-select: none;
       -webkit-user-select: none;
-    }
-
-    .schedule-helper {
-      color: var(--muted);
-      font-size: 0.82rem;
-      font-weight: 700;
     }
 
     @media (max-width: 719px) {
@@ -1730,11 +1720,8 @@
         line-height: 1.2;
       }
 
-      .schedule-cell-lock {
-        right: 5px;
-        bottom: 5px;
-        padding: 2px 4px;
-        font-size: 0.6rem;
+      .schedule-dropzone.is-unavailable::after {
+        font-size: 4.4rem;
       }
     }
 
@@ -2102,14 +2089,12 @@
               <button class="pill-btn primary" id="schedulePublishBtn" type="button">저장 / 게시</button>
             </div>
           </div>
-          <div class="schedule-helper">주간은 월-일 기준입니다. 직접 배정한 서버는 고정되고, 자동배정은 남은 자리만 채웁니다.</div>
           <div class="status-line" id="scheduleStatus"></div>
         </div>
 
         <div class="schedule-summary-grid">
           <div class="availability-card schedule-staff-card">
             <h4>서버 목록</h4>
-            <p class="schedule-staff-helper">서버를 탭하면 불가일은 X로 잠깁니다. 서버를 길게 눌러 날짜 칸에 끌어놓거나, 선택 후 날짜 칸을 탭해 배정하세요.</p>
             <div class="staff-roster-list" id="scheduleStaffList">
               <div class="empty-state">데이터 없음</div>
             </div>
