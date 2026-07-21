@@ -1,0 +1,844 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EHWA QR Batch Generator</title>
+  <meta name="description" content="Generate numbered EHWA QR posters from the canonical poster template." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --page: #090504;
+      --panel: rgba(27, 13, 11, 0.9);
+      --panel-deep: rgba(14, 8, 7, 0.96);
+      --line: rgba(201, 154, 71, 0.36);
+      --line-strong: rgba(201, 154, 71, 0.72);
+      --gold: #c99a47;
+      --gold-light: #e5c176;
+      --ivory: #f4eadc;
+      --muted: rgba(244, 234, 220, 0.62);
+      --danger: #ffaaa2;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 78% 8%, rgba(111, 27, 25, 0.25), transparent 30%),
+        radial-gradient(circle at 12% 100%, rgba(89, 23, 18, 0.2), transparent 34%),
+        linear-gradient(135deg, #140a08, var(--page) 48%, #050303);
+      color: var(--ivory);
+      font-family: "Noto Sans KR", system-ui, sans-serif;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    .app-shell {
+      width: min(1180px, calc(100% - 36px));
+      margin: 0 auto;
+      padding: 42px 0 54px;
+    }
+
+    .masthead {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--gold);
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--ivory);
+      font-size: clamp(1.65rem, 4vw, 2.65rem);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.035em;
+    }
+
+    .masthead-note {
+      max-width: 390px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.65;
+      text-align: right;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 390px);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      background: linear-gradient(145deg, var(--panel), var(--panel-deep));
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34), inset 0 0 0 1px rgba(255, 240, 214, 0.035);
+    }
+
+    .form-panel {
+      padding: clamp(22px, 4vw, 34px);
+    }
+
+    .section-title {
+      margin: 0 0 22px;
+      color: var(--gold-light);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    label,
+    .label {
+      color: rgba(244, 234, 220, 0.78);
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.025em;
+    }
+
+    .input-wrap {
+      display: flex;
+      min-width: 0;
+    }
+
+    input,
+    select {
+      min-width: 0;
+      width: 100%;
+      height: 46px;
+      border: 1px solid rgba(244, 234, 220, 0.17);
+      border-radius: 2px;
+      padding: 0 13px;
+      outline: none;
+      background: rgba(5, 3, 3, 0.66);
+      color: var(--ivory);
+      font-size: 0.82rem;
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--line-strong);
+      box-shadow: 0 0 0 3px rgba(201, 154, 71, 0.1);
+    }
+
+    input::placeholder {
+      color: rgba(244, 234, 220, 0.3);
+    }
+
+    .input-wrap input {
+      border-radius: 2px 0 0 2px;
+    }
+
+    .unit-select {
+      flex: 0 0 84px;
+      width: 84px;
+      border-left: 0;
+      border-radius: 0 2px 2px 0;
+      color: var(--gold-light);
+    }
+
+    .hint {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.68rem;
+      line-height: 1.5;
+    }
+
+    .format-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .format-choice {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 44px;
+      border: 1px solid rgba(244, 234, 220, 0.14);
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: border-color 150ms ease, background 150ms ease, color 150ms ease;
+    }
+
+    .format-choice:has(input:checked) {
+      border-color: var(--line-strong);
+      background: rgba(201, 154, 71, 0.12);
+      color: var(--gold-light);
+    }
+
+    .format-choice input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 28px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      border: 1px solid var(--gold);
+      border-radius: 2px;
+      padding: 0 20px;
+      background: var(--gold);
+      color: #1e100b;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: filter 150ms ease, transform 150ms ease;
+    }
+
+    .button:hover:not(:disabled) {
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+    }
+
+    .button:disabled {
+      cursor: wait;
+      opacity: 0.58;
+    }
+
+    .button-secondary {
+      border-color: rgba(244, 234, 220, 0.22);
+      background: transparent;
+      color: var(--ivory);
+    }
+
+    .button-secondary[hidden] {
+      display: none;
+    }
+
+    .status-region {
+      min-height: 56px;
+      margin-top: 20px;
+    }
+
+    .status-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 0.7rem;
+    }
+
+    .status-line strong {
+      color: var(--ivory);
+      font-weight: 600;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 3px;
+      overflow: hidden;
+      background: rgba(244, 234, 220, 0.1);
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, #9c682e, var(--gold-light));
+      transition: width 180ms ease;
+    }
+
+    .error {
+      margin: 10px 0 0;
+      color: var(--danger);
+      font-size: 0.72rem;
+      line-height: 1.5;
+    }
+
+    .preview-panel {
+      position: sticky;
+      top: 24px;
+      overflow: hidden;
+    }
+
+    .preview-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 15px 17px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .preview-header h2 {
+      margin: 0;
+      color: var(--gold-light);
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .source-badge {
+      color: var(--muted);
+      font-size: 0.62rem;
+    }
+
+    .preview-canvas {
+      display: grid;
+      min-height: 580px;
+      place-items: center;
+      padding: 22px;
+      background:
+        linear-gradient(45deg, rgba(255, 255, 255, 0.018) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.018) 75%),
+        linear-gradient(45deg, rgba(255, 255, 255, 0.018) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.018) 75%),
+        #070404;
+      background-position: 0 0, 10px 10px;
+      background-size: 20px 20px;
+    }
+
+    #previewImage {
+      display: block;
+      width: min(100%, 280px);
+      height: auto;
+      aspect-ratio: 1 / 2;
+      object-fit: contain;
+      background: #100807;
+      box-shadow: 0 20px 42px rgba(0, 0, 0, 0.5);
+    }
+
+    .preview-loading {
+      color: var(--muted);
+      font-size: 0.72rem;
+      text-align: center;
+    }
+
+    .render-host {
+      position: fixed;
+      top: 0;
+      left: -100000px;
+      width: 900px;
+      height: 1400px;
+      overflow: hidden;
+      pointer-events: none;
+      visibility: visible;
+    }
+
+    #posterTemplate {
+      display: block;
+      width: 900px;
+      height: 1400px;
+      border: 0;
+    }
+
+    @media (max-width: 820px) {
+      .app-shell {
+        width: min(100% - 24px, 620px);
+        padding-top: 26px;
+      }
+
+      .masthead {
+        display: block;
+      }
+
+      .masthead-note {
+        margin-top: 14px;
+        text-align: left;
+      }
+
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .preview-panel {
+        position: static;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .field-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+
+      .preview-canvas {
+        min-height: 500px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="masthead">
+      <div>
+        <p class="eyebrow">EHWA production tools</p>
+        <h1>QR Batch Generator</h1>
+      </div>
+      <p class="masthead-note">Each file is rendered live from <strong>qr-poster.html</strong>. The generator only inserts the QR image and table number.</p>
+    </header>
+
+    <div class="workspace">
+      <section class="panel form-panel" aria-labelledby="generator-title">
+        <h2 class="section-title" id="generator-title">Batch settings</h2>
+
+        <form id="generatorForm" novalidate>
+          <div class="field">
+            <label for="urlTemplate">QR URL template</label>
+            <input id="urlTemplate" name="urlTemplate" type="url" value="https://ehwa.ca/t/{id}" placeholder="https://ehwa.ca/t/{id}" autocomplete="url" required />
+            <p class="hint">Use <strong>{id}</strong> where the table number belongs.</p>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="startNumber">Start Number</label>
+              <input id="startNumber" name="startNumber" type="number" value="1" min="0" step="1" required />
+            </div>
+            <div class="field">
+              <label for="endNumber">End Number</label>
+              <input id="endNumber" name="endNumber" type="number" value="25" min="0" step="1" required />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="qrSize">QR Size</label>
+            <div class="input-wrap">
+              <input id="qrSize" name="qrSize" type="number" value="40" min="1" step="1" required />
+              <select class="unit-select" id="qrUnit" name="qrUnit" aria-label="QR size unit">
+                <option value="mm" selected>mm</option>
+                <option value="px">px</option>
+              </select>
+            </div>
+            <p class="hint">Controls export resolution; the poster’s existing QR footprint stays unchanged. Millimetres render at 300 DPI.</p>
+          </div>
+
+          <fieldset class="field" style="margin-inline: 0; padding: 0; border: 0;">
+            <legend class="label" style="margin-bottom: 8px;">Output format</legend>
+            <div class="format-options">
+              <label class="format-choice">
+                <input type="radio" name="outputFormat" value="png" checked />
+                <span>PNG</span>
+              </label>
+              <label class="format-choice">
+                <input type="radio" name="outputFormat" value="pdf" />
+                <span>PDF</span>
+              </label>
+              <label class="format-choice">
+                <input type="radio" name="outputFormat" value="both" />
+                <span>Both</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <div class="actions">
+            <button class="button" id="generateButton" type="submit">Generate</button>
+            <button class="button button-secondary" id="cancelButton" type="button" hidden>Cancel</button>
+          </div>
+
+          <div class="status-region" aria-live="polite">
+            <div class="status-line">
+              <strong id="statusText">Loading poster template…</strong>
+              <span id="statusCount"></span>
+            </div>
+            <div class="progress-track" aria-hidden="true">
+              <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <p class="error" id="errorText" hidden></p>
+          </div>
+        </form>
+      </section>
+
+      <aside class="panel preview-panel" aria-labelledby="preview-title">
+        <div class="preview-header">
+          <h2 id="preview-title">First poster preview</h2>
+          <span class="source-badge">Live template</span>
+        </div>
+        <div class="preview-canvas">
+          <p class="preview-loading" id="previewLoading">Preparing preview…</p>
+          <img id="previewImage" alt="Preview of the first generated QR poster" hidden />
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <div class="render-host" aria-hidden="true">
+    <iframe id="posterTemplate" src="qr-poster.html" title="Poster render template" tabindex="-1"></iframe>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@3.10.0/dist/dom-to-image-more.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>
+    (function () {
+      "use strict";
+
+      const form = document.getElementById("generatorForm");
+      const templateFrame = document.getElementById("posterTemplate");
+      const urlTemplateInput = document.getElementById("urlTemplate");
+      const startInput = document.getElementById("startNumber");
+      const endInput = document.getElementById("endNumber");
+      const qrSizeInput = document.getElementById("qrSize");
+      const qrUnitInput = document.getElementById("qrUnit");
+      const generateButton = document.getElementById("generateButton");
+      const cancelButton = document.getElementById("cancelButton");
+      const statusText = document.getElementById("statusText");
+      const statusCount = document.getElementById("statusCount");
+      const progressBar = document.getElementById("progressBar");
+      const errorText = document.getElementById("errorText");
+      const previewImage = document.getElementById("previewImage");
+      const previewLoading = document.getElementById("previewLoading");
+
+      let templateReady = false;
+      let cancelled = false;
+      let busy = false;
+      let previewTimer = 0;
+      let previewObjectUrl = "";
+      let renderQueue = Promise.resolve();
+
+      function setStatus(message, current, total) {
+        statusText.textContent = message;
+        statusCount.textContent = total ? current + " / " + total : "";
+        progressBar.style.width = total ? Math.round((current / total) * 100) + "%" : "0%";
+      }
+
+      function showError(message) {
+        errorText.textContent = message;
+        errorText.hidden = !message;
+      }
+
+      function getSettings() {
+        const template = urlTemplateInput.value.trim();
+        const start = Number(startInput.value);
+        const end = Number(endInput.value);
+        const size = Number(qrSizeInput.value);
+        const unit = qrUnitInput.value;
+        const formatInput = form.querySelector('input[name="outputFormat"]:checked');
+
+        if (!template || !template.includes("{id}")) {
+          throw new Error("The QR URL template must include {id}.");
+        }
+        if (!Number.isSafeInteger(start) || !Number.isSafeInteger(end) || start < 0 || end < 0) {
+          throw new Error("Start and end numbers must be whole numbers of 0 or greater.");
+        }
+        if (end < start) {
+          throw new Error("End Number must be greater than or equal to Start Number.");
+        }
+        if (!Number.isFinite(size) || size <= 0) {
+          throw new Error("QR Size must be greater than zero.");
+        }
+
+        const qrPixels = unit === "mm" ? Math.round(size * 300 / 25.4) : Math.round(size);
+        if (qrPixels < 64 || qrPixels > 2400) {
+          throw new Error("QR Size must resolve to between 64 and 2400 pixels.");
+        }
+
+        return {
+          template: template,
+          start: start,
+          end: end,
+          total: end - start + 1,
+          qrPixels: qrPixels,
+          format: formatInput ? formatInput.value : "png"
+        };
+      }
+
+      function ensureLibraries() {
+        if (!window.QRCode || !window.domtoimage || !window.JSZip || !window.jspdf) {
+          throw new Error("The export tools could not load. Check your internet connection and reload this page.");
+        }
+      }
+
+      function waitForImage(image) {
+        if (image.complete && image.naturalWidth > 0) return Promise.resolve();
+        if (typeof image.decode === "function") {
+          return image.decode().catch(function () {
+            return new Promise(function (resolve, reject) {
+              image.addEventListener("load", resolve, { once: true });
+              image.addEventListener("error", reject, { once: true });
+            });
+          });
+        }
+        return new Promise(function (resolve, reject) {
+          image.addEventListener("load", resolve, { once: true });
+          image.addEventListener("error", reject, { once: true });
+        });
+      }
+
+      async function waitForPosterAssets(doc) {
+        if (doc.fonts && doc.fonts.ready) await doc.fonts.ready;
+        const images = Array.from(doc.querySelectorAll("img"));
+        await Promise.all(images.map(function (image) {
+          return waitForImage(image).catch(function () { return undefined; });
+        }));
+      }
+
+      function createQrDataUrl(text, pixels) {
+        const host = document.createElement("div");
+        new QRCode(host, {
+          text: text,
+          width: pixels,
+          height: pixels,
+          colorDark: "#000000",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.H
+        });
+        const canvas = host.querySelector("canvas");
+        if (!canvas) throw new Error("QR generation failed.");
+        return canvas.toDataURL("image/png");
+      }
+
+      async function injectQr(id, settings) {
+        const doc = templateFrame.contentDocument;
+        if (!doc) throw new Error("The poster template is unavailable.");
+
+        const paper = doc.querySelector('[data-qr-slot="front"]');
+        const number = paper && paper.querySelector(".qr-center-number");
+        if (!paper || !number) {
+          throw new Error("The front QR placeholder was not found in qr-poster.html.");
+        }
+
+        paper.querySelectorAll(":scope > img").forEach(function (image) {
+          image.remove();
+        });
+
+        const qrUrl = settings.template.replaceAll("{id}", String(id));
+        const image = doc.createElement("img");
+        image.alt = "QR code for table " + id;
+        image.decoding = "sync";
+        image.src = createQrDataUrl(qrUrl, settings.qrPixels);
+        paper.insertBefore(image, number);
+        number.textContent = String(id);
+        number.hidden = false;
+        await waitForImage(image);
+      }
+
+      async function renderPoster(id, settings) {
+        await injectQr(id, settings);
+        const doc = templateFrame.contentDocument;
+        const posterFrame = doc.querySelector('.poster-frame[data-side="front"]');
+        const qrPaper = doc.querySelector('[data-qr-slot="front"]');
+        if (!posterFrame || !qrPaper) throw new Error("The front poster could not be rendered.");
+
+        const qrWidth = qrPaper.getBoundingClientRect().width;
+        const scale = settings.qrPixels / qrWidth;
+        return window.domtoimage.toCanvas(posterFrame, {
+          scale: scale,
+          pixelRatio: 1,
+          cacheBust: true
+        });
+      }
+
+      function queuePosterRender(id, settings) {
+        const job = renderQueue.then(function () {
+          return renderPoster(id, settings);
+        });
+        renderQueue = job.catch(function () { return undefined; });
+        return job;
+      }
+
+      function canvasToBlob(canvas) {
+        return new Promise(function (resolve, reject) {
+          canvas.toBlob(function (blob) {
+            if (blob) resolve(blob);
+            else reject(new Error("PNG export failed."));
+          }, "image/png");
+        });
+      }
+
+      function downloadBlob(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      }
+
+      function fileNumber(id, widestId) {
+        const width = Math.max(2, String(widestId).length);
+        return String(id).padStart(width, "0");
+      }
+
+      function nextFrame() {
+        return new Promise(function (resolve) {
+          requestAnimationFrame(function () { requestAnimationFrame(resolve); });
+        });
+      }
+
+      async function updatePreview() {
+        if (!templateReady || busy) return;
+        try {
+          ensureLibraries();
+          const settings = getSettings();
+          previewLoading.hidden = false;
+          previewLoading.textContent = "Updating preview…";
+          const canvas = await queuePosterRender(settings.start, settings);
+          const blob = await canvasToBlob(canvas);
+          if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
+          previewObjectUrl = URL.createObjectURL(blob);
+          previewImage.src = previewObjectUrl;
+          previewImage.hidden = false;
+          previewLoading.hidden = true;
+          if (!busy) setStatus("Ready to generate", 0, 0);
+          showError("");
+        } catch (error) {
+          previewLoading.hidden = false;
+          previewLoading.textContent = "Preview unavailable";
+          showError(error instanceof Error ? error.message : String(error));
+        }
+      }
+
+      function schedulePreview() {
+        window.clearTimeout(previewTimer);
+        previewTimer = window.setTimeout(updatePreview, 450);
+      }
+
+      async function generateBatch(settings) {
+        const wantsPng = settings.format === "png" || settings.format === "both";
+        const wantsPdf = settings.format === "pdf" || settings.format === "both";
+        const zip = wantsPng ? new JSZip() : null;
+        const jsPDF = window.jspdf.jsPDF;
+        const pdf = wantsPdf ? new jsPDF({ orientation: "portrait", unit: "mm", format: [60, 120], compress: true }) : null;
+
+        for (let index = 0; index < settings.total; index += 1) {
+          if (cancelled) throw new Error("Generation cancelled.");
+          const id = settings.start + index;
+          setStatus("Rendering table " + id + "…", index, settings.total);
+          await nextFrame();
+
+          const canvas = await queuePosterRender(id, settings);
+          const dataUrl = canvas.toDataURL("image/png");
+
+          if (zip) {
+            const blob = await canvasToBlob(canvas);
+            zip.file("poster-" + fileNumber(id, settings.end) + ".png", blob);
+          }
+
+          if (pdf) {
+            if (index > 0) pdf.addPage([60, 120], "portrait");
+            pdf.addImage(dataUrl, "PNG", 0, 0, 60, 120, undefined, "FAST");
+          }
+
+          setStatus("Rendered table " + id, index + 1, settings.total);
+          await nextFrame();
+        }
+
+        if (cancelled) throw new Error("Generation cancelled.");
+
+        const batchName = "ehwa-posters-" + fileNumber(settings.start, settings.end) + "-" + fileNumber(settings.end, settings.end);
+
+        if (zip && pdf) {
+          zip.file(batchName + ".pdf", pdf.output("blob"));
+        }
+
+        if (zip) {
+          setStatus(settings.format === "both" ? "Packaging PNG and PDF files…" : "Packaging PNG files…", settings.total, settings.total);
+          const zipBlob = await zip.generateAsync({ type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } });
+          downloadBlob(zipBlob, batchName + ".zip");
+        }
+
+        if (pdf && !zip) {
+          pdf.save(batchName + ".pdf");
+        }
+      }
+
+      templateFrame.addEventListener("load", async function () {
+        try {
+          ensureLibraries();
+          await waitForPosterAssets(templateFrame.contentDocument);
+          templateReady = true;
+          await updatePreview();
+        } catch (error) {
+          setStatus("Unable to load poster template", 0, 0);
+          showError(error instanceof Error ? error.message : String(error));
+        }
+      });
+
+      [urlTemplateInput, startInput, qrSizeInput, qrUnitInput].forEach(function (input) {
+        input.addEventListener("input", schedulePreview);
+        input.addEventListener("change", schedulePreview);
+      });
+
+      cancelButton.addEventListener("click", function () {
+        cancelled = true;
+        cancelButton.disabled = true;
+        setStatus("Cancelling after the current poster…", 0, 0);
+      });
+
+      form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        if (busy) return;
+
+        try {
+          if (!templateReady) throw new Error("The poster template is still loading.");
+          ensureLibraries();
+          const settings = getSettings();
+          showError("");
+          busy = true;
+          cancelled = false;
+          generateButton.disabled = true;
+          cancelButton.disabled = false;
+          cancelButton.hidden = false;
+          await generateBatch(settings);
+          setStatus("Download ready", settings.total, settings.total);
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          setStatus(cancelled ? "Generation cancelled" : "Generation stopped", 0, 0);
+          if (!cancelled) showError(message);
+        } finally {
+          busy = false;
+          generateButton.disabled = false;
+          cancelButton.hidden = true;
+          cancelButton.disabled = false;
+          schedulePreview();
+        }
+      });
+    }());
+  </script>
+</body>
+</html>
