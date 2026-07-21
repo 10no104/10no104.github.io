@@ -1262,6 +1262,128 @@
       color: #245f51;
     }
 
+    .schedule-month-calendar {
+      display: grid;
+      gap: 12px;
+      margin: 16px 18px 18px;
+      padding: 16px;
+      border: 1px solid rgba(113, 88, 60, 0.14);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.68);
+      box-shadow: 0 12px 26px rgba(45, 29, 18, 0.05);
+    }
+
+    .schedule-month-calendar > h4 {
+      margin: 0;
+      color: #2a1b18;
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .schedule-month-calendar .calendar-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .schedule-month-calendar .calendar-nav {
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      border: 1px solid rgba(113, 67, 50, 0.14);
+      border-radius: 14px;
+      background: rgba(255, 251, 246, 0.94);
+      color: #2a1b18;
+      font-size: 1.15rem;
+      font-weight: 900;
+      box-shadow: 0 10px 20px rgba(52, 29, 22, 0.08);
+    }
+
+    .schedule-month-calendar .calendar-label {
+      color: #221512;
+      font-size: 1rem;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+    }
+
+    .schedule-month-calendar .calendar-weekdays,
+    .schedule-month-calendar .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .schedule-month-calendar .calendar-weekdays {
+      margin-bottom: -4px;
+    }
+
+    .schedule-month-calendar .calendar-weekdays span {
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.72rem;
+      font-weight: 900;
+    }
+
+    .schedule-month-calendar .calendar-day {
+      position: relative;
+      aspect-ratio: 1;
+      min-height: 0;
+      padding: 6px 4px;
+      border: 1px solid rgba(113, 67, 50, 0.1);
+      border-radius: 12px;
+      background: rgba(255, 251, 246, 0.92);
+      color: #211310;
+      text-align: center;
+      box-shadow: 0 10px 18px rgba(52, 29, 22, 0.06);
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .schedule-month-calendar .calendar-day:hover {
+      transform: translateY(-2px);
+      border-color: rgba(143, 36, 56, 0.28);
+      box-shadow: 0 16px 24px rgba(52, 29, 22, 0.08);
+    }
+
+    .schedule-month-calendar .calendar-day.is-empty {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .schedule-month-calendar .calendar-day.is-today {
+      border-color: rgba(24, 92, 130, 0.72);
+      background: linear-gradient(180deg, rgba(236, 249, 255, 0.98), rgba(209, 235, 248, 0.98));
+      box-shadow: 0 0 0 2px rgba(24, 92, 130, 0.16), 0 12px 22px rgba(24, 92, 130, 0.14);
+    }
+
+    .schedule-month-calendar .calendar-day.is-selected {
+      color: #fffaf2;
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--wine), #b9871f);
+      box-shadow: 0 10px 20px rgba(123, 31, 47, 0.2);
+    }
+
+    .schedule-month-calendar .calendar-day.has-schedule::after {
+      position: absolute;
+      right: 5px;
+      bottom: 5px;
+      width: 5px;
+      height: 5px;
+      border-radius: 999px;
+      background: #245f51;
+      content: "";
+    }
+
+    .schedule-month-calendar .calendar-day.is-selected.has-schedule::after {
+      background: #fff3b3;
+    }
+
+    .schedule-month-calendar .calendar-day strong {
+      display: block;
+      font-size: 0.9rem;
+      line-height: 1;
+    }
+
     .schedule-summary-grid {
       display: grid;
       gap: 10px;
@@ -1785,6 +1907,26 @@
         font-weight: 950;
       }
 
+      .schedule-month-calendar {
+        margin: 16px 8px 18px;
+        padding: 13px;
+        border-radius: 18px;
+      }
+
+      .schedule-month-calendar .calendar-weekdays,
+      .schedule-month-calendar .calendar-grid {
+        gap: 4px;
+      }
+
+      .schedule-month-calendar .calendar-day {
+        padding: 4px 2px;
+        border-radius: 9px;
+      }
+
+      .schedule-month-calendar .calendar-day strong {
+        font-size: 0.78rem;
+      }
+
       .schedule-day-top {
         gap: 3px;
       }
@@ -2246,6 +2388,19 @@
             </div>
           </div>
         </div>
+
+        <section class="schedule-month-calendar" aria-label="월간 스케줄 달력">
+          <h4>월간 달력</h4>
+          <div class="calendar-toolbar">
+            <button class="calendar-nav" id="scheduleMonthPrevBtn" type="button" aria-label="이전 달">&lt;</button>
+            <strong class="calendar-label" id="scheduleMonthLabel">월</strong>
+            <button class="calendar-nav" id="scheduleMonthNextBtn" type="button" aria-label="다음 달">&gt;</button>
+          </div>
+          <div class="calendar-weekdays" aria-hidden="true">
+            <span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span><span>일</span>
+          </div>
+          <div class="calendar-grid" id="scheduleMonthGrid"></div>
+        </section>
       </section>
     </main>
   </div>

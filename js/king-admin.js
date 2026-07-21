@@ -122,6 +122,7 @@
     supportsAllSortOrder: true,
     scheduleWeekStart: "",
     scheduleWeekWindowStart: "",
+    scheduleMonthCursor: null,
     scheduleWeeks: [],
     scheduleAvailability: [],
     scheduleStaff: [],
@@ -227,6 +228,10 @@
       "scheduleWeekPrevBtn",
       "scheduleWeekNextBtn",
       "scheduleWeekChips",
+      "scheduleMonthPrevBtn",
+      "scheduleMonthNextBtn",
+      "scheduleMonthLabel",
+      "scheduleMonthGrid",
       "scheduleLoadBtn",
       "schedulePublishBtn",
       "scheduleAutoFillBtn",
@@ -260,6 +265,10 @@
     const diff = day === 0 ? -6 : 1 - day;
     result.setDate(result.getDate() + diff);
     return result;
+  }
+
+  function startOfMonth(date) {
+    return new Date(date.getFullYear(), date.getMonth(), 1);
   }
 
   function addDays(date, amount) {
@@ -1677,6 +1686,57 @@
     }).join("");
   }
 
+  function renderScheduleMonthCalendar() {
+    if (!refs.scheduleMonthGrid || !refs.scheduleMonthLabel) return;
+    const selectedWeekStart = toSafeDate(state.scheduleWeekStart);
+    const cursor = state.scheduleMonthCursor instanceof Date
+      ? startOfMonth(state.scheduleMonthCursor)
+      : startOfMonth(selectedWeekStart || new Date());
+    const monthEnd = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0);
+    const today = startOfDay(new Date());
+    const selectedDates = new Set(selectedWeekStart
+      ? Array.from({ length: 7 }, (_unused, index) => formatInputDate(addDays(selectedWeekStart, index)))
+      : []);
+    const assignments = getScheduleNamesByCellFromBoard();
+    const leadingBlanks = (cursor.getDay() + 6) % 7;
+    const cells = [];
+
+    state.scheduleMonthCursor = cursor;
+    refs.scheduleMonthLabel.textContent = new Intl.DateTimeFormat("ko-KR", {
+      year: "numeric",
+      month: "long"
+    }).format(cursor);
+
+    for (let index = 0; index < leadingBlanks; index += 1) {
+      cells.push('<div class="calendar-day is-empty" aria-hidden="true"></div>');
+    }
+
+    for (let day = 1; day <= monthEnd.getDate(); day += 1) {
+      const date = new Date(cursor.getFullYear(), cursor.getMonth(), day);
+      const isoDate = formatInputDate(date);
+      const hasSchedule = ["uptown", "downtown"].some((branch) => (assignments.get(getScheduleCellKey(branch, isoDate)) || []).length > 0);
+      const classes = [
+        "calendar-day",
+        isSameDate(date, today) ? "is-today" : "",
+        selectedDates.has(isoDate) ? "is-selected" : "",
+        hasSchedule ? "has-schedule" : ""
+      ].filter(Boolean).join(" ");
+      const dateLabel = new Intl.DateTimeFormat("ko-KR", {
+        weekday: "short",
+        month: "long",
+        day: "numeric"
+      }).format(date);
+
+      cells.push(`
+        <button class="${classes}" type="button" data-schedule-month-date="${isoDate}" aria-label="${escapeHtml(`${dateLabel} 주간 스케줄 보기`)}">
+          <strong>${day}</strong>
+        </button>
+      `);
+    }
+
+    refs.scheduleMonthGrid.innerHTML = cells.join("");
+  }
+
   function normalizeScheduleStaffKey(name = "") {
     return String(name || "").trim().toLowerCase().replace(/\s+/g, "");
   }
@@ -2026,7 +2086,7 @@
                   <header>
                     <strong aria-label="${escapeHtml(formatScheduleDayLabel(date))}">
                       <span class="schedule-day-label-full" aria-hidden="true">${escapeHtml(formatScheduleDayLabel(date))}</span>
-                      <span class="schedule-day-label-compact" aria-hidden="true">${escapeHtml(compactDayLabel.day)}<small>${escapeHtml(compactDayLabel.weekday)}</small></span>
+                      <span class="schedule-day-label-compact" aria-hidden="true"><small>${escapeHtml(compactDayLabel.weekday)}</small>${escapeHtml(compactDayLabel.day)}</span>
                     </strong>
                     <span class="schedule-branch-label">${escapeHtml(branch.label)}</span>
                   </header>
@@ -2070,6 +2130,7 @@
     renderAvailabilityList("preferred", refs.preferredList);
     renderScheduleStaffList();
     renderScheduleWeekChips();
+    renderScheduleMonthCalendar();
     refs.scheduleDetailToggleBtn.textContent = state.scheduleDetailsOpen ? "세부 설정 닫기" : "세부 설정";
     refs.scheduleDetailToggleBtn.classList.toggle("is-active", state.scheduleDetailsOpen);
     refs.scheduleDetailToggleBtn.setAttribute("aria-expanded", String(state.scheduleDetailsOpen));
@@ -3082,8 +3143,36 @@
     document.addEventListener("pointermove", moveSchedulePointerDrag, { passive: false });
     document.addEventListener("pointerup", endSchedulePointerDrag);
     document.addEventListener("pointercancel", cancelSchedulePointerDrag);
+    refs.scheduleMonthPrevBtn.addEventListener("click", () => {
+      const cursor = state.scheduleMonthCursor instanceof Date
+        ? state.scheduleMonthCursor
+        : toSafeDate(state.scheduleWeekStart) || new Date();
+      state.scheduleMonthCursor = new Date(cursor.getFullYear(), cursor.getMonth() - 1, 1);
+      renderScheduleMonthCalendar();
+    });
+    refs.scheduleMonthNextBtn.addEventListener("click", () => {
+      const cursor = state.scheduleMonthCursor instanceof Date
+        ? state.scheduleMonthCursor
+        : toSafeDate(state.scheduleWeekStart) || new Date();
+      state.scheduleMonthCursor = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1);
+      renderScheduleMonthCalendar();
+    });
+    refs.scheduleMonthGrid.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-schedule-month-date]");
+      if (!button) return;
+      const date = toSafeDate(button.dataset.scheduleMonthDate);
+      if (!date) return;
+      const weekStart = startOfWeek(date);
+      state.scheduleWeekStart = formatInputDate(weekStart);
+      state.scheduleWeekWindowStart = formatInputDate(addWeeks(weekStart, -1));
+      state.scheduleMonthCursor = startOfMonth(date);
+      refs.scheduleWeekStart.value = state.scheduleWeekStart;
+      renderScheduleWeekChips();
+      void fetchScheduleData();
+    });
     refs.scheduleWeekStart.addEventListener("change", () => {
       state.scheduleWeekStart = getScheduleWeekStart();
+      state.scheduleMonthCursor = startOfMonth(toSafeDate(state.scheduleWeekStart) || new Date());
       refs.scheduleWeekStart.value = state.scheduleWeekStart;
       void fetchScheduleData();
     });
@@ -3092,6 +3181,7 @@
       state.scheduleWeekWindowStart = formatInputDate(addWeeks(current, -3));
       const options = getScheduleWeekOptions();
       state.scheduleWeekStart = options[1]?.weekStart || options[0]?.weekStart || state.scheduleWeekStart;
+      state.scheduleMonthCursor = startOfMonth(toSafeDate(state.scheduleWeekStart) || new Date());
       refs.scheduleWeekStart.value = state.scheduleWeekStart;
       renderScheduleWeekChips();
       if (state.activeTab === "schedule") void fetchScheduleData();
@@ -3101,6 +3191,7 @@
       state.scheduleWeekWindowStart = formatInputDate(addWeeks(current, 3));
       const options = getScheduleWeekOptions();
       state.scheduleWeekStart = options[1]?.weekStart || options[0]?.weekStart || state.scheduleWeekStart;
+      state.scheduleMonthCursor = startOfMonth(toSafeDate(state.scheduleWeekStart) || new Date());
       refs.scheduleWeekStart.value = state.scheduleWeekStart;
       renderScheduleWeekChips();
       if (state.activeTab === "schedule") void fetchScheduleData();
@@ -3109,6 +3200,7 @@
       const button = event.target.closest("[data-schedule-week]");
       if (!button) return;
       state.scheduleWeekStart = button.dataset.scheduleWeek;
+      state.scheduleMonthCursor = startOfMonth(toSafeDate(state.scheduleWeekStart) || new Date());
       refs.scheduleWeekStart.value = state.scheduleWeekStart;
       renderScheduleWeekChips();
       void fetchScheduleData();
@@ -3215,6 +3307,7 @@
     }).format(new Date());
     state.scheduleWeekStart = formatInputDate(addWeeks(startOfWeek(new Date()), 1));
     state.scheduleWeekWindowStart = formatInputDate(startOfWeek(new Date()));
+    state.scheduleMonthCursor = startOfMonth(toSafeDate(state.scheduleWeekStart) || new Date());
     state.scheduleStaff = FALLBACK_SERVER_REFS.map(normalizeStaffRef).filter(Boolean);
     state.scheduleUsingFallbackStaff = true;
     refs.scheduleWeekStart.value = state.scheduleWeekStart;
