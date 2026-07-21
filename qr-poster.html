@@ -19,9 +19,9 @@
       --paper-shadow: rgba(63, 39, 19, 0.16);
       --brand-mark-width: clamp(30px, 7vw, 44px);
       --brand-title-size: clamp(0.95rem, 3vw, 1.35rem);
-      --poster-output-width: 60mm;
-      --poster-output-height: 120mm;
-      --qr-output-size: 40mm;
+      --poster-output-width: 50mm;
+      --poster-output-height: 100mm;
+      --qr-output-size: 30mm;
       --poster-preview-width: min(42vw, 300px, calc((100vh - 56px) * 0.5));
     }
 
@@ -71,19 +71,144 @@
       line-height: 1.55;
     }
 
-    .print-capacity {
-      flex: 0 0 auto;
-      padding: 7px 10px;
-      border: 1px solid rgba(201, 154, 71, 0.42);
-      color: var(--gold);
-      font-size: 0.68rem;
+    .size-summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(90px, 1fr));
+      gap: 8px;
+      min-width: min(100%, 360px);
+    }
+
+    .size-card {
+      display: grid;
+      gap: 3px;
+      padding: 8px 10px;
+      border: 1px solid rgba(201, 154, 71, 0.38);
+      background: rgba(7, 4, 3, 0.34);
+    }
+
+    .size-card-label {
+      color: rgba(244, 234, 220, 0.58);
+      font-size: 0.58rem;
       font-weight: 700;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
+    }
+
+    .size-card-value {
+      color: var(--gold);
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
       white-space: nowrap;
     }
 
-    .print-controls-grid {
+    .control-grid {
+      display: grid;
+      grid-template-columns: minmax(220px, 0.8fr) minmax(270px, 1fr) minmax(270px, 1fr);
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .control-panel {
+      min-width: 0;
+      padding: 14px;
+      border: 1px solid rgba(201, 154, 71, 0.28);
+    }
+
+    .control-panel-title {
+      margin: 0 0 10px;
+      color: var(--gold);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .copy-actions {
+      display: grid;
+      gap: 8px;
+    }
+
+    .copy-button {
+      min-height: 38px;
+      border: 1px solid rgba(201, 154, 71, 0.68);
+      border-radius: 2px;
+      background: rgba(201, 154, 71, 0.1);
+      color: var(--ivory);
+      font: inherit;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+    }
+
+    .copy-button:hover {
+      border-color: var(--gold);
+      background: rgba(201, 154, 71, 0.2);
+    }
+
+    .copy-button:active {
+      transform: translateY(1px);
+    }
+
+    .copy-button:disabled {
+      cursor: wait;
+      opacity: 0.58;
+    }
+
+    .copy-status {
+      min-height: 2.8em;
+      margin: 10px 0 0;
+      color: rgba(244, 234, 220, 0.62);
+      font-size: 0.65rem;
+      line-height: 1.45;
+    }
+
+    .copy-status[data-state="success"] {
+      color: #e4bf75;
+    }
+
+    .copy-status[data-state="error"] {
+      color: #e99b8c;
+    }
+
+    .text-settings {
+      display: grid;
+      gap: 8px;
+    }
+
+    .text-setting-row {
+      display: grid;
+      grid-template-columns: 72px minmax(0, 1fr);
+      align-items: center;
+      gap: 10px;
+    }
+
+    .text-setting-row span {
+      color: rgba(244, 234, 220, 0.72);
+      font-size: 0.7rem;
+    }
+
+    .text-setting-row input {
+      width: 100%;
+      min-width: 0;
+      border: 1px solid rgba(244, 234, 220, 0.18);
+      border-radius: 2px;
+      padding: 8px 9px;
+      background: rgba(7, 4, 3, 0.64);
+      color: var(--ivory);
+      font: inherit;
+      font-size: 0.72rem;
+      outline: none;
+    }
+
+    .text-setting-row input:focus {
+      border-color: rgba(201, 154, 71, 0.82);
+      box-shadow: 0 0 0 2px rgba(201, 154, 71, 0.12);
+    }
+
+    .qr-editor-grid {
       display: grid;
       grid-template-columns: minmax(170px, 0.72fr) minmax(320px, 1.28fr);
       gap: 18px;
@@ -747,12 +872,13 @@
         display: block;
       }
 
-      .print-capacity {
-        display: inline-block;
+      .size-summary {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         margin-top: 12px;
       }
 
-      .print-controls-grid {
+      .control-grid,
+      .qr-editor-grid {
         grid-template-columns: 1fr;
         gap: 12px;
       }
@@ -811,18 +937,58 @@
   </style>
 </head>
 <body>
-  <section class="print-controls" aria-label="Poster settings">
+  <section class="print-controls" aria-label="Poster controls">
     <div class="print-controls-header">
       <div>
-        <h1 class="print-controls-title">POSTER SETTINGS</h1>
-        <p class="print-controls-note">CSS 포스터 기준 크기는 금색 테두리 포함 6×12cm이며, 앞면 QR은 약 4×4cm입니다.</p>
+        <h1 class="print-controls-title">POSTER CONTROL</h1>
+        <p class="print-controls-note">앞면과 뒷면을 각각 이미지로 복사하고, 지점명과 멘트를 바로 수정할 수 있습니다.</p>
       </div>
-      <div class="print-capacity">6×12 CM · QR ≈ 4×4 CM</div>
+      <div class="size-summary" aria-label="Poster size information">
+        <div class="size-card">
+          <span class="size-card-label">Poster</span>
+          <strong class="size-card-value">5 × 10 cm</strong>
+        </div>
+        <div class="size-card">
+          <span class="size-card-label">QR</span>
+          <strong class="size-card-value">3 × 3 cm</strong>
+        </div>
+        <div class="size-card">
+          <span class="size-card-label">A4 landscape</span>
+          <strong class="size-card-value">10 / sheet</strong>
+        </div>
+      </div>
     </div>
 
-    <div class="print-controls-grid">
-      <fieldset>
-        <legend>Edit side</legend>
+    <div class="control-grid">
+      <div class="control-panel">
+        <h2 class="control-panel-title">Copy Image</h2>
+        <div class="copy-actions">
+          <button class="copy-button" id="copyFrontButton" type="button">앞면 이미지 복사</button>
+          <button class="copy-button" id="copyBackButton" type="button">뒷면 이미지 복사</button>
+        </div>
+        <p class="copy-status" id="copyStatus" aria-live="polite">버튼을 누르면 포스터 이미지가 클립보드에 복사됩니다.</p>
+      </div>
+
+      <div class="control-panel">
+        <h2 class="control-panel-title">Text</h2>
+        <div class="text-settings">
+          <label class="text-setting-row">
+            <span>지점</span>
+            <input id="locationInput" type="text" value="Downtown" maxlength="32" autocomplete="off" />
+          </label>
+          <label class="text-setting-row">
+            <span>앞면 멘트</span>
+            <input id="frontMessageInput" type="text" value="View Menu" maxlength="40" autocomplete="off" />
+          </label>
+          <label class="text-setting-row">
+            <span>뒷면 멘트</span>
+            <input id="backMessageInput" type="text" value="Keep in touch with us" maxlength="48" autocomplete="off" />
+          </label>
+        </div>
+      </div>
+
+      <fieldset class="control-panel">
+        <legend>Edit QR</legend>
         <div class="side-picker">
           <label class="side-choice">
             <input type="radio" name="printSide" value="front" checked />
@@ -834,8 +1000,15 @@
           </label>
         </div>
       </fieldset>
+    </div>
 
-      <div class="qr-settings-wrap">
+    <div class="qr-editor-grid">
+      <div class="control-panel">
+        <h2 class="control-panel-title">QR Size</h2>
+        <p class="print-controls-note">앞면 QR은 출력 기준 약 3 × 3cm로 맞춰져 있어 휴대폰 스캔을 우선하면서 포스터 안에서 과하게 커지지 않도록 했습니다.</p>
+      </div>
+
+      <div class="qr-settings-wrap control-panel">
         <div class="qr-settings" data-side-settings="front">
           <span class="qr-settings-title">Front QR</span>
           <div class="qr-setting-row">
@@ -881,7 +1054,6 @@
         </div>
       </div>
     </div>
-
   </section>
 
   <div class="poster-stage">
@@ -959,6 +1131,11 @@
       const params = new URLSearchParams(window.location.search);
       const sideSettings = Array.from(document.querySelectorAll("[data-side-settings]"));
       const sideInputs = Array.from(document.querySelectorAll('input[name="printSide"]'));
+      const copyButtons = {
+        front: document.getElementById("copyFrontButton"),
+        back: document.getElementById("copyBackButton")
+      };
+      const copyStatus = document.getElementById("copyStatus");
       let selectedSide = "front";
 
       const slots = {
@@ -1020,6 +1197,166 @@
         });
       }
 
+      function syncText(inputId, selector) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+
+        const update = function () {
+          document.querySelectorAll(selector).forEach(function (element) {
+            element.textContent = input.value;
+          });
+        };
+
+        input.addEventListener("input", update);
+        update();
+      }
+
+      function setCopyStatus(message, state) {
+        if (!copyStatus) return;
+        copyStatus.textContent = message;
+        copyStatus.dataset.state = state || "";
+      }
+
+      function makeAbsoluteImageSources(root) {
+        root.querySelectorAll("img").forEach(function (image) {
+          const source = image.getAttribute("src");
+          if (!source || source.startsWith("data:") || source.startsWith("blob:")) return;
+
+          try {
+            image.setAttribute("src", new URL(source, document.baseURI).href);
+          } catch (error) {
+            // Keep the original source if the browser cannot resolve it.
+          }
+        });
+      }
+
+      function makeAbsoluteCssUrls(css) {
+        return css.replace(/url\(\s*(["']?)([^"')]+)\1\s*\)/g, function (match, quote, source) {
+          if (/^(data:|blob:|https?:|file:|#)/i.test(source)) return match;
+
+          try {
+            return "url(" + quote + new URL(source, document.baseURI).href + quote + ")";
+          } catch (error) {
+            return match;
+          }
+        });
+      }
+
+      async function canvasFromPoster(side) {
+        const source = document.querySelector('.poster-frame[data-side="' + side + '"]');
+        if (!source) throw new Error("Poster not found");
+
+        if (document.fonts && document.fonts.ready) {
+          await document.fonts.ready;
+        }
+
+        await Promise.all(Array.from(source.querySelectorAll("img")).map(function (image) {
+          if (image.complete) {
+            return image.decode ? image.decode().catch(function () {}) : Promise.resolve();
+          }
+
+          return new Promise(function (resolve) {
+            image.addEventListener("load", resolve, { once: true });
+            image.addEventListener("error", resolve, { once: true });
+          });
+        }));
+
+        const rect = source.getBoundingClientRect();
+        const scale = 3;
+        const width = Math.max(1, Math.round(rect.width));
+        const height = Math.max(1, Math.round(rect.height));
+        const clone = source.cloneNode(true);
+        clone.style.width = width + "px";
+        clone.style.height = height + "px";
+        clone.querySelectorAll("[id]").forEach(function (element) {
+          element.removeAttribute("id");
+        });
+        makeAbsoluteImageSources(clone);
+
+        const css = makeAbsoluteCssUrls(Array.from(document.querySelectorAll("style"))
+          .map(function (style) { return style.textContent || ""; })
+          .join("\n")
+          .replace(/]]>/g, "]]]]><![CDATA[>"));
+        const markup = new XMLSerializer().serializeToString(clone);
+        const svg = [
+          '<svg xmlns="http://www.w3.org/2000/svg" width="', width * scale,
+          '" height="', height * scale, '" viewBox="0 0 ', width, ' ', height, '">',
+          '<style><![CDATA[', css, ']]></style>',
+          '<foreignObject x="0" y="0" width="', width, '" height="', height, '">',
+          '<div xmlns="http://www.w3.org/1999/xhtml" style="width:', width, 'px;height:', height, 'px;">',
+          markup,
+          "</div></foreignObject></svg>"
+        ].join("");
+        const svgUrl = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
+
+        return new Promise(function (resolve, reject) {
+          const image = new Image();
+          image.decoding = "async";
+          image.onload = function () {
+            const canvas = document.createElement("canvas");
+            canvas.width = width * scale;
+            canvas.height = height * scale;
+            const context = canvas.getContext("2d");
+
+            try {
+              context.drawImage(image, 0, 0, canvas.width, canvas.height);
+              URL.revokeObjectURL(svgUrl);
+              resolve(canvas);
+            } catch (error) {
+              URL.revokeObjectURL(svgUrl);
+              reject(error);
+            }
+          };
+          image.onerror = function () {
+            URL.revokeObjectURL(svgUrl);
+            reject(new Error("Poster image render failed"));
+          };
+          image.src = svgUrl;
+        });
+      }
+
+      function canvasBlob(canvas) {
+        return new Promise(function (resolve, reject) {
+          try {
+            canvas.toBlob(function (blob) {
+              if (blob) {
+                resolve(blob);
+              } else {
+                reject(new Error("PNG conversion failed"));
+              }
+            }, "image/png");
+          } catch (error) {
+            reject(error);
+          }
+        });
+      }
+
+      async function copyPoster(side) {
+        const button = copyButtons[side];
+        if (!button) return;
+
+        if (!navigator.clipboard || !window.ClipboardItem) {
+          setCopyStatus("이미지 복사는 HTTPS 또는 localhost에서 지원됩니다.", "error");
+          return;
+        }
+
+        button.disabled = true;
+        const originalLabel = button.textContent;
+        button.textContent = "이미지 준비 중...";
+        setCopyStatus(side === "front" ? "앞면 이미지를 준비하고 있습니다." : "뒷면 이미지를 준비하고 있습니다.", "");
+
+        try {
+          const blob = await canvasBlob(await canvasFromPoster(side));
+          await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+          setCopyStatus(side === "front" ? "앞면 이미지가 클립보드에 복사되었습니다." : "뒷면 이미지가 클립보드에 복사되었습니다.", "success");
+        } catch (error) {
+          setCopyStatus("복사하지 못했습니다. 브라우저의 클립보드 권한을 확인해주세요.", "error");
+        } finally {
+          button.disabled = false;
+          button.textContent = originalLabel;
+        }
+      }
+
       function bindSlot(slot) {
         const urlInput = document.getElementById(slot.urlId);
         const fileInput = document.getElementById(slot.fileId);
@@ -1070,6 +1407,22 @@
           showSelectedSettings();
         });
       });
+
+      if (copyButtons.front) {
+        copyButtons.front.addEventListener("click", function () {
+          copyPoster("front");
+        });
+      }
+
+      if (copyButtons.back) {
+        copyButtons.back.addEventListener("click", function () {
+          copyPoster("back");
+        });
+      }
+
+      syncText("locationInput", ".brand-location");
+      syncText("frontMessageInput", ".caption-title");
+      syncText("backMessageInput", ".back-kicker");
 
       showSelectedSettings();
     }());
