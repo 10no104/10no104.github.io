@@ -2240,7 +2240,14 @@
       })
       .map((item) => ({ ...item, source: "temporary" }));
     const fixedItems = getFixedPreferenceItems(status);
-    const items = [...dateItems, ...fixedItems]
+    const mergedItems = new Map();
+    [...dateItems, ...fixedItems].forEach((item) => {
+      const key = `${normalizeScheduleStaffKey(item.staff_key || item.staff_name)}|${item.availability_date}`;
+      const existing = mergedItems.get(key);
+      // A one-off entry can add a time or note to the same recurring weekday.
+      mergedItems.set(key, existing ? { ...item, ...existing } : item);
+    });
+    const items = Array.from(mergedItems.values())
       .sort((a, b) => String(a.availability_date).localeCompare(String(b.availability_date)) || String(a.staff_name || a.staff_key).localeCompare(String(b.staff_name || b.staff_key)));
 
     if (!items.length) {
@@ -2254,10 +2261,9 @@
         ? `${item.available_start || "open"} - ${item.available_end || "close"}`
         : "";
       const detail = [time, item.note].filter(Boolean).join(" · ");
-      const sourceLabel = item.source === "fixed" ? "고정" : "일시";
       return `
-        <div class="availability-row is-${escapeHtml(status)} is-${escapeHtml(item.source)}" title="${escapeHtml(`${sourceLabel} ${status === "unavailable" ? "불가" : "선호"}`)}">
-          <span class="availability-person"><i class="availability-source" aria-label="${escapeHtml(sourceLabel)}"></i>${escapeHtml(item.staff_name || item.staff_key || "-")}</span>
+        <div class="availability-row is-${escapeHtml(status)}">
+          <span>${escapeHtml(item.staff_name || item.staff_key || "-")}</span>
           <span class="availability-meta">
             <b>${escapeHtml(date ? formatScheduleDayLabel(date) : item.availability_date || "-")}</b>
             ${detail ? `<small>${escapeHtml(detail)}</small>` : ""}

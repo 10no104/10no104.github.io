@@ -1317,6 +1317,45 @@
       font-weight: 800;
     }
 
+    .fixed-weekday-panel {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+      padding: 12px;
+      border: 1px solid rgba(143, 36, 56, 0.12);
+      border-radius: 16px;
+      background: rgba(255, 250, 244, 0.72);
+    }
+
+    .fixed-weekday-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .fixed-weekday-head h3,
+    .fixed-weekday-head p {
+      margin: 0;
+    }
+
+    .fixed-weekday-head h3 {
+      color: var(--ink);
+      font-size: 0.88rem;
+      letter-spacing: -0.02em;
+    }
+
+    .fixed-weekday-head p {
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 750;
+      text-align: right;
+    }
+
+    .fixed-weekday-panel .preference-block {
+      margin-top: 0;
+    }
+
     .preference-panel {
       margin-top: 14px;
       padding: 14px;
@@ -1390,7 +1429,7 @@
 
     .preference-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(142px, 1fr));
       gap: 8px;
       margin-top: 12px;
     }
@@ -1767,6 +1806,19 @@
         align-items: stretch;
       }
 
+      .fixed-weekday-panel {
+        padding: 10px;
+        border-radius: 14px;
+      }
+
+      .fixed-weekday-head {
+        align-items: flex-start;
+      }
+
+      .fixed-weekday-head p {
+        max-width: 155px;
+      }
+
       .availability-save {
         width: 100%;
       }
@@ -1969,6 +2021,20 @@
                   <span>Sun</span>
                 </div>
                 <div class="calendar-grid" id="calendarGrid"></div>
+                <section class="fixed-weekday-panel" aria-label="고정 요일 설정">
+                  <div class="fixed-weekday-head">
+                    <h3>고정 요일</h3>
+                    <p>선택한 요일이 달력 전체에 반영됩니다.</p>
+                  </div>
+                  <div class="preference-block">
+                    <span class="preference-label">고정 불가</span>
+                    <div class="weekday-toggle-group" id="fixedUnavailableWeekdays" data-preference-kind="fixedUnavailableWeekdays"></div>
+                  </div>
+                  <div class="preference-block">
+                    <span class="preference-label">고정 선호</span>
+                    <div class="weekday-toggle-group" id="fixedPreferredWeekdays" data-preference-kind="fixedPreferredWeekdays"></div>
+                  </div>
+                </section>
                 <div class="calendar-actions">
                   <button class="availability-save" id="saveAvailabilityButton" type="button">Submit</button>
                   <div class="availability-status" id="availabilityStatus"></div>
@@ -1981,16 +2047,6 @@
                     </div>
                   </div>
 
-                  <div class="preference-block">
-                    <span class="preference-label">고정 불가 요일</span>
-                    <div class="weekday-toggle-group" id="fixedUnavailableWeekdays" data-preference-kind="fixedUnavailableWeekdays"></div>
-                  </div>
-
-                  <div class="preference-block">
-                    <span class="preference-label">고정 희망 요일</span>
-                    <div class="weekday-toggle-group" id="fixedPreferredWeekdays" data-preference-kind="fixedPreferredWeekdays"></div>
-                  </div>
-
                   <div class="preference-grid">
                     <label class="preference-field">
                       <span class="preference-label">성향</span>
@@ -2001,16 +2057,16 @@
                       </select>
                     </label>
                     <label class="preference-field">
+                      <span class="preference-label">주 최대 횟수</span>
+                      <input id="maxWeeklyShiftsInput" type="number" min="1" max="7" inputmode="numeric" placeholder="예: 3" />
+                    </label>
+                    <label class="preference-field" id="preferredBranchField" hidden>
                       <span class="preference-label">선호 지점</span>
                       <select id="preferredBranchSelect">
                         <option value="">상관 없음</option>
                         <option value="uptown">Uptown</option>
                         <option value="downtown">Downtown</option>
                       </select>
-                    </label>
-                    <label class="preference-field">
-                      <span class="preference-label">주 최대 횟수</span>
-                      <input id="maxWeeklyShiftsInput" type="number" min="1" max="7" inputmode="numeric" placeholder="예: 3" />
                     </label>
                   </div>
 
@@ -2244,6 +2300,7 @@
           "fixedPreferredWeekdays",
           "workStyleSelect",
           "preferredBranchSelect",
+          "preferredBranchField",
           "maxWeeklyShiftsInput",
           "savePreferencesButton",
           "preferenceStatus",
@@ -3183,6 +3240,15 @@
       function getCalendarDateStatus(isoDate) {
         if (state.unavailableDates.has(isoDate)) return "unavailable";
         if (state.preferredDates.has(isoDate)) return "preferred";
+        return getFixedCalendarDateStatus(isoDate);
+      }
+
+      function getFixedCalendarDateStatus(isoDate) {
+        const date = new Date(`${isoDate}T00:00:00`);
+        if (Number.isNaN(date.getTime())) return "default";
+        const weekday = date.getDay();
+        if (state.staffPreferences.fixedUnavailableWeekdays.includes(weekday)) return "unavailable";
+        if (state.staffPreferences.fixedPreferredWeekdays.includes(weekday)) return "preferred";
         return "default";
       }
 
@@ -3198,11 +3264,16 @@
       }
 
       function getNextCalendarDateStatus(isoDate) {
+        const currentStatus = getCalendarDateStatus(isoDate);
+        const fixedStatus = getFixedCalendarDateStatus(isoDate);
+        if (currentStatus === fixedStatus && fixedStatus !== "default") {
+          return fixedStatus === "unavailable" ? "preferred" : "unavailable";
+        }
         return {
           default: "unavailable",
           unavailable: "preferred",
           preferred: "default"
-        }[getCalendarDateStatus(isoDate)] || "default";
+        }[currentStatus] || "default";
       }
 
       function getBranchScheduleCell(card, branchKey) {
@@ -3388,21 +3459,24 @@
       function renderPreferenceControls() {
         const hasProfile = Boolean(state.currentStaff && state.currentAccess);
         const prefs = state.staffPreferences;
+        const branchScope = normalizeKey(state.currentAccess?.branch_scope || state.currentStaff?.sourceKey || "");
+        const canChoosePreferredBranch = hasProfile && branchScope === "both";
 
         renderPreferenceWeekdays(refs.fixedUnavailableWeekdays, "fixedUnavailableWeekdays", "is-unavailable");
         renderPreferenceWeekdays(refs.fixedPreferredWeekdays, "fixedPreferredWeekdays", "is-preferred");
         refs.workStyleSelect.value = prefs.workStyle || "";
         refs.preferredBranchSelect.value = prefs.preferredBranch || "";
         refs.maxWeeklyShiftsInput.value = prefs.maxWeeklyShifts || "";
+        refs.preferredBranchField.hidden = !canChoosePreferredBranch;
 
         [
           refs.workStyleSelect,
-          refs.preferredBranchSelect,
           refs.maxWeeklyShiftsInput,
           refs.savePreferencesButton
         ].forEach((control) => {
           control.disabled = !hasProfile;
         });
+        refs.preferredBranchSelect.disabled = !canChoosePreferredBranch;
 
         if (!hasProfile) {
           setPreferenceStatus("");
@@ -3442,6 +3516,7 @@
 
         markPreferencesDirty();
         renderPreferenceControls();
+        renderCalendar();
       }
 
       function renderAll() {
@@ -3706,9 +3781,22 @@
             p_date_details: state.dateDetails
           });
           if (error) throw error;
+          if (state.preferencesDirty) {
+            const { error: preferenceError } = await supabaseClient.rpc("noble_submit_staff_preferences_v1", {
+              input_ref: state.savedRefCode || refs.staffIdInput.value,
+              p_fixed_unavailable_weekdays: state.staffPreferences.fixedUnavailableWeekdays,
+              p_fixed_preferred_weekdays: state.staffPreferences.fixedPreferredWeekdays,
+              p_work_style: state.staffPreferences.workStyle || null,
+              p_preferred_branch: state.staffPreferences.preferredBranch || null,
+              p_max_weekly_shifts: state.staffPreferences.maxWeeklyShifts || null
+            });
+            if (preferenceError) throw preferenceError;
+            state.preferencesDirty = false;
+            setPreferenceStatus("Saved", "success");
+          }
           state.availabilityDirty = false;
           setAvailabilityStatus("Saved");
-          setStatus("Availability saved");
+          setStatus("Availability and fixed settings saved");
         } catch (error) {
           setAvailabilityStatus("Local saved. DB submit failed.");
           setStatus(error.message || "Availability submit failed");
