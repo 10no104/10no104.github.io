@@ -641,7 +641,7 @@
 
     .back-qr-grid {
       position: absolute;
-      top: 25.5%;
+      top: 21.5%;
       left: 22%;
       width: 56%;
       display: grid;
@@ -690,6 +690,31 @@
       mix-blend-mode: screen;
       pointer-events: none;
       z-index: 8;
+    }
+
+    .back-footer {
+      position: absolute;
+      right: 9%;
+      bottom: 4.8%;
+      left: 9%;
+      z-index: 13;
+      color: rgba(244, 234, 220, 0.82);
+      font-size: clamp(0.42rem, 2.55cqw, 0.62rem);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      line-height: 1.45;
+      text-align: center;
+      text-shadow: 0 0.7cqw 2.4cqw rgba(0, 0, 0, 0.42);
+    }
+
+    .back-footer::before {
+      content: "";
+      display: block;
+      width: 32%;
+      height: 0.3cqw;
+      margin: 0 auto 2.2cqw;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0.72;
     }
 
     @media (max-width: 720px) {
@@ -759,7 +784,7 @@
       }
 
       .back-qr-grid {
-        top: 29.5%;
+        top: 24.5%;
         left: 22%;
         width: 56%;
         gap: 3.5%;
@@ -776,6 +801,11 @@
       .back-kicker {
         margin-top: 1.8cqw;
         font-size: 2.8cqw;
+      }
+
+      .back-footer {
+        bottom: 4.5%;
+        font-size: 2.55cqw;
       }
     }
   </style>
@@ -918,6 +948,7 @@
           </div>
         </section>
 
+        <div class="back-footer">예약하고, 듣고 싶은 음악을 신청해 주세요</div>
         <div class="ground" aria-hidden="true"></div>
       </main>
     </div>
