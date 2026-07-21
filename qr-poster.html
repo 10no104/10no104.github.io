@@ -598,7 +598,18 @@
     .poster--back::before {
       inset: 0;
       opacity: 0.48;
-      filter: brightness(0) saturate(100%) invert(70%) sepia(48%) saturate(720%) hue-rotate(356deg) brightness(92%) contrast(90%);
+      background: var(--gold);
+      -webkit-mask-image: url("assets/pattern.webp");
+      mask-image: url("assets/pattern.webp");
+      -webkit-mask-position: center top;
+      mask-position: center top;
+      -webkit-mask-size: 82% auto;
+      mask-size: 82% auto;
+      -webkit-mask-repeat: repeat;
+      mask-repeat: repeat;
+      -webkit-mask-mode: alpha;
+      mask-mode: alpha;
+      filter: none;
     }
 
     .back-heading {
