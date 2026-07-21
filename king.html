@@ -1285,6 +1285,15 @@
       transform: scale(0.98);
     }
 
+    .staff-roster-list.is-drag-disabled .staff-pill {
+      cursor: default;
+      touch-action: manipulation;
+    }
+
+    .staff-roster-list.is-drag-disabled .staff-pill:active {
+      transform: none;
+    }
+
     .staff-pill.is-selected {
       border-color: transparent;
       color: #fffaf2;
@@ -1535,14 +1544,13 @@
       position: absolute;
       inset: 0;
       z-index: 0;
-      display: grid;
-      place-items: center;
-      content: "×";
-      color: #a3223b;
-      font-size: 5.4rem;
-      font-weight: 900;
-      line-height: 1;
-      opacity: 0.52;
+      width: 62%;
+      height: 62%;
+      margin: auto;
+      display: block;
+      content: "";
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M20 20L80 80M80 20L20 80' fill='none' stroke='%23a3223b' stroke-width='13' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+      opacity: 0.58;
       pointer-events: none;
     }
 
@@ -1701,8 +1709,9 @@
       }
 
       .schedule-day-label-compact {
-        display: grid;
-        gap: 1px;
+        display: inline-flex;
+        align-items: baseline;
+        gap: 2px;
         color: #3a291d;
         font-size: 0.72rem;
         line-height: 1;
@@ -1775,7 +1784,8 @@
       }
 
       .schedule-dropzone.is-blocked::after {
-        font-size: 3.5rem;
+        width: 58%;
+        height: 58%;
       }
     }
 

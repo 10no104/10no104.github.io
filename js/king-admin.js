@@ -1649,7 +1649,7 @@
 
   function formatScheduleDayCompactLabel(date) {
     const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
-    return { day: String(date.getDate()), weekday: weekdays[date.getDay()] };
+    return { day: `${date.getDate()}일`, weekday: weekdays[date.getDay()] };
   }
 
   function formatWeekRangeLabel(start, end) {
@@ -1955,6 +1955,7 @@
       .slice()
       .sort((a, b) => a.branch_scope.localeCompare(b.branch_scope) || a.name.localeCompare(b.name));
     const selectedKey = normalizeScheduleStaffKey(state.scheduleSelectedStaffKey);
+    refs.scheduleStaffList.classList.toggle("is-drag-disabled", state.scheduleDetailsOpen);
 
     if (!staff.length) {
       refs.scheduleStaffList.innerHTML = '<div class="empty-state">서버 목록이 없습니다.</div>';
@@ -1969,7 +1970,7 @@
           type="button"
           data-schedule-staff="${escapeHtml(item.staff_key || item.name)}"
           aria-pressed="${selectedKey === normalizeScheduleStaffKey(item.staff_key || item.name) ? "true" : "false"}"
-          aria-label="${escapeHtml(`${item.name} 선택 또는 길게 눌러 드래그`)}"
+          aria-label="${escapeHtml(state.scheduleDetailsOpen ? `${item.name} 선택` : `${item.name} 선택 또는 길게 눌러 드래그`)}"
         >
           <span>${escapeHtml(item.name)}</span>
           <small>${escapeHtml(formatBranchLabel(item.branch_scope))}</small>
@@ -2575,6 +2576,7 @@
   function beginSchedulePointerDrag(event) {
     const button = event.target.closest("[data-schedule-staff]");
     if (!button || !event.isPrimary || (event.pointerType === "mouse" && event.button !== 0)) return;
+    if (state.scheduleDetailsOpen) return;
     const staff = getScheduleStaffByKey(button.dataset.scheduleStaff);
     if (!staff) return;
     const staffKey = normalizeScheduleStaffKey(staff.staff_key || staff.name);
