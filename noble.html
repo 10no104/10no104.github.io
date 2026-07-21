@@ -326,6 +326,18 @@
       box-shadow: inset 0 1px 0 rgba(255, 248, 236, 0.12);
     }
 
+    .lookup-change {
+      display: none;
+      min-height: 36px;
+      padding: 0 12px;
+      border: 1px solid rgba(255, 229, 194, 0.24);
+      border-radius: 12px;
+      background: rgba(255, 248, 238, 0.12);
+      color: #fff7ef;
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
     .lookup-status {
       min-height: 22px;
       margin: 0;
@@ -333,6 +345,36 @@
       font-size: 0.9rem;
       font-weight: 700;
       line-height: 1.55;
+    }
+
+    body.has-profile:not(.is-reference-open) .lookup-card {
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-end;
+      min-height: 0;
+      padding: 8px 10px;
+      border-radius: 16px;
+      gap: 8px;
+    }
+
+    body.has-profile:not(.is-reference-open) .lookup-label,
+    body.has-profile:not(.is-reference-open) .lookup-title,
+    body.has-profile:not(.is-reference-open) .lookup-row,
+    body.has-profile:not(.is-reference-open) .lookup-request {
+      display: none;
+    }
+
+    body.has-profile:not(.is-reference-open) .lookup-status {
+      min-height: 0;
+      margin-right: auto;
+      font-size: 0.72rem;
+      line-height: 1.2;
+    }
+
+    body.has-profile .lookup-change {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     body.modal-open {
@@ -841,6 +883,27 @@
       margin-bottom: 12px;
     }
 
+    .schedule-confirmed-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: rgba(46, 124, 103, 0.14);
+      color: #1f6652;
+      font-size: 0.72rem;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .schedule-controls .helper-text {
+      margin-left: auto;
+      text-align: right;
+      font-size: 0.78rem;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
     .schedule-nav {
       width: 40px;
       height: 40px;
@@ -909,23 +972,20 @@
 
     .branch-day-list {
       display: grid;
-      grid-template-columns: repeat(7, minmax(96px, 1fr));
-      gap: 7px;
-      overflow-x: auto;
-      padding-bottom: 4px;
-      scroll-snap-type: x proximity;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 5px;
     }
 
     .branch-day {
       display: grid;
       align-content: start;
-      gap: 7px;
-      min-height: 92px;
-      padding: 9px;
+      min-width: 0;
+      gap: 5px;
+      min-height: 78px;
+      padding: 7px 5px;
       border: 1px solid rgba(113, 67, 50, 0.1);
       border-radius: 12px;
       background: rgba(255, 250, 244, 0.9);
-      scroll-snap-align: start;
     }
 
     .branch-day.is-today {
@@ -953,39 +1013,42 @@
     }
 
     .branch-day-head {
-      display: flex;
+      display: grid;
       align-items: center;
-      justify-content: space-between;
-      gap: 6px;
+      justify-items: center;
+      gap: 2px;
       color: #291915;
       font-weight: 900;
+      font-size: 0.82rem;
+      line-height: 1;
     }
 
     .branch-day-head span {
       color: var(--muted);
-      font-size: 0.72rem;
+      font-size: 0.64rem;
       font-weight: 800;
     }
 
     .server-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
+      display: grid;
+      gap: 3px;
     }
 
     .server-chip {
+      width: 100%;
       max-width: 100%;
-      min-height: 25px;
-      padding: 5px 8px;
-      border-radius: 999px;
+      min-height: 20px;
+      padding: 4px 3px;
+      border-radius: 8px;
       background: rgba(143, 36, 56, 0.08);
       color: #4c211d;
-      font-size: 0.76rem;
+      font-size: 0.64rem;
       font-weight: 800;
       line-height: 1.1;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      text-align: center;
     }
 
     .server-chip.is-me {
@@ -1480,6 +1543,15 @@
         width: 100%;
       }
 
+      body.has-profile:not(.is-reference-open) .lookup-card {
+        min-height: 0;
+        padding: 7px 8px;
+      }
+
+      body.has-profile:not(.is-reference-open) .lookup-status {
+        font-size: 0.68rem;
+      }
+
       .request-modal {
         align-items: end;
         padding: 10px;
@@ -1597,22 +1669,28 @@
       }
 
       .branch-day-list {
-        grid-template-columns: repeat(7, minmax(92px, 92px));
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 3px;
       }
 
       .branch-day {
-        min-height: 88px;
-        padding: 7px;
+        min-height: 70px;
+        padding: 5px 2px;
+        gap: 3px;
       }
 
       .branch-day-head {
-        font-size: 0.82rem;
+        font-size: 0.72rem;
+      }
+
+      .branch-day-head span {
+        font-size: 0.56rem;
       }
 
       .server-chip {
-        min-height: 23px;
-        padding: 5px 7px;
-        font-size: 0.7rem;
+        min-height: 18px;
+        padding: 3px 1px;
+        font-size: 0.55rem;
       }
 
       .calendar-meta {
@@ -1750,6 +1828,7 @@
         </div>
         <button class="lookup-request" id="requestAccessButton" type="button">추가 요청</button>
         <p class="lookup-status" id="lookupStatus">Loading...</p>
+        <button class="lookup-change" id="changeReferenceButton" type="button" aria-expanded="false">코드 변경</button>
       </form>
     </section>
 
@@ -1816,9 +1895,10 @@
               </div>
               <div class="card-body">
                 <div class="schedule-controls">
-                  <button class="schedule-nav" id="schedulePrev" type="button" aria-label="Previous week">&lt;</button>
+                  <span class="schedule-confirmed-badge">최신 확정</span>
                   <div class="helper-text" id="weekRangeLabel"></div>
-                  <button class="schedule-nav" id="scheduleNext" type="button" aria-label="Next week">&gt;</button>
+                  <button class="schedule-nav" id="schedulePrev" type="button" aria-label="Previous week" hidden>&lt;</button>
+                  <button class="schedule-nav" id="scheduleNext" type="button" aria-label="Next week" hidden>&gt;</button>
                 </div>
                 <div class="section-head">
                   <div>
@@ -2101,6 +2181,7 @@
           "lookupForm",
           "staffIdInput",
           "lookupStatus",
+          "changeReferenceButton",
           "requestAccessButton",
           "requestModal",
           "requestCloseButton",
@@ -2376,8 +2457,11 @@
       }
 
       function formatTinyRecordDate(record) {
+        if (record.dateObj) {
+          return `${formatScheduleDay(record.dateObj)} ${record.dateObj.getMonth() + 1}/${record.dateObj.getDate()}`;
+        }
         const parsed = parseKoreanMonthDay(record.date);
-        return parsed ? `${parsed.month}/${parsed.day}` : record.date;
+        return parsed ? `${record.day || "-"} ${parsed.month}/${parsed.day}` : record.date;
       }
 
       function formatRecordBranch(record) {
@@ -2875,12 +2959,17 @@
       }
 
       function renderIdentity() {
-        if (!state.currentStaff || !state.currentAccess) {
+        const hasProfile = Boolean(state.currentStaff && state.currentAccess);
+        document.body.classList.toggle("has-profile", hasProfile);
+        if (!hasProfile) {
+          document.body.classList.remove("is-reference-open");
+          refs.changeReferenceButton.setAttribute("aria-expanded", "false");
           refs.appUserName.textContent = "Noble App";
           refs.appUserMeta.textContent = "";
           return;
         }
 
+        refs.changeReferenceButton.setAttribute("aria-expanded", String(document.body.classList.contains("is-reference-open")));
         refs.appUserName.textContent = state.currentStaff.name;
         refs.appUserMeta.textContent = `${getBranchLabel(state.currentAccess.branch_scope)} · ${getRoleLabel(state.currentAccess.job_role)}`;
       }
@@ -3169,52 +3258,11 @@
         refs.scheduleList.classList.remove("is-empty");
         if (renderDbScheduleView()) return;
 
-        const allRecords = getAllRecords(state.periods);
-        state.scheduleCursor = clampScheduleCursor(state.scheduleCursor);
-        const week = getWeekCards(allRecords, state.scheduleCursor);
-        const branchRows = [
-          { key: "uptown", label: "Uptown" },
-          { key: "downtown", label: "Downtown" }
-        ];
-
-        refs.weekRangeLabel.textContent = `${formatLongDate(week.weekStart)} - ${formatLongDate(week.weekEnd)}`;
-        refs.schedulePrev.disabled = false;
-        refs.scheduleNext.disabled = isSameDate(week.weekStart, state.latestScheduleWeekStart);
-
-        refs.scheduleList.innerHTML = `
-          <div class="branch-schedule-grid">
-            ${branchRows.map((branch) => {
-              const days = week.cards.map((card) => {
-                const servers = getBranchScheduleCell(card, branch.key);
-                const isMyWork = servers.some((server) => server.isMe);
-                const serverMarkup = servers.length
-                  ? servers.map((server) => `<span class="server-chip ${server.isMe ? "is-me" : ""}">${escapeHtml(server.name)}</span>`).join("")
-                  : `<span class="server-empty">-</span>`;
-                const dayClasses = [
-                  "branch-day",
-                  isSameDate(card.date, new Date()) ? "is-today" : "",
-                  isMyWork ? "is-my-work" : ""
-                ].filter(Boolean).join(" ");
-                return `
-                  <article class="${dayClasses}">
-                    <div class="branch-day-head">
-                      <strong>${escapeHtml(formatScheduleDay(card.date))}</strong>
-                      <span>${escapeHtml(formatScheduleMonthDay(card.date))}</span>
-                    </div>
-                    <div class="server-list">${serverMarkup}</div>
-                  </article>
-                `;
-              }).join("");
-
-              return `
-                <section class="branch-schedule-column is-${branch.key}">
-                  <h3 class="branch-schedule-title">${branch.label}</h3>
-                  <div class="branch-day-list">${days}</div>
-                </section>
-              `;
-            }).join("")}
-          </div>
-        `;
+        refs.weekRangeLabel.textContent = "확정된 최신 스케줄이 없습니다.";
+        refs.schedulePrev.disabled = true;
+        refs.scheduleNext.disabled = true;
+        refs.scheduleList.classList.add("is-empty");
+        refs.scheduleList.innerHTML = `<div class="empty-state">확정된 최신 스케줄을 불러오면 여기에 표시됩니다.</div>`;
       }
 
       function renderCalendar() {
@@ -3513,6 +3561,7 @@
           await loadDbSchedule(input);
           loadUnavailableDates();
           await loadDbPreferences(input);
+          document.body.classList.remove("is-reference-open");
           renderAll();
           setStatus("Ready");
         } catch (error) {
@@ -3659,6 +3708,13 @@
         refs.lookupForm.addEventListener("submit", (event) => {
           event.preventDefault();
           submitLookup();
+        });
+
+        refs.changeReferenceButton.addEventListener("click", () => {
+          const isOpen = !document.body.classList.contains("is-reference-open");
+          document.body.classList.toggle("is-reference-open", isOpen);
+          refs.changeReferenceButton.setAttribute("aria-expanded", String(isOpen));
+          if (isOpen) window.setTimeout(() => refs.staffIdInput.focus(), 0);
         });
 
         refs.requestAccessButton.addEventListener("click", openRequestModal);
