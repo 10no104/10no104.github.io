@@ -128,6 +128,7 @@
     scheduleCalendarEvents: [],
     scheduleWeeks: [],
     scheduleAvailability: [],
+    scheduleFetchToken: 0,
     scheduleStaff: [],
     scheduleUsingFallbackStaff: false,
     scheduleWeek: null,
@@ -2237,8 +2238,7 @@
         if (!date || weekStart === null || weekEnd === null) return false;
         const time = startOfDay(date).getTime();
         return time >= weekStart && time <= weekEnd;
-      })
-      .map((item) => ({ ...item, source: "temporary" }));
+      });
     const fixedItems = getFixedPreferenceItems(status);
     const mergedItems = new Map();
     [...dateItems, ...fixedItems].forEach((item) => {
@@ -2262,7 +2262,7 @@
         : "";
       const detail = [time, item.note].filter(Boolean).join(" · ");
       return `
-        <div class="availability-row is-${escapeHtml(status)}">
+        <div class="availability-row">
           <span>${escapeHtml(item.staff_name || item.staff_key || "-")}</span>
           <span class="availability-meta">
             <b>${escapeHtml(date ? formatScheduleDayLabel(date) : item.availability_date || "-")}</b>
@@ -2289,8 +2289,7 @@
           staff_name: staff.name,
           branch_scope: staff.branch_scope,
           availability_date: formatInputDate(date),
-          status,
-          source: "fixed"
+          status
         });
       });
     });
@@ -2442,23 +2441,27 @@
       return;
     }
 
+    const fetchToken = ++state.scheduleFetchToken;
     state.scheduleWeekStart = getScheduleWeekStart();
-    refs.scheduleWeekStart.value = state.scheduleWeekStart;
+    const selectedWeekStart = state.scheduleWeekStart;
+    refs.scheduleWeekStart.value = selectedWeekStart;
     const dates = getScheduleWeekDates();
-    const weekEnd = formatInputDate(dates[6]);
     const weekOptions = getScheduleWeekOptions();
-    const weekWindowFrom = weekOptions[0]?.weekStart || state.scheduleWeekStart;
-    const weekWindowTo = weekOptions[weekOptions.length - 1]?.weekStart || state.scheduleWeekStart;
+    const weekWindowFrom = weekOptions[0]?.weekStart || selectedWeekStart;
+    const weekWindowTo = weekOptions[weekOptions.length - 1]?.weekStart || selectedWeekStart;
+    const availabilityWindowEnd = formatInputDate(addDays(toSafeDate(weekWindowTo) || dates[6], 6));
     setScheduleStatus("스케줄 데이터를 불러오는 중...");
     await fetchScheduleCalendarEvents();
+    if (fetchToken !== state.scheduleFetchToken) return;
 
     const availabilityResult = await supabaseClient
       .from("noble_staff_availability")
       .select("staff_key,staff_name,branch_scope,availability_date,status,available_start,available_end,note")
-      .gte("availability_date", state.scheduleWeekStart)
-      .lte("availability_date", weekEnd)
+      .gte("availability_date", weekWindowFrom)
+      .lte("availability_date", availabilityWindowEnd)
       .order("availability_date", { ascending: true });
 
+    if (fetchToken !== state.scheduleFetchToken) return;
     if (availabilityResult.error) {
       setScheduleStatus(availabilityResult.error.message, "error");
       return;
@@ -2466,6 +2469,7 @@
 
     const staffResult = await fetchEmployeeRefRows();
 
+    if (fetchToken !== state.scheduleFetchToken) return;
     if (staffResult.error) {
       console.warn("Could not load employee refs", staffResult.error);
     }
@@ -2474,6 +2478,7 @@
       .from("noble_staff_preferences")
       .select("*");
 
+    if (fetchToken !== state.scheduleFetchToken) return;
     if (preferencesResult.error) {
       console.warn("Could not load staff preferences", preferencesResult.error);
     }
@@ -2485,22 +2490,20 @@
       .lte("week_start", weekWindowTo)
       .order("week_start", { ascending: true });
 
-    if (!weeksResult.error) {
-      state.scheduleWeeks = weeksResult.data || [];
-    }
+    if (fetchToken !== state.scheduleFetchToken) return;
 
     const weekResult = await supabaseClient
       .from("noble_schedule_weeks")
       .select("id,week_start,status,note")
-      .eq("week_start", state.scheduleWeekStart)
+      .eq("week_start", selectedWeekStart)
       .maybeSingle();
 
+    if (fetchToken !== state.scheduleFetchToken) return;
     if (weekResult.error) {
       setScheduleStatus(weekResult.error.message, "error");
       return;
     }
 
-    state.scheduleAvailability = availabilityResult.data || [];
     const preferenceByKey = new Map();
     (preferencesResult.data || [])
       .map(normalizeStaffRef)
@@ -2538,27 +2541,33 @@
       .forEach((staff) => {
         mergedStaff.set(normalizeScheduleStaffKey(staff.staff_key || staff.name), staff);
       });
-    state.scheduleStaff = Array.from(mergedStaff.values());
-    state.scheduleUsingFallbackStaff = !dbStaff.length;
-    state.scheduleWeek = weekResult.data || null;
-    state.scheduleShifts = [];
+    const scheduleStaff = Array.from(mergedStaff.values());
+    let scheduleShifts = [];
 
-    if (state.scheduleWeek?.id) {
+    if (weekResult.data?.id) {
       const shiftsResult = await supabaseClient
         .from("noble_schedule_shifts")
         .select("id,week_id,shift_date,branch,staff_key,staff_name,job_role,shift_label,start_time,end_time,sort_order,note")
-        .eq("week_id", state.scheduleWeek.id)
+        .eq("week_id", weekResult.data.id)
         .order("branch", { ascending: true })
         .order("shift_date", { ascending: true })
         .order("sort_order", { ascending: true });
 
+      if (fetchToken !== state.scheduleFetchToken) return;
       if (shiftsResult.error) {
         setScheduleStatus(shiftsResult.error.message, "error");
         return;
       }
-      state.scheduleShifts = shiftsResult.data || [];
+      scheduleShifts = shiftsResult.data || [];
     }
 
+    if (fetchToken !== state.scheduleFetchToken) return;
+    if (!weeksResult.error) state.scheduleWeeks = weeksResult.data || [];
+    state.scheduleAvailability = availabilityResult.data || [];
+    state.scheduleStaff = scheduleStaff;
+    state.scheduleUsingFallbackStaff = !dbStaff.length;
+    state.scheduleWeek = weekResult.data || null;
+    state.scheduleShifts = scheduleShifts;
     renderScheduleBoard();
     setScheduleStatus("스케줄 데이터를 불러왔습니다.", "success");
   }
@@ -3568,7 +3577,7 @@
       state.scheduleWeekStart = button.dataset.scheduleWeek;
       state.scheduleMonthCursor = startOfMonth(toSafeDate(state.scheduleWeekStart) || new Date());
       refs.scheduleWeekStart.value = state.scheduleWeekStart;
-      renderScheduleWeekChips();
+      renderScheduleBoard();
       void fetchScheduleData();
     });
 
