@@ -1588,15 +1588,14 @@
       font-size: 0.82rem;
       font-weight: 900;
       text-align: left;
-      cursor: grab;
+      cursor: pointer;
       user-select: none;
       -webkit-user-select: none;
-      touch-action: none;
+      touch-action: pan-y;
       transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
     }
 
     .staff-pill:active {
-      cursor: grabbing;
       transform: scale(0.98);
     }
 
@@ -1925,6 +1924,110 @@
       font-weight: 900;
     }
 
+    .schedule-day-picker-trigger {
+      display: inline-flex;
+      align-items: center;
+      min-width: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      text-align: inherit;
+      cursor: pointer;
+    }
+
+    .schedule-day-picker-trigger:focus-visible {
+      border-radius: 7px;
+      outline: 2px solid rgba(36, 95, 81, 0.55);
+      outline-offset: 2px;
+    }
+
+    .schedule-day-picker-modal .modal {
+      width: min(100%, 560px);
+    }
+
+    .schedule-day-picker-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      padding: 14px 16px 18px;
+    }
+
+    .schedule-day-picker-empty {
+      grid-column: 1 / -1;
+      padding: 12px;
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .schedule-day-picker-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 52px;
+      padding: 8px 10px;
+      border: 1px solid rgba(36, 95, 81, 0.24);
+      border-radius: 14px;
+      background: rgba(242, 251, 246, 0.86);
+      color: #245f51;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .schedule-day-picker-item:hover,
+    .schedule-day-picker-item:focus-visible {
+      border-color: #245f51;
+      box-shadow: 0 0 0 3px rgba(36, 95, 81, 0.12);
+      outline: none;
+    }
+
+    .schedule-day-picker-item span {
+      min-width: 0;
+    }
+
+    .schedule-day-picker-item strong,
+    .schedule-day-picker-item small {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .schedule-day-picker-item strong {
+      color: currentColor;
+      font-size: 0.86rem;
+      font-weight: 950;
+    }
+
+    .schedule-day-picker-item small {
+      margin-top: 2px;
+      color: currentColor;
+      font-size: 0.66rem;
+      font-weight: 800;
+      opacity: 0.76;
+    }
+
+    .schedule-day-picker-mark {
+      flex: 0 0 auto;
+      font-size: 1.18rem;
+      font-weight: 950;
+      line-height: 1;
+    }
+
+    .schedule-day-picker-item.is-unavailable,
+    .schedule-day-picker-item:disabled {
+      border-color: rgba(163, 34, 59, 0.42);
+      background: rgba(255, 239, 241, 0.92);
+      color: #9a3142;
+      cursor: not-allowed;
+      opacity: 1;
+    }
+
     .schedule-day-top {
       display: grid;
       gap: 8px;
@@ -2208,6 +2311,21 @@
         min-height: 28px;
         place-items: center;
         text-align: center;
+      }
+
+      .schedule-day-picker-trigger {
+        justify-content: center;
+      }
+
+      .schedule-day-picker-list {
+        gap: 7px;
+        padding: 12px;
+      }
+
+      .schedule-day-picker-item {
+        min-height: 48px;
+        padding: 7px 8px;
+        border-radius: 12px;
       }
 
       .schedule-day-label-full,
@@ -2909,6 +3027,16 @@
     </div>
   </div>
 
-  <script src="js/king-admin.js?v=20260721-5"></script>
+  <div class="modal-backdrop schedule-day-picker-modal" id="scheduleDayPickerModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="scheduleDayPickerTitle">
+      <div class="modal-head">
+        <h3 id="scheduleDayPickerTitle">가능한 서버</h3>
+        <button class="icon-btn" id="scheduleDayPickerClose" type="button" aria-label="닫기">X</button>
+      </div>
+      <div class="schedule-day-picker-list" id="scheduleDayPickerList"></div>
+    </div>
+  </div>
+
+  <script src="js/king-admin.js?v=20260721-6"></script>
 </body>
 </html>
