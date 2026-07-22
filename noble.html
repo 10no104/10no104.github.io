@@ -927,6 +927,39 @@
       gap: 12px;
     }
 
+    .schedule-legend {
+      display: flex;
+      align-items: center;
+      gap: 7px 12px;
+      margin: 0 0 10px;
+      flex-wrap: wrap;
+    }
+
+    .schedule-legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: #6c5b52;
+      font-size: 0.7rem;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .schedule-legend-item b {
+      display: inline-grid;
+      width: 18px;
+      height: 18px;
+      place-items: center;
+      border-radius: 6px;
+      background: rgba(108, 91, 82, 0.1);
+      font-size: 0.72rem;
+    }
+
+    .schedule-legend-item.is-my-work { color: #1c5e9c; }
+    .schedule-legend-item.is-my-work b { background: rgba(37, 99, 164, 0.14); }
+    .schedule-legend-item.is-substitute-requested { color: #a05224; }
+    .schedule-legend-item.is-substitute-requested b { background: rgba(207, 114, 48, 0.16); }
+
     .branch-schedule-column {
       min-width: 0;
       padding: 10px;
@@ -999,6 +1032,12 @@
       box-shadow: inset 0 0 0 2px rgba(37, 99, 164, 0.18), 0 12px 20px rgba(37, 99, 164, 0.1);
     }
 
+    .branch-day.is-not-my-work {
+      border-color: rgba(113, 67, 50, 0.08);
+      background: rgba(122, 108, 98, 0.07);
+      opacity: 0.74;
+    }
+
     .branch-day.is-my-work .branch-day-head {
       color: #163e6d;
     }
@@ -1010,6 +1049,20 @@
     .branch-day.is-today.is-my-work {
       border-color: rgba(37, 99, 164, 0.58);
       box-shadow: inset 0 0 0 2px rgba(37, 99, 164, 0.22), 0 12px 20px rgba(37, 99, 164, 0.12);
+    }
+
+    .branch-day.is-substitute-requested {
+      border-color: rgba(193, 95, 39, 0.52);
+      background: linear-gradient(180deg, rgba(255, 241, 226, 0.98), rgba(255, 224, 197, 0.96));
+      box-shadow: inset 0 0 0 2px rgba(193, 95, 39, 0.16), 0 12px 20px rgba(193, 95, 39, 0.1);
+      opacity: 1;
+    }
+
+    .branch-day.is-substitute-requestable {
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
     }
 
     .branch-day-head {
@@ -1027,6 +1080,27 @@
       color: var(--muted);
       font-size: 0.64rem;
       font-weight: 800;
+    }
+
+    .branch-day-status {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      min-width: 0;
+      padding: 3px 4px;
+      border-radius: 6px;
+      background: rgba(37, 99, 164, 0.13);
+      color: #1c5e9c;
+      font-size: 0.56rem;
+      font-weight: 900;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .branch-day-status.is-substitute-requested {
+      background: rgba(193, 95, 39, 0.15);
+      color: #a05224;
     }
 
     .server-list {
@@ -1060,6 +1134,48 @@
       color: var(--muted);
       font-size: 0.78rem;
       font-weight: 700;
+    }
+
+    .substitute-request-meta {
+      margin: 0 0 10px;
+      color: #4b2b24;
+      font-size: 0.9rem;
+      font-weight: 900;
+    }
+
+    .substitute-request-notice {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin: 0 0 12px;
+      padding: 10px;
+      border: 1px solid rgba(193, 95, 39, 0.22);
+      border-radius: 13px;
+      background: rgba(255, 238, 219, 0.78);
+      color: #8b4a23;
+      font-size: 0.78rem;
+      font-weight: 800;
+      line-height: 1.45;
+    }
+
+    .substitute-request-actions {
+      display: grid;
+      grid-template-columns: 0.78fr 1.22fr;
+      gap: 8px;
+    }
+
+    .substitute-request-actions .request-submit {
+      margin-top: 0;
+    }
+
+    .request-cancel {
+      min-height: 48px;
+      border: 1px solid rgba(113, 67, 50, 0.16);
+      border-radius: 16px;
+      background: rgba(255, 252, 248, 0.92);
+      color: #68483d;
+      font: inherit;
+      font-weight: 900;
     }
 
     .calendar-meta {
@@ -1769,6 +1885,21 @@
         font-size: 0.56rem;
       }
 
+      .branch-day-status {
+        width: 100%;
+        min-height: 14px;
+        padding: 2px;
+        font-size: 0.52rem;
+      }
+
+      .branch-day-status-text {
+        display: none;
+      }
+
+      .schedule-legend-item {
+        font-size: 0.64rem;
+      }
+
       .server-chip {
         min-height: 18px;
         padding: 3px 1px;
@@ -2192,6 +2323,27 @@
     </div>
   </div>
 
+  <div class="request-modal" id="substituteRequestModal" hidden aria-hidden="true">
+    <div class="request-dialog" role="dialog" aria-modal="true" aria-labelledby="substituteRequestTitle">
+      <div class="request-head">
+        <div>
+          <p>Shift Swap</p>
+          <h3 id="substituteRequestTitle">대타 요청</h3>
+        </div>
+        <button class="request-close" id="substituteRequestCloseButton" type="button" aria-label="대타 요청 닫기">×</button>
+      </div>
+      <p class="substitute-request-meta" id="substituteRequestMeta"></p>
+      <p class="substitute-request-notice"><span aria-hidden="true">🔁</span><span>이 근무일에 대타 요청을 등록하시겠습니까? 요청 후 스케줄에 표시됩니다.</span></p>
+      <form class="request-form" id="substituteRequestForm">
+        <div class="substitute-request-actions">
+          <button class="request-cancel" id="substituteRequestCancelButton" type="button">취소</button>
+          <button class="request-submit" type="submit">대타 요청하기</button>
+        </div>
+        <p class="request-status" id="substituteRequestStatus"></p>
+      </form>
+    </div>
+  </div>
+
   <script>
     (function () {
       "use strict";
@@ -2256,6 +2408,8 @@
         currentAccess: null,
         dbScheduleRows: [],
         dbScheduleWeekStart: "",
+        dbSubstituteRequestKeys: new Set(),
+        substituteRequestTarget: null,
         scheduleCursor: startOfWeek(new Date()),
         latestScheduleWeekStart: startOfWeek(new Date()),
         calendarCursor: startOfMonth(new Date()),
@@ -2265,6 +2419,9 @@
         staffPreferences: createEmptyStaffPreferences(),
         calendarPressTimer: null,
         calendarLongPressTriggered: false,
+        schedulePressTimer: null,
+        scheduleLongPressTriggered: false,
+        schedulePressStart: null,
         availabilityDirty: false,
         preferencesDirty: false
       };
@@ -2325,7 +2482,13 @@
           "dateDetailMeta",
           "dateDetailStatus",
           "dateDetailNote",
-          "dateDetailStatusText"
+          "dateDetailStatusText",
+          "substituteRequestModal",
+          "substituteRequestCloseButton",
+          "substituteRequestCancelButton",
+          "substituteRequestForm",
+          "substituteRequestMeta",
+          "substituteRequestStatus"
         ].forEach((id) => {
           refs[id] = byId(id);
         });
@@ -2475,6 +2638,26 @@
           console.warn("DB schedule unavailable", error);
           state.dbScheduleRows = [];
           state.dbScheduleWeekStart = "";
+        }
+      }
+
+      function getSubstituteRequestKey(branch = "", isoDate = "") {
+        return `${normalizeKey(branch)}|${isoDate}`;
+      }
+
+      async function loadDbSubstituteRequests(input = "") {
+        state.dbSubstituteRequestKeys = new Set();
+        const refCode = String(input || "").trim();
+        if (!refCode || !supabaseClient) return;
+
+        try {
+          const { data, error } = await supabaseClient.rpc("noble_get_my_substitute_requests_v1", { input_ref: refCode });
+          if (error) throw error;
+          state.dbSubstituteRequestKeys = new Set((Array.isArray(data) ? data : [])
+            .filter((item) => item.status === "open")
+            .map((item) => getSubstituteRequestKey(item.branch, item.shift_date)));
+        } catch (error) {
+          console.warn("Substitute requests unavailable", error);
         }
       }
 
@@ -2834,6 +3017,48 @@
         document.body.classList.remove("modal-open");
       }
 
+      function closeSubstituteRequestModal() {
+        state.substituteRequestTarget = null;
+        refs.substituteRequestModal.hidden = true;
+        refs.substituteRequestModal.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("modal-open");
+      }
+
+      function openSubstituteRequestModal(isoDate, branch) {
+        if (!isoDate || !branch || !state.dbScheduleWeekStart) return;
+        state.substituteRequestTarget = { isoDate, branch: normalizeKey(branch) };
+        refs.substituteRequestMeta.textContent = `${formatLongDate(new Date(`${isoDate}T00:00:00`))} · ${getBranchLabel(branch)}`;
+        refs.substituteRequestStatus.textContent = "";
+        refs.substituteRequestModal.hidden = false;
+        refs.substituteRequestModal.setAttribute("aria-hidden", "false");
+        document.body.classList.add("modal-open");
+        window.setTimeout(() => refs.substituteRequestCancelButton.focus(), 0);
+      }
+
+      async function submitSubstituteRequest() {
+        const target = state.substituteRequestTarget;
+        const refCode = state.savedRefCode || refs.staffIdInput.value;
+        if (!target || !refCode || !state.dbScheduleWeekStart) return;
+
+        refs.substituteRequestStatus.textContent = "대타 요청을 저장하는 중...";
+        try {
+          if (!supabaseClient) throw new Error("Supabase client is not available.");
+          const { error } = await supabaseClient.rpc("noble_request_substitute_v1", {
+            input_ref: refCode,
+            p_week_start: state.dbScheduleWeekStart,
+            p_shift_date: target.isoDate,
+            p_branch: target.branch
+          });
+          if (error) throw error;
+          state.dbSubstituteRequestKeys.add(getSubstituteRequestKey(target.branch, target.isoDate));
+          renderScheduleView();
+          closeSubstituteRequestModal();
+          setStatus("대타 요청을 등록했습니다.");
+        } catch (error) {
+          refs.substituteRequestStatus.textContent = error.message || "대타 요청을 저장하지 못했습니다.";
+        }
+      }
+
       function saveAccessRequest(payload) {
         try {
           const raw = window.localStorage.getItem(ACCESS_REQUEST_KEY);
@@ -3050,6 +3275,8 @@
         state.currentAccess = null;
         state.dbScheduleRows = [];
         state.dbScheduleWeekStart = "";
+        state.dbSubstituteRequestKeys = new Set();
+        state.substituteRequestTarget = null;
         state.periods = [];
         state.openPeriodKey = null;
         state.scheduleCursor = state.latestScheduleWeekStart || startOfWeek(new Date());
@@ -3326,6 +3553,12 @@
         refs.schedulePrev.disabled = true;
         refs.scheduleNext.disabled = true;
         refs.scheduleList.innerHTML = `
+          <div class="schedule-legend" aria-label="스케줄 표시 안내">
+            <span class="schedule-legend-item is-my-work"><b aria-hidden="true">💼</b>내 근무</span>
+            <span class="schedule-legend-item is-substitute-requested"><b aria-hidden="true">🔁</b>대타 요청</span>
+            <span class="schedule-legend-item"><b aria-hidden="true">○</b>비근무</span>
+          </div>
+          <p class="calendar-usage-guide">💼 내 근무일을 길게 누르면 대타 요청을 등록할 수 있습니다.</p>
           <div class="branch-schedule-grid">
             ${branchRows.map((branch) => {
               const days = Array.from({ length: 7 }, (_unused, index) => {
@@ -3341,20 +3574,27 @@
                     };
                   });
                 const isMyWork = servers.some((server) => server.isMe);
+                const isSubstituteRequested = isMyWork && state.dbSubstituteRequestKeys.has(getSubstituteRequestKey(branch.key, isoDate));
                 const serverMarkup = servers.length
                   ? servers.map((server) => `<span class="server-chip ${server.isMe ? "is-me" : ""}">${escapeHtml(server.name)}</span>`).join("")
                   : `<span class="server-empty">-</span>`;
                 const dayClasses = [
                   "branch-day",
                   isSameDate(date, new Date()) ? "is-today" : "",
-                  isMyWork ? "is-my-work" : ""
+                  isMyWork ? "is-my-work" : "is-not-my-work",
+                  isSubstituteRequested ? "is-substitute-requested" : "",
+                  isMyWork && !isSubstituteRequested ? "is-substitute-requestable" : ""
                 ].filter(Boolean).join(" ");
+                const statusMarkup = isMyWork
+                  ? `<span class="branch-day-status ${isSubstituteRequested ? "is-substitute-requested" : ""}"><span aria-hidden="true">${isSubstituteRequested ? "🔁" : "💼"}</span><span class="branch-day-status-text">${isSubstituteRequested ? "대타 요청" : "내 근무"}</span></span>`
+                  : "";
 
                 return `
-                  <article class="${dayClasses}">
+                  <article class="${dayClasses}" ${isMyWork && !isSubstituteRequested ? `data-substitute-request-date="${escapeHtml(isoDate)}" data-substitute-request-branch="${escapeHtml(branch.key)}" aria-label="${escapeHtml(`${formatScheduleDay(date)} ${branch.label} 내 근무일. 길게 눌러 대타 요청`)}"` : ""}>
                     <div class="branch-day-head">
                       <strong>${escapeHtml(formatScheduleDay(date))}</strong>
                       <span>${escapeHtml(formatScheduleMonthDay(date))}</span>
+                      ${statusMarkup}
                     </div>
                     <div class="server-list">${serverMarkup}</div>
                   </article>
@@ -3689,6 +3929,7 @@
           state.savedRefCode = input;
           saveRefCode(input);
           await loadDbSchedule(input);
+          await loadDbSubstituteRequests(input);
           loadUnavailableDates();
           await loadDbPreferences(input);
           document.body.classList.remove("is-reference-open");
@@ -3775,6 +4016,22 @@
       function clearCalendarLongPress() {
         window.clearTimeout(state.calendarPressTimer);
         state.calendarPressTimer = null;
+      }
+
+      function startScheduleLongPress(day, event) {
+        window.clearTimeout(state.schedulePressTimer);
+        state.scheduleLongPressTriggered = false;
+        state.schedulePressStart = { x: event.clientX, y: event.clientY };
+        state.schedulePressTimer = window.setTimeout(() => {
+          state.scheduleLongPressTriggered = true;
+          openSubstituteRequestModal(day.dataset.substituteRequestDate, day.dataset.substituteRequestBranch);
+        }, 520);
+      }
+
+      function clearScheduleLongPress() {
+        window.clearTimeout(state.schedulePressTimer);
+        state.schedulePressTimer = null;
+        state.schedulePressStart = null;
       }
 
       async function submitAvailability() {
@@ -3874,6 +4131,12 @@
           if (event.target === refs.dateDetailModal) closeDateDetailModal();
         });
 
+        refs.substituteRequestCloseButton.addEventListener("click", closeSubstituteRequestModal);
+        refs.substituteRequestCancelButton.addEventListener("click", closeSubstituteRequestModal);
+        refs.substituteRequestModal.addEventListener("click", (event) => {
+          if (event.target === refs.substituteRequestModal) closeSubstituteRequestModal();
+        });
+
         refs.requestForm.addEventListener("submit", (event) => {
           event.preventDefault();
           void submitAccessRequest();
@@ -3884,10 +4147,16 @@
           saveDateDetail();
         });
 
+        refs.substituteRequestForm.addEventListener("submit", (event) => {
+          event.preventDefault();
+          void submitSubstituteRequest();
+        });
+
         document.addEventListener("keydown", (event) => {
           if (event.key !== "Escape") return;
           if (!refs.requestModal.hidden) closeRequestModal();
           if (!refs.dateDetailModal.hidden) closeDateDetailModal();
+          if (!refs.substituteRequestModal.hidden) closeSubstituteRequestModal();
         });
 
         refs.navTabs.forEach((button) => {
@@ -3904,6 +4173,27 @@
         refs.scheduleNext.addEventListener("click", () => {
           state.scheduleCursor = clampScheduleCursor(addDays(state.scheduleCursor, 7));
           renderScheduleView();
+        });
+
+        refs.scheduleList.addEventListener("pointerdown", (event) => {
+          const day = event.target.closest("[data-substitute-request-date]");
+          if (!day) return;
+          startScheduleLongPress(day, event);
+        });
+
+        refs.scheduleList.addEventListener("pointermove", (event) => {
+          if (!state.schedulePressTimer || !state.schedulePressStart) return;
+          if (Math.hypot(event.clientX - state.schedulePressStart.x, event.clientY - state.schedulePressStart.y) > 10) {
+            clearScheduleLongPress();
+          }
+        });
+
+        ["pointerup", "pointercancel"].forEach((eventName) => {
+          refs.scheduleList.addEventListener(eventName, clearScheduleLongPress);
+        });
+
+        refs.scheduleList.addEventListener("contextmenu", (event) => {
+          if (event.target.closest("[data-substitute-request-date]")) event.preventDefault();
         });
 
         refs.periodList.addEventListener("click", (event) => {

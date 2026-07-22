@@ -134,10 +134,8 @@
     scheduleWeek: null,
     scheduleShifts: [],
     scheduleSelectedStaffKey: "",
+    scheduleSelectedCellKey: "",
     scheduleDetailsOpen: false,
-    schedulePointerDrag: null,
-    scheduleSuppressClickUntil: 0,
-    scheduleDayPickerCell: "",
     sortables: {
       visual: null,
       all: null,
@@ -253,11 +251,7 @@
       "scheduleStaffList",
       "unavailableList",
       "preferredList",
-      "scheduleBoard",
-      "scheduleDayPickerModal",
-      "scheduleDayPickerTitle",
-      "scheduleDayPickerClose",
-      "scheduleDayPickerList"
+      "scheduleBoard"
     ].forEach((id) => {
       refs[id] = byId(id);
     });
@@ -2302,13 +2296,32 @@
     return items;
   }
 
+  function getScheduleStaffDateState(staff, isoDate) {
+    const date = toSafeDate(isoDate);
+    if (!staff || !date) return null;
+    const availability = getAvailabilityForStaff(staff, isoDate);
+    if (availability?.status === "unavailable") return { type: "unavailable", label: "불가" };
+    if (staff.fixed_unavailable_weekdays?.includes(date.getDay())) return { type: "unavailable", label: "고정 불가" };
+    if (availability?.status === "preferred") return { type: "preferred", label: "선호" };
+    if (staff.fixed_preferred_weekdays?.includes(date.getDay())) return { type: "preferred", label: "고정 선호" };
+    return null;
+  }
+
+  function getSelectedScheduleCellContext() {
+    const cellKey = state.scheduleSelectedCellKey;
+    const [branch, isoDate] = String(cellKey || "").split("|");
+    const textarea = cellKey ? getScheduleTextarea(cellKey) : null;
+    if (!branch || !isoDate || !textarea) return null;
+    return { cellKey, branch, isoDate, names: getCurrentNames(textarea) };
+  }
+
   function renderScheduleStaffList() {
     const staff = getScheduleStaffPool()
       .slice()
       .sort((a, b) => a.branch_scope.localeCompare(b.branch_scope) || a.name.localeCompare(b.name));
     const selectedKey = normalizeScheduleStaffKey(state.scheduleSelectedStaffKey);
     const assignmentContext = getBoardAssignments();
-    refs.scheduleStaffList.classList.toggle("is-drag-disabled", state.scheduleDetailsOpen);
+    const selectedCell = getSelectedScheduleCellContext();
 
     if (!staff.length) {
       refs.scheduleStaffList.innerHTML = '<div class="empty-state">서버 목록이 없습니다.</div>';
@@ -2320,19 +2333,29 @@
       ${staff.map((item) => {
         const staffId = normalizeScheduleStaffKey(item.staff_key || item.name);
         const assignedDays = new Set((assignmentContext.byStaff.get(staffId) || []).map((assignment) => assignment.isoDate)).size;
+        const dayState = selectedCell ? getScheduleStaffDateState(item, selectedCell.isoDate) : null;
+        const dropStatus = selectedCell
+          ? getScheduleDropStatus(item, selectedCell.branch, selectedCell.isoDate, selectedCell.names, assignmentContext)
+          : null;
+        const isBlocked = Boolean(selectedCell && !dropStatus?.allowed);
+        const isPreferred = Boolean(selectedCell && !isBlocked && dayState?.type === "preferred");
+        const stateLabel = isBlocked ? dropStatus?.label : dayState?.label || "";
+        const indicator = isBlocked ? "×" : isPreferred ? "♥" : "";
+        const stateClass = isBlocked ? "is-day-unavailable" : isPreferred ? "is-day-preferred" : "";
+        const isSelected = selectedKey === staffId;
         return `
         <button
-          class="staff-pill is-${escapeHtml(normalizeBranchScope(item.branch_scope))} ${selectedKey === normalizeScheduleStaffKey(item.staff_key || item.name) ? "is-selected" : ""}"
+          class="staff-pill is-${escapeHtml(normalizeBranchScope(item.branch_scope))} ${isSelected ? "is-selected" : ""} ${selectedCell ? "is-date-context" : ""} ${stateClass}"
           type="button"
           data-schedule-staff="${escapeHtml(item.staff_key || item.name)}"
-          aria-pressed="${selectedKey === normalizeScheduleStaffKey(item.staff_key || item.name) ? "true" : "false"}"
-          aria-label="${escapeHtml(state.scheduleDetailsOpen ? `${item.name} 선택, 이번 주 ${assignedDays}일 배정` : `${item.name} 선택 또는 길게 눌러 드래그, 이번 주 ${assignedDays}일 배정`)}"
-          title="${escapeHtml(`${item.name}: 이번 주 ${assignedDays}일 배정`)}"
+          aria-pressed="${isSelected ? "true" : "false"}"
+          aria-label="${escapeHtml(selectedCell ? `${item.name}: ${stateLabel || "배정 가능"}` : `${item.name}, 이번 주 ${assignedDays}일 배정`)}"
+          title="${escapeHtml(selectedCell ? `${item.name}: ${stateLabel || "배정 가능"}` : `${item.name}: 이번 주 ${assignedDays}일 배정`)}"
         >
           <span class="staff-pill-name">${escapeHtml(item.name)}</span>
           <span class="staff-pill-meta">
-            <small>${escapeHtml(formatBranchLabel(item.branch_scope))}</small>
-            <b class="staff-pill-count" aria-hidden="true">${assignedDays}일</b>
+            <small>${escapeHtml(selectedCell && stateLabel ? stateLabel : formatBranchLabel(item.branch_scope))}</small>
+            ${selectedCell ? (indicator ? `<b class="staff-pill-day-mark" aria-hidden="true">${indicator}</b>` : "") : `<b class="staff-pill-count" aria-hidden="true">${assignedDays}일</b>`}
           </span>
         </button>
       `;
@@ -2376,8 +2399,10 @@
             const targetCount = Math.max(boardTargets.get(cellKey) ?? getDefaultServerCount(date), names.length);
             const compactDayLabel = formatScheduleDayCompactLabel(date);
             const dropStatus = getScheduleDropStatus(selectedStaff, branch.key, dateValue, names, assignmentContext);
+            const isTargetedCell = state.scheduleSelectedCellKey === cellKey;
             const dropClasses = [
               "schedule-dropzone",
+              isTargetedCell ? "is-targeted" : "",
               selectedStaff && dropStatus.allowed ? "is-ready" : "",
               selectedStaff && !dropStatus.allowed && dropStatus.type !== "none" ? "is-blocked" : "",
               selectedStaff && dropStatus.type === "assigned" ? "is-assigned" : ""
@@ -2386,7 +2411,7 @@
               <article class="schedule-day-card is-${branch.key} ${isSameDate(date, today) ? "is-today" : ""} ${calendarInfo.holiday ? "is-holiday" : ""} ${calendarInfo.events.length ? "has-calendar-event" : ""}" title="${escapeHtml(calendarInfo.labels.join(" · "))}">
                 <div class="schedule-day-top">
                   <header>
-                    <button class="schedule-day-picker-trigger" type="button" data-schedule-day-picker="${escapeHtml(cellKey)}" aria-label="${escapeHtml(`${formatScheduleDayLabel(date)} ${branch.label} 가능한 서버 보기`)}">
+                    <button class="schedule-day-select-trigger" type="button" data-schedule-select-cell="${escapeHtml(cellKey)}" aria-label="${escapeHtml(`${formatScheduleDayLabel(date)} ${branch.label} 선택`)}">
                       <strong aria-hidden="true">
                         <span class="schedule-day-label-full">${escapeHtml(formatScheduleDayLabel(date))}</span>
                         <span class="schedule-day-label-compact"><small>${escapeHtml(compactDayLabel.weekday)}</small>${escapeHtml(compactDayLabel.day)}</span>
@@ -2850,6 +2875,11 @@
 
   function selectScheduleStaff(staff, allowToggle = true) {
     if (!staff) return;
+    const selectedCell = getSelectedScheduleCellContext();
+    if (selectedCell) {
+      assignScheduleStaffToCell(staff, selectedCell.cellKey);
+      return;
+    }
     const staffKey = normalizeScheduleStaffKey(staff.staff_key || staff.name);
     state.scheduleSelectedStaffKey = allowToggle && state.scheduleSelectedStaffKey === staffKey ? "" : staffKey;
     renderScheduleBoard();
@@ -2859,33 +2889,6 @@
         : "서버 선택을 해제했습니다.",
       ""
     );
-  }
-
-  function previewScheduleStaffForDrag(staff) {
-    if (!staff) return;
-    const staffKey = normalizeScheduleStaffKey(staff.staff_key || staff.name);
-    state.scheduleSelectedStaffKey = staffKey;
-    refs.scheduleStaffList.querySelectorAll("[data-schedule-staff]").forEach((button) => {
-      const isSelected = normalizeScheduleStaffKey(button.dataset.scheduleStaff) === staffKey;
-      button.classList.toggle("is-selected", isSelected);
-      button.setAttribute("aria-pressed", String(isSelected));
-    });
-
-    const context = getBoardAssignments();
-    refs.scheduleBoard.querySelectorAll("[data-schedule-dropzone]").forEach((zone) => {
-      const cellKey = zone.dataset.scheduleDropzone || "";
-      const [branch, isoDate] = cellKey.split("|");
-      const textarea = getScheduleTextarea(cellKey);
-      const names = textarea ? getCurrentNames(textarea) : [];
-      const dropStatus = getScheduleDropStatus(staff, branch, isoDate, names, context);
-      const isBlocked = !dropStatus.allowed && dropStatus.type !== "none";
-      zone.classList.toggle("is-ready", dropStatus.allowed);
-      zone.classList.toggle("is-blocked", isBlocked);
-      zone.classList.toggle("is-assigned", dropStatus.type === "assigned");
-      zone.setAttribute("aria-label", `${formatScheduleDayLabel(toSafeDate(isoDate))} ${formatBranchLabel(branch)}: ${dropStatus.label}`);
-      const hint = zone.querySelector(".schedule-drop-hint");
-      if (hint) hint.textContent = dropStatus.label;
-    });
   }
 
   function getScheduleTextarea(cellKey) {
@@ -2907,62 +2910,17 @@
     }
 
     textarea.value = [...names, staff.name].join("\n");
+    state.scheduleSelectedCellKey = "";
     state.scheduleSelectedStaffKey = normalizeScheduleStaffKey(staff.staff_key || staff.name);
     renderScheduleBoard();
     setScheduleStatus(`${staff.name} · ${formatScheduleDayLabel(toSafeDate(isoDate))} ${formatBranchLabel(branch)} 배정 완료`, "success");
   }
 
-  function closeScheduleDayPicker() {
-    state.scheduleDayPickerCell = "";
-    refs.scheduleDayPickerModal.classList.remove("is-open");
-    refs.scheduleDayPickerModal.setAttribute("aria-hidden", "true");
-  }
-
-  function renderScheduleDayPicker() {
-    const cellKey = state.scheduleDayPickerCell;
-    const [branch, isoDate] = String(cellKey || "").split("|");
-    const date = toSafeDate(isoDate);
-    if (!branch || !date) {
-      closeScheduleDayPicker();
-      return;
-    }
-
-    const textarea = getScheduleTextarea(cellKey);
-    const names = textarea ? getCurrentNames(textarea) : [];
-    const context = getBoardAssignments();
-    const staff = getScheduleStaffPool()
-      .filter((item) => branchMatchesStaff(item, branch))
-      .sort((a, b) => a.name.localeCompare(b.name));
-    refs.scheduleDayPickerTitle.textContent = `${formatScheduleDayLabel(date)} · ${formatBranchLabel(branch)}`;
-
-    refs.scheduleDayPickerList.innerHTML = staff.length ? staff.map((item) => {
-      const status = getScheduleDropStatus(item, branch, isoDate, names, context);
-      const unavailable = !status.allowed;
-      return `
-        <button
-          class="schedule-day-picker-item${unavailable ? " is-unavailable" : ""}"
-          type="button"
-          data-schedule-day-picker-staff="${escapeHtml(item.staff_key || item.name)}"
-          ${unavailable ? "disabled" : ""}
-          aria-label="${escapeHtml(`${item.name}: ${status.label}`)}"
-        >
-          <span>
-            <strong>${escapeHtml(item.name)}</strong>
-            <small>${escapeHtml(status.allowed ? "탭하여 배정" : status.label)}</small>
-          </span>
-          <b class="schedule-day-picker-mark" aria-hidden="true">${unavailable ? "×" : "+"}</b>
-        </button>
-      `;
-    }).join("") : '<div class="schedule-day-picker-empty">배정 가능한 서버가 없습니다.</div>';
-  }
-
-  function openScheduleDayPicker(cellKey) {
+  function selectScheduleCell(cellKey) {
     if (!getScheduleTextarea(cellKey)) return;
-    state.scheduleDayPickerCell = cellKey;
-    renderScheduleDayPicker();
-    refs.scheduleDayPickerModal.classList.add("is-open");
-    refs.scheduleDayPickerModal.setAttribute("aria-hidden", "false");
-    window.setTimeout(() => refs.scheduleDayPickerClose.focus(), 0);
+    state.scheduleSelectedCellKey = state.scheduleSelectedCellKey === cellKey ? "" : cellKey;
+    state.scheduleSelectedStaffKey = "";
+    renderScheduleBoard();
   }
 
   function removeScheduleStaffFromCell(cellKey, name) {
@@ -2975,135 +2933,6 @@
     setScheduleStatus(`${name} 배정을 삭제했습니다.`, "");
   }
 
-  function clearScheduleDrag() {
-    const drag = state.schedulePointerDrag;
-    document.querySelectorAll(".schedule-dropzone.is-drag-over, .schedule-dropzone.is-drag-invalid").forEach((zone) => {
-      zone.classList.remove("is-drag-over", "is-drag-invalid");
-    });
-    if (drag?.holdTimer) window.clearTimeout(drag.holdTimer);
-    drag?.ghost?.remove();
-    document.body.classList.remove("is-schedule-dragging");
-    state.schedulePointerDrag = null;
-  }
-
-  function setScheduleDragTarget(drag, clientX, clientY) {
-    const target = document.elementFromPoint(clientX, clientY);
-    const zone = target?.closest?.("[data-schedule-dropzone]") || null;
-    if (drag.dropzone && drag.dropzone !== zone) {
-      drag.dropzone.classList.remove("is-drag-over", "is-drag-invalid");
-    }
-    drag.dropzone = zone;
-    drag.dropStatus = null;
-    if (!zone) return;
-
-    const [branch, isoDate] = String(zone.dataset.scheduleDropzone || "").split("|");
-    const textarea = getScheduleTextarea(zone.dataset.scheduleDropzone);
-    const names = textarea ? getCurrentNames(textarea) : [];
-    drag.dropStatus = getScheduleDropStatus(drag.staff, branch, isoDate, names, getBoardAssignments());
-    zone.classList.toggle("is-drag-over", drag.dropStatus.allowed);
-    zone.classList.toggle("is-drag-invalid", !drag.dropStatus.allowed);
-  }
-
-  function beginSchedulePointerDrag(event) {
-    const button = event.target.closest("[data-schedule-staff]");
-    if (!button || !event.isPrimary || (event.pointerType === "mouse" && event.button !== 0)) return;
-    if (state.scheduleDetailsOpen) return;
-    const staff = getScheduleStaffByKey(button.dataset.scheduleStaff);
-    if (!staff) return;
-    const staffKey = normalizeScheduleStaffKey(staff.staff_key || staff.name);
-    const wasSelected = state.scheduleSelectedStaffKey === staffKey;
-
-    state.schedulePointerDrag = {
-      pointerId: event.pointerId,
-      startX: event.clientX,
-      startY: event.clientY,
-      staff,
-      source: button,
-      wasSelected,
-      active: false,
-      didMove: false,
-      holdTimer: null,
-      lastX: event.clientX,
-      lastY: event.clientY,
-      ghost: null,
-      dropzone: null,
-      dropStatus: null
-    };
-    state.schedulePointerDrag.holdTimer = window.setTimeout(() => {
-      const drag = state.schedulePointerDrag;
-      if (!drag || drag.pointerId !== event.pointerId || drag.active) return;
-      drag.active = true;
-      drag.holdTimer = null;
-      previewScheduleStaffForDrag(drag.staff);
-      try {
-        drag.source.setPointerCapture(drag.pointerId);
-      } catch (_error) {
-        // Pointer capture is not available in every embedded browser.
-      }
-      drag.ghost = document.createElement("div");
-      drag.ghost.className = "schedule-drag-ghost";
-      drag.ghost.textContent = drag.staff.name;
-      document.body.append(drag.ghost);
-      document.body.classList.add("is-schedule-dragging");
-      drag.ghost.style.left = `${drag.lastX}px`;
-      drag.ghost.style.top = `${drag.lastY}px`;
-      setScheduleDragTarget(drag, drag.lastX, drag.lastY);
-    }, 260);
-  }
-
-  function moveSchedulePointerDrag(event) {
-    const drag = state.schedulePointerDrag;
-    if (!drag || drag.pointerId !== event.pointerId) return;
-    drag.lastX = event.clientX;
-    drag.lastY = event.clientY;
-    const moved = Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY);
-    if (!drag.active) {
-      if (moved >= 10) clearScheduleDrag();
-      return;
-    }
-
-    if (moved >= 8) drag.didMove = true;
-    event.preventDefault();
-    drag.ghost.style.left = `${event.clientX}px`;
-    drag.ghost.style.top = `${event.clientY}px`;
-    setScheduleDragTarget(drag, event.clientX, event.clientY);
-  }
-
-  function endSchedulePointerDrag(event) {
-    const drag = state.schedulePointerDrag;
-    if (!drag || drag.pointerId !== event.pointerId) return;
-    const wasDragging = drag.active;
-    const cellKey = drag.dropzone?.dataset.scheduleDropzone || "";
-    const status = drag.dropStatus;
-    if (!wasDragging) {
-      clearScheduleDrag();
-      return;
-    }
-
-    clearScheduleDrag();
-    state.scheduleSuppressClickUntil = Date.now() + 350;
-    state.scheduleSelectedStaffKey = normalizeScheduleStaffKey(drag.staff.staff_key || drag.staff.name);
-    if (!drag.didMove) {
-      renderScheduleBoard();
-      return;
-    }
-    if (cellKey && status?.allowed) {
-      assignScheduleStaffToCell(drag.staff, cellKey);
-    } else {
-      renderScheduleBoard();
-      setScheduleStatus(status ? `${drag.staff.name}: ${status.label}` : "날짜 칸 위에 놓아주세요.", "error");
-    }
-  }
-
-  function cancelSchedulePointerDrag(event) {
-    const drag = state.schedulePointerDrag;
-    if (!drag || (event && drag.pointerId !== event.pointerId)) return;
-    const wasActive = drag.active;
-    clearScheduleDrag();
-    if (!wasActive) return;
-    state.scheduleSelectedStaffKey = normalizeScheduleStaffKey(drag.staff.staff_key || drag.staff.name);
-    renderScheduleBoard();
-  }
 
   function getStaffIdentity(name, staffPool = getScheduleStaffPool()) {
     const normalized = normalizeScheduleStaffKey(name);
@@ -3536,19 +3365,6 @@
     refs.scheduleCopyImageBtn.addEventListener("click", () => void copyScheduleImageToClipboard());
     refs.scheduleResetBtn.addEventListener("click", () => void resetScheduleWeek());
     refs.schedulePublishBtn.addEventListener("click", () => void saveScheduleWeek());
-    refs.scheduleDayPickerClose.addEventListener("click", closeScheduleDayPicker);
-    refs.scheduleDayPickerModal.addEventListener("click", (event) => {
-      if (event.target === refs.scheduleDayPickerModal) closeScheduleDayPicker();
-    });
-    refs.scheduleDayPickerList.addEventListener("click", (event) => {
-      const button = event.target.closest("[data-schedule-day-picker-staff]");
-      if (!button || button.disabled) return;
-      const staff = getScheduleStaffByKey(button.dataset.scheduleDayPickerStaff);
-      const cellKey = state.scheduleDayPickerCell;
-      if (!staff || !cellKey) return;
-      closeScheduleDayPicker();
-      assignScheduleStaffToCell(staff, cellKey);
-    });
     refs.scheduleCalendarEventForm.addEventListener("submit", (event) => void saveScheduleCalendarEvent(event));
     refs.scheduleCalendarEventDate.addEventListener("change", () => {
       const date = toSafeDate(refs.scheduleCalendarEventDate.value);
@@ -3561,31 +3377,30 @@
       const button = event.target.closest("[data-delete-schedule-calendar-event]");
       if (button) void deleteScheduleCalendarEvent(button.dataset.deleteScheduleCalendarEvent);
     });
-    refs.scheduleStaffList.addEventListener("pointerdown", beginSchedulePointerDrag);
     refs.scheduleStaffList.addEventListener("click", (event) => {
-      if (Date.now() < state.scheduleSuppressClickUntil) return;
       const button = event.target.closest("[data-schedule-staff]");
       if (!button) return;
       const staff = getScheduleStaffByKey(button.dataset.scheduleStaff);
       if (staff) selectScheduleStaff(staff);
     });
     refs.scheduleBoard.addEventListener("click", (event) => {
-      if (Date.now() < state.scheduleSuppressClickUntil) return;
       const removeButton = event.target.closest("[data-remove-schedule-assignment]");
       if (removeButton) {
         removeScheduleStaffFromCell(removeButton.dataset.removeScheduleAssignment, removeButton.dataset.scheduleName);
         return;
       }
-      const pickerButton = event.target.closest("[data-schedule-day-picker]");
-      if (pickerButton) {
-        openScheduleDayPicker(pickerButton.dataset.scheduleDayPicker);
+      const cellButton = event.target.closest("[data-schedule-select-cell]");
+      if (cellButton) {
+        const staff = getSelectedScheduleStaff();
+        if (staff) assignScheduleStaffToCell(staff, cellButton.dataset.scheduleSelectCell);
+        else selectScheduleCell(cellButton.dataset.scheduleSelectCell);
         return;
       }
       const zone = event.target.closest("[data-schedule-dropzone]");
       if (!zone) return;
       const staff = getSelectedScheduleStaff();
       if (!staff) {
-        openScheduleDayPicker(zone.dataset.scheduleDropzone);
+        selectScheduleCell(zone.dataset.scheduleDropzone);
         return;
       }
       assignScheduleStaffToCell(staff, zone.dataset.scheduleDropzone);
@@ -3595,17 +3410,13 @@
       const zone = event.target.closest("[data-schedule-dropzone]");
       if (!zone) return;
       event.preventDefault();
-      state.scheduleSuppressClickUntil = Date.now() + 350;
       const staff = getSelectedScheduleStaff();
       if (!staff) {
-        openScheduleDayPicker(zone.dataset.scheduleDropzone);
+        selectScheduleCell(zone.dataset.scheduleDropzone);
         return;
       }
       assignScheduleStaffToCell(staff, zone.dataset.scheduleDropzone);
     });
-    document.addEventListener("pointermove", moveSchedulePointerDrag, { passive: false });
-    document.addEventListener("pointerup", endSchedulePointerDrag);
-    document.addEventListener("pointercancel", cancelSchedulePointerDrag);
     refs.scheduleMonthPrevBtn.addEventListener("click", () => {
       const cursor = state.scheduleMonthCursor instanceof Date
         ? state.scheduleMonthCursor
