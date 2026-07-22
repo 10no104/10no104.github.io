@@ -583,6 +583,147 @@
       flex-wrap: wrap;
     }
 
+    .employee-calendar-modal {
+      width: min(100%, 500px);
+    }
+
+    .employee-calendar-body {
+      display: grid;
+      gap: 12px;
+      padding: 18px;
+    }
+
+    .employee-calendar-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .employee-calendar-toolbar strong {
+      color: #221512;
+      font-size: 1rem;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+    }
+
+    .employee-calendar-toolbar .calendar-nav {
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      border: 1px solid rgba(113, 67, 50, 0.14);
+      border-radius: 14px;
+      background: rgba(255, 251, 246, 0.94);
+      color: #2a1b18;
+      font-size: 1.15rem;
+      font-weight: 900;
+      box-shadow: 0 10px 20px rgba(52, 29, 22, 0.08);
+    }
+
+    .employee-calendar-weekdays,
+    .employee-calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .employee-calendar-weekdays span {
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.72rem;
+      font-weight: 900;
+    }
+
+    .employee-calendar-day {
+      position: relative;
+      display: grid;
+      aspect-ratio: 1;
+      min-height: 0;
+      place-items: center;
+      border: 1px solid rgba(113, 67, 50, 0.1);
+      border-radius: 12px;
+      background: rgba(255, 252, 247, 0.86);
+      color: #2a1b18;
+      box-shadow: 0 7px 14px rgba(52, 29, 22, 0.04);
+    }
+
+    .employee-calendar-day.is-empty {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .employee-calendar-day.is-today {
+      border-color: #b9871f;
+      box-shadow: inset 0 0 0 2px rgba(185, 135, 31, 0.18);
+    }
+
+    .employee-calendar-day.is-unavailable {
+      border-color: rgba(163, 34, 59, 0.58);
+      background: repeating-linear-gradient(-45deg, rgba(163, 34, 59, 0.1) 0 7px, rgba(255, 240, 242, 0.94) 7px 14px);
+      color: #8d2739;
+    }
+
+    .employee-calendar-day.is-preferred {
+      border-color: rgba(29, 128, 97, 0.54);
+      background: linear-gradient(135deg, rgba(218, 243, 232, 0.96), rgba(242, 252, 247, 0.94));
+      color: #1d6252;
+    }
+
+    .employee-calendar-day strong {
+      font-size: 0.92rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .employee-calendar-day i {
+      position: absolute;
+      right: 4px;
+      bottom: 4px;
+      display: inline-grid;
+      width: 14px;
+      height: 14px;
+      place-items: center;
+      border-radius: 999px;
+      color: #fffaf2;
+      font-size: 0.7rem;
+      font-style: normal;
+      font-weight: 950;
+      line-height: 1;
+    }
+
+    .employee-calendar-day.is-unavailable i,
+    .employee-calendar-legend i.is-unavailable { background: #a3223b; }
+
+    .employee-calendar-day.is-preferred i,
+    .employee-calendar-legend i.is-preferred { background: #1d8061; }
+
+    .employee-calendar-legend {
+      display: flex;
+      gap: 12px;
+      color: #6f665e;
+      font-size: 0.76rem;
+      font-weight: 850;
+    }
+
+    .employee-calendar-legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .employee-calendar-legend i {
+      display: inline-grid;
+      width: 15px;
+      height: 15px;
+      place-items: center;
+      border-radius: 5px;
+      color: #fffaf2;
+      font-size: 0.72rem;
+      font-style: normal;
+      font-weight: 950;
+      line-height: 1;
+    }
+
     .menu-card {
       display: grid;
       gap: 14px;
@@ -3049,6 +3190,31 @@
     </div>
   </div>
 
+  <div class="modal-backdrop" id="employeeCalendarModal" aria-hidden="true">
+    <div class="modal employee-calendar-modal" role="dialog" aria-modal="true" aria-labelledby="employeeCalendarTitle">
+      <div class="modal-head">
+        <h3 id="employeeCalendarTitle">서버 달력</h3>
+        <button class="icon-btn" id="employeeCalendarClose" type="button" aria-label="닫기">X</button>
+      </div>
+      <div class="employee-calendar-body">
+        <div class="employee-calendar-toolbar">
+          <button class="calendar-nav" id="employeeCalendarPrev" type="button" aria-label="이전 달">&lt;</button>
+          <strong id="employeeCalendarLabel">월</strong>
+          <button class="calendar-nav" id="employeeCalendarNext" type="button" aria-label="다음 달">&gt;</button>
+        </div>
+        <div class="employee-calendar-weekdays" aria-hidden="true">
+          <span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span><span>일</span>
+        </div>
+        <div class="employee-calendar-grid" id="employeeCalendarGrid"></div>
+        <div class="employee-calendar-legend" aria-label="달력 표시 안내">
+          <span><i class="is-unavailable">×</i>불가</span>
+          <span><i class="is-preferred">★</i>선호</span>
+        </div>
+        <div class="status-line" id="employeeCalendarStatus"></div>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-backdrop" id="scheduleNoteModal" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="scheduleNoteTitle">
       <div class="modal-head">
@@ -3069,6 +3235,6 @@
     </div>
   </div>
 
-  <script src="js/king-admin.js?v=20260721-15"></script>
+  <script src="js/king-admin.js?v=20260721-16"></script>
 </body>
 </html>

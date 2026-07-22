@@ -112,6 +112,11 @@
     accessRequests: [],
     employees: [],
     employeeShowInactive: false,
+    employeeCalendarEmployee: null,
+    employeeCalendarCursor: startOfMonth(new Date()),
+    employeeCalendarAvailability: [],
+    employeeCalendarPreference: null,
+    employeeCalendarFetchToken: 0,
     menuSession: null,
     menuItems: [],
     menuSearch: "",
@@ -183,6 +188,14 @@
       "employeeStatus",
       "accessRequestList",
       "employeeList",
+      "employeeCalendarModal",
+      "employeeCalendarTitle",
+      "employeeCalendarClose",
+      "employeeCalendarPrev",
+      "employeeCalendarNext",
+      "employeeCalendarLabel",
+      "employeeCalendarGrid",
+      "employeeCalendarStatus",
       "employeeEditorModal",
       "employeeEditorTitle",
       "employeeEditorForm",
@@ -586,6 +599,7 @@
         </div>
         ${!isActive ? `<div class="reservation-notes">근무 아님${item.inactive_at ? ` · ${escapeHtml(formatDateTimeLabel(item.inactive_at))}` : ""}</div>` : ""}
         <div class="employee-actions">
+          <button class="pill-btn" type="button" data-view-employee-calendar="${escapeHtml(item.id || item.ref_code || item.staff_key)}">달력 보기</button>
           <button class="pill-btn" type="button" data-edit-employee="${escapeHtml(item.id || item.ref_code || item.staff_key)}">Edit</button>
         </div>
       </article>
@@ -604,6 +618,133 @@
     refs.employeeList.innerHTML = visibleEmployees.length
       ? visibleEmployees.map(renderEmployeeCard).join("")
       : '<div class="empty-state">직원 데이터가 없습니다.</div>';
+  }
+
+  function getEmployeeById(id = "") {
+    const key = String(id || "");
+    return state.employees.find((item) => [item.id, item.ref_code, item.staff_key]
+      .map((value) => String(value || ""))
+      .includes(key)) || null;
+  }
+
+  function getEmployeeCalendarDayState(isoDate = "") {
+    const date = toSafeDate(isoDate);
+    if (!date) return null;
+    const entry = state.employeeCalendarAvailability.find((item) => item.availability_date === isoDate) || null;
+    if (entry?.status === "unavailable") return { type: "unavailable", label: "불가", note: entry.note || "" };
+    if (entry?.status === "preferred") return { type: "preferred", label: "선호", note: entry.note || "" };
+
+    const preference = state.employeeCalendarPreference || {};
+    if (normalizeWeekdayList(preference.fixed_unavailable_weekdays).includes(date.getDay())) {
+      return { type: "unavailable", label: "불가", note: "" };
+    }
+    if (normalizeWeekdayList(preference.fixed_preferred_weekdays).includes(date.getDay())) {
+      return { type: "preferred", label: "선호", note: "" };
+    }
+    return null;
+  }
+
+  function renderEmployeeCalendar() {
+    const cursor = startOfMonth(state.employeeCalendarCursor || new Date());
+    const today = startOfDay(new Date());
+    const monthEnd = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0);
+    const leadingBlanks = (cursor.getDay() + 6) % 7;
+    const cells = [];
+
+    refs.employeeCalendarLabel.textContent = new Intl.DateTimeFormat("ko-KR", {
+      year: "numeric",
+      month: "long"
+    }).format(cursor);
+
+    for (let index = 0; index < leadingBlanks; index += 1) {
+      cells.push('<div class="employee-calendar-day is-empty" aria-hidden="true"></div>');
+    }
+
+    for (let day = 1; day <= monthEnd.getDate(); day += 1) {
+      const date = new Date(cursor.getFullYear(), cursor.getMonth(), day);
+      const isoDate = formatInputDate(date);
+      const dayState = getEmployeeCalendarDayState(isoDate);
+      const dateLabel = new Intl.DateTimeFormat("ko-KR", {
+        weekday: "short",
+        month: "long",
+        day: "numeric"
+      }).format(date);
+      const title = [dateLabel, dayState?.label, dayState?.note].filter(Boolean).join(" · ");
+      const classes = [
+        "employee-calendar-day",
+        isSameDate(date, today) ? "is-today" : "",
+        dayState ? `is-${dayState.type}` : ""
+      ].filter(Boolean).join(" ");
+      const marker = dayState ? `<i aria-hidden="true">${dayState.type === "unavailable" ? "×" : "★"}</i>` : "";
+      cells.push(`<div class="${classes}" title="${escapeHtml(title)}"><strong>${day}</strong>${marker}</div>`);
+    }
+
+    refs.employeeCalendarGrid.innerHTML = cells.join("");
+  }
+
+  function closeEmployeeCalendar() {
+    state.employeeCalendarFetchToken += 1;
+    refs.employeeCalendarModal.setAttribute("aria-hidden", "true");
+    refs.employeeCalendarModal.classList.remove("is-open");
+  }
+
+  async function loadEmployeeCalendar() {
+    const employee = state.employeeCalendarEmployee;
+    const staffKey = String(employee?.staff_key || employee?.name || "").trim();
+    if (!employee || !staffKey || !supabaseClient || !state.menuSession) return;
+
+    const requestToken = ++state.employeeCalendarFetchToken;
+    const cursor = startOfMonth(state.employeeCalendarCursor || new Date());
+    const monthStart = formatInputDate(cursor);
+    const monthEnd = formatInputDate(new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0));
+    refs.employeeCalendarStatus.textContent = "달력을 불러오는 중...";
+    refs.employeeCalendarStatus.className = "status-line";
+
+    const [availabilityResult, preferenceResult] = await Promise.all([
+      supabaseClient
+        .from("noble_staff_availability")
+        .select("availability_date,status,note")
+        .eq("staff_key", staffKey)
+        .gte("availability_date", monthStart)
+        .lte("availability_date", monthEnd)
+        .order("availability_date", { ascending: true }),
+      supabaseClient
+        .from("noble_staff_preferences")
+        .select("fixed_unavailable_weekdays,fixed_preferred_weekdays")
+        .eq("staff_key", staffKey)
+        .maybeSingle()
+    ]);
+
+    if (requestToken !== state.employeeCalendarFetchToken) return;
+    if (availabilityResult.error) {
+      refs.employeeCalendarStatus.textContent = availabilityResult.error.message || "달력을 불러오지 못했습니다.";
+      refs.employeeCalendarStatus.className = "status-line is-error";
+      return;
+    }
+    if (preferenceResult.error) {
+      console.warn("Could not load staff calendar preferences", preferenceResult.error);
+    }
+
+    state.employeeCalendarAvailability = availabilityResult.data || [];
+    state.employeeCalendarPreference = preferenceResult.data || null;
+    renderEmployeeCalendar();
+    refs.employeeCalendarStatus.textContent = "";
+    refs.employeeCalendarStatus.className = "status-line";
+  }
+
+  async function openEmployeeCalendar(id = "") {
+    const employee = getEmployeeById(id);
+    if (!employee) return;
+    const name = employee.staff_key || employee.name || employee.ref_code || "서버";
+    state.employeeCalendarEmployee = employee;
+    state.employeeCalendarCursor = startOfMonth(new Date());
+    state.employeeCalendarAvailability = [];
+    state.employeeCalendarPreference = null;
+    refs.employeeCalendarTitle.textContent = `${name} 달력`;
+    refs.employeeCalendarModal.setAttribute("aria-hidden", "false");
+    refs.employeeCalendarModal.classList.add("is-open");
+    renderEmployeeCalendar();
+    await loadEmployeeCalendar();
   }
 
   async function fetchEmployees() {
@@ -3537,9 +3678,36 @@
       void deleteAccessRequest(button.dataset.deleteAccessRequest);
     });
     refs.employeeList.addEventListener("click", (event) => {
+      const calendarButton = event.target.closest("[data-view-employee-calendar]");
+      if (calendarButton) {
+        void openEmployeeCalendar(calendarButton.dataset.viewEmployeeCalendar);
+        return;
+      }
       const button = event.target.closest("[data-edit-employee]");
       if (!button) return;
       openEmployeeEditor(button.dataset.editEmployee);
+    });
+    refs.employeeCalendarClose.addEventListener("click", closeEmployeeCalendar);
+    refs.employeeCalendarModal.addEventListener("click", (event) => {
+      if (event.target === refs.employeeCalendarModal) closeEmployeeCalendar();
+    });
+    refs.employeeCalendarPrev.addEventListener("click", () => {
+      state.employeeCalendarCursor = new Date(
+        state.employeeCalendarCursor.getFullYear(),
+        state.employeeCalendarCursor.getMonth() - 1,
+        1
+      );
+      renderEmployeeCalendar();
+      void loadEmployeeCalendar();
+    });
+    refs.employeeCalendarNext.addEventListener("click", () => {
+      state.employeeCalendarCursor = new Date(
+        state.employeeCalendarCursor.getFullYear(),
+        state.employeeCalendarCursor.getMonth() + 1,
+        1
+      );
+      renderEmployeeCalendar();
+      void loadEmployeeCalendar();
     });
     refs.employeeEditorClose.addEventListener("click", closeEmployeeEditor);
     refs.employeeEditorCancel.addEventListener("click", closeEmployeeEditor);
