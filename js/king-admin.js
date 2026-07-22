@@ -115,8 +115,8 @@
     employeeCalendarEmployee: null,
     employeeCalendarCursor: startOfMonth(new Date()),
     employeeCalendarAvailability: [],
-    employeeCalendarPreference: null,
     employeeCalendarFetchToken: 0,
+    employeeCalendarSavingDates: new Set(),
     menuSession: null,
     menuItems: [],
     menuSearch: "",
@@ -634,14 +634,6 @@
     const entry = state.employeeCalendarAvailability.find((item) => item.availability_date === isoDate) || null;
     if (entry?.status === "unavailable") return { type: "unavailable", label: "불가", note: entry.note || "" };
     if (entry?.status === "preferred") return { type: "preferred", label: "선호", note: entry.note || "" };
-
-    const preference = state.employeeCalendarPreference || {};
-    if (normalizeWeekdayList(preference.fixed_unavailable_weekdays).includes(date.getDay())) {
-      return { type: "unavailable", label: "불가", note: "" };
-    }
-    if (normalizeWeekdayList(preference.fixed_preferred_weekdays).includes(date.getDay())) {
-      return { type: "preferred", label: "선호", note: "" };
-    }
     return null;
   }
 
@@ -677,7 +669,7 @@
         dayState ? `is-${dayState.type}` : ""
       ].filter(Boolean).join(" ");
       const marker = dayState ? `<i aria-hidden="true">${dayState.type === "unavailable" ? "×" : "★"}</i>` : "";
-      cells.push(`<div class="${classes}" title="${escapeHtml(title)}"><strong>${day}</strong>${marker}</div>`);
+      cells.push(`<button class="${classes}" type="button" data-employee-calendar-date="${isoDate}" title="${escapeHtml(title)}" aria-label="${escapeHtml(`${dateLabel} ${dayState?.label || "해제"}. 탭해서 상태 변경`)}"><strong>${day}</strong>${marker}</button>`);
     }
 
     refs.employeeCalendarGrid.innerHTML = cells.join("");
@@ -701,20 +693,13 @@
     refs.employeeCalendarStatus.textContent = "달력을 불러오는 중...";
     refs.employeeCalendarStatus.className = "status-line";
 
-    const [availabilityResult, preferenceResult] = await Promise.all([
-      supabaseClient
-        .from("noble_staff_availability")
-        .select("availability_date,status,note")
-        .eq("staff_key", staffKey)
-        .gte("availability_date", monthStart)
-        .lte("availability_date", monthEnd)
-        .order("availability_date", { ascending: true }),
-      supabaseClient
-        .from("noble_staff_preferences")
-        .select("fixed_unavailable_weekdays,fixed_preferred_weekdays")
-        .eq("staff_key", staffKey)
-        .maybeSingle()
-    ]);
+    const availabilityResult = await supabaseClient
+      .from("noble_staff_availability")
+      .select("availability_date,status,note")
+      .eq("staff_key", staffKey)
+      .gte("availability_date", monthStart)
+      .lte("availability_date", monthEnd)
+      .order("availability_date", { ascending: true });
 
     if (requestToken !== state.employeeCalendarFetchToken) return;
     if (availabilityResult.error) {
@@ -722,15 +707,93 @@
       refs.employeeCalendarStatus.className = "status-line is-error";
       return;
     }
-    if (preferenceResult.error) {
-      console.warn("Could not load staff calendar preferences", preferenceResult.error);
-    }
-
     state.employeeCalendarAvailability = availabilityResult.data || [];
-    state.employeeCalendarPreference = preferenceResult.data || null;
     renderEmployeeCalendar();
     refs.employeeCalendarStatus.textContent = "";
     refs.employeeCalendarStatus.className = "status-line";
+  }
+
+  function syncScheduleAvailabilityFromEmployeeCalendar(employee, isoDate, status) {
+    const staffKey = normalizeScheduleStaffKey(employee?.staff_key || employee?.name);
+    const staffName = employee?.staff_key || employee?.name || "";
+    state.scheduleAvailability = state.scheduleAvailability.filter((item) => {
+      if (item.availability_date !== isoDate) return true;
+      const itemKey = normalizeScheduleStaffKey(item.staff_key || item.staff_name);
+      const itemName = normalizeScheduleStaffKey(item.staff_name || item.staff_key);
+      return itemKey !== staffKey && itemName !== staffKey;
+    });
+    if (status !== "default") {
+      state.scheduleAvailability.push({
+        staff_key: staffName,
+        staff_name: staffName,
+        branch_scope: normalizeBranchScope(employee?.branch_scope || "both"),
+        availability_date: isoDate,
+        status
+      });
+    }
+  }
+
+  async function cycleEmployeeCalendarDate(isoDate = "") {
+    const employee = state.employeeCalendarEmployee;
+    const staffKey = String(employee?.staff_key || employee?.name || "").trim();
+    if (!employee || !staffKey || !isoDate || state.employeeCalendarSavingDates.has(isoDate)) return;
+
+    const current = state.employeeCalendarAvailability.find((item) => item.availability_date === isoDate) || null;
+    const nextStatus = current?.status === "unavailable"
+      ? "preferred"
+      : current?.status === "preferred"
+        ? "default"
+        : "unavailable";
+    state.employeeCalendarSavingDates.add(isoDate);
+    refs.employeeCalendarStatus.textContent = "변경 사항을 저장하는 중...";
+    refs.employeeCalendarStatus.className = "status-line";
+
+    try {
+      let error = null;
+      if (nextStatus === "default") {
+        const result = await supabaseClient
+          .from("noble_staff_availability")
+          .delete()
+          .eq("staff_key", staffKey)
+          .eq("availability_date", isoDate);
+        error = result.error;
+      } else if (current) {
+        const result = await supabaseClient
+          .from("noble_staff_availability")
+          .update({ status: nextStatus, available_start: null, available_end: null, note: null })
+          .eq("staff_key", staffKey)
+          .eq("availability_date", isoDate);
+        error = result.error;
+      } else {
+        const result = await supabaseClient
+          .from("noble_staff_availability")
+          .insert({
+            staff_key: staffKey,
+            staff_name: employee.staff_key || employee.name || staffKey,
+            branch_scope: normalizeBranchScope(employee.branch_scope || "both"),
+            availability_date: isoDate,
+            status: nextStatus
+          });
+        error = result.error;
+      }
+      if (error) throw error;
+
+      state.employeeCalendarAvailability = state.employeeCalendarAvailability
+        .filter((item) => item.availability_date !== isoDate);
+      if (nextStatus !== "default") {
+        state.employeeCalendarAvailability.push({ availability_date: isoDate, status: nextStatus, note: "" });
+      }
+      syncScheduleAvailabilityFromEmployeeCalendar(employee, isoDate, nextStatus);
+      renderEmployeeCalendar();
+      if (state.activeTab === "schedule") renderScheduleBoard();
+      refs.employeeCalendarStatus.textContent = nextStatus === "default" ? "해제했습니다." : nextStatus === "unavailable" ? "불가로 표시했습니다." : "선호로 표시했습니다.";
+      refs.employeeCalendarStatus.className = "status-line is-success";
+    } catch (error) {
+      refs.employeeCalendarStatus.textContent = error.message || "날짜 상태를 저장하지 못했습니다.";
+      refs.employeeCalendarStatus.className = "status-line is-error";
+    } finally {
+      state.employeeCalendarSavingDates.delete(isoDate);
+    }
   }
 
   async function openEmployeeCalendar(id = "") {
@@ -740,7 +803,6 @@
     state.employeeCalendarEmployee = employee;
     state.employeeCalendarCursor = startOfMonth(new Date());
     state.employeeCalendarAvailability = [];
-    state.employeeCalendarPreference = null;
     refs.employeeCalendarTitle.textContent = `${name} 달력`;
     refs.employeeCalendarModal.setAttribute("aria-hidden", "false");
     refs.employeeCalendarModal.classList.add("is-open");
@@ -3711,6 +3773,10 @@
       );
       renderEmployeeCalendar();
       void loadEmployeeCalendar();
+    });
+    refs.employeeCalendarGrid.addEventListener("click", (event) => {
+      const day = event.target.closest("[data-employee-calendar-date]");
+      if (day) void cycleEmployeeCalendarDate(day.dataset.employeeCalendarDate);
     });
     refs.employeeEditorClose.addEventListener("click", closeEmployeeEditor);
     refs.employeeEditorCancel.addEventListener("click", closeEmployeeEditor);

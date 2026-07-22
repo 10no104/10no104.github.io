@@ -640,10 +640,13 @@
       aspect-ratio: 1;
       min-height: 0;
       place-items: center;
+      padding: 0;
       border: 1px solid rgba(113, 67, 50, 0.1);
       border-radius: 12px;
       background: rgba(255, 252, 247, 0.86);
       color: #2a1b18;
+      font: inherit;
+      cursor: pointer;
       box-shadow: 0 7px 14px rgba(52, 29, 22, 0.04);
     }
 
@@ -722,6 +725,14 @@
       font-style: normal;
       font-weight: 950;
       line-height: 1;
+    }
+
+    .employee-calendar-guide {
+      margin: -3px 0 0;
+      color: #6f665e;
+      font-size: 0.76rem;
+      font-weight: 800;
+      line-height: 1.4;
     }
 
     .menu-card {
@@ -3210,6 +3221,7 @@
           <span><i class="is-unavailable">×</i>불가</span>
           <span><i class="is-preferred">★</i>선호</span>
         </div>
+        <p class="employee-calendar-guide">날짜를 탭하면 불가 → 선호 → 해제 순서로 바뀝니다.</p>
         <div class="status-line" id="employeeCalendarStatus"></div>
       </div>
     </div>
@@ -3235,6 +3247,6 @@
     </div>
   </div>
 
-  <script src="js/king-admin.js?v=20260721-17"></script>
+  <script src="js/king-admin.js?v=20260721-18"></script>
 </body>
 </html>
