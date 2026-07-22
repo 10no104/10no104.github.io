@@ -970,6 +970,8 @@
     .schedule-legend-item.is-my-work b { background: rgba(37, 99, 164, 0.14); }
     .schedule-legend-item.is-substitute-requested { color: #a05224; }
     .schedule-legend-item.is-substitute-requested b { background: rgba(207, 114, 48, 0.16); }
+    .schedule-legend-item.is-note { color: #8a5f19; }
+    .schedule-legend-item.is-note b { background: rgba(178, 112, 22, 0.16); }
     .schedule-legend-item.is-not-my-work { color: #796a63; }
     .schedule-legend-item.is-not-my-work b { background: rgba(122, 108, 98, 0.16); }
 
@@ -1101,20 +1103,52 @@
     }
 
     .server-chip {
+      display: block;
       width: 100%;
       max-width: 100%;
       min-height: 20px;
       padding: 4px 3px;
+      border: 1px solid transparent;
       border-radius: 8px;
       background: rgba(143, 36, 56, 0.08);
       color: #4c211d;
+      font-family: inherit;
       font-size: 0.64rem;
       font-weight: 800;
       line-height: 1.1;
-      white-space: nowrap;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    button.server-chip {
+      cursor: pointer;
+    }
+
+    button.server-chip:focus-visible {
+      outline: 2px solid rgba(37, 99, 164, 0.8);
+      outline-offset: 2px;
+    }
+
+    .server-chip.has-note {
+      border-color: rgba(178, 112, 22, 0.28);
+      background: linear-gradient(180deg, rgba(255, 249, 224, 0.98), rgba(255, 239, 196, 0.94));
+      color: #5a3c12;
+    }
+
+    .server-chip-name,
+    .server-chip-note {
+      display: block;
       overflow: hidden;
       text-overflow: ellipsis;
-      text-align: center;
+      white-space: nowrap;
+    }
+
+    .server-chip-note {
+      margin-top: 3px;
+      color: #8a5f19;
+      font-size: 0.53rem;
+      font-weight: 900;
+      line-height: 1.1;
     }
 
     .server-chip.is-me {
@@ -1632,6 +1666,31 @@
       font-weight: 800;
     }
 
+    .schedule-note-dialog {
+      width: min(100%, 460px);
+    }
+
+    .schedule-note-meta {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 800;
+    }
+
+    .schedule-note-content {
+      margin: 0;
+      padding: 14px;
+      border: 1px solid rgba(143, 36, 56, 0.14);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.7);
+      color: #3d211d;
+      font-size: 0.96rem;
+      font-weight: 750;
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+
     .bottom-nav {
       position: fixed;
       left: 50%;
@@ -1898,6 +1957,11 @@
         min-height: 18px;
         padding: 3px 1px;
         font-size: 0.55rem;
+      }
+
+      .server-chip-note {
+        margin-top: 2px;
+        font-size: 0.46rem;
       }
 
       .calendar-meta {
@@ -2319,6 +2383,20 @@
     </div>
   </div>
 
+  <div class="request-modal" id="scheduleNoteModal" hidden aria-hidden="true">
+    <div class="request-dialog schedule-note-dialog" role="dialog" aria-modal="true" aria-labelledby="scheduleNoteTitle">
+      <div class="request-head">
+        <div>
+          <p>Schedule Note</p>
+          <h3 id="scheduleNoteTitle">근무 노트</h3>
+        </div>
+        <button class="request-close" id="scheduleNoteCloseButton" type="button" aria-label="근무 노트 닫기">×</button>
+      </div>
+      <p class="schedule-note-meta" id="scheduleNoteMeta"></p>
+      <p class="schedule-note-content" id="scheduleNoteContent"></p>
+    </div>
+  </div>
+
   <div class="request-modal" id="substituteRequestModal" hidden aria-hidden="true">
     <div class="request-dialog" role="dialog" aria-modal="true" aria-labelledby="substituteRequestTitle">
       <div class="request-head">
@@ -2480,6 +2558,11 @@
           "dateDetailStatus",
           "dateDetailNote",
           "dateDetailStatusText",
+          "scheduleNoteModal",
+          "scheduleNoteCloseButton",
+          "scheduleNoteTitle",
+          "scheduleNoteMeta",
+          "scheduleNoteContent",
           "substituteRequestModal",
           "substituteRequestCloseButton",
           "substituteRequestCancelButton",
@@ -3030,6 +3113,29 @@
       function closeDateDetailModal() {
         refs.dateDetailModal.hidden = true;
         refs.dateDetailModal.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("modal-open");
+      }
+
+      function openScheduleNoteModal(button) {
+        let note = "";
+        try {
+          note = decodeURIComponent(String(button?.dataset.scheduleNote || "")).trim();
+        } catch (error) {
+          note = String(button?.dataset.scheduleNote || "").trim();
+        }
+        if (!note) return;
+        refs.scheduleNoteTitle.textContent = button.dataset.scheduleNoteServer || "근무 노트";
+        refs.scheduleNoteMeta.textContent = button.dataset.scheduleNoteDate || "";
+        refs.scheduleNoteContent.textContent = note;
+        refs.scheduleNoteModal.hidden = false;
+        refs.scheduleNoteModal.setAttribute("aria-hidden", "false");
+        document.body.classList.add("modal-open");
+        refs.scheduleNoteCloseButton.focus();
+      }
+
+      function closeScheduleNoteModal() {
+        refs.scheduleNoteModal.hidden = true;
+        refs.scheduleNoteModal.setAttribute("aria-hidden", "true");
         document.body.classList.remove("modal-open");
       }
 
@@ -3586,6 +3692,7 @@
           <div class="schedule-legend" aria-label="스케줄 표시 안내">
             <span class="schedule-legend-item is-my-work"><b aria-hidden="true"></b>내 근무</span>
             <span class="schedule-legend-item is-substitute-requested"><b aria-hidden="true"></b>대타 요청</span>
+            <span class="schedule-legend-item is-note"><b aria-hidden="true">📝</b>노트 있음 · 서버를 누르면 전체 보기</span>
             <span class="schedule-legend-item is-not-my-work"><b aria-hidden="true"></b>비근무</span>
           </div>
           <p class="calendar-usage-guide">내 근무일을 길게 누르면 대타 요청을 등록하거나 취소할 수 있습니다.<br>대타를 해주실 분은 해당 서버에게 직접 연락해 주세요.</p>
@@ -3601,6 +3708,7 @@
                     return {
                       name: row.staff_name || row.staff_key || "-",
                       staffKey: row.staff_key || row.staff_name || "",
+                      note: String(row.note || "").trim(),
                       isMe
                     };
                   });
@@ -3614,7 +3722,19 @@
                 const serverMarkup = servers.length
                   ? servers.map((server) => {
                     const substituteRequest = getSubstituteRequestForServer(branch.key, isoDate, server);
-                    return `<span class="server-chip ${server.isMe ? "is-me" : ""} ${substituteRequest ? "is-substitute-requester" : ""}">${escapeHtml(server.name)}${substituteRequest ? '<small>대타 요청</small>' : ""}</span>`;
+                    const noteLabel = server.note ? ` · 노트: ${server.note}` : "";
+                    const noteMarkup = server.note
+                      ? `<small class="server-chip-note">📝 ${escapeHtml(server.note)}</small>`
+                      : "";
+                    const chipClass = [
+                      "server-chip",
+                      server.isMe ? "is-me" : "",
+                      substituteRequest ? "is-substitute-requester" : "",
+                      server.note ? "has-note" : ""
+                    ].filter(Boolean).join(" ");
+                    return server.note
+                      ? `<button class="${chipClass}" type="button" data-schedule-note="${escapeHtml(encodeURIComponent(server.note))}" data-schedule-note-server="${escapeHtml(server.name)}" data-schedule-note-date="${escapeHtml(`${formatLongDate(date)} · ${branch.label}`)}" aria-label="${escapeHtml(`${server.name}${noteLabel}. 노트 내용 보기`)}"><span class="server-chip-name">${escapeHtml(server.name)}</span>${noteMarkup}${substituteRequest ? '<small>대타 요청</small>' : ""}</button>`
+                      : `<span class="${chipClass}">${escapeHtml(server.name)}${substituteRequest ? '<small>대타 요청</small>' : ""}</span>`;
                   }).join("")
                   : `<span class="server-empty">-</span>`;
                 const dayClasses = [
@@ -4161,6 +4281,12 @@
           if (event.target === refs.dateDetailModal) closeDateDetailModal();
         });
 
+        refs.scheduleNoteCloseButton.addEventListener("click", closeScheduleNoteModal);
+
+        refs.scheduleNoteModal.addEventListener("click", (event) => {
+          if (event.target === refs.scheduleNoteModal) closeScheduleNoteModal();
+        });
+
         refs.substituteRequestCloseButton.addEventListener("click", closeSubstituteRequestModal);
         refs.substituteRequestCancelButton.addEventListener("click", closeSubstituteRequestModal);
         refs.substituteRequestCancelOpenButton.addEventListener("click", () => void cancelSubstituteRequest());
@@ -4187,6 +4313,7 @@
           if (event.key !== "Escape") return;
           if (!refs.requestModal.hidden) closeRequestModal();
           if (!refs.dateDetailModal.hidden) closeDateDetailModal();
+          if (!refs.scheduleNoteModal.hidden) closeScheduleNoteModal();
           if (!refs.substituteRequestModal.hidden) closeSubstituteRequestModal();
         });
 
@@ -4215,9 +4342,16 @@
         });
 
         refs.scheduleList.addEventListener("pointerdown", (event) => {
+          if (event.target.closest("[data-schedule-note]")) return;
           const day = event.target.closest("[data-substitute-request-date]");
           if (!day) return;
           startScheduleLongPress(day, event);
+        });
+
+        refs.scheduleList.addEventListener("click", (event) => {
+          const button = event.target.closest("[data-schedule-note]");
+          if (!button) return;
+          openScheduleNoteModal(button);
         });
 
         refs.scheduleList.addEventListener("pointermove", (event) => {
