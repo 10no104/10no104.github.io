@@ -2521,7 +2521,7 @@
                         >
                           <span class="schedule-assignment-content">
                             <span class="schedule-assignment-name">${escapeHtml(name)}</span>
-                            ${note ? `<small class="schedule-assignment-note">${escapeHtml(note)}</small>` : ""}
+                            ${note ? `<small class="schedule-assignment-note">서버 메모: ${escapeHtml(note)}</small>` : ""}
                           </span>
                           <span class="schedule-assignment-remove" aria-hidden="true">×</span>
                         </button>
@@ -2887,7 +2887,7 @@
           });
           lineY += lineHeight;
           if (!entry.note) return;
-          drawFittedText(ctx, `↳ ${entry.note}`, x + dayWidth / 2, lineY, dayWidth - 34, {
+          drawFittedText(ctx, `서버 메모: ${entry.note}`, x + dayWidth / 2, lineY, dayWidth - 34, {
             size: 15,
             minSize: 10,
             weight: 800,
