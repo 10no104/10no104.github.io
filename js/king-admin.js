@@ -2726,7 +2726,7 @@
     const weekTitle = dates.length
       ? `${formatScheduleDayLabel(dates[0])} - ${formatScheduleDayLabel(dates[6])}`
       : "주간 스케줄";
-    drawFittedText(ctx, "Noble Server Schedule", margin, margin + 16, width - margin * 2, {
+    drawFittedText(ctx, "EHWA 스케줄", margin, margin + 16, width - margin * 2, {
       size: 36,
       minSize: 24,
       weight: 900,
@@ -2812,7 +2812,7 @@
 
   function downloadScheduleCanvas(canvas) {
     const link = document.createElement("a");
-    link.download = `noble-schedule-${state.scheduleWeekStart || "week"}.png`;
+    link.download = `ehwa-schedule-${state.scheduleWeekStart || "week"}.png`;
     link.href = canvas.toDataURL("image/png");
     link.click();
   }
