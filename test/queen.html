@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reservations Admin | EHWA</title>
+  <title>Floor Operations | EHWA</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet" />
@@ -557,6 +557,284 @@
       line-height: 1.55;
     }
 
+    .request-overview {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .request-metric {
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      background: rgba(255, 250, 244, 0.09);
+    }
+
+    .request-metric span,
+    .request-metric strong {
+      display: block;
+    }
+
+    .request-metric span {
+      margin-bottom: 5px;
+      color: rgba(255, 248, 240, 0.64);
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .request-metric strong {
+      color: #fffaf2;
+      font-size: clamp(1.2rem, 4vw, 1.65rem);
+      letter-spacing: -0.04em;
+    }
+
+    .request-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .request-toolbar h3 {
+      margin: 0;
+    }
+
+    .request-refresh-btn {
+      min-height: 38px;
+      padding: 0 13px;
+      border: 1px solid rgba(123, 31, 47, 0.16);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.76);
+      color: #612330;
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .request-refresh-btn:disabled {
+      cursor: wait;
+      opacity: 0.58;
+    }
+
+    .request-filter-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .request-filter-row::-webkit-scrollbar {
+      display: none;
+    }
+
+    .request-filter-btn {
+      flex: 0 0 auto;
+      min-height: 38px;
+      padding: 0 14px;
+      border: 1px solid rgba(113, 88, 60, 0.14);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.76);
+      color: #5e4c3e;
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .request-filter-btn.is-active {
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--wine), #b9871f);
+      color: #fff;
+      box-shadow: 0 10px 18px rgba(123, 31, 47, 0.16);
+    }
+
+    .request-sync-status {
+      min-height: 20px;
+      margin: 0 0 12px;
+      color: #847263;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .request-sync-status.is-error {
+      color: #92394d;
+    }
+
+    .request-queue {
+      display: grid;
+      gap: 12px;
+    }
+
+    .request-card {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+      border: 1px solid rgba(113, 88, 60, 0.14);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 14px 26px rgba(50, 31, 20, 0.07);
+    }
+
+    .request-card.is-new {
+      border-color: rgba(123, 31, 47, 0.3);
+      box-shadow: 0 16px 30px rgba(123, 31, 47, 0.11);
+    }
+
+    .request-card.is-service {
+      background: linear-gradient(135deg, rgba(255, 246, 219, 0.96), rgba(255, 255, 255, 0.9));
+    }
+
+    .request-card.is-completed,
+    .request-card.is-canceled {
+      opacity: 0.72;
+    }
+
+    .request-card-top,
+    .request-card-meta,
+    .request-card-actions,
+    .request-total-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .request-card-top,
+    .request-total-row {
+      justify-content: space-between;
+    }
+
+    .request-card-meta {
+      flex-wrap: wrap;
+    }
+
+    .request-table-code {
+      color: #281a13;
+      font-size: 1.35rem;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    .request-age {
+      color: #887365;
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+
+    .request-kind-badge,
+    .request-status-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .request-kind-badge {
+      background: rgba(123, 31, 47, 0.1);
+      color: #6b2230;
+    }
+
+    .request-status-badge {
+      background: rgba(55, 119, 79, 0.12);
+      color: #286344;
+    }
+
+    .request-items {
+      display: grid;
+      gap: 7px;
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(246, 239, 230, 0.78);
+      color: #36261c;
+    }
+
+    .request-item-row {
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: baseline;
+      font-size: 0.88rem;
+    }
+
+    .request-item-row strong {
+      color: #692737;
+    }
+
+    .request-item-row span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .request-item-row small {
+      color: #806d5e;
+      font-weight: 700;
+    }
+
+    .request-service-copy {
+      padding: 15px;
+      border-radius: 16px;
+      background: rgba(123, 31, 47, 0.08);
+      color: #57202c;
+      font-size: 1.08rem;
+      font-weight: 900;
+    }
+
+    .request-note {
+      margin: 0;
+      color: #69584b;
+      font-size: 0.84rem;
+      line-height: 1.5;
+    }
+
+    .request-total-row {
+      color: #39271d;
+      font-weight: 800;
+    }
+
+    .request-card-actions {
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .request-action-btn {
+      min-height: 42px;
+      padding: 0 16px;
+      border: 0;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--wine), #b9871f);
+      color: #fff;
+      font: inherit;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 12px 20px rgba(123, 31, 47, 0.16);
+    }
+
+    .request-action-btn:disabled {
+      cursor: wait;
+      opacity: 0.58;
+    }
+
+    .request-empty {
+      padding: 34px 18px;
+      border: 1px dashed rgba(113, 88, 60, 0.2);
+      border-radius: 20px;
+      color: #7e6b5d;
+      text-align: center;
+      line-height: 1.6;
+    }
+
     .bottom-nav {
       position: fixed;
       left: 50%;
@@ -603,6 +881,27 @@
       font-size: 0.78rem;
       font-weight: 900;
       letter-spacing: 0.04em;
+    }
+
+    .nav-tab {
+      position: relative;
+    }
+
+    .nav-count {
+      position: absolute;
+      top: 5px;
+      right: max(8px, calc(50% - 28px));
+      display: grid;
+      place-items: center;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 5px;
+      border-radius: 999px;
+      background: #f2c75c;
+      color: #3e2118;
+      font-size: 0.68rem;
+      font-weight: 900;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.22);
     }
 
     .nav-tab.is-active {
@@ -1781,6 +2080,26 @@
         grid-template-columns: 1fr;
       }
 
+      .request-overview {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .request-toolbar {
+        align-items: flex-start;
+      }
+
+      .request-card {
+        padding: 14px;
+      }
+
+      .request-item-row {
+        grid-template-columns: 28px minmax(0, 1fr);
+      }
+
+      .request-item-row small {
+        grid-column: 2;
+      }
+
       .table-map-zone.is-wide {
         grid-column: span 1;
       }
@@ -1945,11 +2264,11 @@
             <img src="../assets/logo-dark.webp" alt="EHWA logo" />
         </a>
         <div class="brand-copy">
-          <p>Reservations</p>
+          <p>Floor Operations</p>
           <h1>Downtown</h1>
         </div>
       </div>
-        <a class="pill-btn" href="./reservation/">Guest Form</a>
+        <a class="pill-btn" href="./menu/?table=A12&amp;guests=2">Open Guest Menu</a>
     </header>
 
     <section class="app-view is-active" data-view="reservation">
@@ -2036,29 +2355,39 @@
 
     <section class="app-view placeholder-view" data-view="online">
       <section class="purpose-hero">
-        <p class="purpose-kicker">Digital orders</p>
-        <h2>Online</h2>
-        <p>To-go orders, reservation pause controls, and online requests will be organized here.</p>
+        <p class="purpose-kicker">Live table service</p>
+        <h2>Orders &amp; Calls</h2>
+        <p>Orders and service calls sent from the table menu appear here. Work the queue in arrival order and update each request as the floor handles it.</p>
+        <div class="request-overview" aria-label="Active request summary">
+          <div class="request-metric">
+            <span>Open</span>
+            <strong id="metricOpenRequests">0</strong>
+          </div>
+          <div class="request-metric">
+            <span>Orders</span>
+            <strong id="metricOpenOrders">0</strong>
+          </div>
+          <div class="request-metric">
+            <span>Calls</span>
+            <strong id="metricOpenCalls">0</strong>
+          </div>
+        </div>
       </section>
 
       <section class="purpose-panel">
-        <h3>Online Queue</h3>
-        <div class="online-grid">
-          <article class="online-card">
-            <span>To-go</span>
-            <strong>Orders</strong>
-            <small>Incoming pickup and takeout requests.</small>
-          </article>
-          <article class="online-card">
-            <span>Reservations</span>
-            <strong>Pause Intake</strong>
-            <small>Stop or resume online reservation requests.</small>
-          </article>
-          <article class="online-card">
-            <span>Requests</span>
-            <strong>Online Messages</strong>
-            <small>Special requests and follow-up items.</small>
-          </article>
+        <div class="request-toolbar">
+          <h3>Live Queue</h3>
+          <button class="request-refresh-btn" id="refreshRequestsBtn" type="button">Refresh</button>
+        </div>
+        <div class="request-filter-row" id="requestFilterRow" aria-label="Request filters">
+          <button class="request-filter-btn is-active" type="button" data-request-filter="active">Active</button>
+          <button class="request-filter-btn" type="button" data-request-filter="orders">Orders</button>
+          <button class="request-filter-btn" type="button" data-request-filter="service">Calls</button>
+          <button class="request-filter-btn" type="button" data-request-filter="completed">Completed</button>
+        </div>
+        <p class="request-sync-status" id="requestSyncStatus">Connecting to the request queue…</p>
+        <div class="request-queue" id="requestQueue" aria-live="polite">
+          <div class="request-empty">Loading orders and service calls…</div>
         </div>
       </section>
     </section>
@@ -2120,7 +2449,8 @@
           <path d="M9 8a3 3 0 0 1 6 0"></path>
           <path d="M9 13h6"></path>
         </svg>
-        <span>온라인</span>
+        <span>주문</span>
+        <b class="nav-count" id="requestNavCount" hidden>0</b>
       </button>
       <button class="nav-tab" type="button" data-queen-tab="notes" aria-pressed="false">
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -2229,8 +2559,14 @@
       tableOptionColumnIndex: 0
     };
 
+    const SUPABASE_CONFIG = {
+      url: "https://pzhzdjsjfdzbzkhnaxmc.supabase.co",
+      anonKey: "sb_publishable_3Ox2JIQXVLwusT-xzIMJ4g_YXTR5q8e"
+    };
+    const DINING_REQUESTS_TABLE = "dining_requests";
+
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3Iiujn95evZuFiyLNrJUo-_H6rKngdxt0EeBFVw/exec";
-    const AUTO_REFRESH_MS = 10000;
+    const AUTO_REFRESH_MS = 5000;
     const AUTO_REMOVE_AFTER_MS = 60 * 60 * 1000;
     const AUTO_REMOVE_MUTATION_SPACING_MS = 200;
 
@@ -2251,8 +2587,23 @@
       tableOptions: [],
       activeTableReservation: null,
       selectedTableAssignments: [],
-      pendingRemoveReservation: null
+      pendingRemoveReservation: null,
+      diningRequests: [],
+      requestFilter: "active",
+      requestsLoadedAt: null,
+      requestLoadError: false,
+      requestActionError: "",
+      requestUpdatingIds: new Set()
     };
+
+    function escapeHtml(value = "") {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
 
     function parseGvizText(text = "") {
       return JSON.parse(
@@ -2301,6 +2652,272 @@
     function formatTableAssignments(value = "") {
       const items = Array.isArray(value) ? value : parseTableAssignments(value);
       return items.join(" + ");
+    }
+
+    const REQUEST_STATUS_LABELS = {
+      new: "New",
+      acknowledged: "Accepted",
+      preparing: "Preparing",
+      ready: "Ready",
+      completed: "Completed",
+      canceled: "Canceled"
+    };
+
+    const REQUEST_TYPE_LABELS = {
+      order: "Table order",
+      water: "Bring water",
+      napkins: "Bring napkins",
+      server: "Server requested"
+    };
+
+    function normalizeDiningRequest(row = {}) {
+      return {
+        ...row,
+        id: Number(row.id),
+        guest_count: Number(row.guest_count || 0),
+        item_count: Number(row.item_count || 0),
+        subtotal: Number(row.subtotal || 0),
+        tax: Number(row.tax || 0),
+        total: Number(row.total || 0),
+        items: Array.isArray(row.items) ? row.items : [],
+        status: String(row.status || "new").toLowerCase(),
+        kind: String(row.kind || "service").toLowerCase(),
+        request_type: String(row.request_type || "server").toLowerCase()
+      };
+    }
+
+    function formatRequestMoney(value) {
+      return new Intl.NumberFormat("en-CA", {
+        style: "currency",
+        currency: "CAD"
+      }).format(Number(value || 0));
+    }
+
+    function formatRequestClock(value) {
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "Time unavailable";
+      return new Intl.DateTimeFormat("en-CA", {
+        hour: "numeric",
+        minute: "2-digit"
+      }).format(date);
+    }
+
+    function formatRequestAge(value) {
+      const createdAt = new Date(value);
+      if (Number.isNaN(createdAt.getTime())) return "";
+      const elapsedMinutes = Math.max(0, Math.floor((Date.now() - createdAt.getTime()) / 60000));
+      if (elapsedMinutes < 1) return "just now";
+      if (elapsedMinutes < 60) return `${elapsedMinutes}m ago`;
+      const elapsedHours = Math.floor(elapsedMinutes / 60);
+      if (elapsedHours < 24) return `${elapsedHours}h ago`;
+      return `${Math.floor(elapsedHours / 24)}d ago`;
+    }
+
+    function getActiveDiningRequests() {
+      return state.diningRequests.filter((request) => !["completed", "canceled"].includes(request.status));
+    }
+
+    function getFilteredDiningRequests() {
+      const activeRequests = getActiveDiningRequests();
+      if (state.requestFilter === "orders") {
+        return activeRequests.filter((request) => request.kind === "order");
+      }
+      if (state.requestFilter === "service") {
+        return activeRequests.filter((request) => request.kind === "service");
+      }
+      if (state.requestFilter === "completed") {
+        return state.diningRequests.filter((request) => ["completed", "canceled"].includes(request.status));
+      }
+      return activeRequests.slice().sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    }
+
+    function getNextRequestAction(request) {
+      if (["completed", "canceled"].includes(request.status)) {
+        return { status: "new", label: "Reopen" };
+      }
+      if (request.kind === "service") {
+        return request.status === "new"
+          ? { status: "acknowledged", label: "On it" }
+          : { status: "completed", label: "Done" };
+      }
+      const orderFlow = {
+        new: { status: "acknowledged", label: "Accept order" },
+        acknowledged: { status: "preparing", label: "Start prep" },
+        preparing: { status: "ready", label: "Mark ready" },
+        ready: { status: "completed", label: "Complete" }
+      };
+      return orderFlow[request.status] || { status: "completed", label: "Complete" };
+    }
+
+    function renderDiningRequestCard(request) {
+      const nextAction = getNextRequestAction(request);
+      const requestTypeLabel = REQUEST_TYPE_LABELS[request.request_type] || request.request_type;
+      const statusLabel = REQUEST_STATUS_LABELS[request.status] || request.status;
+      const isUpdating = state.requestUpdatingIds.has(request.id);
+      const itemsMarkup = request.kind === "order"
+        ? `
+          <div class="request-items">
+            ${request.items.map((item) => {
+              const quantity = Number(item.quantity || 0);
+              const name = item.nameEn || item.nameKo || "Menu item";
+              const lineTotal = Number(item.lineTotal ?? (Number(item.unitPrice || 0) * quantity));
+              return `
+                <div class="request-item-row">
+                  <strong>${escapeHtml(quantity)}×</strong>
+                  <span>${escapeHtml(name)}</span>
+                  <small>${escapeHtml(formatRequestMoney(lineTotal))}</small>
+                </div>
+              `;
+            }).join("") || '<span>No item details were included.</span>'}
+          </div>
+          <div class="request-total-row">
+            <span>${escapeHtml(request.item_count)} item${request.item_count === 1 ? "" : "s"}</span>
+            <strong>${escapeHtml(formatRequestMoney(request.total))}</strong>
+          </div>
+        `
+        : `<div class="request-service-copy">${escapeHtml(requestTypeLabel)}</div>`;
+
+      return `
+        <article class="request-card is-${escapeHtml(request.kind)} is-${escapeHtml(request.status)}">
+          <div class="request-card-top">
+            <div>
+              <div class="request-card-meta">
+                <span class="request-kind-badge">${escapeHtml(requestTypeLabel)}</span>
+                <span class="request-status-badge">${escapeHtml(statusLabel)}</span>
+              </div>
+              <div class="request-table-code">Table ${escapeHtml(request.table_code || "-")}</div>
+            </div>
+            <div class="request-age">${escapeHtml(formatRequestClock(request.created_at))}<br />${escapeHtml(formatRequestAge(request.created_at))}</div>
+          </div>
+          ${itemsMarkup}
+          ${request.note ? `<p class="request-note"><strong>Note:</strong> ${escapeHtml(request.note)}</p>` : ""}
+          <div class="request-card-actions">
+            <button
+              class="request-action-btn"
+              type="button"
+              data-request-id="${escapeHtml(request.id)}"
+              data-request-status="${escapeHtml(nextAction.status)}"
+              ${isUpdating ? "disabled" : ""}
+            >${isUpdating ? "Updating…" : escapeHtml(nextAction.label)}</button>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderDiningRequests() {
+      const queue = document.getElementById("requestQueue");
+      const syncStatus = document.getElementById("requestSyncStatus");
+      const navCount = document.getElementById("requestNavCount");
+      if (!queue || !syncStatus || !navCount) return;
+
+      const activeRequests = getActiveDiningRequests();
+      const openOrders = activeRequests.filter((request) => request.kind === "order").length;
+      const openCalls = activeRequests.filter((request) => request.kind === "service").length;
+      document.getElementById("metricOpenRequests").textContent = String(activeRequests.length);
+      document.getElementById("metricOpenOrders").textContent = String(openOrders);
+      document.getElementById("metricOpenCalls").textContent = String(openCalls);
+      navCount.textContent = String(activeRequests.length);
+      navCount.hidden = activeRequests.length === 0;
+
+      document.querySelectorAll("[data-request-filter]").forEach((button) => {
+        button.classList.toggle("is-active", button.dataset.requestFilter === state.requestFilter);
+      });
+
+      if (state.requestActionError) {
+        syncStatus.textContent = state.requestActionError;
+        syncStatus.className = "request-sync-status is-error";
+      } else if (state.requestLoadError) {
+        syncStatus.textContent = "Could not reach the request queue. Existing items may be out of date.";
+        syncStatus.className = "request-sync-status is-error";
+      } else if (state.requestsLoadedAt) {
+        syncStatus.textContent = `Auto-refresh every 5 seconds · Updated ${formatRequestClock(state.requestsLoadedAt)}`;
+        syncStatus.className = "request-sync-status";
+      }
+
+      const requests = getFilteredDiningRequests();
+      if (!requests.length) {
+        const emptyMessage = state.requestFilter === "completed"
+          ? "No completed requests yet."
+          : "The active queue is clear.";
+        queue.innerHTML = `<div class="request-empty">${emptyMessage}</div>`;
+        return;
+      }
+
+      queue.innerHTML = requests.map(renderDiningRequestCard).join("");
+    }
+
+    async function fetchDiningRequests() {
+      const { url, anonKey } = SUPABASE_CONFIG;
+      if (!url || !anonKey) throw new Error("Missing Supabase configuration");
+      const endpoint = new URL(`${url}/rest/v1/${DINING_REQUESTS_TABLE}`);
+      endpoint.searchParams.set("select", "id,branch,table_code,guest_count,kind,request_type,status,source,note,items,item_count,subtotal,tax,total,created_at,updated_at");
+      endpoint.searchParams.set("branch", `eq.${ADMIN_SHEET_CONFIG.branchLabel.toLowerCase()}`);
+      endpoint.searchParams.set("order", "created_at.desc");
+      endpoint.searchParams.set("limit", "100");
+      const response = await fetch(endpoint.toString(), {
+        headers: {
+          apikey: anonKey,
+          Authorization: `Bearer ${anonKey}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`Request queue failed (${response.status}): ${await response.text()}`);
+      }
+      return (await response.json()).map(normalizeDiningRequest);
+    }
+
+    async function refreshDiningRequests({ manual = false } = {}) {
+      const refreshButton = document.getElementById("refreshRequestsBtn");
+      if (manual && refreshButton) refreshButton.disabled = true;
+      try {
+        state.diningRequests = await fetchDiningRequests();
+        state.requestsLoadedAt = new Date().toISOString();
+        state.requestLoadError = false;
+        state.requestActionError = "";
+      } catch (error) {
+        console.error("Dining request refresh failed", error);
+        state.requestLoadError = true;
+      } finally {
+        if (refreshButton) refreshButton.disabled = false;
+        renderDiningRequests();
+      }
+    }
+
+    async function updateDiningRequestStatus(requestId, nextStatus) {
+      const numericId = Number(requestId);
+      if (!Number.isFinite(numericId) || state.requestUpdatingIds.has(numericId)) return;
+      state.requestUpdatingIds.add(numericId);
+      state.requestActionError = "";
+      renderDiningRequests();
+
+      try {
+        const { url, anonKey } = SUPABASE_CONFIG;
+        const endpoint = new URL(`${url}/rest/v1/${DINING_REQUESTS_TABLE}`);
+        endpoint.searchParams.set("id", `eq.${numericId}`);
+        const response = await fetch(endpoint.toString(), {
+          method: "PATCH",
+          headers: {
+            apikey: anonKey,
+            Authorization: `Bearer ${anonKey}`,
+            "Content-Type": "application/json",
+            Prefer: "return=minimal"
+          },
+          body: JSON.stringify({ status: nextStatus })
+        });
+        if (!response.ok) {
+          throw new Error(`Status update failed (${response.status}): ${await response.text()}`);
+        }
+        const request = state.diningRequests.find((item) => item.id === numericId);
+        if (request) request.status = nextStatus;
+        state.requestLoadError = false;
+        state.requestActionError = "";
+      } catch (error) {
+        console.error("Dining request status update failed", error);
+        state.requestActionError = "Status was not updated. Please try again.";
+      } finally {
+        state.requestUpdatingIds.delete(numericId);
+        renderDiningRequests();
+      }
     }
 
     function getTableGroupKey(option = "") {
@@ -3545,13 +4162,21 @@
         fetchTableOptions().catch((error) => {
           console.error("Table options load failed", error);
           return [];
+        }),
+        fetchDiningRequests().catch((error) => {
+          console.error("Dining request load failed", error);
+          state.requestLoadError = true;
+          return [];
         })
       ])
-        .then(([reservations, tableOptions]) => {
+        .then(([reservations, tableOptions, diningRequests]) => {
           state.tableOptions = tableOptions;
+          state.diningRequests = diningRequests;
+          if (!state.requestLoadError) state.requestsLoadedAt = new Date().toISOString();
           syncReservations(reservations);
           syncPendingFeedbackQueue(reservations);
           autoRemoveExpiredReservations(reservations);
+          renderDiningRequests();
         })
         .catch((error) => {
           console.error(error);
@@ -3562,14 +4187,29 @@
 
     async function performAutoRefresh() {
       if (document.hidden) return;
-      try {
-        const reservations = await fetchReservations();
+      const [reservationResult, requestResult] = await Promise.allSettled([
+        fetchReservations(),
+        fetchDiningRequests()
+      ]);
+
+      if (reservationResult.status === "fulfilled") {
+        const reservations = reservationResult.value;
         syncReservations(reservations, { detectNew: true });
         syncPendingFeedbackQueue(reservations);
         autoRemoveExpiredReservations(reservations);
-      } catch (error) {
-        console.error("Auto refresh failed", error);
+      } else {
+        console.error("Reservation auto refresh failed", reservationResult.reason);
       }
+
+      if (requestResult.status === "fulfilled") {
+        state.diningRequests = requestResult.value;
+        state.requestsLoadedAt = new Date().toISOString();
+        state.requestLoadError = false;
+      } else {
+        console.error("Dining request auto refresh failed", requestResult.reason);
+        state.requestLoadError = true;
+      }
+      renderDiningRequests();
     }
 
     document.getElementById("todayHeading").textContent = new Intl.DateTimeFormat("en-CA", {
@@ -3679,6 +4319,23 @@
         );
         refreshAfterMutation();
       }
+    });
+
+    document.getElementById("requestFilterRow").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-request-filter]");
+      if (!button) return;
+      state.requestFilter = button.dataset.requestFilter || "active";
+      renderDiningRequests();
+    });
+
+    document.getElementById("refreshRequestsBtn").addEventListener("click", () => {
+      refreshDiningRequests({ manual: true });
+    });
+
+    document.getElementById("requestQueue").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-request-id][data-request-status]");
+      if (!button) return;
+      updateDiningRequestStatus(button.dataset.requestId, button.dataset.requestStatus);
     });
 
     sheetClose.addEventListener("click", closeSheet);

@@ -921,6 +921,40 @@
       box-shadow: 0 14px 28px rgba(90, 17, 34, 0.22);
     }
 
+    .request-toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      z-index: 220;
+      width: min(calc(100% - 28px), 440px);
+      padding: 14px 18px;
+      border-radius: 18px;
+      background: #1f5d3d;
+      color: #fff;
+      font-weight: 800;
+      text-align: center;
+      box-shadow: 0 20px 42px rgba(20, 12, 9, 0.28);
+      opacity: 0;
+      transform: translate(-50%, 18px);
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .request-toast.is-visible {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    .request-toast.is-error {
+      background: #8a3045;
+    }
+
+    .drawer-submit-btn:disabled,
+    .server-modal-btn:disabled {
+      cursor: wait;
+      opacity: 0.62;
+    }
+
     .menu-page .tabs .tab-drink {
       position: relative;
       padding-inline: 42px;
@@ -1258,6 +1292,7 @@
       </div>
     </div>
   </div>
+  <div class="request-toast" id="requestToast" role="status" aria-live="polite"></div>
 
   <script>
     /**
@@ -1272,6 +1307,7 @@
       url: "https://pzhzdjsjfdzbzkhnaxmc.supabase.co",
       anonKey: "sb_publishable_3Ox2JIQXVLwusT-xzIMJ4g_YXTR5q8e"
     };
+    const DINING_REQUESTS_TABLE = "dining_requests";
     const SHEET_CONFIG = {
       sheetId: "1xa9OZbctYnlbaAL8lKIgmefM5hvSw0Plk01lxp5G2fc",
       gid: "1100419696"
@@ -1344,6 +1380,8 @@
     let isServerModalOpen = false;
     let selectedServerRequestType = "water";
     let menuImageObserver = null;
+    let requestToastHandle = null;
+    let isDiningRequestSubmitting = false;
 
     function escapeHtml(text = "") {
       return text
@@ -1845,6 +1883,23 @@
     function setInitialOrderFields() {
       const tableCodeInput = document.getElementById("tableCode");
       const guestCountInput = document.getElementById("guestCount");
+      const storeInput = document.getElementById("storeSelect");
+      const searchParams = new URLSearchParams(window.location.search);
+      const requestedTable = (searchParams.get("table") || searchParams.get("t") || "").trim();
+      const requestedGuests = Number(searchParams.get("guests") || searchParams.get("party") || 0);
+      const requestedStore = (searchParams.get("store") || searchParams.get("branch") || "").trim().toLowerCase();
+
+      if (tableCodeInput && requestedTable) {
+        tableCodeInput.value = requestedTable.slice(0, 40);
+      }
+
+      if (guestCountInput && Number.isFinite(requestedGuests) && requestedGuests > 0) {
+        guestCountInput.value = String(Math.min(Math.round(requestedGuests), 100));
+      }
+
+      if (storeInput && /^[a-z0-9_-]{1,40}$/.test(requestedStore)) {
+        storeInput.value = requestedStore;
+      }
 
       if (tableCodeInput && !tableCodeInput.value) {
         tableCodeInput.value = "A12";
@@ -1857,19 +1912,18 @@
 
     function buildOrderPayload(formValues) {
       return {
-        store: formValues.store,
-        table: {
-          code: formValues.tableCode,
-          guestCount: Number(formValues.guestCount || 0)
-        },
+        branch: String(formValues.store || MENU_BRANCH).trim().toLowerCase(),
+        table_code: String(formValues.tableCode || "Unknown").trim().slice(0, 40),
+        guest_count: Number(formValues.guestCount || 0),
+        kind: "order",
+        request_type: "order",
+        status: "new",
         source: "table-qr",
         note: formValues.orderNote,
-        totals: {
-          itemCount: getCartItemCount(),
-          subtotal: Number(getCartSubtotal().toFixed(2)),
-          tax: getCartTax(),
-          total: getCartTotal()
-        },
+        item_count: getCartItemCount(),
+        subtotal: Number(getCartSubtotal().toFixed(2)),
+        tax: getCartTax(),
+        total: getCartTotal(),
         items: cartItems.map((item) => ({
           menuId: item.menuId,
           nameKo: item.nameKo,
@@ -1884,15 +1938,58 @@
 
     function buildServerRequestPayload(formValues) {
       return {
-        store: formValues.store,
-        table: {
-          code: formValues.tableCode,
-          guestCount: Number(formValues.guestCount || 0)
-        },
+        branch: String(formValues.store || MENU_BRANCH).trim().toLowerCase(),
+        table_code: String(formValues.tableCode || "Unknown").trim().slice(0, 40),
+        guest_count: Number(formValues.guestCount || 0),
+        kind: "service",
+        request_type: selectedServerRequestType,
+        status: "new",
         source: "table-service-call",
-        requestType: selectedServerRequestType,
-        note: formValues.orderNote || ""
+        note: formValues.orderNote || "",
+        items: [],
+        item_count: 0,
+        subtotal: 0,
+        tax: 0,
+        total: 0
       };
+    }
+
+    function showRequestToast(message, { error = false } = {}) {
+      const toast = document.getElementById("requestToast");
+      if (!toast) return;
+      window.clearTimeout(requestToastHandle);
+      toast.textContent = message;
+      toast.classList.toggle("is-error", error);
+      toast.classList.add("is-visible");
+      requestToastHandle = window.setTimeout(() => {
+        toast.classList.remove("is-visible");
+      }, 4200);
+    }
+
+    async function submitDiningRequest(payload) {
+      const { url, anonKey } = SUPABASE_CONFIG;
+      if (!url || !anonKey) throw new Error("Missing Supabase configuration");
+
+      const endpoint = new URL(`${url}/rest/v1/${DINING_REQUESTS_TABLE}`);
+      endpoint.searchParams.set("select", "id,status,created_at");
+      const response = await fetch(endpoint.toString(), {
+        method: "POST",
+        headers: {
+          apikey: anonKey,
+          Authorization: `Bearer ${anonKey}`,
+          "Content-Type": "application/json",
+          Prefer: "return=representation"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const responseText = await response.text();
+      if (!response.ok) {
+        throw new Error(`Dining request failed (${response.status}): ${responseText}`);
+      }
+
+      const rows = responseText ? JSON.parse(responseText) : [];
+      return rows[0] || null;
     }
 
     function openCartDrawer() {
@@ -1985,7 +2082,7 @@
         mobileOrderListEl.innerHTML = emptyMarkup;
         mobileOrderSummaryEl.innerHTML = summaryMarkup(0, 0, 0, 0);
         inlineTitleEl.textContent = "Your order is empty";
-        if (isCartDrawerOpen) closeCartDrawer();
+        inlineMetaEl.textContent = `Table ${document.getElementById("tableCode")?.value || "A12"}`;
         return;
       }
 
@@ -2023,6 +2120,7 @@
       bindOrderListInteractions(mobileOrderListEl);
 
       inlineTitleEl.textContent = `${itemCount} item${itemCount === 1 ? "" : "s"} selected`;
+      inlineMetaEl.textContent = `Table ${document.getElementById("tableCode")?.value || "A12"} · ${formatCurrency(total)}`;
 
     }
 
@@ -2031,7 +2129,7 @@
       const statusEl = document.getElementById("orderStatus");
       if (!form || !statusEl) return;
 
-      form.addEventListener("submit", (event) => {
+      form.addEventListener("submit", async (event) => {
         event.preventDefault();
 
         if (!cartItems.length) {
@@ -2040,8 +2138,32 @@
           return;
         }
 
-        statusEl.textContent = "Order ready.";
-        statusEl.className = "order-status is-success";
+        if (isDiningRequestSubmitting) return;
+        const submitButton = document.getElementById("drawerSubmitBtn");
+        const formValues = Object.fromEntries(new FormData(form).entries());
+        isDiningRequestSubmitting = true;
+        if (submitButton) submitButton.disabled = true;
+        statusEl.textContent = "Sending order…";
+        statusEl.className = "order-status";
+
+        try {
+          const result = await submitDiningRequest(buildOrderPayload(formValues));
+          const requestNumber = result?.id ? ` #${result.id}` : "";
+          cartItems = [];
+          renderOrderSummary();
+          statusEl.textContent = `Order${requestNumber} sent.`;
+          statusEl.className = "order-status is-success";
+          showRequestToast(`Order${requestNumber} sent to Table ${formValues.tableCode}.`);
+          closeCartDrawer();
+        } catch (error) {
+          console.error("Order submission failed", error);
+          statusEl.textContent = "Could not send the order. Please try again or call a server.";
+          statusEl.className = "order-status is-error";
+          showRequestToast("Order was not sent. Please try again.", { error: true });
+        } finally {
+          isDiningRequestSubmitting = false;
+          if (submitButton) submitButton.disabled = false;
+        }
       });
 
       setInitialOrderFields();
@@ -2288,19 +2410,32 @@
 
       drawerSubmitBtn.addEventListener("click", () => {
         submitOrderFromShortcut();
-        if (isCartDrawerOpen) {
-          closeCartDrawer();
-        }
       });
 
-      const runServerCallTest = () => {
+      const submitServerCall = async () => {
+        if (isDiningRequestSubmitting) return;
         const formData = new FormData(form);
         const formValues = Object.fromEntries(formData.entries());
-        void buildServerRequestPayload(formValues);
-        statusEl.textContent = `Request ready: ${selectedServerRequestType}.`;
-        statusEl.className = "order-status is-success";
+        isDiningRequestSubmitting = true;
+        modalConfirmBtn.disabled = true;
+        modalMessage.textContent = "Sending request…";
 
-        closeServerModal();
+        try {
+          await submitDiningRequest(buildServerRequestPayload(formValues));
+          statusEl.textContent = `Request sent: ${selectedServerRequestType}.`;
+          statusEl.className = "order-status is-success";
+          showRequestToast(`${selectedServerRequestType} request sent for Table ${formValues.tableCode}.`);
+          closeServerModal();
+        } catch (error) {
+          console.error("Server call failed", error);
+          statusEl.textContent = "Could not call a server. Please try again.";
+          statusEl.className = "order-status is-error";
+          modalMessage.textContent = "Could not send. Please try again.";
+          showRequestToast("Server request was not sent.", { error: true });
+        } finally {
+          isDiningRequestSubmitting = false;
+          modalConfirmBtn.disabled = false;
+        }
       };
 
       requestGrid.querySelectorAll("[data-request-type]").forEach((button) => {
@@ -2324,7 +2459,7 @@
         closeServerModal();
       });
 
-      modalConfirmBtn.addEventListener("click", runServerCallTest);
+      modalConfirmBtn.addEventListener("click", submitServerCall);
 
       modalBackdrop.addEventListener("click", (event) => {
         if (event.target === modalBackdrop) {
