@@ -2205,7 +2205,7 @@
   }
 
   function getScheduleDropStatus(staff, branch, isoDate, names = [], context = getBoardAssignments()) {
-    if (!staff) return { allowed: false, type: "none", label: "서버를 먼저 선택하세요." };
+    if (!staff) return { allowed: false, type: "none", label: "" };
     if (!branchMatchesStaff(staff, branch)) {
       return { allowed: false, type: "branch", label: "이 매장에는 배정할 수 없어요." };
     }
@@ -3048,7 +3048,7 @@
       drag.ghost.style.left = `${drag.lastX}px`;
       drag.ghost.style.top = `${drag.lastY}px`;
       setScheduleDragTarget(drag, drag.lastX, drag.lastY);
-    }, 420);
+    }, 260);
   }
 
   function moveSchedulePointerDrag(event) {
@@ -3085,7 +3085,6 @@
     state.scheduleSelectedStaffKey = normalizeScheduleStaffKey(drag.staff.staff_key || drag.staff.name);
     if (!drag.didMove) {
       renderScheduleBoard();
-      setScheduleStatus(`${drag.staff.name} 선택됨 — 길게 눌러 끌어놓거나 날짜를 탭해 배정하세요.`, "");
       return;
     }
     if (cellKey && status?.allowed) {
@@ -3586,7 +3585,7 @@
       if (!zone) return;
       const staff = getSelectedScheduleStaff();
       if (!staff) {
-        setScheduleStatus("서버를 먼저 선택한 뒤 날짜 칸을 탭하세요.", "error");
+        openScheduleDayPicker(zone.dataset.scheduleDropzone);
         return;
       }
       assignScheduleStaffToCell(staff, zone.dataset.scheduleDropzone);
@@ -3599,7 +3598,7 @@
       state.scheduleSuppressClickUntil = Date.now() + 350;
       const staff = getSelectedScheduleStaff();
       if (!staff) {
-        setScheduleStatus("서버를 먼저 선택한 뒤 날짜 칸을 탭하세요.", "error");
+        openScheduleDayPicker(zone.dataset.scheduleDropzone);
         return;
       }
       assignScheduleStaffToCell(staff, zone.dataset.scheduleDropzone);
