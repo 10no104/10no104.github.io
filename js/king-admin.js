@@ -681,6 +681,14 @@
     refs.employeeCalendarModal.classList.remove("is-open");
   }
 
+  function getEmployeeCalendarIdentityKeys(employee = {}) {
+    return new Set([
+      employee.staff_key,
+      employee.name,
+      employee.ref_code
+    ].map(normalizeScheduleStaffKey).filter(Boolean));
+  }
+
   async function loadEmployeeCalendar() {
     const employee = state.employeeCalendarEmployee;
     const staffKey = String(employee?.staff_key || employee?.name || "").trim();
@@ -695,8 +703,7 @@
 
     const availabilityResult = await supabaseClient
       .from("noble_staff_availability")
-      .select("availability_date,status,note")
-      .eq("staff_key", staffKey)
+      .select("staff_key,staff_name,availability_date,status,note")
       .gte("availability_date", monthStart)
       .lte("availability_date", monthEnd)
       .order("availability_date", { ascending: true });
@@ -707,7 +714,12 @@
       refs.employeeCalendarStatus.className = "status-line is-error";
       return;
     }
-    state.employeeCalendarAvailability = availabilityResult.data || [];
+    const identityKeys = getEmployeeCalendarIdentityKeys(employee);
+    state.employeeCalendarAvailability = (availabilityResult.data || []).filter((item) => {
+      const itemKey = normalizeScheduleStaffKey(item.staff_key || item.staff_name);
+      const itemName = normalizeScheduleStaffKey(item.staff_name || item.staff_key);
+      return identityKeys.has(itemKey) || identityKeys.has(itemName);
+    });
     renderEmployeeCalendar();
     refs.employeeCalendarStatus.textContent = "";
     refs.employeeCalendarStatus.className = "status-line";
@@ -739,6 +751,7 @@
     if (!employee || !staffKey || !isoDate || state.employeeCalendarSavingDates.has(isoDate)) return;
 
     const current = state.employeeCalendarAvailability.find((item) => item.availability_date === isoDate) || null;
+    const savedStaffKey = String(current?.staff_key || staffKey).trim();
     const nextStatus = current?.status === "unavailable"
       ? "preferred"
       : current?.status === "preferred"
@@ -754,14 +767,14 @@
         const result = await supabaseClient
           .from("noble_staff_availability")
           .delete()
-          .eq("staff_key", staffKey)
+          .eq("staff_key", savedStaffKey)
           .eq("availability_date", isoDate);
         error = result.error;
       } else if (current) {
         const result = await supabaseClient
           .from("noble_staff_availability")
           .update({ status: nextStatus, available_start: null, available_end: null, note: null })
-          .eq("staff_key", staffKey)
+          .eq("staff_key", savedStaffKey)
           .eq("availability_date", isoDate);
         error = result.error;
       } else {
@@ -781,7 +794,13 @@
       state.employeeCalendarAvailability = state.employeeCalendarAvailability
         .filter((item) => item.availability_date !== isoDate);
       if (nextStatus !== "default") {
-        state.employeeCalendarAvailability.push({ availability_date: isoDate, status: nextStatus, note: "" });
+        state.employeeCalendarAvailability.push({
+          staff_key: staffKey,
+          staff_name: employee.staff_key || employee.name || staffKey,
+          availability_date: isoDate,
+          status: nextStatus,
+          note: ""
+        });
       }
       syncScheduleAvailabilityFromEmployeeCalendar(employee, isoDate, nextStatus);
       renderEmployeeCalendar();
