@@ -115,8 +115,10 @@
     employeeCalendarEmployee: null,
     employeeCalendarCursor: startOfMonth(new Date()),
     employeeCalendarAvailability: [],
+    employeeCalendarInitialAvailability: [],
     employeeCalendarFetchToken: 0,
-    employeeCalendarSavingDates: new Set(),
+    employeeCalendarPendingChanges: new Map(),
+    employeeCalendarSaving: false,
     menuSession: null,
     menuItems: [],
     menuSearch: "",
@@ -197,6 +199,7 @@
       "employeeCalendarLabel",
       "employeeCalendarGrid",
       "employeeCalendarStatus",
+      "employeeCalendarSave",
       "employeeEditorModal",
       "employeeEditorTitle",
       "employeeEditorForm",
@@ -673,9 +676,13 @@
     }
 
     refs.employeeCalendarGrid.innerHTML = cells.join("");
+    const pendingCount = state.employeeCalendarPendingChanges.size;
+    refs.employeeCalendarSave.disabled = pendingCount === 0 || state.employeeCalendarSaving;
+    refs.employeeCalendarSave.textContent = pendingCount ? `저장 (${pendingCount})` : "저장";
   }
 
   function closeEmployeeCalendar() {
+    if (state.employeeCalendarPendingChanges.size && !window.confirm("저장하지 않은 날짜 변경이 있습니다. 닫을까요?")) return;
     state.employeeCalendarFetchToken += 1;
     refs.employeeCalendarModal.setAttribute("aria-hidden", "true");
     refs.employeeCalendarModal.classList.remove("is-open");
@@ -720,6 +727,8 @@
       const itemName = normalizeScheduleStaffKey(item.staff_name || item.staff_key);
       return identityKeys.has(itemKey) || identityKeys.has(itemName);
     });
+    state.employeeCalendarInitialAvailability = state.employeeCalendarAvailability.map((item) => ({ ...item }));
+    state.employeeCalendarPendingChanges = new Map();
     renderEmployeeCalendar();
     refs.employeeCalendarStatus.textContent = "";
     refs.employeeCalendarStatus.className = "status-line";
@@ -745,73 +754,92 @@
     }
   }
 
-  async function cycleEmployeeCalendarDate(isoDate = "") {
+  function cycleEmployeeCalendarDate(isoDate = "") {
     const employee = state.employeeCalendarEmployee;
     const staffKey = String(employee?.staff_key || employee?.name || "").trim();
-    if (!employee || !staffKey || !isoDate || state.employeeCalendarSavingDates.has(isoDate)) return;
+    if (!employee || !staffKey || !isoDate || state.employeeCalendarSaving) return;
 
     const current = state.employeeCalendarAvailability.find((item) => item.availability_date === isoDate) || null;
-    const savedStaffKey = String(current?.staff_key || staffKey).trim();
     const nextStatus = current?.status === "unavailable"
       ? "preferred"
       : current?.status === "preferred"
         ? "default"
         : "unavailable";
-    state.employeeCalendarSavingDates.add(isoDate);
+    const original = state.employeeCalendarInitialAvailability.find((item) => item.availability_date === isoDate) || null;
+    const originalStatus = original?.status || "default";
+
+    state.employeeCalendarAvailability = state.employeeCalendarAvailability
+      .filter((item) => item.availability_date !== isoDate);
+    if (nextStatus !== "default") {
+      state.employeeCalendarAvailability.push({
+        staff_key: current?.staff_key || staffKey,
+        staff_name: current?.staff_name || employee.staff_key || employee.name || staffKey,
+        availability_date: isoDate,
+        status: nextStatus,
+        note: ""
+      });
+    }
+    if (nextStatus === originalStatus) state.employeeCalendarPendingChanges.delete(isoDate);
+    else state.employeeCalendarPendingChanges.set(isoDate, nextStatus);
+    renderEmployeeCalendar();
+    refs.employeeCalendarStatus.textContent = state.employeeCalendarPendingChanges.size ? "변경 사항을 저장하려면 저장 버튼을 누르세요." : "";
+    refs.employeeCalendarStatus.className = "status-line";
+  }
+
+  async function saveEmployeeCalendar() {
+    const employee = state.employeeCalendarEmployee;
+    const staffKey = String(employee?.staff_key || employee?.name || "").trim();
+    const changes = Array.from(state.employeeCalendarPendingChanges.entries());
+    if (!employee || !staffKey || !changes.length || state.employeeCalendarSaving) return;
+
+    state.employeeCalendarSaving = true;
+    renderEmployeeCalendar();
     refs.employeeCalendarStatus.textContent = "변경 사항을 저장하는 중...";
     refs.employeeCalendarStatus.className = "status-line";
 
     try {
-      let error = null;
-      if (nextStatus === "default") {
-        const result = await supabaseClient
-          .from("noble_staff_availability")
-          .delete()
-          .eq("staff_key", savedStaffKey)
-          .eq("availability_date", isoDate);
-        error = result.error;
-      } else if (current) {
-        const result = await supabaseClient
-          .from("noble_staff_availability")
-          .update({ status: nextStatus, available_start: null, available_end: null, note: null })
-          .eq("staff_key", savedStaffKey)
-          .eq("availability_date", isoDate);
-        error = result.error;
-      } else {
-        const result = await supabaseClient
-          .from("noble_staff_availability")
-          .insert({
-            staff_key: staffKey,
-            staff_name: employee.staff_key || employee.name || staffKey,
-            branch_scope: normalizeBranchScope(employee.branch_scope || "both"),
-            availability_date: isoDate,
-            status: nextStatus
-          });
-        error = result.error;
+      for (const [isoDate, nextStatus] of changes) {
+        const original = state.employeeCalendarInitialAvailability.find((item) => item.availability_date === isoDate) || null;
+        const savedStaffKey = String(original?.staff_key || staffKey).trim();
+        let result;
+        if (nextStatus === "default") {
+          result = await supabaseClient
+            .from("noble_staff_availability")
+            .delete()
+            .eq("staff_key", savedStaffKey)
+            .eq("availability_date", isoDate);
+        } else if (original) {
+          result = await supabaseClient
+            .from("noble_staff_availability")
+            .update({ status: nextStatus, available_start: null, available_end: null, note: null })
+            .eq("staff_key", savedStaffKey)
+            .eq("availability_date", isoDate);
+        } else {
+          result = await supabaseClient
+            .from("noble_staff_availability")
+            .insert({
+              staff_key: staffKey,
+              staff_name: employee.staff_key || employee.name || staffKey,
+              branch_scope: normalizeBranchScope(employee.branch_scope || "both"),
+              availability_date: isoDate,
+              status: nextStatus
+            });
+        }
+        if (result.error) throw result.error;
+        syncScheduleAvailabilityFromEmployeeCalendar(employee, isoDate, nextStatus);
       }
-      if (error) throw error;
 
-      state.employeeCalendarAvailability = state.employeeCalendarAvailability
-        .filter((item) => item.availability_date !== isoDate);
-      if (nextStatus !== "default") {
-        state.employeeCalendarAvailability.push({
-          staff_key: staffKey,
-          staff_name: employee.staff_key || employee.name || staffKey,
-          availability_date: isoDate,
-          status: nextStatus,
-          note: ""
-        });
-      }
-      syncScheduleAvailabilityFromEmployeeCalendar(employee, isoDate, nextStatus);
-      renderEmployeeCalendar();
+      state.employeeCalendarInitialAvailability = state.employeeCalendarAvailability.map((item) => ({ ...item }));
+      state.employeeCalendarPendingChanges = new Map();
       if (state.activeTab === "schedule") renderScheduleBoard();
-      refs.employeeCalendarStatus.textContent = nextStatus === "default" ? "해제했습니다." : nextStatus === "unavailable" ? "불가로 표시했습니다." : "선호로 표시했습니다.";
+      refs.employeeCalendarStatus.textContent = `${changes.length}개 날짜를 저장했습니다.`;
       refs.employeeCalendarStatus.className = "status-line is-success";
     } catch (error) {
       refs.employeeCalendarStatus.textContent = error.message || "날짜 상태를 저장하지 못했습니다.";
       refs.employeeCalendarStatus.className = "status-line is-error";
     } finally {
-      state.employeeCalendarSavingDates.delete(isoDate);
+      state.employeeCalendarSaving = false;
+      renderEmployeeCalendar();
     }
   }
 
@@ -822,6 +850,8 @@
     state.employeeCalendarEmployee = employee;
     state.employeeCalendarCursor = startOfMonth(new Date());
     state.employeeCalendarAvailability = [];
+    state.employeeCalendarInitialAvailability = [];
+    state.employeeCalendarPendingChanges = new Map();
     refs.employeeCalendarTitle.textContent = `${name} 달력`;
     refs.employeeCalendarModal.setAttribute("aria-hidden", "false");
     refs.employeeCalendarModal.classList.add("is-open");
@@ -3776,6 +3806,7 @@
       if (event.target === refs.employeeCalendarModal) closeEmployeeCalendar();
     });
     refs.employeeCalendarPrev.addEventListener("click", () => {
+      if (state.employeeCalendarPendingChanges.size && !window.confirm("저장하지 않은 날짜 변경이 있습니다. 이동할까요?")) return;
       state.employeeCalendarCursor = new Date(
         state.employeeCalendarCursor.getFullYear(),
         state.employeeCalendarCursor.getMonth() - 1,
@@ -3785,6 +3816,7 @@
       void loadEmployeeCalendar();
     });
     refs.employeeCalendarNext.addEventListener("click", () => {
+      if (state.employeeCalendarPendingChanges.size && !window.confirm("저장하지 않은 날짜 변경이 있습니다. 이동할까요?")) return;
       state.employeeCalendarCursor = new Date(
         state.employeeCalendarCursor.getFullYear(),
         state.employeeCalendarCursor.getMonth() + 1,
@@ -3795,8 +3827,9 @@
     });
     refs.employeeCalendarGrid.addEventListener("click", (event) => {
       const day = event.target.closest("[data-employee-calendar-date]");
-      if (day) void cycleEmployeeCalendarDate(day.dataset.employeeCalendarDate);
+      if (day) cycleEmployeeCalendarDate(day.dataset.employeeCalendarDate);
     });
+    refs.employeeCalendarSave.addEventListener("click", () => void saveEmployeeCalendar());
     refs.employeeEditorClose.addEventListener("click", closeEmployeeEditor);
     refs.employeeEditorCancel.addEventListener("click", closeEmployeeEditor);
     refs.employeeEditorModal.addEventListener("click", (event) => {
