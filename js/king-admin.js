@@ -2262,7 +2262,7 @@
         : "";
       const detail = [time, item.note].filter(Boolean).join(" · ");
       return `
-        <div class="availability-row">
+        <div class="availability-row is-${escapeHtml(status)}">
           <span>${escapeHtml(item.staff_name || item.staff_key || "-")}</span>
           <span class="availability-meta">
             <b>${escapeHtml(date ? formatScheduleDayLabel(date) : item.availability_date || "-")}</b>
