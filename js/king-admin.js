@@ -2125,8 +2125,8 @@
 
   function getStaffUnavailableLabel(staff, isoDate) {
     const availability = getAvailabilityForStaff(staff, isoDate);
-    if (availability?.status === "unavailable") return "불가일";
-    return "고정 불가일";
+    if (availability?.status === "unavailable") return "일반 불가";
+    return "고정 불가";
   }
 
   function branchMatchesStaff(staff, branch) {
@@ -2201,7 +2201,7 @@
   function getScheduleDropStatus(staff, branch, isoDate, names = [], context = getBoardAssignments()) {
     if (!staff) return { allowed: false, type: "none", label: "" };
     if (!branchMatchesStaff(staff, branch)) {
-      return { allowed: false, type: "branch", label: "이 매장에는 배정할 수 없어요." };
+      return { allowed: false, type: "branch", label: "매장 불가" };
     }
     if (isStaffUnavailableOnDate(staff, isoDate)) {
       return { allowed: false, type: "unavailable", label: getStaffUnavailableLabel(staff, isoDate) };
@@ -2215,7 +2215,7 @@
 
     const sameDayAssignments = context.byStaff.get(staffKey) || [];
     if (sameDayAssignments.some((item) => item.isoDate === isoDate)) {
-      return { allowed: false, type: "double-booked", label: "같은 날 다른 매장 배정됨" };
+      return { allowed: false, type: "double-booked", label: "다른 매장 근무" };
     }
 
     const maxWeeklyShifts = normalizeMaxWeeklyShifts(staff.max_weekly_shifts);
@@ -2300,9 +2300,9 @@
     const date = toSafeDate(isoDate);
     if (!staff || !date) return null;
     const availability = getAvailabilityForStaff(staff, isoDate);
-    if (availability?.status === "unavailable") return { type: "unavailable", label: "불가" };
+    if (availability?.status === "unavailable") return { type: "unavailable", label: "일반 불가" };
     if (staff.fixed_unavailable_weekdays?.includes(date.getDay())) return { type: "unavailable", label: "고정 불가" };
-    if (availability?.status === "preferred") return { type: "preferred", label: "선호" };
+    if (availability?.status === "preferred") return { type: "preferred", label: "일반 선호" };
     if (staff.fixed_preferred_weekdays?.includes(date.getDay())) return { type: "preferred", label: "고정 선호" };
     return null;
   }
@@ -2877,18 +2877,12 @@
     if (!staff) return;
     const selectedCell = getSelectedScheduleCellContext();
     if (selectedCell) {
-      assignScheduleStaffToCell(staff, selectedCell.cellKey);
+      assignScheduleStaffToCell(staff, selectedCell.cellKey, { keepStaffSelected: false });
       return;
     }
     const staffKey = normalizeScheduleStaffKey(staff.staff_key || staff.name);
     state.scheduleSelectedStaffKey = allowToggle && state.scheduleSelectedStaffKey === staffKey ? "" : staffKey;
     renderScheduleBoard();
-    setScheduleStatus(
-      state.scheduleSelectedStaffKey
-        ? `${staff.name} 선택됨 — 초록색 날짜 칸에 놓을 수 있습니다.`
-        : "서버 선택을 해제했습니다.",
-      ""
-    );
   }
 
   function getScheduleTextarea(cellKey) {
@@ -2896,7 +2890,8 @@
       .find((textarea) => textarea.dataset.scheduleCell === cellKey) || null;
   }
 
-  function assignScheduleStaffToCell(staff, cellKey) {
+  function assignScheduleStaffToCell(staff, cellKey, options = {}) {
+    const { keepStaffSelected = true } = options;
     const [branch, isoDate] = String(cellKey || "").split("|");
     const textarea = getScheduleTextarea(cellKey);
     if (!staff || !branch || !isoDate || !textarea) return;
@@ -2911,7 +2906,9 @@
 
     textarea.value = [...names, staff.name].join("\n");
     state.scheduleSelectedCellKey = "";
-    state.scheduleSelectedStaffKey = normalizeScheduleStaffKey(staff.staff_key || staff.name);
+    state.scheduleSelectedStaffKey = keepStaffSelected
+      ? normalizeScheduleStaffKey(staff.staff_key || staff.name)
+      : "";
     renderScheduleBoard();
     setScheduleStatus(`${staff.name} · ${formatScheduleDayLabel(toSafeDate(isoDate))} ${formatBranchLabel(branch)} 배정 완료`, "success");
   }

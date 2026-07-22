@@ -1591,21 +1591,12 @@
       cursor: pointer;
       user-select: none;
       -webkit-user-select: none;
-      touch-action: pan-y;
+      touch-action: manipulation;
       transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
     }
 
     .staff-pill:active {
       transform: scale(0.98);
-    }
-
-    .staff-roster-list.is-drag-disabled .staff-pill {
-      cursor: default;
-      touch-action: manipulation;
-    }
-
-    .staff-roster-list.is-drag-disabled .staff-pill:active {
-      transform: none;
     }
 
     .staff-pill.is-selected {
@@ -1704,6 +1695,38 @@
     .staff-pill.is-selected .staff-pill-count {
       background: rgba(255, 250, 242, 0.2);
       color: #fffaf2;
+    }
+
+    .staff-pill.is-date-context {
+      border-width: 2px;
+    }
+
+    .staff-pill.is-day-unavailable:not(.is-selected) {
+      --day-state-color: #8d2739;
+      border-color: #a3223b;
+      background: repeating-linear-gradient(-45deg, rgba(163, 34, 59, 0.11) 0 7px, rgba(255, 240, 242, 0.9) 7px 14px);
+      color: var(--day-state-color);
+    }
+
+    .staff-pill.is-day-preferred:not(.is-selected) {
+      --day-state-color: #1d6252;
+      border-color: rgba(36, 95, 81, 0.54);
+      background: linear-gradient(135deg, rgba(218, 243, 232, 0.94), rgba(239, 251, 245, 0.92));
+      color: var(--day-state-color);
+    }
+
+    .staff-pill-day-mark {
+      display: inline-grid;
+      width: 20px;
+      height: 20px;
+      flex: 0 0 auto;
+      place-items: center;
+      border-radius: 999px;
+      background: var(--day-state-color, currentColor);
+      color: #fffaf2;
+      font-size: 0.86rem;
+      font-weight: 950;
+      line-height: 1;
     }
 
     .availability-list {
@@ -1924,7 +1947,7 @@
       font-weight: 900;
     }
 
-    .schedule-day-picker-trigger {
+    .schedule-day-select-trigger {
       display: inline-flex;
       align-items: center;
       min-width: 0;
@@ -1937,95 +1960,10 @@
       cursor: pointer;
     }
 
-    .schedule-day-picker-trigger:focus-visible {
+    .schedule-day-select-trigger:focus-visible {
       border-radius: 7px;
       outline: 2px solid rgba(36, 95, 81, 0.55);
       outline-offset: 2px;
-    }
-
-    .schedule-day-picker-modal .modal {
-      width: min(100%, 560px);
-    }
-
-    .schedule-day-picker-list {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-      padding: 14px 16px 18px;
-    }
-
-    .schedule-day-picker-empty {
-      grid-column: 1 / -1;
-      padding: 12px;
-      color: var(--muted);
-      font-size: 0.84rem;
-      font-weight: 800;
-      text-align: center;
-    }
-
-    .schedule-day-picker-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      min-height: 52px;
-      padding: 8px 10px;
-      border: 1px solid rgba(36, 95, 81, 0.24);
-      border-radius: 14px;
-      background: rgba(242, 251, 246, 0.86);
-      color: #245f51;
-      font: inherit;
-      text-align: left;
-      cursor: pointer;
-    }
-
-    .schedule-day-picker-item:hover,
-    .schedule-day-picker-item:focus-visible {
-      border-color: #245f51;
-      box-shadow: 0 0 0 3px rgba(36, 95, 81, 0.12);
-      outline: none;
-    }
-
-    .schedule-day-picker-item span {
-      min-width: 0;
-    }
-
-    .schedule-day-picker-item strong,
-    .schedule-day-picker-item small {
-      display: block;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .schedule-day-picker-item strong {
-      color: currentColor;
-      font-size: 0.86rem;
-      font-weight: 950;
-    }
-
-    .schedule-day-picker-item small {
-      margin-top: 2px;
-      color: currentColor;
-      font-size: 0.66rem;
-      font-weight: 800;
-      opacity: 0.76;
-    }
-
-    .schedule-day-picker-mark {
-      flex: 0 0 auto;
-      font-size: 1.18rem;
-      font-weight: 950;
-      line-height: 1;
-    }
-
-    .schedule-day-picker-item.is-unavailable,
-    .schedule-day-picker-item:disabled {
-      border-color: rgba(163, 34, 59, 0.42);
-      background: rgba(255, 239, 241, 0.92);
-      color: #9a3142;
-      cursor: not-allowed;
-      opacity: 1;
     }
 
     .schedule-day-top {
@@ -2138,18 +2076,11 @@
       background: rgba(242, 251, 246, 0.78);
     }
 
-    .schedule-dropzone.is-drag-over {
+    .schedule-dropzone.is-targeted {
       border-style: solid;
-      border-color: #245f51;
-      background: rgba(224, 246, 235, 0.96);
-      box-shadow: 0 0 0 3px rgba(36, 95, 81, 0.14);
-      transform: translateY(-1px);
-    }
-
-    .schedule-dropzone.is-drag-invalid {
-      border-color: #9a3142;
-      background: rgba(255, 237, 239, 0.94);
-      box-shadow: 0 0 0 3px rgba(123, 31, 47, 0.12);
+      border-color: #b9871f;
+      background: rgba(255, 248, 226, 0.92);
+      box-shadow: 0 0 0 3px rgba(185, 135, 31, 0.16);
     }
 
     .schedule-assignment-list {
@@ -2204,28 +2135,6 @@
     .schedule-dropzone.is-blocked .schedule-drop-hint {
       color: #8d2739;
       font-weight: 950;
-    }
-
-    .schedule-drag-ghost {
-      position: fixed;
-      z-index: 110;
-      display: inline-flex;
-      align-items: center;
-      min-height: 34px;
-      padding: 7px 11px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, var(--wine), #b9871f);
-      color: #fffaf2;
-      box-shadow: 0 12px 25px rgba(45, 29, 18, 0.28);
-      font-size: 0.84rem;
-      font-weight: 900;
-      pointer-events: none;
-      transform: translate(-50%, -125%);
-    }
-
-    body.is-schedule-dragging {
-      user-select: none;
-      -webkit-user-select: none;
     }
 
     @media (max-width: 719px) {
@@ -2313,19 +2222,8 @@
         text-align: center;
       }
 
-      .schedule-day-picker-trigger {
+      .schedule-day-select-trigger {
         justify-content: center;
-      }
-
-      .schedule-day-picker-list {
-        gap: 7px;
-        padding: 12px;
-      }
-
-      .schedule-day-picker-item {
-        min-height: 48px;
-        padding: 7px 8px;
-        border-radius: 12px;
       }
 
       .schedule-day-label-full,
@@ -3027,16 +2925,6 @@
     </div>
   </div>
 
-  <div class="modal-backdrop schedule-day-picker-modal" id="scheduleDayPickerModal" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="scheduleDayPickerTitle">
-      <div class="modal-head">
-        <h3 id="scheduleDayPickerTitle">가능한 서버</h3>
-        <button class="icon-btn" id="scheduleDayPickerClose" type="button" aria-label="닫기">X</button>
-      </div>
-      <div class="schedule-day-picker-list" id="scheduleDayPickerList"></div>
-    </div>
-  </div>
-
-  <script src="js/king-admin.js?v=20260721-6"></script>
+  <script src="js/king-admin.js?v=20260721-9"></script>
 </body>
 </html>
