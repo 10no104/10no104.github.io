@@ -2879,7 +2879,10 @@
     if (!staff) return;
     const selectedCellKey = state.scheduleSelectedCellKey;
     if (selectedCellKey && getScheduleTextarea(selectedCellKey)) {
-      assignScheduleStaffToCell(staff, selectedCellKey, { keepStaffSelected: false });
+      assignScheduleStaffToCell(staff, selectedCellKey, {
+        keepStaffSelected: false,
+        keepCellSelected: true
+      });
       return;
     }
     state.scheduleSelectedCellKey = "";
@@ -2894,7 +2897,7 @@
   }
 
   function assignScheduleStaffToCell(staff, cellKey, options = {}) {
-    const { keepStaffSelected = true } = options;
+    const { keepStaffSelected = true, keepCellSelected = false } = options;
     const [branch, isoDate] = String(cellKey || "").split("|");
     const textarea = getScheduleTextarea(cellKey);
     if (!staff || !branch || !isoDate || !textarea) return;
@@ -2909,7 +2912,7 @@
       textarea.value = names
         .filter((name) => !staffKeys.has(normalizeScheduleStaffKey(name)))
         .join("\n");
-      state.scheduleSelectedCellKey = "";
+      state.scheduleSelectedCellKey = keepCellSelected ? cellKey : "";
       state.scheduleSelectedStaffKey = keepStaffSelected
         ? normalizeScheduleStaffKey(staff.staff_key || staff.name)
         : "";
@@ -2926,7 +2929,7 @@
     }
 
     textarea.value = [...names, staff.name].join("\n");
-    state.scheduleSelectedCellKey = "";
+    state.scheduleSelectedCellKey = keepCellSelected ? cellKey : "";
     state.scheduleSelectedStaffKey = keepStaffSelected
       ? normalizeScheduleStaffKey(staff.staff_key || staff.name)
       : "";
@@ -3404,6 +3407,7 @@
     refs.scheduleBoard.addEventListener("click", (event) => {
       const removeButton = event.target.closest("[data-remove-schedule-assignment]");
       if (removeButton) {
+        if (!state.scheduleSelectedCellKey && !getSelectedScheduleStaff()) return;
         removeScheduleStaffFromCell(removeButton.dataset.removeScheduleAssignment, removeButton.dataset.scheduleName);
         return;
       }
