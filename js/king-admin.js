@@ -2852,7 +2852,7 @@
           });
           lineY += lineHeight;
           if (!entry.note) return;
-          drawFittedText(ctx, entry.note, x + dayWidth / 2, lineY, dayWidth - 34, {
+          drawFittedText(ctx, `↳ ${entry.note}`, x + dayWidth / 2, lineY, dayWidth - 34, {
             size: 15,
             minSize: 10,
             weight: 800,

@@ -876,9 +876,9 @@
     }
 
     .schedule-controls {
-      display: flex;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
       align-items: center;
-      justify-content: space-between;
       gap: 10px;
       margin-bottom: 12px;
     }
@@ -896,19 +896,30 @@
       white-space: nowrap;
     }
 
-    .schedule-controls .helper-text {
-      margin-left: auto;
-      text-align: right;
+    .schedule-week-nav {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      min-width: 0;
+      gap: 6px;
+    }
+
+    .schedule-week-nav .helper-text {
+      margin: 0;
+      flex: 1;
+      min-width: 0;
+      text-align: center;
       font-size: 0.78rem;
       font-weight: 800;
       line-height: 1.25;
     }
 
     .schedule-nav {
-      width: 40px;
-      height: 40px;
+      flex: 0 0 auto;
+      width: 34px;
+      height: 34px;
       border: 1px solid rgba(113, 67, 50, 0.14);
-      border-radius: 14px;
+      border-radius: 12px;
       background: rgba(255, 251, 246, 0.94);
       color: #2a1b18;
       font-size: 1.12rem;
@@ -2134,10 +2145,12 @@
               </div>
               <div class="card-body">
                 <div class="schedule-controls">
-                  <span class="schedule-confirmed-badge">최신 확정</span>
-                  <div class="helper-text" id="weekRangeLabel"></div>
-                  <button class="schedule-nav" id="schedulePrev" type="button" aria-label="Previous week" hidden>&lt;</button>
-                  <button class="schedule-nav" id="scheduleNext" type="button" aria-label="Next week" hidden>&gt;</button>
+                  <span class="schedule-confirmed-badge">주간 스케줄</span>
+                  <div class="schedule-week-nav" aria-label="주간 스케줄 이동">
+                    <button class="schedule-nav" id="schedulePrev" type="button" aria-label="이전 주">&lt;</button>
+                    <div class="helper-text" id="weekRangeLabel"></div>
+                    <button class="schedule-nav" id="scheduleNext" type="button" aria-label="다음 주">&gt;</button>
+                  </div>
                 </div>
                 <div class="section-head">
                   <div>
@@ -2424,10 +2437,10 @@
         currentAccess: null,
         dbScheduleRows: [],
         dbScheduleWeekStart: "",
+        scheduleRequestToken: 0,
         dbSubstituteRequests: [],
         substituteRequestTarget: null,
         scheduleCursor: startOfWeek(new Date()),
-        latestScheduleWeekStart: startOfWeek(new Date()),
         calendarCursor: startOfMonth(new Date()),
         unavailableDates: new Set(),
         preferredDates: new Set(),
@@ -2638,25 +2651,27 @@
         return Array.isArray(data) ? data[0] : data;
       }
 
-      async function loadDbSchedule(input = "") {
+      async function loadDbSchedule(input = "", selectedWeek = state.scheduleCursor) {
+        const requestToken = ++state.scheduleRequestToken;
         state.dbScheduleRows = [];
-        state.dbScheduleWeekStart = "";
+        const weekStart = startOfWeek(selectedWeek instanceof Date ? selectedWeek : new Date());
+        state.scheduleCursor = weekStart;
+        state.dbScheduleWeekStart = toIsoDate(weekStart);
         const refCode = String(input || "").trim();
         if (!refCode || !supabaseClient) return;
 
         try {
-          const { data, error } = await supabaseClient.rpc("noble_get_latest_schedule", { input_ref: refCode });
+          const { data, error } = await supabaseClient.rpc("noble_get_schedule_week_v1", {
+            input_ref: refCode,
+            p_week_start: state.dbScheduleWeekStart
+          });
           if (error) throw error;
+          if (requestToken !== state.scheduleRequestToken) return;
           state.dbScheduleRows = Array.isArray(data) ? data : [];
-          state.dbScheduleWeekStart = state.dbScheduleRows[0]?.week_start || "";
-          if (state.dbScheduleWeekStart) {
-            state.scheduleCursor = startOfWeek(new Date(`${state.dbScheduleWeekStart}T00:00:00`));
-            state.latestScheduleWeekStart = state.scheduleCursor;
-          }
         } catch (error) {
+          if (requestToken !== state.scheduleRequestToken) return;
           console.warn("DB schedule unavailable", error);
           state.dbScheduleRows = [];
-          state.dbScheduleWeekStart = "";
         }
       }
 
@@ -3342,13 +3357,14 @@
       function resetProfileState(message) {
         state.currentStaff = null;
         state.currentAccess = null;
+        state.scheduleRequestToken += 1;
         state.dbScheduleRows = [];
         state.dbScheduleWeekStart = "";
         state.dbSubstituteRequests = [];
         state.substituteRequestTarget = null;
         state.periods = [];
         state.openPeriodKey = null;
-        state.scheduleCursor = state.latestScheduleWeekStart || startOfWeek(new Date());
+        state.scheduleCursor = startOfWeek(new Date());
         state.unavailableDates = new Set();
         state.preferredDates = new Set();
         state.dateDetails = {};
@@ -3486,27 +3502,6 @@
         renderPeriodCards(periods);
       }
 
-      function getLatestScheduleWeekStart() {
-        let latestDate = null;
-
-        state.sources.forEach((source) => {
-          source.staff.forEach((staff) => {
-            getDailyRecords(staff).forEach((record) => {
-              if (record.isSummary || !record.dateObj || !(record.hours > 0 || record.tip > 0)) return;
-              if (!latestDate || record.dateObj > latestDate) latestDate = record.dateObj;
-            });
-          });
-        });
-
-        return latestDate ? startOfWeek(latestDate) : startOfWeek(new Date());
-      }
-
-      function clampScheduleCursor(cursor) {
-        const latestWeek = state.latestScheduleWeekStart || getLatestScheduleWeekStart();
-        const weekStart = startOfWeek(cursor);
-        return weekStart > latestWeek ? latestWeek : weekStart;
-      }
-
       function getWeekCards(records = [], cursor = new Date()) {
         const weekStart = startOfWeek(cursor);
         const weekEnd = endOfWeek(weekStart);
@@ -3608,9 +3603,7 @@
 
       function renderDbScheduleView() {
         const rows = state.dbScheduleRows || [];
-        if (!rows.length || !state.dbScheduleWeekStart) return false;
-
-        const weekStart = startOfWeek(new Date(`${state.dbScheduleWeekStart}T00:00:00`));
+        const weekStart = startOfWeek(state.scheduleCursor || new Date());
         const weekEnd = endOfWeek(weekStart);
         const branchRows = [
           { key: "uptown", label: "Uptown" },
@@ -3619,15 +3612,15 @@
         const currentKey = normalizeKey(state.currentAccess?.staff_key || state.currentStaff?.name || "");
 
         refs.weekRangeLabel.textContent = `${formatLongDate(weekStart)} - ${formatLongDate(weekEnd)}`;
-        refs.schedulePrev.disabled = true;
-        refs.scheduleNext.disabled = true;
+        refs.schedulePrev.disabled = false;
+        refs.scheduleNext.disabled = false;
         refs.scheduleList.innerHTML = `
           <div class="schedule-legend" aria-label="스케줄 표시 안내">
             <span class="schedule-legend-item is-my-work"><b aria-hidden="true"></b>내 근무</span>
             <span class="schedule-legend-item is-substitute-requested"><b aria-hidden="true"></b>대타 요청</span>
             <span class="schedule-legend-item is-not-my-work"><b aria-hidden="true"></b>비근무</span>
           </div>
-          <p class="calendar-usage-guide">내 근무일을 길게 누르면 대타 요청을 등록하거나 취소할 수 있습니다.</p>
+          <p class="calendar-usage-guide">내 근무일을 길게 누르면 대타 요청을 등록하거나 취소할 수 있습니다.<br>대타를 해주실 분은 해당 서버에게 직접 연락해 주세요.</p>
           <div class="branch-schedule-grid">
             ${branchRows.map((branch) => {
               const days = Array.from({ length: 7 }, (_unused, index) => {
@@ -3695,19 +3688,15 @@
       function renderScheduleView() {
         if (!state.currentStaff || !state.currentAccess) {
           refs.weekRangeLabel.textContent = "";
+          refs.schedulePrev.disabled = true;
+          refs.scheduleNext.disabled = true;
           refs.scheduleList.classList.add("is-empty");
           refs.scheduleList.innerHTML = `<div class="empty-state">데이터 없음</div>`;
           return;
         }
 
         refs.scheduleList.classList.remove("is-empty");
-        if (renderDbScheduleView()) return;
-
-        refs.weekRangeLabel.textContent = "확정된 최신 스케줄이 없습니다.";
-        refs.schedulePrev.disabled = true;
-        refs.scheduleNext.disabled = true;
-        refs.scheduleList.classList.add("is-empty");
-        refs.scheduleList.innerHTML = `<div class="empty-state">확정된 최신 스케줄을 불러오면 여기에 표시됩니다.</div>`;
+        renderDbScheduleView();
       }
 
       function renderCalendar() {
@@ -3938,8 +3927,7 @@
           state.sourceErrors = sourceErrors;
           state.rows = sources[0]?.rows || [];
           state.staff = sources.flatMap((source) => source.staff);
-          state.latestScheduleWeekStart = getLatestScheduleWeekStart();
-          state.scheduleCursor = state.latestScheduleWeekStart;
+          state.scheduleCursor = startOfWeek(new Date());
           state.loaded = true;
           setStatus("Ready");
 
@@ -4003,11 +3991,11 @@
           state.currentAccess = access;
           state.periods = periods;
           state.openPeriodKey = defaultOpenPeriod ? defaultOpenPeriod.id : null;
-          state.scheduleCursor = state.latestScheduleWeekStart || getLatestScheduleWeekStart();
+          state.scheduleCursor = startOfWeek(new Date());
           state.calendarCursor = startOfMonth(new Date());
           state.savedRefCode = input;
           saveRefCode(input);
-          await loadDbSchedule(input);
+          await loadDbSchedule(input, state.scheduleCursor);
           await loadDbSubstituteRequests(input);
           loadUnavailableDates();
           await loadDbPreferences(input);
@@ -4245,14 +4233,22 @@
           });
         });
 
-        refs.schedulePrev.addEventListener("click", () => {
-          state.scheduleCursor = addDays(state.scheduleCursor, -7);
+        async function moveScheduleWeek(amount) {
+          const nextWeek = startOfWeek(addDays(state.scheduleCursor || new Date(), amount));
+          state.scheduleCursor = nextWeek;
+          state.dbScheduleRows = [];
+          state.dbScheduleWeekStart = toIsoDate(nextWeek);
           renderScheduleView();
+          await loadDbSchedule(state.savedRefCode || refs.staffIdInput.value, nextWeek);
+          renderScheduleView();
+        }
+
+        refs.schedulePrev.addEventListener("click", () => {
+          void moveScheduleWeek(-7);
         });
 
         refs.scheduleNext.addEventListener("click", () => {
-          state.scheduleCursor = clampScheduleCursor(addDays(state.scheduleCursor, 7));
-          renderScheduleView();
+          void moveScheduleWeek(7);
         });
 
         refs.scheduleList.addEventListener("pointerdown", (event) => {
