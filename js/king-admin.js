@@ -2781,17 +2781,71 @@
     ctx.fillText(fittedText, x, y);
   }
 
+  function drawScheduleClipboardEntry(ctx, entry, x, y, maxWidth, color) {
+    const fontFamily = '"Malgun Gothic", "Apple SD Gothic Neo", Arial, sans-serif';
+    const nameSize = 24;
+    const noteSize = 18;
+    const noteText = entry.note ? ` - ${entry.note}` : "";
+
+    if (!noteText) {
+      drawFittedText(ctx, entry.name, x, y, maxWidth, {
+        size: nameSize,
+        minSize: nameSize,
+        weight: 900,
+        color,
+        ellipsis: true
+      });
+      return;
+    }
+
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    ctx.font = `900 ${nameSize}px ${fontFamily}`;
+    const nameWidth = ctx.measureText(entry.name).width;
+    if (nameWidth > maxWidth) {
+      drawFittedText(ctx, entry.name, x, y, maxWidth, {
+        size: nameSize,
+        minSize: nameSize,
+        weight: 900,
+        color,
+        ellipsis: true
+      });
+      return;
+    }
+
+    const availableNoteWidth = maxWidth - nameWidth;
+    ctx.font = `800 ${noteSize}px ${fontFamily}`;
+    let fittedNote = noteText;
+    if (ctx.measureText(fittedNote).width > availableNoteWidth) {
+      let noteBody = noteText;
+      while (noteBody && ctx.measureText(`${noteBody}...`).width > availableNoteWidth) {
+        noteBody = noteBody.slice(0, -1);
+      }
+      fittedNote = noteBody ? `${noteBody}...` : "";
+    }
+
+    const noteWidth = fittedNote ? ctx.measureText(fittedNote).width : 0;
+    const totalWidth = nameWidth + noteWidth;
+    const startX = x - totalWidth / 2;
+    ctx.fillStyle = color;
+    ctx.font = `900 ${nameSize}px ${fontFamily}`;
+    ctx.fillText(entry.name, startX, y);
+    if (fittedNote) {
+      ctx.font = `800 ${noteSize}px ${fontFamily}`;
+      ctx.fillText(fittedNote, startX + nameWidth, y);
+    }
+  }
+
   function buildScheduleClipboardCanvas() {
     const dates = getScheduleWeekDates();
     const namesByCell = collectScheduleNamesByCellFromBoard();
-    const branchWidth = 176;
-    const dayWidth = 224;
+    const branchWidth = 164;
+    const dayWidth = 190;
     const margin = 44;
     const titleHeight = 96;
     const headerHeight = 62;
     const rowGap = 12;
     const entryLineHeight = 31;
-    const noteLineHeight = 24;
     const entryGap = 8;
     const entriesByCell = new Map();
     SCHEDULE_BRANCHES.forEach((branch) => {
@@ -2804,7 +2858,7 @@
     const maxCellContentHeight = Math.max(
       0,
       ...Array.from(entriesByCell.values()).map((entries) => (
-        entries.reduce((height, entry) => height + entryLineHeight + (entry.note ? noteLineHeight : 0), 0) +
+        entries.length * entryLineHeight +
         Math.max(0, entries.length - 1) * entryGap
       ))
     );
@@ -2858,10 +2912,18 @@
     dates.forEach((date, index) => {
       const x = tableX + branchWidth + index * dayWidth;
       fillRoundRect(ctx, x + 4, headerY, dayWidth - 8, headerHeight, 16, "#f3e6d5");
-      drawFittedText(ctx, formatScheduleDayLabel(date), x + dayWidth / 2, headerY + headerHeight / 2, dayWidth - 24, {
-        size: 20,
-        weight: 900,
+      const compactDay = formatScheduleDayCompactLabel(date);
+      drawFittedText(ctx, compactDay.weekday, x + dayWidth / 2, headerY + 24, dayWidth - 24, {
+        size: 23,
+        minSize: 18,
+        weight: 950,
         color: "#2f2118"
+      });
+      drawFittedText(ctx, `${date.getMonth() + 1}/${date.getDate()}`, x + dayWidth / 2, headerY + 47, dayWidth - 24, {
+        size: 14,
+        minSize: 12,
+        weight: 850,
+        color: "#6c5b52"
       });
     });
 
@@ -2892,27 +2954,12 @@
         }
 
         const entries = entriesByCell.get(cellKey) || [];
-        const contentHeight = entries.reduce((height, entry) => height + entryLineHeight + (entry.note ? noteLineHeight : 0), 0) +
+        const contentHeight = entries.length * entryLineHeight +
           Math.max(0, entries.length - 1) * entryGap;
         let entryY = y + (rowHeight - contentHeight) / 2;
         entries.forEach((entry, entryIndex) => {
-          drawFittedText(ctx, entry.name, x + dayWidth / 2, entryY + entryLineHeight / 2, dayWidth - 32, {
-            size: 24,
-            minSize: 16,
-            weight: 900,
-            color: branch.color,
-            ellipsis: true
-          });
-          if (entry.note) {
-            drawFittedText(ctx, `- ${entry.note}`, x + dayWidth / 2, entryY + entryLineHeight + noteLineHeight / 2, dayWidth - 32, {
-              size: 18,
-              minSize: 12,
-              weight: 800,
-              color: "#8b5d26",
-              ellipsis: true
-            });
-          }
-          entryY += entryLineHeight + (entry.note ? noteLineHeight : 0);
+          drawScheduleClipboardEntry(ctx, entry, x + dayWidth / 2, entryY + entryLineHeight / 2, dayWidth - 32, branch.color);
+          entryY += entryLineHeight;
           if (entryIndex < entries.length - 1) entryY += entryGap;
         });
       });
