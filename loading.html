@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#071c18" />
+  <meta name="theme-color" content="#f5efe4" />
   <title>EHWA | Menu Loading</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&family=Noto+Serif+KR:wght@500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/loading.css" />
 </head>
 <body class="loading-page">
@@ -18,15 +18,15 @@
     <section class="loading-card">
       <div class="brand-mark" aria-label="EHWA 로고">
         <span class="brand-mark__halo" aria-hidden="true"></span>
-        <img src="assets/logo-white.webp" alt="EHWA" />
+        <img src="assets/logo-dark.webp" alt="EHWA" />
       </div>
 
-      <p class="loading-kicker">EHWA KOREAN KITCHEN &amp; SOJU BAR</p>
+      <p class="loading-kicker">EHWA · 오늘의 한 잔과 안주</p>
       <h1 id="loading-title">오늘의 메뉴를<br /><em>준비하고 있어요</em></h1>
 
       <article class="promo-card" aria-live="polite">
         <span class="promo-card__eyebrow">EHWA TIP <span aria-hidden="true">✦</span></span>
-        <span class="promo-card__icon" data-promo-icon aria-hidden="true">🍽️</span>
+        <span class="promo-card__icon" data-promo-icon aria-hidden="true">✤</span>
         <p class="promo-card__title" data-promo-title>술 시키면 기본안주로 이거 줍니다</p>
         <p class="promo-card__description" data-promo-description>첫 잔부터 든든하게, 오늘의 기본안주를 함께 내어드려요.</p>
       </article>
@@ -39,24 +39,24 @@
       <p class="loading-note" data-loading-note>잠시만 기다려주세요 · 약 2–3초</p>
     </section>
 
-    <p class="loading-footer">Korean food · good drinks · better nights</p>
+    <p class="loading-footer">EHWA · 한식과 술이 있는 밤</p>
   </main>
 
   <script>
     (() => {
       const promos = [
         {
-          icon: "🍽️",
+          icon: "✤",
           title: "술 시키면 기본안주로 이거 줍니다",
           description: "첫 잔부터 든든하게, 오늘의 기본안주를 함께 내어드려요."
         },
         {
-          icon: "🎵",
+          icon: "♫",
           title: "QR로 해당 지역 노래를 바꿀 수 있습니다",
           description: "지금 있는 매장의 분위기에 어울리는 노래를 직접 골라보세요."
         },
         {
-          icon: "🌙",
+          icon: "月",
           title: "늦은 밤에도 따뜻하게, 한 잔 더",
           description: "맛있는 안주와 술이 있는 EHWA의 밤은 조금 더 오래 이어집니다."
         }
