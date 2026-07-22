@@ -1,14 +1,10 @@
 :root {
   --loading-paper: #f5efe4;
-  --loading-paper-light: #fffaf1;
-  --loading-paper-deep: #eadcc5;
   --loading-ink: #2b211c;
   --loading-muted: #75685d;
-  --loading-jade: #1f4a3e;
-  --loading-vermilion: #a94e3d;
-  --loading-gold: #b88b36;
-  --loading-gold-light: #d4af5e;
-  --loading-line: rgba(77, 48, 28, 0.2);
+  --loading-burgundy: #5a1122;
+  --loading-gold: #d4af37;
+  --loading-gold-light: #e1c568;
 }
 
 * {
@@ -24,7 +20,10 @@ body {
 body.loading-page {
   min-height: 100svh;
   overflow: hidden;
-  background: var(--loading-paper);
+  background:
+    radial-gradient(circle at top left, rgba(212, 175, 55, 0.18), transparent 28%),
+    radial-gradient(circle at 85% 12%, rgba(90, 17, 34, 0.12), transparent 22%),
+    linear-gradient(180deg, rgba(251, 247, 241, 0.96) 0%, rgba(245, 239, 228, 0.98) 100%);
   color: var(--loading-ink);
   font-family: "Noto Sans KR", "Pretendard", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
@@ -40,18 +39,18 @@ body.loading-page {
 .loading-page::before {
   inset: 0;
   background:
-    linear-gradient(180deg, rgba(255, 252, 246, 0.4), rgba(234, 220, 197, 0.28)),
-    url("../assets/background수묵.webp") center bottom / cover no-repeat,
-    var(--loading-paper);
-  opacity: 0.76;
-  mix-blend-mode: multiply;
+    linear-gradient(180deg, rgba(17, 12, 10, 0.48), rgba(17, 12, 10, 0.12)),
+    url("../assets/background수묵.webp") center top / cover no-repeat;
+  opacity: 0.14;
 }
 
 .loading-page::after {
-  inset: 0;
-  background: url("../assets/pattern.webp") center / 650px auto;
-  opacity: 0.12;
-  mix-blend-mode: multiply;
+  inset: auto -8vw -10vh auto;
+  width: min(42vw, 460px);
+  height: min(42vw, 460px);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.18) 0%, rgba(212, 175, 55, 0.04) 48%, transparent 72%);
+  filter: blur(10px);
 }
 
 .loading-shell {
@@ -67,19 +66,21 @@ body.loading-page {
   position: relative;
   width: min(100%, 430px);
   padding: 38px 34px 32px;
-  border: 1px solid var(--loading-line);
-  border-radius: 10px;
-  background: rgba(255, 250, 241, 0.88);
-  box-shadow: 0 24px 60px rgba(65, 43, 24, 0.14), inset 0 1px rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(120, 103, 77, 0.14);
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(255, 252, 247, 0.96), rgba(251, 246, 238, 0.9)),
+    url("../assets/pattern.webp") center / 440px auto;
+  box-shadow: 0 18px 40px rgba(30, 21, 16, 0.12);
   text-align: center;
   backdrop-filter: blur(16px);
 }
 
 .loading-card::before {
   position: absolute;
-  inset: 8px;
-  border: 1px solid rgba(169, 78, 61, 0.2);
-  border-radius: 5px;
+  inset: 10px;
+  border: 1px solid rgba(120, 103, 77, 0.13);
+  border-radius: 14px;
   content: "";
   pointer-events: none;
 }
@@ -91,17 +92,17 @@ body.loading-page {
   height: 90px;
   margin: 0 auto 22px;
   place-items: center;
-  border: 1px solid var(--loading-gold);
+  border: 1px solid rgba(71, 48, 31, 0.12);
   border-radius: 50%;
-  background: rgba(255, 250, 241, 0.46);
-  box-shadow: 0 0 0 7px rgba(184, 139, 54, 0.08), 0 12px 28px rgba(65, 43, 24, 0.12);
+  background: linear-gradient(180deg, #fffdf9 0%, #f3eadc 100%);
+  box-shadow: 0 0 0 7px rgba(212, 175, 55, 0.08), 0 12px 28px rgba(42, 28, 18, 0.12);
   animation: mark-breathe 3.2s ease-in-out infinite;
 }
 
 .brand-mark__halo {
   position: absolute;
   inset: -8px;
-  border: 1px solid rgba(169, 78, 61, 0.2);
+  border: 1px solid rgba(90, 17, 34, 0.16);
   border-radius: 50%;
 }
 
@@ -113,7 +114,7 @@ body.loading-page {
 
 .loading-kicker {
   margin: 0 0 13px;
-  color: var(--loading-vermilion);
+  color: var(--loading-burgundy);
   font-size: 0.69rem;
   font-weight: 700;
   letter-spacing: 0.2em;
@@ -131,7 +132,7 @@ body.loading-page {
 }
 
 .loading-card h1 em {
-  color: var(--loading-jade);
+  color: var(--loading-burgundy);
   font-style: normal;
 }
 
@@ -141,9 +142,9 @@ body.loading-page {
   margin: 29px 0 27px;
   padding: 22px 20px 19px;
   overflow: hidden;
-  border: 1px solid rgba(169, 78, 61, 0.22);
+  border: 1px solid rgba(120, 103, 77, 0.16);
   border-radius: 5px;
-  background: rgba(234, 220, 197, 0.34);
+  background: rgba(245, 239, 228, 0.58);
   animation: promo-in 0.7s both;
 }
 
@@ -153,16 +154,16 @@ body.loading-page {
   bottom: -44px;
   width: 120px;
   height: 120px;
-  border: 1px solid rgba(169, 78, 61, 0.16);
+  border: 1px solid rgba(90, 17, 34, 0.13);
   border-radius: 50%;
   content: "";
-  box-shadow: 0 0 0 16px rgba(169, 78, 61, 0.04), 0 0 0 34px rgba(169, 78, 61, 0.025);
+  box-shadow: 0 0 0 16px rgba(90, 17, 34, 0.04), 0 0 0 34px rgba(90, 17, 34, 0.025);
 }
 
 .promo-card__eyebrow {
   display: block;
   margin-bottom: 10px;
-  color: var(--loading-vermilion);
+  color: var(--loading-burgundy);
   font-size: 0.64rem;
   font-weight: 800;
   letter-spacing: 0.18em;
@@ -178,7 +179,7 @@ body.loading-page {
   display: block;
   height: 31px;
   margin-bottom: 7px;
-  color: var(--loading-vermilion);
+  color: var(--loading-burgundy);
   font-family: "Noto Serif KR", serif;
   font-size: 1.65rem;
   line-height: 1;
@@ -220,7 +221,7 @@ body.loading-page {
 }
 
 .loading-status.is-ready {
-  color: var(--loading-jade);
+  color: var(--loading-burgundy);
 }
 
 .loading-status__dots {
@@ -234,7 +235,7 @@ body.loading-page {
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: var(--loading-vermilion);
+  background: var(--loading-burgundy);
   animation: dot-pulse 1.15s ease-in-out infinite;
 }
 
@@ -248,7 +249,7 @@ body.loading-page {
 
 .is-ready .loading-status__dots i {
   animation: none;
-  background: var(--loading-jade);
+  background: var(--loading-burgundy);
 }
 
 .progress-track {
@@ -266,7 +267,7 @@ body.loading-page {
   height: 100%;
   transform-origin: left center;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--loading-vermilion), var(--loading-gold));
+  background: linear-gradient(90deg, var(--loading-burgundy), var(--loading-gold));
   animation: progress-fill 2.6s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
 }
 
@@ -283,7 +284,7 @@ body.loading-page {
 }
 
 .loading-status.is-ready + .progress-track + .loading-note {
-  color: rgba(31, 74, 62, 0.78);
+  color: rgba(90, 17, 34, 0.78);
 }
 
 .loading-footer {
@@ -299,7 +300,7 @@ body.loading-page {
 
 .loading-orbit {
   position: absolute;
-  border: 1px solid rgba(31, 74, 62, 0.13);
+  border: 1px solid rgba(212, 175, 55, 0.16);
   border-radius: 50%;
   pointer-events: none;
 }
@@ -313,7 +314,7 @@ body.loading-page {
 .loading-orbit--inner {
   width: min(69vw, 440px);
   height: min(69vw, 440px);
-  border-color: rgba(169, 78, 61, 0.11);
+  border-color: rgba(90, 17, 34, 0.1);
   animation: orbit-drift 12s linear infinite reverse;
 }
 
