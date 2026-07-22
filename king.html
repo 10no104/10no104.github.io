@@ -2115,6 +2115,31 @@
       cursor: pointer;
     }
 
+    .schedule-assignment-content {
+      display: grid;
+      min-width: 0;
+      gap: 2px;
+    }
+
+    .schedule-assignment-name,
+    .schedule-assignment-note {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .schedule-assignment-note {
+      color: #8b5d26;
+      font-size: 0.66rem;
+      font-weight: 850;
+      line-height: 1.1;
+    }
+
+    .schedule-assignment.has-note {
+      border-color: rgba(185, 135, 31, 0.34);
+      background: rgba(255, 248, 228, 0.9);
+    }
+
     .schedule-assignment:hover,
     .schedule-assignment:focus-visible {
       border-color: rgba(123, 31, 47, 0.42);
@@ -2345,10 +2370,16 @@
         white-space: nowrap;
       }
 
-      .schedule-assignment > span:first-child {
+      .schedule-assignment-content {
         display: block;
         overflow: hidden;
         text-overflow: ellipsis;
+      }
+
+      .schedule-assignment-note {
+        display: block;
+        margin-top: 1px;
+        font-size: 0.48rem;
       }
 
       .schedule-assignment-remove {
@@ -2932,6 +2963,26 @@
     </div>
   </div>
 
-  <script src="js/king-admin.js?v=20260721-14"></script>
+  <div class="modal-backdrop" id="scheduleNoteModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="scheduleNoteTitle">
+      <div class="modal-head">
+        <h3 id="scheduleNoteTitle">근무 메모</h3>
+        <button class="icon-btn" id="scheduleNoteClose" type="button" aria-label="닫기">X</button>
+      </div>
+      <form class="modal-form" id="scheduleNoteForm">
+        <p id="scheduleNoteMeta" class="helper-text"></p>
+        <div class="field">
+          <label for="scheduleNoteInput">출근 시간 / 메모</label>
+          <input id="scheduleNoteInput" type="text" maxlength="80" placeholder="예: 7:30 출근" autocomplete="off" />
+        </div>
+        <div class="form-actions">
+          <button class="pill-btn" id="scheduleNoteCancel" type="button">취소</button>
+          <button class="pill-btn primary" type="submit">메모 저장</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/king-admin.js?v=20260721-15"></script>
 </body>
 </html>

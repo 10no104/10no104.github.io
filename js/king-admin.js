@@ -133,9 +133,14 @@
     scheduleUsingFallbackStaff: false,
     scheduleWeek: null,
     scheduleShifts: [],
+    scheduleShiftNotes: new Map(),
     scheduleSelectedStaffKey: "",
     scheduleSelectedCellKey: "",
     scheduleDetailsOpen: false,
+    scheduleNoteTarget: null,
+    scheduleNotePressTimer: null,
+    scheduleNotePressStart: null,
+    scheduleNoteSuppressClickUntil: 0,
     sortables: {
       visual: null,
       all: null,
@@ -249,6 +254,12 @@
       "scheduleResetBtn",
       "scheduleStatus",
       "scheduleStaffList",
+      "scheduleNoteModal",
+      "scheduleNoteClose",
+      "scheduleNoteCancel",
+      "scheduleNoteForm",
+      "scheduleNoteMeta",
+      "scheduleNoteInput",
       "unavailableList",
       "preferredList",
       "scheduleBoard"
@@ -2149,6 +2160,35 @@
     return `${branch}|${dateValue}`;
   }
 
+  function getScheduleShiftNoteKey(cellKey, name = "") {
+    return `${cellKey}|${normalizeScheduleStaffKey(name)}`;
+  }
+
+  function getScheduleShiftNote(cellKey, name = "") {
+    return String(state.scheduleShiftNotes.get(getScheduleShiftNoteKey(cellKey, name)) || "").trim();
+  }
+
+  function setScheduleShiftNote(cellKey, name = "", note = "") {
+    const key = getScheduleShiftNoteKey(cellKey, name);
+    const value = String(note || "").trim();
+    if (value) state.scheduleShiftNotes.set(key, value);
+    else state.scheduleShiftNotes.delete(key);
+  }
+
+  function removeScheduleShiftNote(cellKey, name = "") {
+    state.scheduleShiftNotes.delete(getScheduleShiftNoteKey(cellKey, name));
+  }
+
+  function hydrateScheduleShiftNotes(shifts = []) {
+    state.scheduleShiftNotes = new Map();
+    shifts.forEach((shift) => {
+      const note = String(shift.note || "").trim();
+      if (!note) return;
+      const cellKey = getScheduleCellKey(shift.branch, shift.shift_date);
+      setScheduleShiftNote(cellKey, shift.staff_name || shift.staff_key, note);
+    });
+  }
+
   function getShiftNamesByCell() {
     const map = new Map();
     state.scheduleShifts.forEach((shift) => {
@@ -2434,18 +2474,25 @@
                   aria-label="${escapeHtml(`${formatScheduleDayLabel(date)} ${branch.label}: ${dropStatus.label}`)}"
                 >
                   <div class="schedule-assignment-list">
-                    ${names.map((name) => `
-                      <button
-                        class="schedule-assignment"
-                        type="button"
-                        data-remove-schedule-assignment="${escapeHtml(cellKey)}"
-                        data-schedule-name="${escapeHtml(name)}"
-                        aria-label="${escapeHtml(`${name} 배정 삭제`)}"
-                      >
-                        <span>${escapeHtml(name)}</span>
-                        <span class="schedule-assignment-remove" aria-hidden="true">×</span>
-                      </button>
-                    `).join("")}
+                    ${names.map((name) => {
+                      const note = getScheduleShiftNote(cellKey, name);
+                      return `
+                        <button
+                          class="schedule-assignment${note ? " has-note" : ""}"
+                          type="button"
+                          data-remove-schedule-assignment="${escapeHtml(cellKey)}"
+                          data-schedule-note-cell="${escapeHtml(cellKey)}"
+                          data-schedule-name="${escapeHtml(name)}"
+                          aria-label="${escapeHtml(`${name}${note ? ` · ${note}` : ""}. 길게 눌러 근무 메모`)}"
+                        >
+                          <span class="schedule-assignment-content">
+                            <span class="schedule-assignment-name">${escapeHtml(name)}</span>
+                            ${note ? `<small class="schedule-assignment-note">${escapeHtml(note)}</small>` : ""}
+                          </span>
+                          <span class="schedule-assignment-remove" aria-hidden="true">×</span>
+                        </button>
+                      `;
+                    }).join("")}
                   </div>
                   <span class="schedule-drop-hint">${escapeHtml(dropStatus.label)}</span>
                 </div>
@@ -2602,6 +2649,7 @@
     state.scheduleUsingFallbackStaff = !dbStaff.length;
     state.scheduleWeek = weekResult.data || null;
     state.scheduleShifts = scheduleShifts;
+    hydrateScheduleShiftNotes(scheduleShifts);
     renderScheduleBoard({ preserveBoardEdits: false });
     setScheduleStatus("스케줄 데이터를 불러왔습니다.", "success");
   }
@@ -2625,7 +2673,8 @@
             staff_key: staff?.staff_key || normalizeScheduleStaffKey(name),
             staff_name: staff?.name || name,
             job_role: staff?.job_role || "server",
-            sort_order: index
+            sort_order: index,
+            note: getScheduleShiftNote(getScheduleCellKey(branch, shiftDate), staff?.name || name) || null
           });
         });
     });
@@ -2698,14 +2747,16 @@
     const titleHeight = 96;
     const headerHeight = 62;
     const rowGap = 12;
-    const maxNames = Math.max(
+    const maxEntryLines = Math.max(
       2,
       ...SCHEDULE_BRANCHES.flatMap((branch) => dates.map((date) => {
         const cellKey = getScheduleCellKey(branch.key, formatInputDate(date));
-        return (namesByCell.get(cellKey) || []).length;
+        return (namesByCell.get(cellKey) || []).reduce((total, name) => (
+          total + (getScheduleShiftNote(cellKey, name) ? 2 : 1)
+        ), 0);
       }))
     );
-    const rowHeight = Math.max(126, 58 + maxNames * 31);
+    const rowHeight = Math.max(126, 58 + maxEntryLines * 31);
     const width = margin * 2 + branchWidth + dayWidth * dates.length;
     const height = margin * 2 + titleHeight + headerHeight + SCHEDULE_BRANCHES.length * rowHeight + (SCHEDULE_BRANCHES.length - 1) * rowGap + 22;
     const canvas = document.createElement("canvas");
@@ -2788,15 +2839,26 @@
           return;
         }
 
-        const lineHeight = Math.min(32, Math.max(25, (rowHeight - 44) / names.length));
-        const firstLineY = y + rowHeight / 2 - ((names.length - 1) * lineHeight) / 2;
-        names.forEach((name, nameIndex) => {
-          drawFittedText(ctx, name, x + dayWidth / 2, firstLineY + nameIndex * lineHeight, dayWidth - 32, {
+        const entries = names.map((name) => ({ name, note: getScheduleShiftNote(cellKey, name) }));
+        const totalLines = entries.reduce((total, entry) => total + (entry.note ? 2 : 1), 0);
+        const lineHeight = Math.min(32, Math.max(21, (rowHeight - 36) / totalLines));
+        let lineY = y + (rowHeight - totalLines * lineHeight) / 2 + lineHeight / 2;
+        entries.forEach((entry) => {
+          drawFittedText(ctx, entry.name, x + dayWidth / 2, lineY, dayWidth - 32, {
             size: 24,
             minSize: 13,
             weight: 900,
             color: branch.color
           });
+          lineY += lineHeight;
+          if (!entry.note) return;
+          drawFittedText(ctx, entry.note, x + dayWidth / 2, lineY, dayWidth - 34, {
+            size: 15,
+            minSize: 10,
+            weight: 800,
+            color: "rgba(47, 33, 24, 0.64)"
+          });
+          lineY += lineHeight;
         });
       });
     });
@@ -2912,6 +2974,9 @@
       textarea.value = names
         .filter((name) => !staffKeys.has(normalizeScheduleStaffKey(name)))
         .join("\n");
+      names
+        .filter((name) => staffKeys.has(normalizeScheduleStaffKey(name)))
+        .forEach((name) => removeScheduleShiftNote(cellKey, name));
       state.scheduleSelectedCellKey = keepCellSelected ? cellKey : "";
       state.scheduleSelectedStaffKey = keepStaffSelected
         ? normalizeScheduleStaffKey(staff.staff_key || staff.name)
@@ -2950,8 +3015,76 @@
     const nameKey = normalizeScheduleStaffKey(name);
     const nextNames = getCurrentNames(textarea).filter((item) => normalizeScheduleStaffKey(item) !== nameKey);
     textarea.value = nextNames.join("\n");
+    removeScheduleShiftNote(cellKey, name);
     renderScheduleBoard();
     setScheduleStatus(`${name} 배정을 삭제했습니다.`, "");
+  }
+
+  function isScheduleStaffAssignedToCell(staff, cellKey) {
+    const textarea = getScheduleTextarea(cellKey);
+    if (!staff || !textarea) return false;
+    const staffKeys = new Set([
+      normalizeScheduleStaffKey(staff.staff_key || staff.name),
+      normalizeScheduleStaffKey(staff.name)
+    ]);
+    return getCurrentNames(textarea).some((name) => staffKeys.has(normalizeScheduleStaffKey(name)));
+  }
+
+  function openScheduleNoteModal(cellKey, name) {
+    const [branch, isoDate] = String(cellKey || "").split("|");
+    const date = toSafeDate(isoDate);
+    if (!branch || !date || !name) return;
+    state.scheduleNoteTarget = { cellKey, name };
+    refs.scheduleNoteMeta.textContent = `${formatScheduleDayLabel(date)} · ${formatBranchLabel(branch)} · ${name}`;
+    refs.scheduleNoteInput.value = getScheduleShiftNote(cellKey, name);
+    refs.scheduleNoteModal.setAttribute("aria-hidden", "false");
+    refs.scheduleNoteModal.classList.add("is-open");
+    window.setTimeout(() => {
+      refs.scheduleNoteInput.focus();
+      refs.scheduleNoteInput.select();
+    }, 0);
+  }
+
+  function closeScheduleNoteModal() {
+    state.scheduleNoteTarget = null;
+    refs.scheduleNoteModal.setAttribute("aria-hidden", "true");
+    refs.scheduleNoteModal.classList.remove("is-open");
+    refs.scheduleNoteForm.reset();
+  }
+
+  function saveScheduleNote(event) {
+    event.preventDefault();
+    const target = state.scheduleNoteTarget;
+    if (!target) return;
+    setScheduleShiftNote(target.cellKey, target.name, refs.scheduleNoteInput.value);
+    renderScheduleBoard();
+    closeScheduleNoteModal();
+    setScheduleStatus("근무 메모를 저장했습니다. 확정하면 함께 저장됩니다.", "success");
+  }
+
+  function clearScheduleNoteLongPress() {
+    window.clearTimeout(state.scheduleNotePressTimer);
+    state.scheduleNotePressTimer = null;
+    state.scheduleNotePressStart = null;
+  }
+
+  function startScheduleNoteLongPress(cellKey, name, event) {
+    clearScheduleNoteLongPress();
+    state.scheduleNotePressStart = { x: event.clientX, y: event.clientY };
+    state.scheduleNotePressTimer = window.setTimeout(() => {
+      state.scheduleNoteSuppressClickUntil = Date.now() + 450;
+      openScheduleNoteModal(cellKey, name);
+      clearScheduleNoteLongPress();
+    }, 460);
+  }
+
+  function cancelScheduleNoteLongPressOnMove(event) {
+    if (!state.scheduleNotePressStart) return;
+    const distance = Math.hypot(
+      event.clientX - state.scheduleNotePressStart.x,
+      event.clientY - state.scheduleNotePressStart.y
+    );
+    if (distance > 10) clearScheduleNoteLongPress();
   }
 
 
@@ -3308,6 +3441,7 @@
       }
 
       state.scheduleShifts = [];
+      state.scheduleShiftNotes = new Map();
       refs.scheduleBoard.querySelectorAll("[data-schedule-cell]").forEach((textarea) => {
         textarea.value = "";
       });
@@ -3377,6 +3511,12 @@
       if (event.target === refs.employeeEditorModal) closeEmployeeEditor();
     });
     refs.employeeEditorForm.addEventListener("submit", (event) => void saveEmployeeEditor(event));
+    refs.scheduleNoteClose.addEventListener("click", closeScheduleNoteModal);
+    refs.scheduleNoteCancel.addEventListener("click", closeScheduleNoteModal);
+    refs.scheduleNoteModal.addEventListener("click", (event) => {
+      if (event.target === refs.scheduleNoteModal) closeScheduleNoteModal();
+    });
+    refs.scheduleNoteForm.addEventListener("submit", saveScheduleNote);
     refs.scheduleLoadBtn.addEventListener("click", () => void fetchScheduleData());
     refs.scheduleAutoFillBtn.addEventListener("click", autoFillScheduleV2);
     refs.scheduleDetailToggleBtn.addEventListener("click", () => {
@@ -3401,12 +3541,29 @@
     refs.scheduleStaffList.addEventListener("click", (event) => {
       const button = event.target.closest("[data-schedule-staff]");
       if (!button) return;
+      if (Date.now() < state.scheduleNoteSuppressClickUntil) return;
       const staff = getScheduleStaffByKey(button.dataset.scheduleStaff);
       if (staff) selectScheduleStaff(staff);
+    });
+    refs.scheduleStaffList.addEventListener("pointerdown", (event) => {
+      const button = event.target.closest("[data-schedule-staff]");
+      const cellKey = state.scheduleSelectedCellKey;
+      if (!button || !cellKey) return;
+      const staff = getScheduleStaffByKey(button.dataset.scheduleStaff);
+      if (!isScheduleStaffAssignedToCell(staff, cellKey)) return;
+      startScheduleNoteLongPress(cellKey, staff.name, event);
+    });
+    refs.scheduleStaffList.addEventListener("pointermove", cancelScheduleNoteLongPressOnMove);
+    ["pointerup", "pointercancel", "pointerleave"].forEach((eventName) => {
+      refs.scheduleStaffList.addEventListener(eventName, clearScheduleNoteLongPress);
+    });
+    refs.scheduleStaffList.addEventListener("contextmenu", (event) => {
+      if (state.scheduleSelectedCellKey && event.target.closest("[data-schedule-staff]")) event.preventDefault();
     });
     refs.scheduleBoard.addEventListener("click", (event) => {
       const removeButton = event.target.closest("[data-remove-schedule-assignment]");
       if (removeButton) {
+        if (Date.now() < state.scheduleNoteSuppressClickUntil) return;
         if (!state.scheduleSelectedCellKey && !getSelectedScheduleStaff()) return;
         removeScheduleStaffFromCell(removeButton.dataset.removeScheduleAssignment, removeButton.dataset.scheduleName);
         return;
@@ -3426,6 +3583,18 @@
         return;
       }
       assignScheduleStaffToCell(staff, zone.dataset.scheduleDropzone);
+    });
+    refs.scheduleBoard.addEventListener("pointerdown", (event) => {
+      const assignment = event.target.closest("[data-schedule-note-cell]");
+      if (!assignment) return;
+      startScheduleNoteLongPress(assignment.dataset.scheduleNoteCell, assignment.dataset.scheduleName, event);
+    });
+    refs.scheduleBoard.addEventListener("pointermove", cancelScheduleNoteLongPressOnMove);
+    ["pointerup", "pointercancel", "pointerleave"].forEach((eventName) => {
+      refs.scheduleBoard.addEventListener(eventName, clearScheduleNoteLongPress);
+    });
+    refs.scheduleBoard.addEventListener("contextmenu", (event) => {
+      if (event.target.closest("[data-schedule-note-cell]")) event.preventDefault();
     });
     refs.scheduleBoard.addEventListener("keydown", (event) => {
       if (event.key !== "Enter" && event.key !== " ") return;
