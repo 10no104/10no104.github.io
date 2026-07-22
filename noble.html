@@ -1095,27 +1095,6 @@
       font-weight: 800;
     }
 
-    .branch-day-status {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 3px;
-      min-width: 0;
-      padding: 3px 4px;
-      border-radius: 6px;
-      background: rgba(37, 99, 164, 0.13);
-      color: #1c5e9c;
-      font-size: 0.56rem;
-      font-weight: 900;
-      line-height: 1;
-      white-space: nowrap;
-    }
-
-    .branch-day-status.is-substitute-requested {
-      background: rgba(193, 95, 39, 0.15);
-      color: #a05224;
-    }
-
     .server-list {
       display: grid;
       gap: 3px;
@@ -1909,17 +1888,6 @@
 
       .branch-day-head span {
         font-size: 0.56rem;
-      }
-
-      .branch-day-status {
-        width: 100%;
-        min-height: 14px;
-        padding: 2px;
-        font-size: 0.52rem;
-      }
-
-      .branch-day-status-text {
-        display: none;
       }
 
       .schedule-legend-item {
@@ -3657,16 +3625,11 @@
                   isSubstituteRequested ? "is-substitute-requested" : "",
                   isMyWork ? "is-substitute-requestable" : ""
                 ].filter(Boolean).join(" ");
-                const statusMarkup = isMyWork || substituteRequests.length
-                  ? `<span class="branch-day-status ${isSubstituteRequested || substituteRequests.length ? "is-substitute-requested" : ""}"><span class="branch-day-status-text">${isSubstituteRequested ? "대타 요청 중" : isMyWork ? "내 근무" : "대타 요청"}</span></span>`
-                  : "";
-
                 return `
                   <article class="${dayClasses}" ${isMyWork ? `data-substitute-request-date="${escapeHtml(isoDate)}" data-substitute-request-branch="${escapeHtml(branch.key)}" aria-label="${escapeHtml(`${formatScheduleDay(date)} ${branch.label} 내 근무일. 길게 눌러 ${isSubstituteRequested ? "대타 요청 취소" : "대타 요청"}`)}"` : ""}>
                     <div class="branch-day-head">
                       <strong>${escapeHtml(formatScheduleDay(date))}</strong>
                       <span>${escapeHtml(formatScheduleMonthDay(date))}</span>
-                      ${statusMarkup}
                     </div>
                     <div class="server-list">${serverMarkup}</div>
                   </article>

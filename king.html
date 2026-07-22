@@ -1572,6 +1572,52 @@
       grid-column: 1 / -1;
     }
 
+    .schedule-selection-context {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 7px 9px;
+      border: 1px solid rgba(113, 88, 60, 0.14);
+      border-radius: 12px;
+      background: rgba(255, 252, 247, 0.78);
+      color: #493428;
+      font-size: 0.73rem;
+      font-weight: 850;
+    }
+
+    .schedule-selection-context b {
+      color: #2f2118;
+      white-space: nowrap;
+    }
+
+    .schedule-selection-context span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 3px;
+      min-width: 0;
+      white-space: nowrap;
+    }
+
+    .schedule-selection-context i {
+      display: inline-grid;
+      width: 15px;
+      height: 15px;
+      place-items: center;
+      border-radius: 999px;
+      color: #fffaf2;
+      font-size: 0.64rem;
+      font-style: normal;
+      font-weight: 950;
+      line-height: 1;
+    }
+
+    .schedule-selection-context i.is-available { background: #47776f; }
+    .schedule-selection-context i.is-preferred { background: #1d8061; }
+    .schedule-selection-context i.is-unavailable { background: #a3223b; }
+
     .staff-pill {
       display: inline-flex;
       align-items: center;
@@ -1705,6 +1751,13 @@
       --day-state-color: #8d2739;
       border-color: #a3223b;
       background: repeating-linear-gradient(-45deg, rgba(163, 34, 59, 0.11) 0 7px, rgba(255, 240, 242, 0.9) 7px 14px);
+      color: var(--day-state-color);
+    }
+
+    .staff-pill.is-day-available:not(.is-selected) {
+      --day-state-color: #47776f;
+      border-color: rgba(71, 119, 111, 0.56);
+      background: linear-gradient(135deg, rgba(231, 246, 242, 0.96), rgba(248, 253, 251, 0.92));
       color: var(--day-state-color);
     }
 
@@ -2050,6 +2103,34 @@
       background: rgba(242, 251, 246, 0.88);
     }
 
+    .schedule-dropzone.is-preferred {
+      border-color: rgba(29, 128, 97, 0.72);
+      background: linear-gradient(135deg, rgba(214, 244, 231, 0.96), rgba(245, 253, 248, 0.94));
+      box-shadow: inset 0 0 0 1px rgba(29, 128, 97, 0.12);
+    }
+
+    .schedule-dropzone.is-preferred::before {
+      position: absolute;
+      z-index: 2;
+      top: 6px;
+      right: 7px;
+      content: "선호";
+      padding: 3px 5px;
+      border-radius: 999px;
+      background: #1d8061;
+      color: #fffaf2;
+      font-size: 0.62rem;
+      font-weight: 950;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .schedule-dropzone.is-preferred .schedule-assignment-list,
+    .schedule-dropzone.is-preferred .schedule-drop-hint {
+      position: relative;
+      z-index: 1;
+    }
+
     .schedule-dropzone.is-blocked {
       border: 2px solid #a3223b;
       background:
@@ -2162,6 +2243,11 @@
 
     .schedule-dropzone.is-ready .schedule-drop-hint {
       color: #245f51;
+    }
+
+    .schedule-dropzone.is-preferred .schedule-drop-hint {
+      color: #17654d;
+      font-weight: 950;
     }
 
     .schedule-dropzone.is-blocked .schedule-drop-hint {

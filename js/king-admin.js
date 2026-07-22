@@ -2362,6 +2362,7 @@
     const selectedKey = normalizeScheduleStaffKey(state.scheduleSelectedStaffKey);
     const assignmentContext = getBoardAssignments();
     const selectedCell = getSelectedScheduleCellContext();
+    const selectedDate = selectedCell ? toSafeDate(selectedCell.isoDate) : null;
 
     if (!staff.length) {
       refs.scheduleStaffList.innerHTML = '<div class="empty-state">서버 목록이 없습니다.</div>';
@@ -2370,6 +2371,12 @@
 
     refs.scheduleStaffList.innerHTML = `
       ${state.scheduleUsingFallbackStaff ? '<div class="empty-state">employee_refs가 비어 있어 임시 서버 목록을 표시 중입니다.</div>' : ""}
+      ${selectedCell && selectedDate ? `
+        <div class="schedule-selection-context">
+          <b>${escapeHtml(`${formatScheduleDayLabel(selectedDate)} · ${formatBranchLabel(selectedCell.branch)}`)}</b>
+          <span><i class="is-available">✓</i> 가능 <i class="is-preferred">★</i> 선호 <i class="is-unavailable">×</i> 불가</span>
+        </div>
+      ` : ""}
       ${staff.map((item) => {
         const staffId = normalizeScheduleStaffKey(item.staff_key || item.name);
         const assignedDays = new Set((assignmentContext.byStaff.get(staffId) || []).map((assignment) => assignment.isoDate)).size;
@@ -2380,9 +2387,26 @@
         const isAssigned = Boolean(selectedCell && dropStatus?.type === "assigned");
         const isBlocked = Boolean(selectedCell && !dropStatus?.allowed && !isAssigned);
         const isPreferred = Boolean(selectedCell && !isBlocked && dayState?.type === "preferred");
-        const stateLabel = isAssigned ? "배정됨 · 탭해서 삭제" : isBlocked ? dropStatus?.label : dayState?.label || "";
-        const indicator = isBlocked ? "×" : isAssigned ? "−" : isPreferred ? "♥" : "";
-        const stateClass = isBlocked ? "is-day-unavailable" : isAssigned ? "is-day-assigned" : isPreferred ? "is-day-preferred" : "";
+        const isAvailable = Boolean(selectedCell && dropStatus?.allowed && !isPreferred);
+        const stateLabel = isAssigned
+          ? "배정됨 · 탭해서 삭제"
+          : isBlocked
+            ? dropStatus?.label
+            : isPreferred
+              ? "선호 · 가능"
+              : isAvailable
+                ? "가능"
+                : "";
+        const indicator = isBlocked ? "×" : isAssigned ? "−" : isPreferred ? "★" : isAvailable ? "✓" : "";
+        const stateClass = isBlocked
+          ? "is-day-unavailable"
+          : isAssigned
+            ? "is-day-assigned"
+            : isPreferred
+              ? "is-day-preferred"
+              : isAvailable
+                ? "is-day-available"
+                : "";
         const isSelected = selectedKey === staffId;
         return `
         <button
@@ -2441,11 +2465,19 @@
             const targetCount = Math.max(boardTargets.get(cellKey) ?? getDefaultServerCount(date), names.length);
             const compactDayLabel = formatScheduleDayCompactLabel(date);
             const dropStatus = getScheduleDropStatus(selectedStaff, branch.key, dateValue, names, assignmentContext);
+            const dayState = selectedStaff ? getScheduleStaffDateState(selectedStaff, dateValue) : null;
             const isTargetedCell = state.scheduleSelectedCellKey === cellKey;
+            const isPreferred = Boolean(selectedStaff && dropStatus.allowed && dayState?.type === "preferred");
+            const dropHint = selectedStaff
+              ? isPreferred
+                ? "선호 · 배정 가능"
+                : dropStatus.label
+              : "";
             const dropClasses = [
               "schedule-dropzone",
               isTargetedCell ? "is-targeted" : "",
               selectedStaff && dropStatus.allowed ? "is-ready" : "",
+              isPreferred ? "is-preferred" : "",
               selectedStaff && !dropStatus.allowed && dropStatus.type !== "none" ? "is-blocked" : "",
               selectedStaff && dropStatus.type === "assigned" ? "is-assigned" : ""
             ].filter(Boolean).join(" ");
@@ -2494,7 +2526,7 @@
                       `;
                     }).join("")}
                   </div>
-                  <span class="schedule-drop-hint">${escapeHtml(dropStatus.label)}</span>
+                  <span class="schedule-drop-hint">${escapeHtml(dropHint)}</span>
                 </div>
                 <textarea class="schedule-value" data-schedule-cell="${escapeHtml(cellKey)}" aria-hidden="true" tabindex="-1">${escapeHtml(names.join("\n"))}</textarea>
               </article>
