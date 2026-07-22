@@ -2784,20 +2784,31 @@
   function buildScheduleClipboardCanvas() {
     const dates = getScheduleWeekDates();
     const namesByCell = collectScheduleNamesByCellFromBoard();
-    const branchWidth = 164;
-    const dayWidth = 190;
+    const branchWidth = 176;
+    const dayWidth = 224;
     const margin = 44;
     const titleHeight = 96;
     const headerHeight = 62;
     const rowGap = 12;
-    const maxEntryLines = Math.max(
-      2,
-      ...SCHEDULE_BRANCHES.flatMap((branch) => dates.map((date) => {
+    const entryLineHeight = 31;
+    const noteLineHeight = 24;
+    const entryGap = 8;
+    const entriesByCell = new Map();
+    SCHEDULE_BRANCHES.forEach((branch) => {
+      dates.forEach((date) => {
         const cellKey = getScheduleCellKey(branch.key, formatInputDate(date));
-        return (namesByCell.get(cellKey) || []).length;
-      }))
+        entriesByCell.set(cellKey, (namesByCell.get(cellKey) || [])
+          .map((name) => ({ name, note: getScheduleShiftNote(cellKey, name) })));
+      });
+    });
+    const maxCellContentHeight = Math.max(
+      0,
+      ...Array.from(entriesByCell.values()).map((entries) => (
+        entries.reduce((height, entry) => height + entryLineHeight + (entry.note ? noteLineHeight : 0), 0) +
+        Math.max(0, entries.length - 1) * entryGap
+      ))
     );
-    const rowHeight = Math.max(126, 58 + maxEntryLines * 31);
+    const rowHeight = Math.max(150, maxCellContentHeight + 36);
     const width = margin * 2 + branchWidth + dayWidth * dates.length;
     const height = margin * 2 + titleHeight + headerHeight + SCHEDULE_BRANCHES.length * rowHeight + (SCHEDULE_BRANCHES.length - 1) * rowGap + 22;
     const canvas = document.createElement("canvas");
@@ -2880,20 +2891,29 @@
           return;
         }
 
-        const entries = names.map((name) => ({ name, note: getScheduleShiftNote(cellKey, name) }));
-        const totalLines = entries.length;
-        const lineHeight = Math.min(32, Math.max(21, (rowHeight - 36) / totalLines));
-        let lineY = y + (rowHeight - totalLines * lineHeight) / 2 + lineHeight / 2;
-        entries.forEach((entry) => {
-          const entryText = entry.note ? `${entry.name} - ${entry.note}` : entry.name;
-          drawFittedText(ctx, entryText, x + dayWidth / 2, lineY, dayWidth - 32, {
-            size: entry.note ? 19 : 24,
-            minSize: 10,
+        const entries = entriesByCell.get(cellKey) || [];
+        const contentHeight = entries.reduce((height, entry) => height + entryLineHeight + (entry.note ? noteLineHeight : 0), 0) +
+          Math.max(0, entries.length - 1) * entryGap;
+        let entryY = y + (rowHeight - contentHeight) / 2;
+        entries.forEach((entry, entryIndex) => {
+          drawFittedText(ctx, entry.name, x + dayWidth / 2, entryY + entryLineHeight / 2, dayWidth - 32, {
+            size: 24,
+            minSize: 16,
             weight: 900,
             color: branch.color,
             ellipsis: true
           });
-          lineY += lineHeight;
+          if (entry.note) {
+            drawFittedText(ctx, `- ${entry.note}`, x + dayWidth / 2, entryY + entryLineHeight + noteLineHeight / 2, dayWidth - 32, {
+              size: 18,
+              minSize: 12,
+              weight: 800,
+              color: "#8b5d26",
+              ellipsis: true
+            });
+          }
+          entryY += entryLineHeight + (entry.note ? noteLineHeight : 0);
+          if (entryIndex < entries.length - 1) entryY += entryGap;
         });
       });
     });
