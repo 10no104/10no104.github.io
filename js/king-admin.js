@@ -2521,7 +2521,7 @@
                         >
                           <span class="schedule-assignment-content">
                             <span class="schedule-assignment-name">${escapeHtml(name)}</span>
-                            ${note ? `<small class="schedule-assignment-note">서버 메모: ${escapeHtml(note)}</small>` : ""}
+                            ${note ? `<small class="schedule-assignment-note"><span class="schedule-assignment-note-text">${escapeHtml(note)}</span></small>` : ""}
                           </span>
                           <span class="schedule-assignment-remove" aria-hidden="true">×</span>
                         </button>
@@ -2879,6 +2879,15 @@
         const lineHeight = Math.min(32, Math.max(21, (rowHeight - 36) / totalLines));
         let lineY = y + (rowHeight - totalLines * lineHeight) / 2 + lineHeight / 2;
         entries.forEach((entry) => {
+          if (entry.note) {
+            const groupX = x + 12;
+            const groupY = lineY - lineHeight / 2 + 1;
+            const groupWidth = dayWidth - 24;
+            const groupHeight = lineHeight * 2 - 2;
+            fillRoundRect(ctx, groupX, groupY, groupWidth, groupHeight, 10, "rgba(255, 255, 255, 0.72)");
+            strokeRoundRect(ctx, groupX, groupY, groupWidth, groupHeight, 10, branch.border, 1.5);
+            fillRoundRect(ctx, groupX, groupY, 4, groupHeight, 2, branch.color);
+          }
           drawFittedText(ctx, entry.name, x + dayWidth / 2, lineY, dayWidth - 32, {
             size: 24,
             minSize: 13,
@@ -2887,7 +2896,17 @@
           });
           lineY += lineHeight;
           if (!entry.note) return;
-          drawFittedText(ctx, `서버 메모: ${entry.note}`, x + dayWidth / 2, lineY, dayWidth - 34, {
+          ctx.beginPath();
+          ctx.moveTo(x + 23, lineY - lineHeight / 2);
+          ctx.lineTo(x + dayWidth - 23, lineY - lineHeight / 2);
+          ctx.strokeStyle = "rgba(113, 88, 60, 0.14)";
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(x + 27, lineY, 3.5, 0, Math.PI * 2);
+          ctx.fillStyle = branch.color;
+          ctx.fill();
+          drawFittedText(ctx, entry.note, x + dayWidth / 2 + 6, lineY, dayWidth - 62, {
             size: 15,
             minSize: 10,
             weight: 800,
