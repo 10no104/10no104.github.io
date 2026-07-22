@@ -2337,11 +2337,12 @@
         const dropStatus = selectedCell
           ? getScheduleDropStatus(item, selectedCell.branch, selectedCell.isoDate, selectedCell.names, assignmentContext)
           : null;
-        const isBlocked = Boolean(selectedCell && !dropStatus?.allowed);
+        const isAssigned = Boolean(selectedCell && dropStatus?.type === "assigned");
+        const isBlocked = Boolean(selectedCell && !dropStatus?.allowed && !isAssigned);
         const isPreferred = Boolean(selectedCell && !isBlocked && dayState?.type === "preferred");
-        const stateLabel = isBlocked ? dropStatus?.label : dayState?.label || "";
-        const indicator = isBlocked ? "×" : isPreferred ? "♥" : "";
-        const stateClass = isBlocked ? "is-day-unavailable" : isPreferred ? "is-day-preferred" : "";
+        const stateLabel = isAssigned ? "배정됨 · 탭해서 삭제" : isBlocked ? dropStatus?.label : dayState?.label || "";
+        const indicator = isBlocked ? "×" : isAssigned ? "−" : isPreferred ? "♥" : "";
+        const stateClass = isBlocked ? "is-day-unavailable" : isAssigned ? "is-day-assigned" : isPreferred ? "is-day-preferred" : "";
         const isSelected = selectedKey === staffId;
         return `
         <button
@@ -2363,15 +2364,16 @@
     `;
   }
 
-  function renderScheduleBoard() {
+  function renderScheduleBoard(options = {}) {
+    const { preserveBoardEdits = true } = options;
     const branches = [
       { key: "uptown", label: "Uptown" },
       { key: "downtown", label: "Downtown" }
     ];
     const dates = getScheduleWeekDates();
     const shiftMap = getShiftNamesByCell();
-    const boardNames = getScheduleNamesByCellFromBoard();
-    const boardTargets = getScheduleTargetsByCellFromBoard();
+    const boardNames = preserveBoardEdits ? getScheduleNamesByCellFromBoard() : new Map();
+    const boardTargets = preserveBoardEdits ? getScheduleTargetsByCellFromBoard() : new Map();
     const namesByCell = new Map(shiftMap);
     boardNames.forEach((names, cellKey) => namesByCell.set(cellKey, names));
     const assignmentContext = getScheduleAssignmentContextFromMap(namesByCell);
@@ -2600,7 +2602,7 @@
     state.scheduleUsingFallbackStaff = !dbStaff.length;
     state.scheduleWeek = weekResult.data || null;
     state.scheduleShifts = scheduleShifts;
-    renderScheduleBoard();
+    renderScheduleBoard({ preserveBoardEdits: false });
     setScheduleStatus("스케줄 데이터를 불러왔습니다.", "success");
   }
 
@@ -2898,6 +2900,24 @@
     if (!staff || !branch || !isoDate || !textarea) return;
 
     const names = getCurrentNames(textarea);
+    const staffKeys = new Set([
+      normalizeScheduleStaffKey(staff.staff_key || staff.name),
+      normalizeScheduleStaffKey(staff.name)
+    ]);
+    const isAlreadyAssigned = names.some((name) => staffKeys.has(normalizeScheduleStaffKey(name)));
+    if (isAlreadyAssigned) {
+      textarea.value = names
+        .filter((name) => !staffKeys.has(normalizeScheduleStaffKey(name)))
+        .join("\n");
+      state.scheduleSelectedCellKey = "";
+      state.scheduleSelectedStaffKey = keepStaffSelected
+        ? normalizeScheduleStaffKey(staff.staff_key || staff.name)
+        : "";
+      renderScheduleBoard();
+      setScheduleStatus(`${staff.name} · ${formatScheduleDayLabel(toSafeDate(isoDate))} ${formatBranchLabel(branch)} 배정을 삭제했습니다.`, "success");
+      return;
+    }
+
     const dropStatus = getScheduleDropStatus(staff, branch, isoDate, names, getBoardAssignments());
     if (!dropStatus.allowed) {
       renderScheduleBoard();

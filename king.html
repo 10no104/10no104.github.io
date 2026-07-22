@@ -1715,6 +1715,13 @@
       color: var(--day-state-color);
     }
 
+    .staff-pill.is-day-assigned:not(.is-selected) {
+      --day-state-color: #9a6a1e;
+      border-color: rgba(185, 135, 31, 0.64);
+      background: linear-gradient(135deg, rgba(255, 242, 202, 0.96), rgba(255, 249, 229, 0.92));
+      color: var(--day-state-color);
+    }
+
     .staff-pill-day-mark {
       display: inline-grid;
       width: 20px;
@@ -2925,6 +2932,6 @@
     </div>
   </div>
 
-  <script src="js/king-admin.js?v=20260721-10"></script>
+  <script src="js/king-admin.js?v=20260721-12"></script>
 </body>
 </html>
