@@ -1,5 +1,6 @@
 -- Run once in Supabase SQL Editor after supabase-schema-classification.sql.
--- Stores staff-submitted substitute requests for published schedule shifts.
+-- Stores notification-only substitute requests for published schedule shifts.
+-- It never assigns a replacement automatically.
 
 create extension if not exists pgcrypto;
 
@@ -37,10 +38,12 @@ alter table schedule.shift_substitute_requests enable row level security;
 revoke all on schedule.shift_substitute_requests from anon;
 grant select, insert, update, delete on schedule.shift_substitute_requests to authenticated;
 
-create or replace function public.noble_get_my_substitute_requests_v1(input_ref text)
+create or replace function public.noble_get_schedule_substitute_requests_v2(input_ref text)
 returns table (
   shift_date date,
   branch text,
+  requester_staff_key text,
+  requester_name text,
   status text,
   week_start date
 )
@@ -50,6 +53,7 @@ set search_path = public, schedule
 as $$
 declare
   employee record;
+  latest_week date;
 begin
   select *
     into employee
@@ -60,23 +64,34 @@ begin
     raise exception 'invalid reference code';
   end if;
 
+  select max(w.week_start)
+    into latest_week
+  from schedule.schedule_weeks w
+  where w.status = 'published';
+
+  if latest_week is null then
+    return;
+  end if;
+
   return query
     select
       r.shift_date,
       r.branch,
+      r.requester_staff_key,
+      r.requester_name,
       r.status,
       w.week_start
     from schedule.shift_substitute_requests r
     join schedule.schedule_shifts s on s.id = r.shift_id
     join schedule.schedule_weeks w on w.id = s.week_id
-    where r.requester_staff_key = employee.staff_key
+    where w.week_start = latest_week
       and r.status = 'open'
       and w.status = 'published'
-    order by r.shift_date, r.branch;
+    order by r.shift_date, r.branch, r.requester_name;
 end;
 $$;
 
-create or replace function public.noble_request_substitute_v1(
+create or replace function public.noble_request_substitute_v2(
   input_ref text,
   p_week_start date,
   p_shift_date date,
@@ -104,11 +119,14 @@ begin
     into target_shift
   from schedule.schedule_shifts s
   join schedule.schedule_weeks w on w.id = s.week_id
-  where s.staff_key = employee.staff_key
-    and s.shift_date = p_shift_date
-    and s.branch = lower(trim(p_branch))
+  where s.shift_date = p_shift_date
+    and lower(trim(s.branch)) = lower(trim(p_branch))
     and w.week_start = p_week_start
     and w.status = 'published'
+    and (
+      lower(regexp_replace(coalesce(s.staff_key, ''), '[[:space:]]+', '', 'g')) = lower(regexp_replace(employee.staff_key, '[[:space:]]+', '', 'g'))
+      or lower(regexp_replace(coalesce(s.staff_name, ''), '[[:space:]]+', '', 'g')) = lower(regexp_replace(employee.staff_key, '[[:space:]]+', '', 'g'))
+    )
   limit 1;
 
   if target_shift.id is null then
@@ -139,8 +157,67 @@ begin
 end;
 $$;
 
-revoke all on function public.noble_get_my_substitute_requests_v1(text) from public;
-grant execute on function public.noble_get_my_substitute_requests_v1(text) to anon, authenticated;
+create or replace function public.noble_cancel_substitute_v1(
+  input_ref text,
+  p_week_start date,
+  p_shift_date date,
+  p_branch text
+)
+returns boolean
+language plpgsql
+security definer
+set search_path = public, schedule
+as $$
+declare
+  employee record;
+  target_shift record;
+begin
+  select *
+    into employee
+  from public.lookup_employee_ref(input_ref)
+  limit 1;
 
-revoke all on function public.noble_request_substitute_v1(text, date, date, text) from public;
-grant execute on function public.noble_request_substitute_v1(text, date, date, text) to anon, authenticated;
+  if employee.staff_key is null then
+    raise exception 'invalid reference code';
+  end if;
+
+  select s.id
+    into target_shift
+  from schedule.schedule_shifts s
+  join schedule.schedule_weeks w on w.id = s.week_id
+  where s.shift_date = p_shift_date
+    and lower(trim(s.branch)) = lower(trim(p_branch))
+    and w.week_start = p_week_start
+    and w.status = 'published'
+    and (
+      lower(regexp_replace(coalesce(s.staff_key, ''), '[[:space:]]+', '', 'g')) = lower(regexp_replace(employee.staff_key, '[[:space:]]+', '', 'g'))
+      or lower(regexp_replace(coalesce(s.staff_name, ''), '[[:space:]]+', '', 'g')) = lower(regexp_replace(employee.staff_key, '[[:space:]]+', '', 'g'))
+    )
+  limit 1;
+
+  if target_shift.id is null then
+    raise exception 'published shift not found for this staff member';
+  end if;
+
+  update schedule.shift_substitute_requests
+  set status = 'cancelled',
+      updated_at = now()
+  where shift_id = target_shift.id
+    and lower(regexp_replace(requester_staff_key, '[[:space:]]+', '', 'g')) = lower(regexp_replace(employee.staff_key, '[[:space:]]+', '', 'g'))
+    and status = 'open';
+
+  return true;
+end;
+$$;
+
+drop function if exists public.noble_get_my_substitute_requests_v1(text);
+drop function if exists public.noble_request_substitute_v1(text, date, date, text);
+
+revoke all on function public.noble_get_schedule_substitute_requests_v2(text) from public;
+grant execute on function public.noble_get_schedule_substitute_requests_v2(text) to anon, authenticated;
+
+revoke all on function public.noble_request_substitute_v2(text, date, date, text) from public;
+grant execute on function public.noble_request_substitute_v2(text, date, date, text) to anon, authenticated;
+
+revoke all on function public.noble_cancel_substitute_v1(text, date, date, text) from public;
+grant execute on function public.noble_cancel_substitute_v1(text, date, date, text) to anon, authenticated;

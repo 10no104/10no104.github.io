@@ -2875,11 +2875,12 @@
 
   function selectScheduleStaff(staff, allowToggle = true) {
     if (!staff) return;
-    const selectedCell = getSelectedScheduleCellContext();
-    if (selectedCell) {
-      assignScheduleStaffToCell(staff, selectedCell.cellKey, { keepStaffSelected: false });
+    const selectedCellKey = state.scheduleSelectedCellKey;
+    if (selectedCellKey && getScheduleTextarea(selectedCellKey)) {
+      assignScheduleStaffToCell(staff, selectedCellKey, { keepStaffSelected: false });
       return;
     }
+    state.scheduleSelectedCellKey = "";
     const staffKey = normalizeScheduleStaffKey(staff.staff_key || staff.name);
     state.scheduleSelectedStaffKey = allowToggle && state.scheduleSelectedStaffKey === staffKey ? "" : staffKey;
     renderScheduleBoard();

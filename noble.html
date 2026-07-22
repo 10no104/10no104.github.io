@@ -959,6 +959,8 @@
     .schedule-legend-item.is-my-work b { background: rgba(37, 99, 164, 0.14); }
     .schedule-legend-item.is-substitute-requested { color: #a05224; }
     .schedule-legend-item.is-substitute-requested b { background: rgba(207, 114, 48, 0.16); }
+    .schedule-legend-item.is-not-my-work { color: #796a63; }
+    .schedule-legend-item.is-not-my-work b { background: rgba(122, 108, 98, 0.16); }
 
     .branch-schedule-column {
       min-width: 0;
@@ -1051,7 +1053,7 @@
       box-shadow: inset 0 0 0 2px rgba(37, 99, 164, 0.22), 0 12px 20px rgba(37, 99, 164, 0.12);
     }
 
-    .branch-day.is-substitute-requested {
+    .branch-day.has-substitute-request {
       border-color: rgba(193, 95, 39, 0.52);
       background: linear-gradient(180deg, rgba(255, 241, 226, 0.98), rgba(255, 224, 197, 0.96));
       box-shadow: inset 0 0 0 2px rgba(193, 95, 39, 0.16), 0 12px 20px rgba(193, 95, 39, 0.1);
@@ -1128,6 +1130,19 @@
     .server-chip.is-me {
       background: linear-gradient(135deg, rgba(37, 99, 164, 0.96), rgba(45, 145, 190, 0.92));
       color: #fffaf2;
+    }
+
+    .server-chip.is-substitute-requester {
+      background: linear-gradient(135deg, #b56031, #d78a43);
+      color: #fffaf2;
+    }
+
+    .server-chip.is-substitute-requester small {
+      display: block;
+      margin-top: 2px;
+      font-size: 0.52rem;
+      font-weight: 900;
+      line-height: 1;
     }
 
     .server-empty {
@@ -2333,11 +2348,12 @@
         <button class="request-close" id="substituteRequestCloseButton" type="button" aria-label="대타 요청 닫기">×</button>
       </div>
       <p class="substitute-request-meta" id="substituteRequestMeta"></p>
-      <p class="substitute-request-notice"><span aria-hidden="true">🔁</span><span>이 근무일에 대타 요청을 등록하시겠습니까? 요청 후 스케줄에 표시됩니다.</span></p>
+      <p class="substitute-request-notice" id="substituteRequestNotice">이 요청은 알림용이며 자동으로 대타를 배정하지 않습니다.</p>
       <form class="request-form" id="substituteRequestForm">
         <div class="substitute-request-actions">
           <button class="request-cancel" id="substituteRequestCancelButton" type="button">취소</button>
-          <button class="request-submit" type="submit">대타 요청하기</button>
+          <button class="request-cancel" id="substituteRequestCancelOpenButton" type="button" hidden>대타 요청 취소</button>
+          <button class="request-submit" id="substituteRequestSubmitButton" type="submit">대타 요청하기</button>
         </div>
         <p class="request-status" id="substituteRequestStatus"></p>
       </form>
@@ -2408,7 +2424,7 @@
         currentAccess: null,
         dbScheduleRows: [],
         dbScheduleWeekStart: "",
-        dbSubstituteRequestKeys: new Set(),
+        dbSubstituteRequests: [],
         substituteRequestTarget: null,
         scheduleCursor: startOfWeek(new Date()),
         latestScheduleWeekStart: startOfWeek(new Date()),
@@ -2486,8 +2502,11 @@
           "substituteRequestModal",
           "substituteRequestCloseButton",
           "substituteRequestCancelButton",
+          "substituteRequestCancelOpenButton",
+          "substituteRequestSubmitButton",
           "substituteRequestForm",
           "substituteRequestMeta",
+          "substituteRequestNotice",
           "substituteRequestStatus"
         ].forEach((id) => {
           refs[id] = byId(id);
@@ -2641,21 +2660,35 @@
         }
       }
 
-      function getSubstituteRequestKey(branch = "", isoDate = "") {
-        return `${normalizeKey(branch)}|${isoDate}`;
+      function getSubstituteRequestsForDay(branch = "", isoDate = "") {
+        return state.dbSubstituteRequests.filter((item) => (
+          normalizeKey(item.branch) === normalizeKey(branch) &&
+          item.shift_date === isoDate &&
+          item.status === "open"
+        ));
+      }
+
+      function getSubstituteRequestForServer(branch = "", isoDate = "", server = {}) {
+        const keys = new Set([
+          normalizeKey(server.staffKey),
+          normalizeKey(server.name)
+        ].filter(Boolean));
+        return getSubstituteRequestsForDay(branch, isoDate).find((item) => (
+          keys.has(normalizeKey(item.requester_staff_key)) ||
+          keys.has(normalizeKey(item.requester_name))
+        )) || null;
       }
 
       async function loadDbSubstituteRequests(input = "") {
-        state.dbSubstituteRequestKeys = new Set();
+        state.dbSubstituteRequests = [];
         const refCode = String(input || "").trim();
         if (!refCode || !supabaseClient) return;
 
         try {
-          const { data, error } = await supabaseClient.rpc("noble_get_my_substitute_requests_v1", { input_ref: refCode });
+          const { data, error } = await supabaseClient.rpc("noble_get_schedule_substitute_requests_v2", { input_ref: refCode });
           if (error) throw error;
-          state.dbSubstituteRequestKeys = new Set((Array.isArray(data) ? data : [])
-            .filter((item) => item.status === "open")
-            .map((item) => getSubstituteRequestKey(item.branch, item.shift_date)));
+          state.dbSubstituteRequests = (Array.isArray(data) ? data : [])
+            .filter((item) => item.status === "open");
         } catch (error) {
           console.warn("Substitute requests unavailable", error);
         }
@@ -3026,13 +3059,23 @@
 
       function openSubstituteRequestModal(isoDate, branch) {
         if (!isoDate || !branch || !state.dbScheduleWeekStart) return;
-        state.substituteRequestTarget = { isoDate, branch: normalizeKey(branch) };
+        const normalizedBranch = normalizeKey(branch);
+        const ownRequest = getSubstituteRequestForServer(normalizedBranch, isoDate, {
+          staffKey: state.currentAccess?.staff_key,
+          name: state.currentStaff?.name
+        });
+        state.substituteRequestTarget = { isoDate, branch: normalizedBranch, hasOpenRequest: Boolean(ownRequest) };
         refs.substituteRequestMeta.textContent = `${formatLongDate(new Date(`${isoDate}T00:00:00`))} · ${getBranchLabel(branch)}`;
         refs.substituteRequestStatus.textContent = "";
+        refs.substituteRequestNotice.textContent = ownRequest
+          ? "이 근무일의 대타 요청이 현재 알림으로 표시되고 있습니다. 취소할 수 있습니다."
+          : "이 요청은 알림용이며 자동으로 대타를 배정하지 않습니다.";
+        refs.substituteRequestSubmitButton.hidden = Boolean(ownRequest);
+        refs.substituteRequestCancelOpenButton.hidden = !ownRequest;
         refs.substituteRequestModal.hidden = false;
         refs.substituteRequestModal.setAttribute("aria-hidden", "false");
         document.body.classList.add("modal-open");
-        window.setTimeout(() => refs.substituteRequestCancelButton.focus(), 0);
+        window.setTimeout(() => (ownRequest ? refs.substituteRequestCancelOpenButton : refs.substituteRequestSubmitButton).focus(), 0);
       }
 
       async function submitSubstituteRequest() {
@@ -3043,19 +3086,45 @@
         refs.substituteRequestStatus.textContent = "대타 요청을 저장하는 중...";
         try {
           if (!supabaseClient) throw new Error("Supabase client is not available.");
-          const { error } = await supabaseClient.rpc("noble_request_substitute_v1", {
+          const { error } = await supabaseClient.rpc("noble_request_substitute_v2", {
             input_ref: refCode,
             p_week_start: state.dbScheduleWeekStart,
             p_shift_date: target.isoDate,
             p_branch: target.branch
           });
           if (error) throw error;
-          state.dbSubstituteRequestKeys.add(getSubstituteRequestKey(target.branch, target.isoDate));
+          await loadDbSubstituteRequests(refCode);
           renderScheduleView();
           closeSubstituteRequestModal();
           setStatus("대타 요청을 등록했습니다.");
         } catch (error) {
-          refs.substituteRequestStatus.textContent = error.message || "대타 요청을 저장하지 못했습니다.";
+          refs.substituteRequestStatus.textContent = String(error?.message || "").includes("published shift not found")
+            ? "확정 스케줄의 내 근무를 확인하지 못했습니다. 관리자에게 알려주세요."
+            : error.message || "대타 요청을 저장하지 못했습니다.";
+        }
+      }
+
+      async function cancelSubstituteRequest() {
+        const target = state.substituteRequestTarget;
+        const refCode = state.savedRefCode || refs.staffIdInput.value;
+        if (!target || !refCode || !state.dbScheduleWeekStart) return;
+
+        refs.substituteRequestStatus.textContent = "대타 요청을 취소하는 중...";
+        try {
+          if (!supabaseClient) throw new Error("Supabase client is not available.");
+          const { error } = await supabaseClient.rpc("noble_cancel_substitute_v1", {
+            input_ref: refCode,
+            p_week_start: state.dbScheduleWeekStart,
+            p_shift_date: target.isoDate,
+            p_branch: target.branch
+          });
+          if (error) throw error;
+          await loadDbSubstituteRequests(refCode);
+          renderScheduleView();
+          closeSubstituteRequestModal();
+          setStatus("대타 요청을 취소했습니다.");
+        } catch (error) {
+          refs.substituteRequestStatus.textContent = error.message || "대타 요청을 취소하지 못했습니다.";
         }
       }
 
@@ -3275,7 +3344,7 @@
         state.currentAccess = null;
         state.dbScheduleRows = [];
         state.dbScheduleWeekStart = "";
-        state.dbSubstituteRequestKeys = new Set();
+        state.dbSubstituteRequests = [];
         state.substituteRequestTarget = null;
         state.periods = [];
         state.openPeriodKey = null;
@@ -3554,11 +3623,11 @@
         refs.scheduleNext.disabled = true;
         refs.scheduleList.innerHTML = `
           <div class="schedule-legend" aria-label="스케줄 표시 안내">
-            <span class="schedule-legend-item is-my-work"><b aria-hidden="true">💼</b>내 근무</span>
-            <span class="schedule-legend-item is-substitute-requested"><b aria-hidden="true">🔁</b>대타 요청</span>
-            <span class="schedule-legend-item"><b aria-hidden="true">○</b>비근무</span>
+            <span class="schedule-legend-item is-my-work"><b aria-hidden="true"></b>내 근무</span>
+            <span class="schedule-legend-item is-substitute-requested"><b aria-hidden="true"></b>대타 요청</span>
+            <span class="schedule-legend-item is-not-my-work"><b aria-hidden="true"></b>비근무</span>
           </div>
-          <p class="calendar-usage-guide">💼 내 근무일을 길게 누르면 대타 요청을 등록할 수 있습니다.</p>
+          <p class="calendar-usage-guide">내 근무일을 길게 누르면 대타 요청을 등록하거나 취소할 수 있습니다.</p>
           <div class="branch-schedule-grid">
             ${branchRows.map((branch) => {
               const days = Array.from({ length: 7 }, (_unused, index) => {
@@ -3570,27 +3639,37 @@
                     const isMe = normalizeKey(row.staff_key) === currentKey || normalizeKey(row.staff_name) === currentKey;
                     return {
                       name: row.staff_name || row.staff_key || "-",
+                      staffKey: row.staff_key || row.staff_name || "",
                       isMe
                     };
                   });
                 const isMyWork = servers.some((server) => server.isMe);
-                const isSubstituteRequested = isMyWork && state.dbSubstituteRequestKeys.has(getSubstituteRequestKey(branch.key, isoDate));
+                const substituteRequests = getSubstituteRequestsForDay(branch.key, isoDate);
+                const ownSubstituteRequest = getSubstituteRequestForServer(branch.key, isoDate, {
+                  staffKey: state.currentAccess?.staff_key,
+                  name: state.currentStaff?.name
+                });
+                const isSubstituteRequested = Boolean(ownSubstituteRequest);
                 const serverMarkup = servers.length
-                  ? servers.map((server) => `<span class="server-chip ${server.isMe ? "is-me" : ""}">${escapeHtml(server.name)}</span>`).join("")
+                  ? servers.map((server) => {
+                    const substituteRequest = getSubstituteRequestForServer(branch.key, isoDate, server);
+                    return `<span class="server-chip ${server.isMe ? "is-me" : ""} ${substituteRequest ? "is-substitute-requester" : ""}">${escapeHtml(server.name)}${substituteRequest ? '<small>대타 요청</small>' : ""}</span>`;
+                  }).join("")
                   : `<span class="server-empty">-</span>`;
                 const dayClasses = [
                   "branch-day",
                   isSameDate(date, new Date()) ? "is-today" : "",
                   isMyWork ? "is-my-work" : "is-not-my-work",
+                  substituteRequests.length ? "has-substitute-request" : "",
                   isSubstituteRequested ? "is-substitute-requested" : "",
-                  isMyWork && !isSubstituteRequested ? "is-substitute-requestable" : ""
+                  isMyWork ? "is-substitute-requestable" : ""
                 ].filter(Boolean).join(" ");
-                const statusMarkup = isMyWork
-                  ? `<span class="branch-day-status ${isSubstituteRequested ? "is-substitute-requested" : ""}"><span aria-hidden="true">${isSubstituteRequested ? "🔁" : "💼"}</span><span class="branch-day-status-text">${isSubstituteRequested ? "대타 요청" : "내 근무"}</span></span>`
+                const statusMarkup = isMyWork || substituteRequests.length
+                  ? `<span class="branch-day-status ${isSubstituteRequested || substituteRequests.length ? "is-substitute-requested" : ""}"><span class="branch-day-status-text">${isSubstituteRequested ? "대타 요청 중" : isMyWork ? "내 근무" : "대타 요청"}</span></span>`
                   : "";
 
                 return `
-                  <article class="${dayClasses}" ${isMyWork && !isSubstituteRequested ? `data-substitute-request-date="${escapeHtml(isoDate)}" data-substitute-request-branch="${escapeHtml(branch.key)}" aria-label="${escapeHtml(`${formatScheduleDay(date)} ${branch.label} 내 근무일. 길게 눌러 대타 요청`)}"` : ""}>
+                  <article class="${dayClasses}" ${isMyWork ? `data-substitute-request-date="${escapeHtml(isoDate)}" data-substitute-request-branch="${escapeHtml(branch.key)}" aria-label="${escapeHtml(`${formatScheduleDay(date)} ${branch.label} 내 근무일. 길게 눌러 ${isSubstituteRequested ? "대타 요청 취소" : "대타 요청"}`)}"` : ""}>
                     <div class="branch-day-head">
                       <strong>${escapeHtml(formatScheduleDay(date))}</strong>
                       <span>${escapeHtml(formatScheduleMonthDay(date))}</span>
@@ -4133,6 +4212,7 @@
 
         refs.substituteRequestCloseButton.addEventListener("click", closeSubstituteRequestModal);
         refs.substituteRequestCancelButton.addEventListener("click", closeSubstituteRequestModal);
+        refs.substituteRequestCancelOpenButton.addEventListener("click", () => void cancelSubstituteRequest());
         refs.substituteRequestModal.addEventListener("click", (event) => {
           if (event.target === refs.substituteRequestModal) closeSubstituteRequestModal();
         });
