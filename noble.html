@@ -1329,27 +1329,45 @@
 
     .fixed-weekday-head {
       display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 8px;
-    }
-
-    .fixed-weekday-head h3,
-    .fixed-weekday-head p {
-      margin: 0;
+      align-items: center;
     }
 
     .fixed-weekday-head h3 {
+      margin: 0;
       color: var(--ink);
       font-size: 0.88rem;
       letter-spacing: -0.02em;
     }
 
-    .fixed-weekday-head p {
-      color: var(--muted);
-      font-size: 0.68rem;
-      font-weight: 750;
-      text-align: right;
+    .fixed-weekday-notice {
+      display: flex;
+      align-items: flex-start;
+      gap: 7px;
+      margin: -3px 0 0;
+      padding: 8px 9px;
+      border: 1px solid rgba(185, 124, 30, 0.28);
+      border-radius: 11px;
+      background: rgba(255, 242, 202, 0.68);
+      color: #80551a;
+      font-size: 0.71rem;
+      font-weight: 800;
+      line-height: 1.48;
+      word-break: keep-all;
+    }
+
+    .fixed-weekday-notice-icon {
+      display: inline-grid;
+      flex: 0 0 auto;
+      width: 16px;
+      height: 16px;
+      place-items: center;
+      margin-top: 1px;
+      border-radius: 999px;
+      background: #c38726;
+      color: #fffaf2;
+      font-size: 0.66rem;
+      font-weight: 950;
+      line-height: 1;
     }
 
     .fixed-weekday-panel .preference-block {
@@ -1815,14 +1833,6 @@
         border-radius: 14px;
       }
 
-      .fixed-weekday-head {
-        align-items: flex-start;
-      }
-
-      .fixed-weekday-head p {
-        max-width: 155px;
-      }
-
       .availability-save {
         width: 100%;
       }
@@ -2028,8 +2038,8 @@
                 <section class="fixed-weekday-panel" aria-label="고정 요일 설정">
                   <div class="fixed-weekday-head">
                     <h3>고정 요일</h3>
-                    <p>선호는 보장되지 않으며, 불가 요일이 많으면 주간 배정이 어려울 수 있습니다.</p>
                   </div>
+                  <p class="fixed-weekday-notice"><span class="fixed-weekday-notice-icon" aria-hidden="true">!</span><span>선호는 보장되지 않으며, 불가 요일이 많으면<br />해당 주간 배정이 어려울 수 있습니다.</span></p>
                   <div class="preference-block">
                     <span class="preference-label">고정 불가</span>
                     <div class="weekday-toggle-group" id="fixedUnavailableWeekdays" data-preference-kind="fixedUnavailableWeekdays"></div>
