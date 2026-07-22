@@ -2197,38 +2197,30 @@
     }
 
     .schedule-assignment-content {
-      position: relative;
-      display: grid;
+      display: flex;
+      align-items: baseline;
       flex: 1;
       min-width: 0;
-      gap: 4px;
+      gap: 5px;
+      overflow: hidden;
     }
 
     .schedule-assignment-name,
     .schedule-assignment-note-text {
+      min-width: 0;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
 
-    .schedule-assignment.has-note .schedule-assignment-content {
-      padding-left: 9px;
-    }
-
-    .schedule-assignment.has-note .schedule-assignment-content::before {
-      position: absolute;
-      top: 1px;
-      bottom: 1px;
-      left: 0;
-      width: 3px;
-      border-radius: 3px;
-      background: #c08a28;
-      content: "";
+    .schedule-assignment-name {
+      flex: 0 1 auto;
     }
 
     .schedule-assignment-note {
       display: flex;
       align-items: center;
+      flex: 1 1 auto;
       min-width: 0;
       color: #8b5d26;
       font-size: 0.66rem;
@@ -2237,29 +2229,19 @@
     }
 
     .schedule-assignment-note::before {
-      flex: 0 0 5px;
-      width: 5px;
-      height: 5px;
-      margin: 0 6px 0 1px;
-      border-radius: 50%;
-      background: #c08a28;
-      box-shadow: 0 0 0 2px rgba(192, 138, 40, 0.18);
-      content: "";
+      flex: 0 0 auto;
+      margin-right: 5px;
+      color: rgba(113, 88, 60, 0.54);
+      content: "-";
     }
 
     .schedule-assignment-note-text {
       display: block;
-      min-width: 0;
-      padding: 3px 6px;
-      border: 1px solid rgba(185, 135, 31, 0.28);
-      border-radius: 5px;
-      background: rgba(255, 252, 242, 0.94);
     }
 
     .schedule-assignment.has-note {
-      border-color: rgba(185, 135, 31, 0.52);
-      background: rgba(255, 248, 228, 0.94);
-      box-shadow: inset 3px 0 0 rgba(192, 138, 40, 0.72);
+      border-color: rgba(185, 135, 31, 0.34);
+      background: rgba(255, 248, 228, 0.9);
     }
 
     .schedule-assignment:hover,
@@ -2498,38 +2480,19 @@
       }
 
       .schedule-assignment-content {
-        display: grid;
-        gap: 2px;
-        overflow: visible;
+        display: flex;
+        gap: 3px;
+        overflow: hidden;
       }
 
       .schedule-assignment-note {
         display: flex;
-        margin-top: 1px;
+        margin-top: 0;
         font-size: 0.48rem;
       }
 
-      .schedule-assignment.has-note {
-        padding: 2px;
-        border: 1px solid rgba(185, 135, 31, 0.42);
-        box-shadow: inset 2px 0 0 rgba(192, 138, 40, 0.68);
-      }
-
-      .schedule-assignment.has-note .schedule-assignment-content {
-        padding-left: 5px;
-      }
-
       .schedule-assignment-note::before {
-        flex-basis: 3px;
-        width: 3px;
-        height: 3px;
-        margin-right: 3px;
-        box-shadow: none;
-      }
-
-      .schedule-assignment-note-text {
-        padding: 1px 3px;
-        border-radius: 3px;
+        margin-right: 2px;
       }
 
       .schedule-assignment-remove {
@@ -3133,6 +3096,6 @@
     </div>
   </div>
 
-  <script src="js/king-admin.js?v=20260722-2"></script>
+  <script src="js/king-admin.js?v=20260722-3"></script>
 </body>
 </html>

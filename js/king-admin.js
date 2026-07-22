@@ -2759,18 +2759,26 @@
       weight = 800,
       color = "#2f2118",
       align = "center",
-      baseline = "middle"
+      baseline = "middle",
+      ellipsis = false
     } = options;
+    let fittedText = String(text);
     let fontSize = size;
     ctx.textAlign = align;
     ctx.textBaseline = baseline;
     ctx.fillStyle = color;
     do {
       ctx.font = `${weight} ${fontSize}px "Malgun Gothic", "Apple SD Gothic Neo", Arial, sans-serif`;
-      if (ctx.measureText(text).width <= maxWidth || fontSize <= minSize) break;
+      if (ctx.measureText(fittedText).width <= maxWidth || fontSize <= minSize) break;
       fontSize -= 1;
     } while (fontSize > minSize);
-    ctx.fillText(text, x, y);
+    if (ellipsis && ctx.measureText(fittedText).width > maxWidth) {
+      while (fittedText && ctx.measureText(`${fittedText}...`).width > maxWidth) {
+        fittedText = fittedText.slice(0, -1);
+      }
+      fittedText = fittedText ? `${fittedText}...` : "";
+    }
+    ctx.fillText(fittedText, x, y);
   }
 
   function buildScheduleClipboardCanvas() {
@@ -2786,9 +2794,7 @@
       2,
       ...SCHEDULE_BRANCHES.flatMap((branch) => dates.map((date) => {
         const cellKey = getScheduleCellKey(branch.key, formatInputDate(date));
-        return (namesByCell.get(cellKey) || []).reduce((total, name) => (
-          total + (getScheduleShiftNote(cellKey, name) ? 2 : 1)
-        ), 0);
+        return (namesByCell.get(cellKey) || []).length;
       }))
     );
     const rowHeight = Math.max(126, 58 + maxEntryLines * 31);
@@ -2875,42 +2881,17 @@
         }
 
         const entries = names.map((name) => ({ name, note: getScheduleShiftNote(cellKey, name) }));
-        const totalLines = entries.reduce((total, entry) => total + (entry.note ? 2 : 1), 0);
+        const totalLines = entries.length;
         const lineHeight = Math.min(32, Math.max(21, (rowHeight - 36) / totalLines));
         let lineY = y + (rowHeight - totalLines * lineHeight) / 2 + lineHeight / 2;
         entries.forEach((entry) => {
-          if (entry.note) {
-            const groupX = x + 12;
-            const groupY = lineY - lineHeight / 2 + 1;
-            const groupWidth = dayWidth - 24;
-            const groupHeight = lineHeight * 2 - 2;
-            fillRoundRect(ctx, groupX, groupY, groupWidth, groupHeight, 10, "rgba(255, 255, 255, 0.72)");
-            strokeRoundRect(ctx, groupX, groupY, groupWidth, groupHeight, 10, branch.border, 1.5);
-            fillRoundRect(ctx, groupX, groupY, 4, groupHeight, 2, branch.color);
-          }
-          drawFittedText(ctx, entry.name, x + dayWidth / 2, lineY, dayWidth - 32, {
-            size: 24,
-            minSize: 13,
-            weight: 900,
-            color: branch.color
-          });
-          lineY += lineHeight;
-          if (!entry.note) return;
-          ctx.beginPath();
-          ctx.moveTo(x + 23, lineY - lineHeight / 2);
-          ctx.lineTo(x + dayWidth - 23, lineY - lineHeight / 2);
-          ctx.strokeStyle = "rgba(113, 88, 60, 0.14)";
-          ctx.lineWidth = 1;
-          ctx.stroke();
-          ctx.beginPath();
-          ctx.arc(x + 27, lineY, 3.5, 0, Math.PI * 2);
-          ctx.fillStyle = branch.color;
-          ctx.fill();
-          drawFittedText(ctx, entry.note, x + dayWidth / 2 + 6, lineY, dayWidth - 62, {
-            size: 15,
+          const entryText = entry.note ? `${entry.name} - ${entry.note}` : entry.name;
+          drawFittedText(ctx, entryText, x + dayWidth / 2, lineY, dayWidth - 32, {
+            size: entry.note ? 19 : 24,
             minSize: 10,
-            weight: 800,
-            color: "rgba(47, 33, 24, 0.64)"
+            weight: 900,
+            color: branch.color,
+            ellipsis: true
           });
           lineY += lineHeight;
         });
