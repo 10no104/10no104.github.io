@@ -2419,8 +2419,9 @@
         >
           <span class="staff-pill-name">${escapeHtml(item.name)}</span>
           <span class="staff-pill-meta">
-            <small>${escapeHtml(selectedCell && stateLabel ? stateLabel : formatBranchLabel(item.branch_scope))}</small>
-            ${selectedCell ? (indicator ? `<b class="staff-pill-day-mark" aria-hidden="true">${indicator}</b>` : "") : `<b class="staff-pill-count" aria-hidden="true">${assignedDays}일</b>`}
+            ${selectedCell
+              ? (indicator ? `<b class="staff-pill-day-mark" aria-hidden="true">${indicator}</b>` : "")
+              : `<small>${escapeHtml(formatBranchLabel(item.branch_scope))}</small><b class="staff-pill-count" aria-hidden="true">${assignedDays}일</b>`}
           </span>
         </button>
       `;
