@@ -134,6 +134,7 @@
     scheduleWeeks: [],
     scheduleAvailability: [],
     scheduleFetchToken: 0,
+    scheduleDataLoaded: false,
     scheduleStaff: [],
     scheduleUsingFallbackStaff: false,
     scheduleWeek: null,
@@ -2823,6 +2824,7 @@
     state.scheduleUsingFallbackStaff = !dbStaff.length;
     state.scheduleWeek = weekResult.data || null;
     state.scheduleShifts = scheduleShifts;
+    state.scheduleDataLoaded = true;
     hydrateScheduleShiftNotes(scheduleShifts);
     renderScheduleBoard({ preserveBoardEdits: false });
     setScheduleStatus("스케줄 데이터를 불러왔습니다.", "success");
@@ -3642,6 +3644,7 @@
     byId("scheduleAdminPanel").classList.toggle("is-active", tabName === "schedule");
     if (tabName === "menu") void refreshMenuSession();
     if (tabName === "staff") void fetchEmployees();
+    if (tabName === "schedule" && !state.scheduleDataLoaded) void fetchScheduleData();
   }
 
   function bindEvents() {
