@@ -112,13 +112,6 @@
     accessRequests: [],
     employees: [],
     employeeShowInactive: false,
-    employeeCalendarEmployee: null,
-    employeeCalendarCursor: startOfMonth(new Date()),
-    employeeCalendarAvailability: [],
-    employeeCalendarInitialAvailability: [],
-    employeeCalendarFetchToken: 0,
-    employeeCalendarPendingChanges: new Map(),
-    employeeCalendarSaving: false,
     menuSession: null,
     menuItems: [],
     menuSearch: "",
@@ -191,15 +184,6 @@
       "employeeStatus",
       "accessRequestList",
       "employeeList",
-      "employeeCalendarModal",
-      "employeeCalendarTitle",
-      "employeeCalendarClose",
-      "employeeCalendarPrev",
-      "employeeCalendarNext",
-      "employeeCalendarLabel",
-      "employeeCalendarGrid",
-      "employeeCalendarStatus",
-      "employeeCalendarSave",
       "employeeEditorModal",
       "employeeEditorTitle",
       "employeeEditorForm",
@@ -603,7 +587,6 @@
         </div>
         ${!isActive ? `<div class="reservation-notes">근무 아님${item.inactive_at ? ` · ${escapeHtml(formatDateTimeLabel(item.inactive_at))}` : ""}</div>` : ""}
         <div class="employee-actions">
-          <button class="pill-btn" type="button" data-view-employee-calendar="${escapeHtml(item.id || item.ref_code || item.staff_key)}">달력 보기</button>
           <button class="pill-btn" type="button" data-edit-employee="${escapeHtml(item.id || item.ref_code || item.staff_key)}">Edit</button>
         </div>
       </article>
@@ -622,241 +605,6 @@
     refs.employeeList.innerHTML = visibleEmployees.length
       ? visibleEmployees.map(renderEmployeeCard).join("")
       : '<div class="empty-state">직원 데이터가 없습니다.</div>';
-  }
-
-  function getEmployeeById(id = "") {
-    const key = String(id || "");
-    return state.employees.find((item) => [item.id, item.ref_code, item.staff_key]
-      .map((value) => String(value || ""))
-      .includes(key)) || null;
-  }
-
-  function getEmployeeCalendarDayState(isoDate = "") {
-    const date = toSafeDate(isoDate);
-    if (!date) return null;
-    const entry = state.employeeCalendarAvailability.find((item) => item.availability_date === isoDate) || null;
-    if (entry?.status === "unavailable") return { type: "unavailable", label: "불가", note: entry.note || "" };
-    if (entry?.status === "preferred") return { type: "preferred", label: "선호", note: entry.note || "" };
-    return null;
-  }
-
-  function renderEmployeeCalendar() {
-    const cursor = startOfMonth(state.employeeCalendarCursor || new Date());
-    const today = startOfDay(new Date());
-    const monthEnd = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0);
-    const leadingBlanks = (cursor.getDay() + 6) % 7;
-    const cells = [];
-
-    refs.employeeCalendarLabel.textContent = new Intl.DateTimeFormat("ko-KR", {
-      year: "numeric",
-      month: "long"
-    }).format(cursor);
-
-    for (let index = 0; index < leadingBlanks; index += 1) {
-      cells.push('<div class="employee-calendar-day is-empty" aria-hidden="true"></div>');
-    }
-
-    for (let day = 1; day <= monthEnd.getDate(); day += 1) {
-      const date = new Date(cursor.getFullYear(), cursor.getMonth(), day);
-      const isoDate = formatInputDate(date);
-      const dayState = getEmployeeCalendarDayState(isoDate);
-      const dateLabel = new Intl.DateTimeFormat("ko-KR", {
-        weekday: "short",
-        month: "long",
-        day: "numeric"
-      }).format(date);
-      const title = [dateLabel, dayState?.label, dayState?.note].filter(Boolean).join(" · ");
-      const classes = [
-        "employee-calendar-day",
-        isSameDate(date, today) ? "is-today" : "",
-        dayState ? `is-${dayState.type}` : ""
-      ].filter(Boolean).join(" ");
-      const marker = dayState ? `<i aria-hidden="true">${dayState.type === "unavailable" ? "×" : "★"}</i>` : "";
-      cells.push(`<button class="${classes}" type="button" data-employee-calendar-date="${isoDate}" title="${escapeHtml(title)}" aria-label="${escapeHtml(`${dateLabel} ${dayState?.label || "해제"}. 탭해서 상태 변경`)}"><strong>${day}</strong>${marker}</button>`);
-    }
-
-    refs.employeeCalendarGrid.innerHTML = cells.join("");
-    const pendingCount = state.employeeCalendarPendingChanges.size;
-    refs.employeeCalendarSave.disabled = pendingCount === 0 || state.employeeCalendarSaving;
-    refs.employeeCalendarSave.textContent = pendingCount ? `저장 (${pendingCount})` : "저장";
-  }
-
-  function closeEmployeeCalendar() {
-    if (state.employeeCalendarPendingChanges.size && !window.confirm("저장하지 않은 날짜 변경이 있습니다. 닫을까요?")) return;
-    state.employeeCalendarFetchToken += 1;
-    refs.employeeCalendarModal.setAttribute("aria-hidden", "true");
-    refs.employeeCalendarModal.classList.remove("is-open");
-  }
-
-  function getEmployeeCalendarIdentityKeys(employee = {}) {
-    return new Set([
-      employee.staff_key,
-      employee.name,
-      employee.ref_code
-    ].map(normalizeScheduleStaffKey).filter(Boolean));
-  }
-
-  async function loadEmployeeCalendar() {
-    const employee = state.employeeCalendarEmployee;
-    const staffKey = String(employee?.staff_key || employee?.name || "").trim();
-    if (!employee || !staffKey || !supabaseClient || !state.menuSession) return;
-
-    const requestToken = ++state.employeeCalendarFetchToken;
-    const cursor = startOfMonth(state.employeeCalendarCursor || new Date());
-    const monthStart = formatInputDate(cursor);
-    const monthEnd = formatInputDate(new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0));
-    refs.employeeCalendarStatus.textContent = "달력을 불러오는 중...";
-    refs.employeeCalendarStatus.className = "status-line";
-
-    const availabilityResult = await supabaseClient
-      .from("noble_staff_availability")
-      .select("staff_key,staff_name,availability_date,status,note")
-      .gte("availability_date", monthStart)
-      .lte("availability_date", monthEnd)
-      .order("availability_date", { ascending: true });
-
-    if (requestToken !== state.employeeCalendarFetchToken) return;
-    if (availabilityResult.error) {
-      refs.employeeCalendarStatus.textContent = availabilityResult.error.message || "달력을 불러오지 못했습니다.";
-      refs.employeeCalendarStatus.className = "status-line is-error";
-      return;
-    }
-    const identityKeys = getEmployeeCalendarIdentityKeys(employee);
-    state.employeeCalendarAvailability = (availabilityResult.data || []).filter((item) => {
-      const itemKey = normalizeScheduleStaffKey(item.staff_key || item.staff_name);
-      const itemName = normalizeScheduleStaffKey(item.staff_name || item.staff_key);
-      return identityKeys.has(itemKey) || identityKeys.has(itemName);
-    });
-    state.employeeCalendarInitialAvailability = state.employeeCalendarAvailability.map((item) => ({ ...item }));
-    state.employeeCalendarPendingChanges = new Map();
-    renderEmployeeCalendar();
-    refs.employeeCalendarStatus.textContent = "";
-    refs.employeeCalendarStatus.className = "status-line";
-  }
-
-  function syncScheduleAvailabilityFromEmployeeCalendar(employee, isoDate, status) {
-    const staffKey = normalizeScheduleStaffKey(employee?.staff_key || employee?.name);
-    const staffName = employee?.staff_key || employee?.name || "";
-    state.scheduleAvailability = state.scheduleAvailability.filter((item) => {
-      if (item.availability_date !== isoDate) return true;
-      const itemKey = normalizeScheduleStaffKey(item.staff_key || item.staff_name);
-      const itemName = normalizeScheduleStaffKey(item.staff_name || item.staff_key);
-      return itemKey !== staffKey && itemName !== staffKey;
-    });
-    if (status !== "default") {
-      state.scheduleAvailability.push({
-        staff_key: staffName,
-        staff_name: staffName,
-        branch_scope: normalizeBranchScope(employee?.branch_scope || "both"),
-        availability_date: isoDate,
-        status
-      });
-    }
-  }
-
-  function cycleEmployeeCalendarDate(isoDate = "") {
-    const employee = state.employeeCalendarEmployee;
-    const staffKey = String(employee?.staff_key || employee?.name || "").trim();
-    if (!employee || !staffKey || !isoDate || state.employeeCalendarSaving) return;
-
-    const current = state.employeeCalendarAvailability.find((item) => item.availability_date === isoDate) || null;
-    const nextStatus = current?.status === "unavailable"
-      ? "preferred"
-      : current?.status === "preferred"
-        ? "default"
-        : "unavailable";
-    const original = state.employeeCalendarInitialAvailability.find((item) => item.availability_date === isoDate) || null;
-    const originalStatus = original?.status || "default";
-
-    state.employeeCalendarAvailability = state.employeeCalendarAvailability
-      .filter((item) => item.availability_date !== isoDate);
-    if (nextStatus !== "default") {
-      state.employeeCalendarAvailability.push({
-        staff_key: current?.staff_key || staffKey,
-        staff_name: current?.staff_name || employee.staff_key || employee.name || staffKey,
-        availability_date: isoDate,
-        status: nextStatus,
-        note: ""
-      });
-    }
-    if (nextStatus === originalStatus) state.employeeCalendarPendingChanges.delete(isoDate);
-    else state.employeeCalendarPendingChanges.set(isoDate, nextStatus);
-    renderEmployeeCalendar();
-    refs.employeeCalendarStatus.textContent = state.employeeCalendarPendingChanges.size ? "변경 사항을 저장하려면 저장 버튼을 누르세요." : "";
-    refs.employeeCalendarStatus.className = "status-line";
-  }
-
-  async function saveEmployeeCalendar() {
-    const employee = state.employeeCalendarEmployee;
-    const staffKey = String(employee?.staff_key || employee?.name || "").trim();
-    const changes = Array.from(state.employeeCalendarPendingChanges.entries());
-    if (!employee || !staffKey || !changes.length || state.employeeCalendarSaving) return;
-
-    state.employeeCalendarSaving = true;
-    renderEmployeeCalendar();
-    refs.employeeCalendarStatus.textContent = "변경 사항을 저장하는 중...";
-    refs.employeeCalendarStatus.className = "status-line";
-
-    try {
-      for (const [isoDate, nextStatus] of changes) {
-        const original = state.employeeCalendarInitialAvailability.find((item) => item.availability_date === isoDate) || null;
-        const savedStaffKey = String(original?.staff_key || staffKey).trim();
-        let result;
-        if (nextStatus === "default") {
-          result = await supabaseClient
-            .from("noble_staff_availability")
-            .delete()
-            .eq("staff_key", savedStaffKey)
-            .eq("availability_date", isoDate);
-        } else if (original) {
-          result = await supabaseClient
-            .from("noble_staff_availability")
-            .update({ status: nextStatus, available_start: null, available_end: null, note: null })
-            .eq("staff_key", savedStaffKey)
-            .eq("availability_date", isoDate);
-        } else {
-          result = await supabaseClient
-            .from("noble_staff_availability")
-            .insert({
-              staff_key: staffKey,
-              staff_name: employee.staff_key || employee.name || staffKey,
-              branch_scope: normalizeBranchScope(employee.branch_scope || "both"),
-              availability_date: isoDate,
-              status: nextStatus
-            });
-        }
-        if (result.error) throw result.error;
-        syncScheduleAvailabilityFromEmployeeCalendar(employee, isoDate, nextStatus);
-      }
-
-      state.employeeCalendarInitialAvailability = state.employeeCalendarAvailability.map((item) => ({ ...item }));
-      state.employeeCalendarPendingChanges = new Map();
-      if (state.activeTab === "schedule") renderScheduleBoard();
-      refs.employeeCalendarStatus.textContent = `${changes.length}개 날짜를 저장했습니다.`;
-      refs.employeeCalendarStatus.className = "status-line is-success";
-    } catch (error) {
-      refs.employeeCalendarStatus.textContent = error.message || "날짜 상태를 저장하지 못했습니다.";
-      refs.employeeCalendarStatus.className = "status-line is-error";
-    } finally {
-      state.employeeCalendarSaving = false;
-      renderEmployeeCalendar();
-    }
-  }
-
-  async function openEmployeeCalendar(id = "") {
-    const employee = getEmployeeById(id);
-    if (!employee) return;
-    const name = employee.staff_key || employee.name || employee.ref_code || "서버";
-    state.employeeCalendarEmployee = employee;
-    state.employeeCalendarCursor = startOfMonth(new Date());
-    state.employeeCalendarAvailability = [];
-    state.employeeCalendarInitialAvailability = [];
-    state.employeeCalendarPendingChanges = new Map();
-    refs.employeeCalendarTitle.textContent = `${name} 달력`;
-    refs.employeeCalendarModal.setAttribute("aria-hidden", "false");
-    refs.employeeCalendarModal.classList.add("is-open");
-    renderEmployeeCalendar();
-    await loadEmployeeCalendar();
   }
 
   async function fetchEmployees() {
@@ -3275,9 +3023,17 @@
 
     const dropStatus = getScheduleDropStatus(staff, branch, isoDate, names, getBoardAssignments());
     if (!dropStatus.allowed) {
-      renderScheduleBoard();
-      setScheduleStatus(`${staff.name}: ${dropStatus.label}`, "error");
-      return;
+      if (dropStatus.type === "unavailable") {
+        const date = toSafeDate(isoDate);
+        const confirmed = window.confirm(
+          `${staff.name}님은 ${formatScheduleDayLabel(date)}에 ${dropStatus.label}로 등록되어 있습니다.\n그래도 직접 배정할까요?`
+        );
+        if (!confirmed) return;
+      } else {
+        renderScheduleBoard();
+        setScheduleStatus(`${staff.name}: ${dropStatus.label}`, "error");
+        return;
+      }
     }
 
     textarea.value = [...names, staff.name].join("\n");
@@ -3792,44 +3548,10 @@
       void deleteAccessRequest(button.dataset.deleteAccessRequest);
     });
     refs.employeeList.addEventListener("click", (event) => {
-      const calendarButton = event.target.closest("[data-view-employee-calendar]");
-      if (calendarButton) {
-        void openEmployeeCalendar(calendarButton.dataset.viewEmployeeCalendar);
-        return;
-      }
       const button = event.target.closest("[data-edit-employee]");
       if (!button) return;
       openEmployeeEditor(button.dataset.editEmployee);
     });
-    refs.employeeCalendarClose.addEventListener("click", closeEmployeeCalendar);
-    refs.employeeCalendarModal.addEventListener("click", (event) => {
-      if (event.target === refs.employeeCalendarModal) closeEmployeeCalendar();
-    });
-    refs.employeeCalendarPrev.addEventListener("click", () => {
-      if (state.employeeCalendarPendingChanges.size && !window.confirm("저장하지 않은 날짜 변경이 있습니다. 이동할까요?")) return;
-      state.employeeCalendarCursor = new Date(
-        state.employeeCalendarCursor.getFullYear(),
-        state.employeeCalendarCursor.getMonth() - 1,
-        1
-      );
-      renderEmployeeCalendar();
-      void loadEmployeeCalendar();
-    });
-    refs.employeeCalendarNext.addEventListener("click", () => {
-      if (state.employeeCalendarPendingChanges.size && !window.confirm("저장하지 않은 날짜 변경이 있습니다. 이동할까요?")) return;
-      state.employeeCalendarCursor = new Date(
-        state.employeeCalendarCursor.getFullYear(),
-        state.employeeCalendarCursor.getMonth() + 1,
-        1
-      );
-      renderEmployeeCalendar();
-      void loadEmployeeCalendar();
-    });
-    refs.employeeCalendarGrid.addEventListener("click", (event) => {
-      const day = event.target.closest("[data-employee-calendar-date]");
-      if (day) cycleEmployeeCalendarDate(day.dataset.employeeCalendarDate);
-    });
-    refs.employeeCalendarSave.addEventListener("click", () => void saveEmployeeCalendar());
     refs.employeeEditorClose.addEventListener("click", closeEmployeeEditor);
     refs.employeeEditorCancel.addEventListener("click", closeEmployeeEditor);
     refs.employeeEditorModal.addEventListener("click", (event) => {
