@@ -3486,6 +3486,10 @@
   }
 
   function setActiveTab(tabName) {
+    if (state.activeTab === "schedule" && tabName !== "schedule") {
+      // Do not let an in-flight background request overwrite an in-progress board.
+      state.scheduleFetchToken += 1;
+    }
     state.activeTab = tabName;
     document.querySelectorAll("[data-admin-tab]").forEach((button) => {
       button.classList.toggle("is-active", button.dataset.adminTab === tabName);
@@ -3497,7 +3501,6 @@
     byId("scheduleAdminPanel").classList.toggle("is-active", tabName === "schedule");
     if (tabName === "menu") void refreshMenuSession();
     if (tabName === "staff") void fetchEmployees();
-    if (tabName === "schedule") void fetchScheduleData();
   }
 
   function bindEvents() {
@@ -3828,7 +3831,6 @@
         if (session) void fetchScheduleCalendarEvents();
         if (session && state.activeTab === "menu" && !state.menuItems.length) void fetchMenuItems();
         if (session && state.activeTab === "staff") void fetchEmployees();
-        if (session && state.activeTab === "schedule") void fetchScheduleData();
       });
       void refreshMenuSession();
     } else {
