@@ -2784,7 +2784,7 @@
   function drawScheduleClipboardEntry(ctx, entry, x, y, maxWidth, color) {
     const fontFamily = '"Malgun Gothic", "Apple SD Gothic Neo", Arial, sans-serif';
     const nameSize = 24;
-    const noteSize = 18;
+    const noteSize = 24;
     const noteText = entry.note ? ` - ${entry.note}` : "";
 
     if (!noteText) {
@@ -2814,7 +2814,7 @@
     }
 
     const availableNoteWidth = maxWidth - nameWidth;
-    ctx.font = `800 ${noteSize}px ${fontFamily}`;
+    ctx.font = `900 ${noteSize}px ${fontFamily}`;
     let fittedNote = noteText;
     if (ctx.measureText(fittedNote).width > availableNoteWidth) {
       let noteBody = noteText;
@@ -2831,7 +2831,7 @@
     ctx.font = `900 ${nameSize}px ${fontFamily}`;
     ctx.fillText(entry.name, startX, y);
     if (fittedNote) {
-      ctx.font = `800 ${noteSize}px ${fontFamily}`;
+      ctx.font = `900 ${noteSize}px ${fontFamily}`;
       ctx.fillText(fittedNote, startX + nameWidth, y);
     }
   }
