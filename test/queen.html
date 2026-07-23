@@ -54,11 +54,11 @@
       position: fixed;
       inset: 0;
       z-index: 110;
-      border: 12px solid rgba(255, 73, 73, 0.88);
+      border: 12px solid rgba(60, 187, 255, 0.9);
       background: transparent;
       box-shadow:
-        inset 0 0 70px rgba(255, 34, 34, 0.46),
-        inset 0 0 0 6px rgba(255, 210, 91, 0.42);
+        inset 0 0 74px rgba(28, 108, 255, 0.5),
+        inset 0 0 0 6px rgba(112, 232, 255, 0.46);
       pointer-events: none;
       animation: unconfirmed-side-flash 0.9s ease-in-out infinite alternate;
     }
@@ -66,11 +66,11 @@
     @keyframes unconfirmed-side-flash {
       from {
         opacity: 0.34;
-        border-color: rgba(255, 202, 75, 0.68);
+        border-color: rgba(115, 230, 255, 0.72);
       }
       to {
         opacity: 1;
-        border-color: rgba(255, 62, 62, 0.98);
+        border-color: rgba(42, 111, 255, 0.98);
       }
     }
 
@@ -85,7 +85,7 @@
       min-height: 100dvh;
       padding: 32px;
       border: 0;
-      background: #b51632;
+      background: #1557d5;
       color: #fffdf4;
       text-align: center;
       cursor: pointer;
@@ -106,7 +106,7 @@
       font-weight: 900;
       line-height: 0.9;
       letter-spacing: -0.07em;
-      text-shadow: 0 16px 40px rgba(72, 0, 14, 0.42);
+      text-shadow: 0 16px 40px rgba(0, 31, 94, 0.48);
     }
 
     .fullscreen-order-alert span {
@@ -167,15 +167,15 @@
     }
 
     .alarm-enable-btn.is-ringing {
-      border-color: rgba(255, 226, 125, 0.88);
-      background: linear-gradient(135deg, #a91f39, #d9981f);
+      border-color: rgba(129, 231, 255, 0.9);
+      background: linear-gradient(135deg, #1557d5, #00a4c7);
       color: #fff;
       animation: alarm-button-pulse 0.72s ease-in-out infinite alternate;
     }
 
     @keyframes alarm-button-pulse {
-      from { transform: scale(0.98); box-shadow: 0 8px 18px rgba(123, 31, 47, 0.2); }
-      to { transform: scale(1.04); box-shadow: 0 14px 28px rgba(255, 65, 65, 0.46); }
+      from { transform: scale(0.98); box-shadow: 0 8px 18px rgba(21, 87, 213, 0.22); }
+      to { transform: scale(1.04); box-shadow: 0 14px 28px rgba(42, 174, 255, 0.48); }
     }
 
     .order-alert-bar {
@@ -188,11 +188,11 @@
       align-items: center;
       margin-bottom: 14px;
       padding: 14px 16px;
-      border: 2px solid rgba(255, 225, 119, 0.86);
+      border: 2px solid rgba(125, 229, 255, 0.9);
       border-radius: 22px;
-      background: linear-gradient(135deg, #8f162d 0%, #c43439 48%, #c58a18 100%);
+      background: linear-gradient(135deg, #0d47a1 0%, #1565c0 52%, #008ea8 100%);
       color: #fff;
-      box-shadow: 0 20px 44px rgba(112, 14, 31, 0.42);
+      box-shadow: 0 20px 44px rgba(0, 61, 153, 0.42);
       animation: alert-bar-flash 0.82s ease-in-out infinite alternate;
     }
 
@@ -251,18 +251,18 @@
       padding: 0 14px;
       border: 0;
       border-radius: 999px;
-      background: #fff8e7;
-      color: #651725;
+      background: #eef8ff;
+      color: #083f95;
       font: inherit;
       font-size: 0.84rem;
       font-weight: 900;
       white-space: nowrap;
       cursor: pointer;
-      box-shadow: 0 10px 18px rgba(77, 9, 22, 0.22);
+      box-shadow: 0 10px 18px rgba(0, 49, 117, 0.24);
     }
 
     .order-alert-btn.sound {
-      background: rgba(70, 12, 24, 0.36);
+      background: rgba(0, 51, 128, 0.38);
       color: #fff;
       border: 1px solid rgba(255, 255, 255, 0.28);
     }
@@ -882,19 +882,19 @@
     }
 
     .request-card.is-new {
-      border-color: rgba(123, 31, 47, 0.3);
-      box-shadow: 0 16px 30px rgba(123, 31, 47, 0.11);
+      border-color: rgba(21, 87, 213, 0.34);
+      box-shadow: 0 16px 30px rgba(21, 87, 213, 0.13);
       animation: new-request-card-flash 0.9s ease-in-out infinite alternate;
     }
 
     @keyframes new-request-card-flash {
       from {
-        border-color: rgba(212, 175, 55, 0.48);
-        box-shadow: 0 12px 24px rgba(123, 31, 47, 0.1);
+        border-color: rgba(87, 218, 255, 0.56);
+        box-shadow: 0 12px 24px rgba(21, 87, 213, 0.12);
       }
       to {
-        border-color: rgba(220, 45, 65, 0.9);
-        box-shadow: 0 18px 34px rgba(220, 45, 65, 0.28);
+        border-color: rgba(38, 105, 255, 0.94);
+        box-shadow: 0 18px 34px rgba(38, 105, 255, 0.3);
       }
     }
 
@@ -1124,14 +1124,14 @@
     }
 
     .nav-tab.has-pending:not(.is-active) {
-      background: rgba(181, 31, 52, 0.3);
-      color: #fff4d6;
+      background: rgba(21, 87, 213, 0.38);
+      color: #e9faff;
       animation: pending-nav-flash 0.8s ease-in-out infinite alternate;
     }
 
     @keyframes pending-nav-flash {
-      from { box-shadow: inset 0 0 0 1px rgba(255, 210, 91, 0.32); }
-      to { box-shadow: inset 0 0 0 2px rgba(255, 93, 93, 0.92), 0 10px 22px rgba(181, 31, 52, 0.28); }
+      from { box-shadow: inset 0 0 0 1px rgba(117, 229, 255, 0.38); }
+      to { box-shadow: inset 0 0 0 2px rgba(78, 177, 255, 0.96), 0 10px 22px rgba(21, 87, 213, 0.32); }
     }
 
     .panel {
@@ -2858,7 +2858,7 @@
 
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3Iiujn95evZuFiyLNrJUo-_H6rKngdxt0EeBFVw/exec";
     const AUTO_REFRESH_MS = 5000;
-    const ORDER_ALARM_REPEAT_MS = 2400;
+    const ORDER_ALARM_REPEAT_MS = 2200;
     const DEFAULT_DOCUMENT_TITLE = document.title;
     const AUTO_REMOVE_AFTER_MS = 60 * 60 * 1000;
     const AUTO_REMOVE_MUTATION_SPACING_MS = 200;
@@ -3033,7 +3033,7 @@
         oscillator.type = "triangle";
         oscillator.frequency.setValueAtTime(frequency, noteStart);
         gain.gain.setValueAtTime(0.0001, noteStart);
-        gain.gain.exponentialRampToValueAtTime(0.18, noteStart + 0.025);
+        gain.gain.exponentialRampToValueAtTime(0.22, noteStart + 0.025);
         gain.gain.exponentialRampToValueAtTime(0.0001, noteEnd);
         oscillator.connect(gain);
         gain.connect(context.destination);
@@ -4809,11 +4809,15 @@
     };
     document.getElementById("orderAlertReviewBtn").addEventListener("click", openRequestQueue);
     document.getElementById("fullscreenOrderAlert").addEventListener("click", () => {
+      const alarmReady = enableOrderAlarm();
       getUnconfirmedDiningRequests().forEach((request) => {
         state.dismissedFullscreenRequestIds.add(request.id);
       });
       syncUnconfirmedRequestAlert();
       openRequestQueue();
+      alarmReady.then((enabled) => {
+        if (enabled) startOrderAlarm();
+      });
     });
 
     document.addEventListener("pointerdown", () => {
