@@ -686,6 +686,52 @@
         rgba(255, 255, 255, 0.66);
     }
 
+    .table-map-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .table-map-tab {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 46px;
+      padding: 0 14px;
+      border: 1px solid rgba(123, 31, 47, 0.15);
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.76);
+      color: #6b3127;
+      font: inherit;
+      font-size: 0.86rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .table-map-tab span {
+      display: inline-grid;
+      place-items: center;
+      min-width: 24px;
+      min-height: 24px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: rgba(123, 31, 47, 0.09);
+      font-size: 0.68rem;
+    }
+
+    .table-map-tab.is-active {
+      border-color: transparent;
+      background: #5f2731;
+      color: #fffaf2;
+      box-shadow: 0 10px 20px rgba(82, 34, 44, 0.16);
+    }
+
+    .table-map-tab.is-active span {
+      background: rgba(255, 255, 255, 0.18);
+    }
+
     .floor-table-card {
       display: flex;
       flex-direction: column;
@@ -814,7 +860,72 @@
     }
 
     .qr-session-control-panel {
-      margin-bottom: 16px;
+      margin-top: 2px;
+    }
+
+    .qr-session-control-panel > summary {
+      list-style: none;
+    }
+
+    .qr-session-control-panel > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .qr-session-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .qr-session-summary h3,
+    .qr-session-summary p {
+      margin: 0;
+    }
+
+    .qr-session-summary p {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .qr-session-summary-side {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 0 0 auto;
+    }
+
+    .qr-session-summary-count {
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(123, 31, 47, 0.09);
+      color: #682c37;
+      font-size: 0.72rem;
+      font-weight: 900;
+    }
+
+    .qr-session-summary-chevron {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #5f2731;
+      color: #fff;
+      font-size: 1rem;
+      transition: transform 180ms ease;
+    }
+
+    .qr-session-control-panel[open] .qr-session-summary-chevron {
+      transform: rotate(180deg);
+    }
+
+    .qr-session-body {
+      padding-top: 18px;
     }
 
     .qr-session-toolbar,
@@ -2886,24 +2997,46 @@
         <p>Assign an available QR to a table before seating guests. Ending the table session returns that QR to the inactive pool.</p>
       </section>
 
-      <section class="purpose-panel qr-session-control-panel">
-        <div class="qr-session-toolbar">
-          <div>
-            <h3>Dining QR Sessions</h3>
-            <p>Assigned QR codes are active. Unassigned QR codes cannot place orders.</p>
-          </div>
-          <a class="qr-sheet-link" href="./qr.html">QR Cards 1–10</a>
-        </div>
-        <p class="qr-session-status" id="qrSessionStatus">Loading QR sessions…</p>
-        <div class="qr-station-grid" id="qrStationGrid" aria-live="polite"></div>
-      </section>
-
       <section class="purpose-panel">
         <h3>Table Map</h3>
+        <div class="table-map-tabs" id="tableMapTabs" aria-label="Table map area">
+          <button class="table-map-tab is-active" type="button" data-table-map-zone="first" aria-pressed="true">
+            1st Floor <span data-table-map-count="first">0</span>
+          </button>
+          <button class="table-map-tab" type="button" data-table-map-zone="second" aria-pressed="false">
+            2nd Floor <span data-table-map-count="second">0</span>
+          </button>
+          <button class="table-map-tab" type="button" data-table-map-zone="patio" aria-pressed="false">
+            Patio <span data-table-map-count="patio">0</span>
+          </button>
+        </div>
         <div class="table-map-grid" id="tableMapGrid" aria-live="polite">
           <div class="table-map-empty">Loading tables…</div>
         </div>
       </section>
+
+      <details class="purpose-panel qr-session-control-panel">
+        <summary class="qr-session-summary">
+          <div>
+            <h3>QR Session Details</h3>
+            <p>Assigned QR codes, inactive cards, and QR-based history.</p>
+          </div>
+          <div class="qr-session-summary-side">
+            <span class="qr-session-summary-count" id="qrSessionToggleLabel">0 assigned</span>
+            <span class="qr-session-summary-chevron" aria-hidden="true">⌄</span>
+          </div>
+        </summary>
+        <div class="qr-session-body">
+          <div class="qr-session-toolbar">
+            <div>
+              <p>Assigned QR codes are active. Unassigned QR codes cannot place orders.</p>
+            </div>
+            <a class="qr-sheet-link" href="./qr.html">QR Cards 1–10</a>
+          </div>
+          <p class="qr-session-status" id="qrSessionStatus">Loading QR sessions…</p>
+          <div class="qr-station-grid" id="qrStationGrid" aria-live="polite"></div>
+        </div>
+      </details>
     </section>
 
     <section class="app-view placeholder-view is-active" data-view="online">
@@ -3164,6 +3297,7 @@
       feedbackQueue: [],
       feedbackTransitionLocked: false,
       tableOptions: [],
+      activeTableMapZone: "first",
       activeTableReservation: null,
       selectedTableAssignments: [],
       pendingRemoveReservation: null,
@@ -3339,7 +3473,13 @@
     function renderQrStations() {
       const grid = document.getElementById("qrStationGrid");
       const status = document.getElementById("qrSessionStatus");
+      const toggleLabel = document.getElementById("qrSessionToggleLabel");
       if (!grid || !status) return;
+
+      const activeCount = state.qrSessions.filter((session) => session.status === "active" && session.table_code).length;
+      if (toggleLabel) {
+        toggleLabel.textContent = `${activeCount} assigned`;
+      }
 
       if (state.qrSessionActionError) {
         status.textContent = state.qrSessionActionError;
@@ -3348,7 +3488,6 @@
         status.textContent = "QR table assignments are unavailable. Run dining-qr-table-assignment.sql in Supabase.";
         status.className = "qr-session-status is-error";
       } else {
-        const activeCount = state.qrSessions.filter((session) => session.status === "active" && session.table_code).length;
         status.textContent = `${activeCount} of ${DINING_QR_COUNT} QR codes assigned · Session history is retained after checkout.`;
         status.className = "qr-session-status";
       }
@@ -3391,19 +3530,47 @@
       }).join("");
     }
 
+    function getDiningTableMapZone(tableCode) {
+      const normalizedTable = String(tableCode || "").trim().toUpperCase();
+      if (normalizedTable.startsWith("2")) return "second";
+      if (normalizedTable.startsWith("P")) return "patio";
+      return "first";
+    }
+
     function renderTableMap() {
       const grid = document.getElementById("tableMapGrid");
       if (!grid) return;
 
-      const tableOptions = Array.from(new Map(
+      const allTableOptions = Array.from(new Map(
         state.tableOptions
           .map((tableCode) => String(tableCode || "").trim())
           .filter(Boolean)
           .map((tableCode) => [tableCode.toLowerCase(), tableCode])
       ).values());
 
-      if (!tableOptions.length) {
+      const zoneCounts = { first: 0, second: 0, patio: 0 };
+      allTableOptions.forEach((tableCode) => {
+        zoneCounts[getDiningTableMapZone(tableCode)] += 1;
+      });
+      document.querySelectorAll("[data-table-map-count]").forEach((count) => {
+        count.textContent = String(zoneCounts[count.dataset.tableMapCount] || 0);
+      });
+      document.querySelectorAll("[data-table-map-zone]").forEach((button) => {
+        const isActive = button.dataset.tableMapZone === state.activeTableMapZone;
+        button.classList.toggle("is-active", isActive);
+        button.setAttribute("aria-pressed", isActive ? "true" : "false");
+      });
+
+      if (!allTableOptions.length) {
         grid.innerHTML = '<div class="table-map-empty">No table options were found in the Table sheet.</div>';
+        return;
+      }
+
+      const tableOptions = allTableOptions.filter(
+        (tableCode) => getDiningTableMapZone(tableCode) === state.activeTableMapZone
+      );
+      if (!tableOptions.length) {
+        grid.innerHTML = '<div class="table-map-empty">No tables are configured for this area.</div>';
         return;
       }
 
@@ -5463,6 +5630,13 @@
         `End the Table ${tableCode} session? QR ${String(qrNumber).padStart(2, "0")} will become inactive and any open requests will be canceled.`
       );
       if (shouldEnd) endQrSession(qrNumber);
+    });
+
+    document.getElementById("tableMapTabs").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-table-map-zone]");
+      if (!button) return;
+      state.activeTableMapZone = button.dataset.tableMapZone || "first";
+      renderTableMap();
     });
 
     document.getElementById("tableMapGrid").addEventListener("click", (event) => {
