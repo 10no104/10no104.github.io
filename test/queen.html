@@ -49,6 +49,31 @@
       z-index: -1;
     }
 
+    body.has-unconfirmed-requests::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 110;
+      border: 12px solid rgba(255, 73, 73, 0.88);
+      background: rgba(255, 42, 42, 0.08);
+      box-shadow:
+        inset 0 0 70px rgba(255, 34, 34, 0.46),
+        inset 0 0 0 6px rgba(255, 210, 91, 0.42);
+      pointer-events: none;
+      animation: unconfirmed-screen-flash 0.9s ease-in-out infinite alternate;
+    }
+
+    @keyframes unconfirmed-screen-flash {
+      from {
+        opacity: 0.24;
+        border-color: rgba(255, 202, 75, 0.62);
+      }
+      to {
+        opacity: 1;
+        border-color: rgba(255, 62, 62, 0.98);
+      }
+    }
+
     button, input, textarea { font: inherit; }
     a { color: inherit; text-decoration: none; }
 
@@ -65,6 +90,139 @@
       justify-content: space-between;
       gap: 12px;
       margin-bottom: 16px;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .alarm-enable-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 42px;
+      padding: 0 14px;
+      border: 1px solid rgba(255, 211, 115, 0.34);
+      border-radius: 999px;
+      background: rgba(255, 248, 238, 0.13);
+      color: #ffe7b0;
+      font: inherit;
+      font-size: 0.86rem;
+      font-weight: 900;
+      white-space: nowrap;
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.2);
+    }
+
+    .alarm-enable-btn.is-ready {
+      border-color: rgba(107, 224, 151, 0.42);
+      background: rgba(42, 132, 79, 0.22);
+      color: #d7ffe5;
+    }
+
+    .alarm-enable-btn.is-ringing {
+      border-color: rgba(255, 226, 125, 0.88);
+      background: linear-gradient(135deg, #a91f39, #d9981f);
+      color: #fff;
+      animation: alarm-button-pulse 0.72s ease-in-out infinite alternate;
+    }
+
+    @keyframes alarm-button-pulse {
+      from { transform: scale(0.98); box-shadow: 0 8px 18px rgba(123, 31, 47, 0.2); }
+      to { transform: scale(1.04); box-shadow: 0 14px 28px rgba(255, 65, 65, 0.46); }
+    }
+
+    .order-alert-bar {
+      position: sticky;
+      top: 10px;
+      z-index: 112;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 14px;
+      padding: 14px 16px;
+      border: 2px solid rgba(255, 225, 119, 0.86);
+      border-radius: 22px;
+      background: linear-gradient(135deg, #8f162d 0%, #c43439 48%, #c58a18 100%);
+      color: #fff;
+      box-shadow: 0 20px 44px rgba(112, 14, 31, 0.42);
+      animation: alert-bar-flash 0.82s ease-in-out infinite alternate;
+    }
+
+    .order-alert-bar[hidden] {
+      display: none;
+    }
+
+    @keyframes alert-bar-flash {
+      from { filter: brightness(0.92); transform: translateY(0); }
+      to { filter: brightness(1.2); transform: translateY(2px); }
+    }
+
+    .order-alert-icon {
+      display: grid;
+      place-items: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      font-size: 1.55rem;
+      font-weight: 900;
+    }
+
+    .order-alert-copy {
+      min-width: 0;
+    }
+
+    .order-alert-copy strong,
+    .order-alert-copy span {
+      display: block;
+    }
+
+    .order-alert-copy strong {
+      margin-bottom: 3px;
+      font-size: clamp(1.03rem, 3vw, 1.28rem);
+      letter-spacing: -0.03em;
+    }
+
+    .order-alert-copy span {
+      color: rgba(255, 255, 255, 0.84);
+      font-size: 0.82rem;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .order-alert-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .order-alert-btn {
+      min-height: 42px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 999px;
+      background: #fff8e7;
+      color: #651725;
+      font: inherit;
+      font-size: 0.84rem;
+      font-weight: 900;
+      white-space: nowrap;
+      cursor: pointer;
+      box-shadow: 0 10px 18px rgba(77, 9, 22, 0.22);
+    }
+
+    .order-alert-btn.sound {
+      background: rgba(70, 12, 24, 0.36);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.28);
     }
 
     .brand {
@@ -684,6 +842,18 @@
     .request-card.is-new {
       border-color: rgba(123, 31, 47, 0.3);
       box-shadow: 0 16px 30px rgba(123, 31, 47, 0.11);
+      animation: new-request-card-flash 0.9s ease-in-out infinite alternate;
+    }
+
+    @keyframes new-request-card-flash {
+      from {
+        border-color: rgba(212, 175, 55, 0.48);
+        box-shadow: 0 12px 24px rgba(123, 31, 47, 0.1);
+      }
+      to {
+        border-color: rgba(220, 45, 65, 0.9);
+        box-shadow: 0 18px 34px rgba(220, 45, 65, 0.28);
+      }
     }
 
     .request-card.is-service {
@@ -909,6 +1079,17 @@
       color: #fffaf2;
       transform: translateY(-2px);
       box-shadow: 0 16px 28px rgba(123, 31, 47, 0.28);
+    }
+
+    .nav-tab.has-pending:not(.is-active) {
+      background: rgba(181, 31, 52, 0.3);
+      color: #fff4d6;
+      animation: pending-nav-flash 0.8s ease-in-out infinite alternate;
+    }
+
+    @keyframes pending-nav-flash {
+      from { box-shadow: inset 0 0 0 1px rgba(255, 210, 91, 0.32); }
+      to { box-shadow: inset 0 0 0 2px rgba(255, 93, 93, 0.92), 0 10px 22px rgba(181, 31, 52, 0.28); }
     }
 
     .panel {
@@ -2032,6 +2213,35 @@
     }
 
     @media (max-width: 720px) {
+      .topbar {
+        flex-wrap: wrap;
+      }
+
+      .topbar-actions {
+        width: 100%;
+      }
+
+      .topbar-actions > * {
+        flex: 1 1 0;
+      }
+
+      .order-alert-bar {
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 10px;
+        padding: 12px;
+        border-radius: 18px;
+      }
+
+      .order-alert-actions {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .order-alert-btn:only-child {
+        grid-column: 1 / -1;
+      }
+
       .modal-backdrop,
       .feedback-backdrop,
       .sheet-backdrop {
@@ -2179,6 +2389,14 @@
         font-size: 0.78rem;
       }
 
+      .topbar-actions .pill-btn,
+      .topbar-actions .alarm-enable-btn {
+        flex: 1 1 0;
+        min-height: 38px;
+        padding: 0 8px;
+        font-size: 0.74rem;
+      }
+
       .panel-head {
         align-items: flex-start;
         flex-wrap: wrap;
@@ -2254,10 +2472,31 @@
 
       .metric-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      body.has-unconfirmed-requests::after,
+      .alarm-enable-btn.is-ringing,
+      .order-alert-bar,
+      .request-card.is-new,
+      .nav-tab.has-pending:not(.is-active) {
+        animation: none;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="shell">
+    <section class="order-alert-bar" id="orderAlertBar" role="alert" aria-live="assertive" hidden>
+      <div class="order-alert-icon" aria-hidden="true">!</div>
+      <div class="order-alert-copy">
+        <strong id="orderAlertTitle">New request waiting</strong>
+        <span id="orderAlertMessage">Confirm the request to stop the alarm.</span>
+      </div>
+      <div class="order-alert-actions">
+        <button class="order-alert-btn sound" id="orderAlertSoundBtn" type="button">Enable sound</button>
+        <button class="order-alert-btn" id="orderAlertReviewBtn" type="button">Review &amp; confirm</button>
+      </div>
+    </section>
     <header class="topbar">
       <div class="brand">
           <a class="logo-link" href="../index.html" aria-label="EHWA home">
@@ -2268,7 +2507,13 @@
           <h1>Downtown</h1>
         </div>
       </div>
+      <div class="topbar-actions">
+        <button class="alarm-enable-btn" id="alarmEnableBtn" type="button" aria-pressed="false">
+          <span aria-hidden="true">🔔</span>
+          <span id="alarmEnableLabel">Enable alarm</span>
+        </button>
         <a class="pill-btn" href="./menu/?table=A12&amp;guests=2">Open Guest Menu</a>
+      </div>
     </header>
 
     <section class="app-view is-active" data-view="reservation">
@@ -2567,8 +2812,12 @@
 
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3Iiujn95evZuFiyLNrJUo-_H6rKngdxt0EeBFVw/exec";
     const AUTO_REFRESH_MS = 5000;
+    const ORDER_ALARM_REPEAT_MS = 2400;
+    const DEFAULT_DOCUMENT_TITLE = document.title;
     const AUTO_REMOVE_AFTER_MS = 60 * 60 * 1000;
     const AUTO_REMOVE_MUTATION_SPACING_MS = 200;
+    let orderAlarmAudioContext = null;
+    let orderAlarmIntervalHandle = null;
 
     const state = {
       reservations: [],
@@ -2593,6 +2842,8 @@
       requestsLoadedAt: null,
       requestLoadError: false,
       requestActionError: "",
+      orderAlarmUnlocked: false,
+      orderAlarmUnsupported: false,
       requestUpdatingIds: new Set()
     };
 
@@ -2713,6 +2964,151 @@
       return `${Math.floor(elapsedHours / 24)}d ago`;
     }
 
+    function getUnconfirmedDiningRequests() {
+      return state.diningRequests.filter((request) => request.status === "new");
+    }
+
+    function playOrderAlarmPattern() {
+      const context = orderAlarmAudioContext;
+      if (!context || context.state !== "running") return;
+      const startAt = context.currentTime + 0.03;
+      const notes = [
+        { offset: 0, frequency: 880, duration: 0.16 },
+        { offset: 0.25, frequency: 880, duration: 0.16 },
+        { offset: 0.5, frequency: 660, duration: 0.25 }
+      ];
+
+      notes.forEach(({ offset, frequency, duration }) => {
+        const oscillator = context.createOscillator();
+        const gain = context.createGain();
+        const noteStart = startAt + offset;
+        const noteEnd = noteStart + duration;
+        oscillator.type = "triangle";
+        oscillator.frequency.setValueAtTime(frequency, noteStart);
+        gain.gain.setValueAtTime(0.0001, noteStart);
+        gain.gain.exponentialRampToValueAtTime(0.18, noteStart + 0.025);
+        gain.gain.exponentialRampToValueAtTime(0.0001, noteEnd);
+        oscillator.connect(gain);
+        gain.connect(context.destination);
+        oscillator.start(noteStart);
+        oscillator.stop(noteEnd + 0.03);
+      });
+    }
+
+    function ringOrderAlarm() {
+      if (!orderAlarmAudioContext) return;
+      if (orderAlarmAudioContext.state === "suspended") {
+        orderAlarmAudioContext.resume()
+          .then(playOrderAlarmPattern)
+          .catch((error) => console.error("Order alarm resume failed", error));
+        return;
+      }
+      playOrderAlarmPattern();
+    }
+
+    function stopOrderAlarm() {
+      if (orderAlarmIntervalHandle) {
+        window.clearInterval(orderAlarmIntervalHandle);
+        orderAlarmIntervalHandle = null;
+      }
+    }
+
+    function startOrderAlarm() {
+      if (!state.orderAlarmUnlocked || !getUnconfirmedDiningRequests().length) {
+        stopOrderAlarm();
+        return;
+      }
+      if (orderAlarmIntervalHandle) return;
+      ringOrderAlarm();
+      orderAlarmIntervalHandle = window.setInterval(() => {
+        if (!getUnconfirmedDiningRequests().length) {
+          stopOrderAlarm();
+          return;
+        }
+        ringOrderAlarm();
+      }, ORDER_ALARM_REPEAT_MS);
+    }
+
+    async function enableOrderAlarm() {
+      if (state.orderAlarmUnsupported) return false;
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) {
+        state.orderAlarmUnsupported = true;
+        syncUnconfirmedRequestAlert();
+        return false;
+      }
+
+      try {
+        if (!orderAlarmAudioContext) orderAlarmAudioContext = new AudioContextClass();
+        if (orderAlarmAudioContext.state !== "running") {
+          await orderAlarmAudioContext.resume();
+        }
+        state.orderAlarmUnlocked = orderAlarmAudioContext.state === "running";
+        syncUnconfirmedRequestAlert();
+        return state.orderAlarmUnlocked;
+      } catch (error) {
+        console.error("Order alarm could not be enabled", error);
+        state.orderAlarmUnlocked = false;
+        syncUnconfirmedRequestAlert();
+        return false;
+      }
+    }
+
+    function syncUnconfirmedRequestAlert() {
+      const pendingRequests = getUnconfirmedDiningRequests();
+      const pendingCount = pendingRequests.length;
+      const pendingOrders = pendingRequests.filter((request) => request.kind === "order").length;
+      const pendingCalls = pendingRequests.filter((request) => request.kind === "service").length;
+      const alertBar = document.getElementById("orderAlertBar");
+      const alertTitle = document.getElementById("orderAlertTitle");
+      const alertMessage = document.getElementById("orderAlertMessage");
+      const alarmButton = document.getElementById("alarmEnableBtn");
+      const alarmLabel = document.getElementById("alarmEnableLabel");
+      const alertSoundButton = document.getElementById("orderAlertSoundBtn");
+      const ordersTab = document.querySelector('[data-queen-tab="online"]');
+
+      document.body.classList.toggle("has-unconfirmed-requests", pendingCount > 0);
+      if (alertBar) alertBar.hidden = pendingCount === 0;
+      if (ordersTab) ordersTab.classList.toggle("has-pending", pendingCount > 0);
+      document.title = pendingCount > 0
+        ? `🔔 ${pendingCount} NEW · ${DEFAULT_DOCUMENT_TITLE}`
+        : DEFAULT_DOCUMENT_TITLE;
+
+      if (pendingCount > 0 && alertTitle && alertMessage) {
+        const requestParts = [];
+        if (pendingOrders) requestParts.push(`${pendingOrders} order${pendingOrders === 1 ? "" : "s"}`);
+        if (pendingCalls) requestParts.push(`${pendingCalls} call${pendingCalls === 1 ? "" : "s"}`);
+        const tableList = pendingRequests
+          .slice(0, 3)
+          .map((request) => `Table ${request.table_code || "-"}`)
+          .join(", ");
+        alertTitle.textContent = `${pendingCount} new ${pendingCount === 1 ? "request needs" : "requests need"} confirmation`;
+        alertMessage.textContent = `${requestParts.join(" + ")} · ${tableList}. The alarm continues until every new request is confirmed.`;
+      }
+
+      if (alarmButton && alarmLabel) {
+        alarmButton.classList.toggle("is-ready", state.orderAlarmUnlocked && pendingCount === 0);
+        alarmButton.classList.toggle("is-ringing", state.orderAlarmUnlocked && pendingCount > 0);
+        alarmButton.setAttribute("aria-pressed", state.orderAlarmUnlocked ? "true" : "false");
+        alarmButton.disabled = state.orderAlarmUnsupported;
+        alarmLabel.textContent = state.orderAlarmUnsupported
+          ? "Sound unavailable"
+          : state.orderAlarmUnlocked
+            ? (pendingCount > 0 ? "Alarm ringing" : "Alarm ready")
+            : "Enable alarm";
+      }
+
+      if (alertSoundButton) {
+        alertSoundButton.hidden = state.orderAlarmUnlocked || state.orderAlarmUnsupported;
+      }
+
+      if (pendingCount > 0 && state.orderAlarmUnlocked) {
+        startOrderAlarm();
+      } else {
+        stopOrderAlarm();
+      }
+    }
+
     function getActiveDiningRequests() {
       return state.diningRequests.filter((request) => !["completed", "canceled"].includes(request.status));
     }
@@ -2737,11 +3133,11 @@
       }
       if (request.kind === "service") {
         return request.status === "new"
-          ? { status: "acknowledged", label: "On it" }
+          ? { status: "acknowledged", label: "Confirm call" }
           : { status: "completed", label: "Done" };
       }
       const orderFlow = {
-        new: { status: "acknowledged", label: "Accept order" },
+        new: { status: "acknowledged", label: "Confirm order" },
         acknowledged: { status: "preparing", label: "Start prep" },
         preparing: { status: "ready", label: "Mark ready" },
         ready: { status: "completed", label: "Complete" }
@@ -2818,6 +3214,7 @@
       document.getElementById("metricOpenCalls").textContent = String(openCalls);
       navCount.textContent = String(activeRequests.length);
       navCount.hidden = activeRequests.length === 0;
+      syncUnconfirmedRequestAlert();
 
       document.querySelectorAll("[data-request-filter]").forEach((button) => {
         button.classList.toggle("is-active", button.dataset.requestFilter === state.requestFilter);
@@ -4186,13 +4583,12 @@
     }
 
     async function performAutoRefresh() {
-      if (document.hidden) return;
       const [reservationResult, requestResult] = await Promise.allSettled([
-        fetchReservations(),
+        document.hidden ? Promise.resolve(null) : fetchReservations(),
         fetchDiningRequests()
       ]);
 
-      if (reservationResult.status === "fulfilled") {
+      if (reservationResult.status === "fulfilled" && reservationResult.value) {
         const reservations = reservationResult.value;
         syncReservations(reservations, { detectNew: true });
         syncPendingFeedbackQueue(reservations);
@@ -4338,6 +4734,25 @@
       updateDiningRequestStatus(button.dataset.requestId, button.dataset.requestStatus);
     });
 
+    document.getElementById("alarmEnableBtn").addEventListener("click", enableOrderAlarm);
+    document.getElementById("orderAlertSoundBtn").addEventListener("click", enableOrderAlarm);
+    document.getElementById("orderAlertReviewBtn").addEventListener("click", () => {
+      state.requestFilter = "active";
+      document.querySelector('[data-queen-tab="online"]')?.click();
+      renderDiningRequests();
+      window.setTimeout(() => {
+        document.getElementById("requestQueue")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 80);
+    });
+
+    document.addEventListener("pointerdown", () => {
+      enableOrderAlarm();
+    }, { once: true, capture: true });
+    document.addEventListener("keydown", () => {
+      enableOrderAlarm();
+    }, { once: true, capture: true });
+    window.addEventListener("beforeunload", stopOrderAlarm);
+
     sheetClose.addEventListener("click", closeSheet);
     sheet.addEventListener("click", (event) => {
       if (event.target === sheet) closeSheet();
@@ -4372,6 +4787,7 @@
       if (!document.hidden) performAutoRefresh();
     });
 
+    syncUnconfirmedRequestAlert();
     bootstrapAdmin();
   </script>
   <script>
