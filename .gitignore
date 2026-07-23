@@ -1,0 +1,3 @@
+# Local browser capture profiles and generated browser state
+.chrome-capture-profile*/
+.edge-capture-profile*/

@@ -3485,7 +3485,7 @@
         status.textContent = state.qrSessionActionError;
         status.className = "qr-session-status is-error";
       } else if (state.qrSessionLoadError) {
-        status.textContent = "QR table assignments are unavailable. Run dining-qr-table-assignment.sql in Supabase.";
+        status.textContent = "QR table assignments are unavailable. Run tools/sql/dining-qr-table-assignment.sql in Supabase.";
         status.className = "qr-session-status is-error";
       } else {
         status.textContent = `${activeCount} of ${DINING_QR_COUNT} QR codes assigned · Session history is retained after checkout.`;
