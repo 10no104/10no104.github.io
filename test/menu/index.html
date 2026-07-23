@@ -577,6 +577,203 @@
       font-weight: 700;
     }
 
+    .guest-session-panel {
+      display: grid;
+      gap: 14px;
+      width: min(960px, 92vw);
+      margin: 18px auto 0;
+      padding: 18px;
+      border: 1px solid rgba(125, 98, 63, 0.14);
+      border-radius: 24px;
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.96), rgba(250, 244, 235, 0.94)),
+        url("../../../assets/pattern.webp") center / 420px auto;
+      box-shadow: 0 18px 36px rgba(36, 24, 17, 0.08);
+    }
+
+    .guest-session-panel.is-inactive {
+      border-color: rgba(138, 48, 69, 0.25);
+      background: linear-gradient(135deg, rgba(255, 244, 244, 0.98), rgba(255, 251, 244, 0.96));
+    }
+
+    .guest-session-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .guest-session-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .guest-qr-number {
+      display: grid;
+      place-items: center;
+      flex: 0 0 48px;
+      width: 48px;
+      height: 48px;
+      border-radius: 15px;
+      background: #5a1122;
+      color: #fff;
+      font-size: 1.18rem;
+      font-weight: 900;
+    }
+
+    .guest-session-title span,
+    .guest-session-title strong { display: block; }
+
+    .guest-session-title span {
+      color: #8a786a;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .guest-session-title strong {
+      margin-top: 2px;
+      color: #2f2119;
+      font-size: 1.05rem;
+    }
+
+    .guest-session-refresh {
+      flex: 0 0 auto;
+      min-height: 38px;
+      padding: 0 13px;
+      border: 1px solid rgba(90, 17, 34, 0.14);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.8);
+      color: #672236;
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .guest-session-message {
+      margin: 0;
+      padding: 11px 13px;
+      border-radius: 14px;
+      background: rgba(37, 99, 61, 0.09);
+      color: #25633d;
+      font-size: 0.84rem;
+      font-weight: 800;
+      line-height: 1.5;
+    }
+
+    .guest-session-panel.is-inactive .guest-session-message {
+      background: rgba(138, 48, 69, 0.09);
+      color: #842f43;
+    }
+
+    .guest-order-history-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .guest-order-history-head h2 {
+      margin: 0;
+      font-size: 1rem;
+      letter-spacing: -0.03em;
+    }
+
+    .guest-order-history-head span {
+      color: #8a786a;
+      font-size: 0.76rem;
+      font-weight: 800;
+    }
+
+    .guest-order-history-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .guest-order-history-empty {
+      padding: 16px;
+      border: 1px dashed rgba(125, 98, 63, 0.2);
+      border-radius: 16px;
+      color: #847365;
+      font-size: 0.84rem;
+      text-align: center;
+    }
+
+    .guest-order-card {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      border: 1px solid rgba(125, 98, 63, 0.13);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.78);
+    }
+
+    .guest-order-card-top,
+    .guest-order-card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .guest-order-card-top strong {
+      color: #4e1d2a;
+      font-size: 0.94rem;
+    }
+
+    .guest-order-card-top time,
+    .guest-order-card-meta {
+      color: #817063;
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+
+    .guest-order-items {
+      color: #4f4036;
+      font-size: 0.82rem;
+      line-height: 1.55;
+    }
+
+    .guest-order-progress {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .guest-order-step {
+      min-height: 30px;
+      padding: 7px 5px;
+      border-radius: 999px;
+      background: #eee5db;
+      color: #8d7b6c;
+      font-size: 0.67rem;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .guest-order-step.is-done {
+      background: #dcecdf;
+      color: #25633d;
+    }
+
+    .guest-order-step.is-current {
+      background: #5a1122;
+      color: #fff;
+    }
+
+    .guest-order-card.is-canceled .guest-order-progress {
+      grid-template-columns: 1fr;
+    }
+
+    .guest-order-card.is-canceled .guest-order-step {
+      background: #f4dfe4;
+      color: #8a3045;
+    }
+
     .order-payload {
       padding: 16px;
       border-radius: 20px;
@@ -950,8 +1147,10 @@
     }
 
     .drawer-submit-btn:disabled,
-    .server-modal-btn:disabled {
-      cursor: wait;
+    .server-modal-btn:disabled,
+    .menu-add-btn:disabled,
+    .server-call-btn:disabled {
+      cursor: not-allowed;
       opacity: 0.62;
     }
 
@@ -1237,6 +1436,23 @@
       </div>
     </div>
   </div>
+  <section class="guest-session-panel is-inactive" id="guestSessionPanel" aria-live="polite">
+    <div class="guest-session-head">
+      <div class="guest-session-title">
+        <div class="guest-qr-number" id="guestQrNumber">--</div>
+        <div><span>Dining session</span><strong id="guestSessionTitle">Checking QR status…</strong></div>
+      </div>
+      <button class="guest-session-refresh" id="guestOrdersRefresh" type="button">Refresh</button>
+    </div>
+    <p class="guest-session-message" id="guestSessionMessage">Please wait while this QR is verified.</p>
+    <div class="guest-order-history-head">
+      <h2>Your sent orders</h2>
+      <span id="guestOrdersUpdated">Not loaded</span>
+    </div>
+    <div class="guest-order-history-list" id="guestOrderHistory">
+      <div class="guest-order-history-empty">No orders sent in this session.</div>
+    </div>
+  </section>
   <div class="order-layout">
     <div class="menu-stage">
       <main class="wrap">
@@ -1308,6 +1524,8 @@
       anonKey: "sb_publishable_3Ox2JIQXVLwusT-xzIMJ4g_YXTR5q8e"
     };
     const DINING_REQUESTS_TABLE = "dining_requests";
+    const DINING_QR_SESSIONS_TABLE = "dining_qr_sessions";
+    const QR_SESSION_REFRESH_MS = 5000;
     const SHEET_CONFIG = {
       sheetId: "1xa9OZbctYnlbaAL8lKIgmefM5hvSw0Plk01lxp5G2fc",
       gid: "1100419696"
@@ -1382,6 +1600,12 @@
     let menuImageObserver = null;
     let requestToastHandle = null;
     let isDiningRequestSubmitting = false;
+    let currentQrNumber = null;
+    let currentQrSession = null;
+    let guestSessionRequests = [];
+    let qrSessionRefreshHandle = null;
+    let qrSessionLoadError = false;
+    let isQrSessionRefreshing = false;
 
     function escapeHtml(text = "") {
       return text
@@ -1851,6 +2075,10 @@
     }
 
     function addToCart(menuId) {
+      if (!currentQrSession) {
+        showRequestToast("This QR is not active yet. Please ask your server.", { error: true });
+        return;
+      }
       const menuItem = allMenus.find((item) => getMenuId(item) === menuId);
       if (!menuItem) return;
 
@@ -1880,6 +2108,213 @@
       renderOrderSummary();
     }
 
+    function normalizeQrNumber(value) {
+      const qrNumber = Number.parseInt(String(value || ""), 10);
+      return Number.isInteger(qrNumber) && qrNumber >= 1 && qrNumber <= 10 ? qrNumber : null;
+    }
+
+    function formatGuestRequestTime(value) {
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "Time unavailable";
+      return new Intl.DateTimeFormat("en-CA", {
+        hour: "numeric",
+        minute: "2-digit"
+      }).format(date);
+    }
+
+    function getGuestRequestStatusLabel(status) {
+      const labels = {
+        new: "Sent",
+        acknowledged: "Server confirmed",
+        preparing: "Preparing",
+        ready: "Ready to serve",
+        completed: "Served",
+        canceled: "Canceled"
+      };
+      return labels[status] || status;
+    }
+
+    function getGuestRequestProgress(status) {
+      if (status === "canceled") {
+        return '<div class="guest-order-progress"><span class="guest-order-step">Canceled</span></div>';
+      }
+
+      const stageByStatus = {
+        new: 0,
+        acknowledged: 1,
+        preparing: 1,
+        ready: 1,
+        completed: 2
+      };
+      const currentStage = stageByStatus[status] ?? 0;
+      const isCompleted = status === "completed";
+      return `
+        <div class="guest-order-progress">
+          ${["Sent", "Server confirmed", "Served"].map((label, index) => {
+            const className = index < currentStage || isCompleted
+              ? "is-done"
+              : index === currentStage
+                ? "is-current"
+                : "";
+            return `<span class="guest-order-step ${className}">${label}</span>`;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    function renderGuestOrderHistory() {
+      const history = document.getElementById("guestOrderHistory");
+      const updated = document.getElementById("guestOrdersUpdated");
+      if (!history || !updated) return;
+
+      updated.textContent = currentQrSession
+        ? `Updated ${formatGuestRequestTime(new Date().toISOString())}`
+        : "No active session";
+
+      if (!guestSessionRequests.length) {
+        history.innerHTML = `<div class="guest-order-history-empty">${currentQrSession
+          ? "No orders sent in this session."
+          : "Order history appears after Queen activates this QR."}</div>`;
+        return;
+      }
+
+      history.innerHTML = guestSessionRequests.map((request) => {
+        const isOrder = request.kind === "order";
+        const itemSummary = isOrder
+          ? request.items.map((item) => `${Number(item.quantity || 0)}× ${item.nameEn || item.nameKo || "Menu item"}`).join(" · ")
+          : ({ water: "Water request", napkins: "Napkins request", server: "Server requested" }[request.request_type] || "Service request");
+        const title = isOrder ? `Order #${request.id}` : `Request #${request.id}`;
+        return `
+          <article class="guest-order-card is-${escapeHtml(String(request.status))}">
+            <div class="guest-order-card-top">
+              <strong>${escapeHtml(title)}</strong>
+              <time>${escapeHtml(formatGuestRequestTime(request.created_at))}</time>
+            </div>
+            <div class="guest-order-items">${escapeHtml(itemSummary || "Order details unavailable")}</div>
+            ${getGuestRequestProgress(request.status)}
+            <div class="guest-order-card-meta">
+              <span>${escapeHtml(getGuestRequestStatusLabel(request.status))}</span>
+              <strong>${isOrder ? escapeHtml(formatCurrency(request.total)) : ""}</strong>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function syncQrSessionUi() {
+      const panel = document.getElementById("guestSessionPanel");
+      const number = document.getElementById("guestQrNumber");
+      const title = document.getElementById("guestSessionTitle");
+      const message = document.getElementById("guestSessionMessage");
+      const canOrder = Boolean(currentQrSession && !qrSessionLoadError);
+      if (!panel || !number || !title || !message) return;
+
+      number.textContent = currentQrNumber ? String(currentQrNumber).padStart(2, "0") : "--";
+      panel.classList.toggle("is-inactive", !canOrder);
+
+      if (!currentQrNumber) {
+        title.textContent = "QR number required";
+        message.textContent = "Open this menu by scanning one of the numbered dining QR cards.";
+      } else if (qrSessionLoadError) {
+        title.textContent = `QR ${String(currentQrNumber).padStart(2, "0")} unavailable`;
+        message.textContent = "The QR system could not be reached. Please ask your server.";
+      } else if (!currentQrSession) {
+        title.textContent = `QR ${String(currentQrNumber).padStart(2, "0")} is not active`;
+        message.textContent = "Please ask your server to activate this QR before ordering.";
+      } else {
+        title.textContent = `QR ${String(currentQrNumber).padStart(2, "0")} is active`;
+        message.textContent = "Ordering is open. Sent orders and their live status appear below.";
+      }
+
+      document.querySelectorAll(".menu-add-btn, #drawerSubmitBtn, #serverCallBtn, #serverModalConfirmBtn").forEach((button) => {
+        button.disabled = !canOrder || isDiningRequestSubmitting;
+      });
+      renderGuestOrderHistory();
+    }
+
+    async function fetchActiveQrSession() {
+      if (!currentQrNumber) return null;
+      const { url, anonKey } = SUPABASE_CONFIG;
+      const branch = String(document.getElementById("storeSelect")?.value || MENU_BRANCH).trim().toLowerCase();
+      const endpoint = new URL(`${url}/rest/v1/${DINING_QR_SESSIONS_TABLE}`);
+      endpoint.searchParams.set("select", "id,branch,qr_number,status,started_at,updated_at");
+      endpoint.searchParams.set("branch", `eq.${branch}`);
+      endpoint.searchParams.set("qr_number", `eq.${currentQrNumber}`);
+      endpoint.searchParams.set("status", "eq.active");
+      endpoint.searchParams.set("order", "started_at.desc");
+      endpoint.searchParams.set("limit", "1");
+      const response = await fetch(endpoint.toString(), {
+        headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` }
+      });
+      if (!response.ok) {
+        throw new Error(`QR session lookup failed (${response.status}): ${await response.text()}`);
+      }
+      const rows = await response.json();
+      return rows[0] || null;
+    }
+
+    async function fetchGuestSessionRequests(sessionId) {
+      const { url, anonKey } = SUPABASE_CONFIG;
+      const endpoint = new URL(`${url}/rest/v1/${DINING_REQUESTS_TABLE}`);
+      endpoint.searchParams.set("select", "id,kind,request_type,status,items,item_count,total,created_at,updated_at");
+      endpoint.searchParams.set("qr_session_id", `eq.${sessionId}`);
+      endpoint.searchParams.set("order", "created_at.desc");
+      endpoint.searchParams.set("limit", "50");
+      const response = await fetch(endpoint.toString(), {
+        headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` }
+      });
+      if (!response.ok) {
+        throw new Error(`Guest order history failed (${response.status}): ${await response.text()}`);
+      }
+      return (await response.json()).map((request) => ({
+        ...request,
+        id: Number(request.id),
+        total: Number(request.total || 0),
+        items: Array.isArray(request.items) ? request.items : [],
+        status: String(request.status || "new").toLowerCase(),
+        kind: String(request.kind || "service").toLowerCase()
+      }));
+    }
+
+    async function refreshQrSession({ manual = false } = {}) {
+      if (isQrSessionRefreshing) return;
+      const refreshButton = document.getElementById("guestOrdersRefresh");
+      isQrSessionRefreshing = true;
+      if (manual && refreshButton) refreshButton.disabled = true;
+
+      try {
+        const nextSession = await fetchActiveQrSession();
+        currentQrSession = nextSession;
+        guestSessionRequests = nextSession ? await fetchGuestSessionRequests(nextSession.id) : [];
+        qrSessionLoadError = false;
+      } catch (error) {
+        if (!qrSessionLoadError) console.error("QR session refresh failed", error);
+        currentQrSession = null;
+        guestSessionRequests = [];
+        qrSessionLoadError = true;
+      } finally {
+        isQrSessionRefreshing = false;
+        if (refreshButton) refreshButton.disabled = false;
+        syncQrSessionUi();
+      }
+    }
+
+    async function requireActiveQrSession() {
+      if (!currentQrNumber) throw new Error("A numbered QR link is required");
+      const activeSession = await fetchActiveQrSession();
+      if (!activeSession) {
+        currentQrSession = null;
+        guestSessionRequests = [];
+        qrSessionLoadError = false;
+        syncQrSessionUi();
+        throw new Error("This QR is not active");
+      }
+      currentQrSession = activeSession;
+      qrSessionLoadError = false;
+      syncQrSessionUi();
+      return activeSession;
+    }
+
     function setInitialOrderFields() {
       const tableCodeInput = document.getElementById("tableCode");
       const guestCountInput = document.getElementById("guestCount");
@@ -1888,8 +2323,11 @@
       const requestedTable = (searchParams.get("table") || searchParams.get("t") || "").trim();
       const requestedGuests = Number(searchParams.get("guests") || searchParams.get("party") || 0);
       const requestedStore = (searchParams.get("store") || searchParams.get("branch") || "").trim().toLowerCase();
+      currentQrNumber = normalizeQrNumber(searchParams.get("qr") || searchParams.get("q"));
 
-      if (tableCodeInput && requestedTable) {
+      if (tableCodeInput && currentQrNumber) {
+        tableCodeInput.value = `QR-${String(currentQrNumber).padStart(2, "0")}`;
+      } else if (tableCodeInput && requestedTable) {
         tableCodeInput.value = requestedTable.slice(0, 40);
       }
 
@@ -1902,7 +2340,7 @@
       }
 
       if (tableCodeInput && !tableCodeInput.value) {
-        tableCodeInput.value = "A12";
+        tableCodeInput.value = "QR REQUIRED";
       }
 
       if (guestCountInput && !guestCountInput.value) {
@@ -1919,6 +2357,8 @@
         request_type: "order",
         status: "new",
         source: "table-qr",
+        qr_number: currentQrNumber,
+        qr_session_id: currentQrSession?.id || null,
         note: formValues.orderNote,
         item_count: getCartItemCount(),
         subtotal: Number(getCartSubtotal().toFixed(2)),
@@ -1945,6 +2385,8 @@
         request_type: selectedServerRequestType,
         status: "new",
         source: "table-service-call",
+        qr_number: currentQrNumber,
+        qr_session_id: currentQrSession?.id || null,
         note: formValues.orderNote || "",
         items: [],
         item_count: 0,
@@ -1969,9 +2411,16 @@
     async function submitDiningRequest(payload) {
       const { url, anonKey } = SUPABASE_CONFIG;
       if (!url || !anonKey) throw new Error("Missing Supabase configuration");
+      const activeSession = await requireActiveQrSession();
+      const sessionPayload = {
+        ...payload,
+        table_code: `QR-${String(activeSession.qr_number).padStart(2, "0")}`,
+        qr_number: Number(activeSession.qr_number),
+        qr_session_id: Number(activeSession.id)
+      };
 
       const endpoint = new URL(`${url}/rest/v1/${DINING_REQUESTS_TABLE}`);
-      endpoint.searchParams.set("select", "id,status,created_at");
+      endpoint.searchParams.set("select", "id,status,created_at,qr_number,qr_session_id");
       const response = await fetch(endpoint.toString(), {
         method: "POST",
         headers: {
@@ -1980,7 +2429,7 @@
           "Content-Type": "application/json",
           Prefer: "return=representation"
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(sessionPayload)
       });
 
       const responseText = await response.text();
@@ -2153,8 +2602,9 @@
           renderOrderSummary();
           statusEl.textContent = `Order${requestNumber} sent.`;
           statusEl.className = "order-status is-success";
-          showRequestToast(`Order${requestNumber} sent to Table ${formValues.tableCode}.`);
+          showRequestToast(`Order${requestNumber} sent from QR ${String(currentQrNumber).padStart(2, "0")}.`);
           closeCartDrawer();
+          refreshQrSession();
         } catch (error) {
           console.error("Order submission failed", error);
           statusEl.textContent = "Could not send the order. Please try again or call a server.";
@@ -2162,11 +2612,9 @@
           showRequestToast("Order was not sent. Please try again.", { error: true });
         } finally {
           isDiningRequestSubmitting = false;
-          if (submitButton) submitButton.disabled = false;
+          syncQrSessionUi();
         }
       });
-
-      setInitialOrderFields();
     }
 
     function setupCartDrawer() {
@@ -2358,7 +2806,7 @@
               <div class="menu-price-box">
                 <div class="menu-price price">${escapeHtml(formatPrice(item.price))}</div>
                 <div class="menu-card-actions">
-                  <button class="menu-add-btn" data-menu-id="${escapeHtml(getMenuId(item))}" type="button">Add to order</button>
+                  <button class="menu-add-btn" data-menu-id="${escapeHtml(getMenuId(item))}" type="button" ${currentQrSession ? "" : "disabled"}>Add to order</button>
                 </div>
               </div>
             </article>
@@ -2373,6 +2821,7 @@
         });
       });
       initLazyMenuImages(menuListEl);
+      syncQrSessionUi();
     }
 
     function setupToTopButton() {
@@ -2424,8 +2873,9 @@
           await submitDiningRequest(buildServerRequestPayload(formValues));
           statusEl.textContent = `Request sent: ${selectedServerRequestType}.`;
           statusEl.className = "order-status is-success";
-          showRequestToast(`${selectedServerRequestType} request sent for Table ${formValues.tableCode}.`);
+          showRequestToast(`${selectedServerRequestType} request sent from QR ${String(currentQrNumber).padStart(2, "0")}.`);
           closeServerModal();
+          refreshQrSession();
         } catch (error) {
           console.error("Server call failed", error);
           statusEl.textContent = "Could not call a server. Please try again.";
@@ -2434,7 +2884,7 @@
           showRequestToast("Server request was not sent.", { error: true });
         } finally {
           isDiningRequestSubmitting = false;
-          modalConfirmBtn.disabled = false;
+          syncQrSessionUi();
         }
       };
 
@@ -2570,12 +3020,15 @@
     }
 
     async function bootstrap() {
+      setInitialOrderFields();
+      const qrSessionPromise = refreshQrSession();
       try {
         allMenus = await fetchMenusFromSupabase();
       } catch (error) {
         console.error(error);
         allMenus = await fetchMenusFromGoogleSheet().catch(() => SAMPLE_MENU);
       }
+      await qrSessionPromise;
 
       renderTabs();
       renderSubtabs();
@@ -2585,6 +3038,18 @@
       setupToTopButton();
       setupOrderForm();
       setupCartDrawer();
+      syncQrSessionUi();
+
+      document.getElementById("guestOrdersRefresh").addEventListener("click", () => {
+        refreshQrSession({ manual: true });
+      });
+      qrSessionRefreshHandle = window.setInterval(refreshQrSession, QR_SESSION_REFRESH_MS);
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) refreshQrSession();
+      });
+      window.addEventListener("beforeunload", () => {
+        if (qrSessionRefreshHandle) window.clearInterval(qrSessionRefreshHandle);
+      });
     }
 
     bootstrap();

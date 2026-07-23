@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dining QR Cards | EHWA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500;700;800;900&amp;display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #201713;
+      --muted: #76675b;
+      --paper: #fffdf8;
+      --wine: #762436;
+      --gold: #c89931;
+      --line: rgba(84, 62, 45, 0.16);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Noto Sans KR", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(200, 153, 49, 0.18), transparent 28%),
+        linear-gradient(180deg, #f3ece2, #e9dfd1);
+    }
+
+    button,
+    input { font: inherit; }
+
+    .controls {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      padding: 18px;
+      color: #fff8ef;
+      background: rgba(29, 18, 14, 0.95);
+      box-shadow: 0 12px 34px rgba(28, 17, 12, 0.2);
+      backdrop-filter: blur(14px);
+    }
+
+    .controls-inner {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      width: min(1120px, 94vw);
+      margin: 0 auto;
+    }
+
+    .controls h1,
+    .controls p { margin: 0; }
+
+    .controls h1 {
+      font-size: clamp(1.35rem, 4vw, 2rem);
+      letter-spacing: -0.04em;
+    }
+
+    .controls p {
+      margin-top: 5px;
+      color: rgba(255, 248, 239, 0.7);
+      font-size: 0.86rem;
+    }
+
+    .controls-actions {
+      display: flex;
+      align-items: end;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .url-field {
+      display: grid;
+      gap: 5px;
+      min-width: min(440px, 82vw);
+    }
+
+    .url-field span {
+      color: rgba(255, 248, 239, 0.72);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .url-field input {
+      width: 100%;
+      min-height: 42px;
+      padding: 0 12px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .control-btn,
+    .download-btn {
+      min-height: 42px;
+      padding: 0 15px;
+      border: 0;
+      border-radius: 12px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .control-btn {
+      background: #fff8ef;
+      color: #5d2030;
+    }
+
+    .control-btn.primary {
+      background: linear-gradient(135deg, #b68425, #e4bd58);
+      color: #25170f;
+    }
+
+    .sheet {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      width: min(1120px, 94vw);
+      margin: 26px auto 46px;
+    }
+
+    .qr-card {
+      display: grid;
+      justify-items: center;
+      gap: 12px;
+      min-width: 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 250, 242, 0.96)),
+        url("../assets/pattern.webp") center / 420px auto;
+      box-shadow: 0 20px 44px rgba(40, 27, 18, 0.1);
+      break-inside: avoid;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      width: 100%;
+    }
+
+    .brand img {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+    }
+
+    .brand strong,
+    .brand span { display: block; }
+
+    .brand strong {
+      font-size: 1rem;
+      letter-spacing: 0.12em;
+    }
+
+    .brand span {
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .qr-heading {
+      text-align: center;
+    }
+
+    .qr-heading span,
+    .qr-heading strong { display: block; }
+
+    .qr-heading span {
+      color: var(--wine);
+      font-size: 0.76rem;
+      font-weight: 900;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .qr-heading strong {
+      margin-top: 2px;
+      font-size: 2rem;
+      letter-spacing: -0.05em;
+    }
+
+    .qr-canvas-wrap {
+      display: grid;
+      place-items: center;
+      width: min(100%, 260px);
+      aspect-ratio: 1;
+      padding: 12px;
+      border: 2px solid rgba(118, 36, 54, 0.14);
+      border-radius: 22px;
+      background: #fff;
+    }
+
+    .qr-canvas-wrap canvas {
+      display: block !important;
+      width: 100%;
+      height: 100%;
+    }
+
+    .qr-copy {
+      margin: 0;
+      color: #5f5045;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .qr-url {
+      width: 100%;
+      min-width: 0;
+      overflow: hidden;
+      color: #8a796b;
+      font-size: 0.68rem;
+      text-align: center;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .download-btn {
+      width: 100%;
+      background: #efe4d4;
+      color: #5e2331;
+    }
+
+    .qr-error {
+      grid-column: 1 / -1;
+      padding: 24px;
+      border-radius: 18px;
+      background: #fff0f0;
+      color: #8d2438;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    @media (max-width: 820px) {
+      .controls-inner { grid-template-columns: 1fr; }
+      .controls-actions { justify-content: flex-start; }
+      .url-field { min-width: 100%; }
+      .sheet { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 520px) {
+      .sheet { grid-template-columns: 1fr; }
+    }
+
+    @media print {
+      @page { size: letter portrait; margin: 0.35in; }
+
+      body { background: #fff; }
+      .controls { display: none; }
+      .sheet {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.16in;
+        width: 100%;
+        margin: 0;
+      }
+      .qr-card {
+        gap: 0.05in;
+        height: 1.93in;
+        padding: 0.12in 0.16in;
+        border-radius: 0.14in;
+        box-shadow: none;
+      }
+      .brand img { width: 0.27in; height: 0.27in; }
+      .brand strong { font-size: 8pt; }
+      .brand span { font-size: 5.5pt; }
+      .qr-heading span { font-size: 5.5pt; }
+      .qr-heading strong { font-size: 13pt; }
+      .qr-canvas-wrap {
+        width: 1.15in;
+        padding: 0.04in;
+        border-radius: 0.08in;
+      }
+      .qr-copy { font-size: 6pt; }
+      .qr-url,
+      .download-btn { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="controls">
+    <div class="controls-inner">
+      <div>
+        <h1>Dining QR Cards 1–10</h1>
+        <p>각 QR은 Downtown 메뉴와 고유 번호를 함께 전달합니다.</p>
+      </div>
+      <div class="controls-actions">
+        <label class="url-field">
+          <span>Menu base URL</span>
+          <input id="menuBaseUrl" type="url" value="https://www.ehwa.ca/test/menu/" />
+        </label>
+        <button class="control-btn" id="refreshCodes" type="button">Refresh</button>
+        <button class="control-btn primary" id="printCodes" type="button">Print all 10</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="sheet" id="qrSheet" aria-live="polite"></main>
+
+  <script src="./vendor/qrcode.min.js"></script>
+  <script>
+    const QR_COUNT = 10;
+    const QR_BRANCH = "downtown";
+    const QR_SIZE = 480;
+
+    function buildMenuUrl(baseUrl, qrNumber) {
+      const fallback = "https://www.ehwa.ca/test/menu/";
+      const url = new URL(String(baseUrl || fallback).trim() || fallback, window.location.href);
+      url.searchParams.set("qr", String(qrNumber));
+      url.searchParams.set("store", QR_BRANCH);
+      return url.toString();
+    }
+
+    function drawCenteredNumber(canvas, qrNumber) {
+      const context = canvas.getContext("2d");
+      const center = canvas.width / 2;
+      const boxSize = Math.round(canvas.width * 0.145);
+      const radius = Math.round(boxSize * 0.22);
+      const left = center - (boxSize / 2);
+      const top = center - (boxSize / 2);
+
+      context.fillStyle = "#ffffff";
+      context.strokeStyle = "#762436";
+      context.lineWidth = Math.max(4, Math.round(canvas.width * 0.009));
+      context.beginPath();
+      context.roundRect(left, top, boxSize, boxSize, radius);
+      context.fill();
+      context.stroke();
+
+      context.fillStyle = "#762436";
+      context.font = `900 ${Math.round(boxSize * 0.52)}px Arial, sans-serif`;
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillText(String(qrNumber), center, center + Math.round(boxSize * 0.03));
+    }
+
+    function createCard(qrNumber, targetUrl) {
+      const article = document.createElement("article");
+      article.className = "qr-card";
+      article.innerHTML = `
+        <div class="brand">
+          <img src="../assets/logo-dark.webp" alt="EHWA" />
+          <div><strong>EHWA</strong><span>Downtown dining</span></div>
+        </div>
+        <div class="qr-heading"><span>Scan to order</span><strong>QR ${String(qrNumber).padStart(2, "0")}</strong></div>
+        <div class="qr-canvas-wrap" aria-label="Menu QR ${qrNumber}"></div>
+        <p class="qr-copy">Scan, order, and track your order status.</p>
+        <div class="qr-url" title="${targetUrl}">${targetUrl}</div>
+        <button class="download-btn" type="button">Download QR ${String(qrNumber).padStart(2, "0")}</button>
+      `;
+      return article;
+    }
+
+    function renderQrToCanvas(container, targetUrl, qrNumber) {
+      container.innerHTML = "";
+      new window.QRCode(container, {
+        text: targetUrl,
+        width: QR_SIZE,
+        height: QR_SIZE,
+        colorDark: "#211713",
+        colorLight: "#ffffff",
+        correctLevel: window.QRCode.CorrectLevel.H
+      });
+      const canvas = container.querySelector("canvas");
+      if (!canvas) throw new Error("QR canvas was not created");
+      canvas.setAttribute("aria-label", `Menu QR ${qrNumber}`);
+      drawCenteredNumber(canvas, qrNumber);
+      container.querySelectorAll("img").forEach((image) => image.remove());
+      canvas.style.display = "block";
+      window.requestAnimationFrame(() => {
+        canvas.style.display = "block";
+      });
+      return canvas;
+    }
+
+    async function renderQrSheet() {
+      const sheet = document.getElementById("qrSheet");
+      const baseUrl = document.getElementById("menuBaseUrl").value;
+      sheet.innerHTML = "";
+
+      if (typeof window.QRCode !== "function") {
+        sheet.innerHTML = '<div class="qr-error">QR generator could not load. Check the internet connection and refresh this page.</div>';
+        return;
+      }
+
+      for (let qrNumber = 1; qrNumber <= QR_COUNT; qrNumber += 1) {
+        const targetUrl = buildMenuUrl(baseUrl, qrNumber);
+        const card = createCard(qrNumber, targetUrl);
+        const canvasWrap = card.querySelector(".qr-canvas-wrap");
+        const downloadButton = card.querySelector(".download-btn");
+        sheet.appendChild(card);
+
+        try {
+          const canvas = renderQrToCanvas(canvasWrap, targetUrl, qrNumber);
+          downloadButton.addEventListener("click", () => {
+            const link = document.createElement("a");
+            link.download = `ehwa-downtown-qr-${String(qrNumber).padStart(2, "0")}.png`;
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+          });
+        } catch (error) {
+          console.error(`QR ${qrNumber} generation failed`, error);
+          downloadButton.disabled = true;
+          downloadButton.textContent = "QR generation failed";
+        }
+      }
+    }
+
+    document.getElementById("refreshCodes").addEventListener("click", renderQrSheet);
+    document.getElementById("printCodes").addEventListener("click", () => window.print());
+    renderQrSheet();
+  </script>
+</body>
+</html>
