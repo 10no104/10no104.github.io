@@ -673,10 +673,10 @@
       letter-spacing: -0.03em;
     }
 
-    .table-map-preview {
+    .table-map-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 12px;
       min-height: 280px;
       padding: 14px;
       border-radius: 22px;
@@ -686,19 +686,78 @@
         rgba(255, 255, 255, 0.66);
     }
 
-    .table-map-zone {
-      display: grid;
-      place-items: center;
-      min-height: 72px;
+    .floor-table-card {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 154px;
+      padding: 15px;
       border-radius: 18px;
       border: 1px solid rgba(113, 88, 60, 0.13);
       background: rgba(255, 255, 255, 0.76);
-      color: #6b3127;
-      font-weight: 900;
+      color: #39271d;
     }
 
-    .table-map-zone.is-wide {
-      grid-column: span 2;
+    .floor-table-card.is-assigned {
+      border-color: rgba(38, 112, 69, 0.34);
+      background: linear-gradient(145deg, rgba(230, 248, 235, 0.96), rgba(255, 255, 255, 0.9));
+      box-shadow: 0 12px 24px rgba(38, 112, 69, 0.09);
+    }
+
+    .floor-table-top,
+    .floor-table-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .floor-table-name {
+      font-size: 1.35rem;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    .floor-table-state {
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: #eee4d8;
+      color: #796657;
+      font-size: 0.64rem;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .floor-table-card.is-assigned .floor-table-state {
+      background: #d8eddd;
+      color: #25633d;
+    }
+
+    .floor-table-session {
+      min-height: 42px;
+      color: #756356;
+      font-size: 0.78rem;
+      font-weight: 750;
+      line-height: 1.5;
+    }
+
+    .floor-table-actions {
+      margin-top: auto;
+    }
+
+    .floor-table-actions .qr-station-btn {
+      flex: 1 1 0;
+    }
+
+    .table-map-empty {
+      grid-column: 1 / -1;
+      display: grid;
+      place-items: center;
+      min-height: 220px;
+      color: #79695c;
+      font-weight: 800;
+      text-align: center;
     }
 
     .online-grid,
@@ -906,9 +965,45 @@
       color: #fff;
     }
 
+    .qr-station-btn.is-wide {
+      grid-column: 1 / -1;
+    }
+
     .qr-station-btn:disabled {
       cursor: wait;
       opacity: 0.55;
+    }
+
+    .qr-assignment-options {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      margin: 18px 0;
+    }
+
+    .qr-assignment-option {
+      min-height: 64px;
+      border: 1px solid rgba(123, 31, 47, 0.16);
+      border-radius: 16px;
+      background: #fffaf3;
+      color: #5f2631;
+      font: inherit;
+      font-size: 1rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .qr-assignment-option:hover,
+    .qr-assignment-option:focus-visible {
+      border-color: #25633d;
+      background: #eaf6ed;
+      color: #205737;
+      outline: none;
+    }
+
+    .qr-assignment-option:disabled {
+      cursor: wait;
+      opacity: 0.5;
     }
 
     .request-qr-filter-btn[hidden] {
@@ -2491,7 +2586,7 @@
 
       .online-grid,
       .note-grid,
-      .table-map-preview {
+      .table-map-grid {
         grid-template-columns: 1fr;
       }
 
@@ -2519,8 +2614,8 @@
         grid-column: 2;
       }
 
-      .table-map-zone.is-wide {
-        grid-column: span 1;
+      .qr-assignment-options {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       .bottom-nav {
@@ -2788,22 +2883,25 @@
       <section class="purpose-hero">
         <p class="purpose-kicker">Downtown floor</p>
         <h2>Table Status</h2>
-        <p>Table map, seating status, and floor notes will live here.</p>
+        <p>Assign an available QR to a table before seating guests. Ending the table session returns that QR to the inactive pool.</p>
+      </section>
+
+      <section class="purpose-panel qr-session-control-panel">
+        <div class="qr-session-toolbar">
+          <div>
+            <h3>Dining QR Sessions</h3>
+            <p>Assigned QR codes are active. Unassigned QR codes cannot place orders.</p>
+          </div>
+          <a class="qr-sheet-link" href="./qr.html">QR Cards 1–10</a>
+        </div>
+        <p class="qr-session-status" id="qrSessionStatus">Loading QR sessions…</p>
+        <div class="qr-station-grid" id="qrStationGrid" aria-live="polite"></div>
       </section>
 
       <section class="purpose-panel">
         <h3>Table Map</h3>
-        <div class="table-map-preview" aria-label="Table map placeholder">
-          <div class="table-map-zone is-wide">Map Area</div>
-          <div class="table-map-zone">Patio</div>
-          <div class="table-map-zone">Bar</div>
-          <div class="table-map-zone">T1</div>
-          <div class="table-map-zone">T2</div>
-          <div class="table-map-zone">T3</div>
-          <div class="table-map-zone">T4</div>
-          <div class="table-map-zone is-wide">Main Dining</div>
-          <div class="table-map-zone">Private</div>
-          <div class="table-map-zone">Wait</div>
+        <div class="table-map-grid" id="tableMapGrid" aria-live="polite">
+          <div class="table-map-empty">Loading tables…</div>
         </div>
       </section>
     </section>
@@ -2829,23 +2927,11 @@
         </div>
       </section>
 
-      <section class="purpose-panel qr-session-control-panel">
-        <div class="qr-session-toolbar">
-          <div>
-            <h3>Dining QR Sessions</h3>
-            <p>Activate a QR for new guests. Reset closes the visit but keeps its order history.</p>
-          </div>
-          <a class="qr-sheet-link" href="./qr.html">QR Cards 1–10</a>
-        </div>
-        <p class="qr-session-status" id="qrSessionStatus">Loading QR sessions…</p>
-        <div class="qr-station-grid" id="qrStationGrid" aria-live="polite"></div>
-      </section>
-
       <section class="purpose-panel">
         <div class="request-toolbar">
           <h3 id="requestQueueTitle">Live Queue</h3>
           <div class="request-toolbar-actions">
-            <button class="request-refresh-btn request-qr-filter-btn" id="clearRequestQrFilter" type="button" hidden>Show all QR</button>
+            <button class="request-refresh-btn request-qr-filter-btn" id="clearRequestQrFilter" type="button" hidden>Show all</button>
             <button class="request-refresh-btn" id="refreshRequestsBtn" type="button">Refresh</button>
           </div>
         </div>
@@ -2997,6 +3083,23 @@
     </div>
   </div>
 
+  <div class="table-backdrop" id="qrAssignmentModal" aria-hidden="true">
+    <div class="table-modal" role="dialog" aria-modal="true" aria-labelledby="qrAssignmentTitle">
+      <div class="table-modal-top">
+        <div>
+          <h3 id="qrAssignmentTitle">Assign a QR</h3>
+          <p id="qrAssignmentMeta">Choose one available QR for this table.</p>
+        </div>
+        <button class="modal-close" id="closeQrAssignmentModal" type="button">×</button>
+      </div>
+      <div class="qr-assignment-options" id="qrAssignmentOptions"></div>
+      <p class="table-option-empty" id="qrAssignmentEmpty" hidden>Every QR is currently assigned.</p>
+      <div class="table-modal-actions">
+        <button class="pill-btn" id="cancelQrAssignment" type="button">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <div class="feedback-backdrop" id="removeConfirmModal" aria-hidden="true">
     <div class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="removeConfirmTitle">
       <h3 id="removeConfirmTitle">Remove Reservation?</h3>
@@ -3074,6 +3177,8 @@
       qrSessionActionError: "",
       qrSessionUpdatingNumbers: new Set(),
       selectedRequestQrNumber: null,
+      selectedRequestTableCode: null,
+      qrAssignmentTableCode: null,
       orderAlarmUnlocked: false,
       orderAlarmUnsupported: false,
       dismissedFullscreenRequestIds: new Set(),
@@ -3140,9 +3245,9 @@
 
     const REQUEST_STATUS_LABELS = {
       new: "New",
-      acknowledged: "Server confirmed",
+      acknowledged: "Preparing",
       preparing: "Preparing",
-      ready: "Ready",
+      ready: "Preparing",
       completed: "Served",
       canceled: "Canceled"
     };
@@ -3158,6 +3263,7 @@
       return {
         ...row,
         id: Number(row.id),
+        table_code: String(row.table_code || "").trim(),
         qr_number: Number(row.qr_number) || null,
         qr_session_id: Number(row.qr_session_id) || null,
         guest_count: Number(row.guest_count || 0),
@@ -3177,6 +3283,7 @@
         ...row,
         id: Number(row.id),
         qr_number: Number(row.qr_number),
+        table_code: String(row.table_code || "").trim(),
         status: String(row.status || "closed").toLowerCase()
       };
     }
@@ -3209,7 +3316,24 @@
     }
 
     function getActiveQrSession(qrNumber) {
-      return state.qrSessions.find((session) => session.qr_number === qrNumber && session.status === "active") || null;
+      return state.qrSessions.find((session) => (
+        session.qr_number === qrNumber
+        && session.status === "active"
+        && session.table_code
+      )) || null;
+    }
+
+    function getActiveTableSession(tableCode) {
+      const normalizedTable = String(tableCode || "").trim().toLowerCase();
+      return state.qrSessions.find((session) => (
+        session.status === "active"
+        && session.table_code.toLowerCase() === normalizedTable
+      )) || null;
+    }
+
+    function getTableRequestHistory(tableCode) {
+      const normalizedTable = String(tableCode || "").trim().toLowerCase();
+      return state.diningRequests.filter((request) => request.table_code.toLowerCase() === normalizedTable);
     }
 
     function renderQrStations() {
@@ -3221,11 +3345,11 @@
         status.textContent = state.qrSessionActionError;
         status.className = "qr-session-status is-error";
       } else if (state.qrSessionLoadError) {
-        status.textContent = "QR sessions are unavailable. Run dining-qr-sessions-schema.sql in Supabase.";
+        status.textContent = "QR table assignments are unavailable. Run dining-qr-table-assignment.sql in Supabase.";
         status.className = "qr-session-status is-error";
       } else {
-        const activeCount = state.qrSessions.filter((session) => session.status === "active").length;
-        status.textContent = `${activeCount} of ${DINING_QR_COUNT} QR codes active · Order history is retained after reset.`;
+        const activeCount = state.qrSessions.filter((session) => session.status === "active" && session.table_code).length;
+        status.textContent = `${activeCount} of ${DINING_QR_COUNT} QR codes assigned · Session history is retained after checkout.`;
         status.className = "qr-session-status";
       }
 
@@ -3238,46 +3362,186 @@
         const latestSession = state.qrSessions.find((session) => session.qr_number === qrNumber) || null;
         const isUpdating = state.qrSessionUpdatingNumbers.has(qrNumber);
         const meta = activeSession
-          ? `Started ${formatRequestClock(activeSession.started_at)}<br>${activeRequests.length} open request${activeRequests.length === 1 ? "" : "s"}`
+          ? `Table ${escapeHtml(activeSession.table_code)}<br>Started ${formatRequestClock(activeSession.started_at)}`
           : latestSession
-            ? `Last visit ${formatRequestClock(latestSession.started_at)}<br>Ready for new guests`
-            : "No visits yet<br>Ready for new guests";
+            ? `Last used at Table ${escapeHtml(latestSession.table_code || "-")}<br>Assign from the table map`
+            : "No visits yet<br>Assign from the table map";
         return `
           <article class="qr-station-card ${activeSession ? "is-active" : ""}">
             <div class="qr-station-top">
               <strong class="qr-station-number">QR ${String(qrNumber).padStart(2, "0")}</strong>
-              <span class="qr-station-state">${activeSession ? "Active" : "Inactive"}</span>
+              <span class="qr-station-state">${activeSession ? "Assigned" : "Inactive"}</span>
             </div>
             <div class="qr-station-meta">${meta}</div>
             <div class="qr-station-stats"><span>${history.length} records</span><span>${activeRequests.length} open</span></div>
             <div class="qr-station-actions">
-              <button
-                class="qr-station-btn ${activeSession ? "reset" : "primary"}"
-                type="button"
-                data-qr-session-action="${activeSession ? "reset" : "activate"}"
-                data-qr-number="${qrNumber}"
-                ${isUpdating || state.qrSessionLoadError ? "disabled" : ""}
-              >${isUpdating ? "Working…" : activeSession ? "Reset" : "Activate"}</button>
-              <button class="qr-station-btn" type="button" data-qr-history="${qrNumber}">History</button>
+              ${activeSession ? `
+                <button
+                  class="qr-station-btn reset"
+                  type="button"
+                  data-end-qr-session="${qrNumber}"
+                  data-table-code="${escapeHtml(activeSession.table_code)}"
+                  ${isUpdating || state.qrSessionLoadError ? "disabled" : ""}
+                >${isUpdating ? "Working…" : "End session"}</button>
+              ` : ""}
+              <button class="qr-station-btn ${activeSession ? "" : "is-wide"}" type="button" data-qr-history="${qrNumber}">History</button>
             </div>
           </article>
         `;
       }).join("");
     }
 
-    async function mutateQrSession(qrNumber, action) {
+    function renderTableMap() {
+      const grid = document.getElementById("tableMapGrid");
+      if (!grid) return;
+
+      const tableOptions = Array.from(new Map(
+        state.tableOptions
+          .map((tableCode) => String(tableCode || "").trim())
+          .filter(Boolean)
+          .map((tableCode) => [tableCode.toLowerCase(), tableCode])
+      ).values());
+
+      if (!tableOptions.length) {
+        grid.innerHTML = '<div class="table-map-empty">No table options were found in the Table sheet.</div>';
+        return;
+      }
+
+      grid.innerHTML = tableOptions.map((tableCode) => {
+        const activeSession = getActiveTableSession(tableCode);
+        const history = getTableRequestHistory(tableCode);
+        const activeRequests = activeSession
+          ? history.filter((request) => request.qr_session_id === activeSession.id && !["completed", "canceled"].includes(request.status))
+          : [];
+        const isUpdating = activeSession && state.qrSessionUpdatingNumbers.has(activeSession.qr_number);
+        const sessionCopy = activeSession
+          ? `<strong>QR ${String(activeSession.qr_number).padStart(2, "0")}</strong><br>${activeRequests.length} open request${activeRequests.length === 1 ? "" : "s"} · since ${formatRequestClock(activeSession.started_at)}`
+          : `${history.length} historical request${history.length === 1 ? "" : "s"}<br>Assign a QR when guests are seated.`;
+        return `
+          <article class="floor-table-card ${activeSession ? "is-assigned" : ""}">
+            <div class="floor-table-top">
+              <strong class="floor-table-name">${escapeHtml(tableCode)}</strong>
+              <span class="floor-table-state">${activeSession ? "Occupied" : "Available"}</span>
+            </div>
+            <div class="floor-table-session">${sessionCopy}</div>
+            <div class="floor-table-actions">
+              ${activeSession ? `
+                <button
+                  class="qr-station-btn reset"
+                  type="button"
+                  data-end-qr-session="${activeSession.qr_number}"
+                  data-table-code="${escapeHtml(tableCode)}"
+                  ${isUpdating ? "disabled" : ""}
+                >${isUpdating ? "Working…" : "End session"}</button>
+              ` : `
+                <button
+                  class="qr-station-btn primary"
+                  type="button"
+                  data-assign-table="${escapeHtml(tableCode)}"
+                  ${state.qrSessionLoadError ? "disabled" : ""}
+                >Assign QR</button>
+              `}
+              <button class="qr-station-btn" type="button" data-table-history="${escapeHtml(tableCode)}">History</button>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function closeQrAssignmentModal() {
+      const modal = document.getElementById("qrAssignmentModal");
+      state.qrAssignmentTableCode = null;
+      modal?.classList.remove("is-open");
+      modal?.setAttribute("aria-hidden", "true");
+    }
+
+    function renderQrAssignmentOptions() {
+      const options = document.getElementById("qrAssignmentOptions");
+      const empty = document.getElementById("qrAssignmentEmpty");
+      const meta = document.getElementById("qrAssignmentMeta");
+      if (!options || !empty || !meta) return;
+      const tableCode = state.qrAssignmentTableCode;
+      const availableQrNumbers = Array.from({ length: DINING_QR_COUNT }, (_, index) => index + 1)
+        .filter((qrNumber) => !getActiveQrSession(qrNumber));
+      meta.textContent = `Choose one available QR for Table ${tableCode || "-"}.`;
+      empty.hidden = availableQrNumbers.length > 0;
+      options.innerHTML = availableQrNumbers.map((qrNumber) => `
+        <button
+          class="qr-assignment-option"
+          type="button"
+          data-assign-qr="${qrNumber}"
+          data-assign-table="${escapeHtml(tableCode || "")}"
+          ${state.qrSessionUpdatingNumbers.has(qrNumber) ? "disabled" : ""}
+        >QR ${String(qrNumber).padStart(2, "0")}</button>
+      `).join("");
+    }
+
+    function openQrAssignmentModal(tableCode) {
+      if (!tableCode || getActiveTableSession(tableCode)) return;
+      state.qrAssignmentTableCode = tableCode;
+      renderQrAssignmentOptions();
+      const modal = document.getElementById("qrAssignmentModal");
+      modal?.classList.add("is-open");
+      modal?.setAttribute("aria-hidden", "false");
+      window.setTimeout(() => document.querySelector("#qrAssignmentOptions button")?.focus(), 0);
+    }
+
+    async function assignQrToTable(qrNumber, tableCode) {
+      if (!Number.isInteger(qrNumber) || qrNumber < 1 || qrNumber > DINING_QR_COUNT) return;
+      const normalizedTableCode = String(tableCode || "").trim();
+      if (!normalizedTableCode || getActiveTableSession(normalizedTableCode)) return;
+      if (state.qrSessionUpdatingNumbers.has(qrNumber)) return;
+      state.qrSessionUpdatingNumbers.add(qrNumber);
+      state.qrSessionActionError = "";
+      renderDiningRequests();
+
+      try {
+        const { url, anonKey } = SUPABASE_CONFIG;
+        const endpoint = `${url}/rest/v1/rpc/assign_dining_qr_session`;
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            apikey: anonKey,
+            Authorization: `Bearer ${anonKey}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            p_branch: ADMIN_SHEET_CONFIG.branchLabel.toLowerCase(),
+            p_qr_number: qrNumber,
+            p_table_code: normalizedTableCode
+          })
+        });
+        if (!response.ok) {
+          throw new Error(`QR assignment failed (${response.status}): ${await response.text()}`);
+        }
+
+        const [sessions, requests] = await Promise.all([fetchQrSessions(), fetchDiningRequests()]);
+        state.qrSessions = sessions;
+        state.diningRequests = requests;
+        state.qrSessionLoadError = false;
+        state.requestLoadError = false;
+        state.requestsLoadedAt = new Date().toISOString();
+        closeQrAssignmentModal();
+      } catch (error) {
+        console.error("QR assignment failed", error);
+        state.qrSessionActionError = `QR ${String(qrNumber).padStart(2, "0")} could not be assigned to Table ${normalizedTableCode}. Please try again.`;
+      } finally {
+        state.qrSessionUpdatingNumbers.delete(qrNumber);
+        renderDiningRequests();
+        if (state.qrAssignmentTableCode) renderQrAssignmentOptions();
+      }
+    }
+
+    async function endQrSession(qrNumber) {
       if (!Number.isInteger(qrNumber) || qrNumber < 1 || qrNumber > DINING_QR_COUNT) return;
       if (state.qrSessionUpdatingNumbers.has(qrNumber)) return;
       state.qrSessionUpdatingNumbers.add(qrNumber);
       state.qrSessionActionError = "";
-      renderQrStations();
+      renderDiningRequests();
 
       try {
         const { url, anonKey } = SUPABASE_CONFIG;
-        const functionName = action === "reset"
-          ? "reset_dining_qr_session"
-          : "activate_dining_qr_session";
-        const endpoint = `${url}/rest/v1/rpc/${functionName}`;
+        const endpoint = `${url}/rest/v1/rpc/reset_dining_qr_session`;
         const response = await fetch(endpoint, {
           method: "POST",
           headers: {
@@ -3291,7 +3555,7 @@
           })
         });
         if (!response.ok) {
-          throw new Error(`QR ${action} failed (${response.status}): ${await response.text()}`);
+          throw new Error(`Session end failed (${response.status}): ${await response.text()}`);
         }
 
         const [sessions, requests] = await Promise.all([fetchQrSessions(), fetchDiningRequests()]);
@@ -3301,8 +3565,8 @@
         state.requestLoadError = false;
         state.requestsLoadedAt = new Date().toISOString();
       } catch (error) {
-        console.error(`QR ${action} failed`, error);
-        state.qrSessionActionError = `QR ${String(qrNumber).padStart(2, "0")} was not ${action === "reset" ? "reset" : "activated"}. Please try again.`;
+        console.error("QR session end failed", error);
+        state.qrSessionActionError = `QR ${String(qrNumber).padStart(2, "0")} session could not be ended. Please try again.`;
       } finally {
         state.qrSessionUpdatingNumbers.delete(qrNumber);
         renderDiningRequests();
@@ -3438,9 +3702,7 @@
         if (pendingCalls) requestParts.push(`${pendingCalls} call${pendingCalls === 1 ? "" : "s"}`);
         const tableList = pendingRequests
           .slice(0, 3)
-          .map((request) => request.qr_number
-            ? `QR ${String(request.qr_number).padStart(2, "0")}`
-            : `Table ${request.table_code || "-"}`)
+          .map((request) => `Table ${request.table_code || "-"}`)
           .join(", ");
         alertTitle.textContent = `${pendingCount} new ${pendingCount === 1 ? "request needs" : "requests need"} confirmation`;
         alertMessage.textContent = `${requestParts.join(" + ")} · ${tableList}. The alarm continues until every new request is confirmed.`;
@@ -3463,6 +3725,12 @@
           .filter((request) => request.qr_number === state.selectedRequestQrNumber)
           .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
       }
+      if (state.selectedRequestTableCode) {
+        const normalizedTable = state.selectedRequestTableCode.toLowerCase();
+        return state.diningRequests
+          .filter((request) => request.table_code.toLowerCase() === normalizedTable)
+          .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      }
       const activeRequests = getActiveDiningRequests();
       if (state.requestFilter === "orders") {
         return activeRequests.filter((request) => request.kind === "order");
@@ -3476,19 +3744,30 @@
       return activeRequests.slice().sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
     }
 
+    function showRequestHistory({ qrNumber = null, tableCode = null } = {}) {
+      state.selectedRequestQrNumber = Number.isInteger(qrNumber) ? qrNumber : null;
+      state.selectedRequestTableCode = tableCode ? String(tableCode).trim() : null;
+      state.requestFilter = "active";
+      document.querySelector('[data-queen-tab="online"]')?.click();
+      renderDiningRequests();
+      window.setTimeout(() => {
+        document.getElementById("requestQueue")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 80);
+    }
+
     function getNextRequestAction(request) {
       if (["completed", "canceled"].includes(request.status)) {
         return { status: "new", label: "Reopen" };
       }
       if (request.kind === "service") {
         return request.status === "new"
-          ? { status: "acknowledged", label: "Confirm call" }
+          ? { status: "completed", label: "Confirm & done" }
           : { status: "completed", label: "Done" };
       }
       const orderFlow = {
-        new: { status: "acknowledged", label: "Confirm order" },
-        acknowledged: { status: "preparing", label: "Start prep" },
-        preparing: { status: "ready", label: "Mark ready" },
+        new: { status: "preparing", label: "Confirm order" },
+        acknowledged: { status: "completed", label: "Mark served" },
+        preparing: { status: "completed", label: "Mark served" },
         ready: { status: "completed", label: "Mark served" }
       };
       return orderFlow[request.status] || { status: "completed", label: "Complete" };
@@ -3498,9 +3777,7 @@
       const nextAction = getNextRequestAction(request);
       const requestTypeLabel = REQUEST_TYPE_LABELS[request.request_type] || request.request_type;
       const statusLabel = REQUEST_STATUS_LABELS[request.status] || request.status;
-      const locationLabel = request.qr_number
-        ? `QR ${String(request.qr_number).padStart(2, "0")}`
-        : `Table ${request.table_code || "-"}`;
+      const locationLabel = `Table ${request.table_code || "-"}`;
       const isUpdating = state.requestUpdatingIds.has(request.id);
       const itemsMarkup = request.kind === "order"
         ? `
@@ -3571,16 +3848,23 @@
       if (queueTitle) {
         queueTitle.textContent = state.selectedRequestQrNumber
           ? `QR ${String(state.selectedRequestQrNumber).padStart(2, "0")} History`
-          : "Live Queue";
+          : state.selectedRequestTableCode
+            ? `Table ${state.selectedRequestTableCode} History`
+            : "Live Queue";
       }
-      if (clearQrFilterButton) clearQrFilterButton.hidden = !state.selectedRequestQrNumber;
+      if (clearQrFilterButton) {
+        clearQrFilterButton.hidden = !state.selectedRequestQrNumber && !state.selectedRequestTableCode;
+      }
       syncUnconfirmedRequestAlert();
       renderQrStations();
+      renderTableMap();
 
       document.querySelectorAll("[data-request-filter]").forEach((button) => {
         button.classList.toggle(
           "is-active",
-          !state.selectedRequestQrNumber && button.dataset.requestFilter === state.requestFilter
+          !state.selectedRequestQrNumber
+            && !state.selectedRequestTableCode
+            && button.dataset.requestFilter === state.requestFilter
         );
       });
 
@@ -3599,6 +3883,8 @@
       if (!requests.length) {
         const emptyMessage = state.selectedRequestQrNumber
           ? `No order history for QR ${String(state.selectedRequestQrNumber).padStart(2, "0")} yet.`
+          : state.selectedRequestTableCode
+            ? `No order history for Table ${state.selectedRequestTableCode} yet.`
           : state.requestFilter === "completed"
           ? "No completed requests yet."
           : "The active queue is clear.";
@@ -3645,7 +3931,7 @@
       const { url, anonKey } = SUPABASE_CONFIG;
       if (!url || !anonKey) throw new Error("Missing Supabase configuration");
       const endpoint = new URL(`${url}/rest/v1/${DINING_QR_SESSIONS_TABLE}`);
-      endpoint.searchParams.set("select", "id,branch,qr_number,status,started_at,ended_at,ended_reason,created_at,updated_at");
+      endpoint.searchParams.set("select", "id,branch,qr_number,table_code,status,started_at,ended_at,ended_reason,created_at,updated_at");
       endpoint.searchParams.set("branch", `eq.${ADMIN_SHEET_CONFIG.branchLabel.toLowerCase()}`);
       endpoint.searchParams.set("order", "started_at.desc");
       endpoint.searchParams.set("limit", "200");
@@ -5150,12 +5436,14 @@
       const button = event.target.closest("[data-request-filter]");
       if (!button) return;
       state.selectedRequestQrNumber = null;
+      state.selectedRequestTableCode = null;
       state.requestFilter = button.dataset.requestFilter || "active";
       renderDiningRequests();
     });
 
     document.getElementById("clearRequestQrFilter").addEventListener("click", () => {
       state.selectedRequestQrNumber = null;
+      state.selectedRequestTableCode = null;
       state.requestFilter = "active";
       renderDiningRequests();
     });
@@ -5163,23 +5451,53 @@
     document.getElementById("qrStationGrid").addEventListener("click", (event) => {
       const historyButton = event.target.closest("[data-qr-history]");
       if (historyButton) {
-        state.selectedRequestQrNumber = Number(historyButton.dataset.qrHistory);
-        renderDiningRequests();
-        document.getElementById("requestQueue")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        showRequestHistory({ qrNumber: Number(historyButton.dataset.qrHistory) });
         return;
       }
 
-      const actionButton = event.target.closest("[data-qr-session-action][data-qr-number]");
-      if (!actionButton) return;
-      const qrNumber = Number(actionButton.dataset.qrNumber);
-      const action = actionButton.dataset.qrSessionAction;
-      if (action === "reset") {
-        const shouldReset = window.confirm(
-          `Reset QR ${String(qrNumber).padStart(2, "0")}? Open requests will be canceled and this visit will move to history.`
-        );
-        if (!shouldReset) return;
+      const endButton = event.target.closest("[data-end-qr-session]");
+      if (!endButton) return;
+      const qrNumber = Number(endButton.dataset.endQrSession);
+      const tableCode = endButton.dataset.tableCode || "-";
+      const shouldEnd = window.confirm(
+        `End the Table ${tableCode} session? QR ${String(qrNumber).padStart(2, "0")} will become inactive and any open requests will be canceled.`
+      );
+      if (shouldEnd) endQrSession(qrNumber);
+    });
+
+    document.getElementById("tableMapGrid").addEventListener("click", (event) => {
+      const historyButton = event.target.closest("[data-table-history]");
+      if (historyButton) {
+        showRequestHistory({ tableCode: historyButton.dataset.tableHistory });
+        return;
       }
-      mutateQrSession(qrNumber, action);
+
+      const assignButton = event.target.closest("[data-assign-table]");
+      if (assignButton) {
+        openQrAssignmentModal(assignButton.dataset.assignTable);
+        return;
+      }
+
+      const endButton = event.target.closest("[data-end-qr-session]");
+      if (!endButton) return;
+      const qrNumber = Number(endButton.dataset.endQrSession);
+      const tableCode = endButton.dataset.tableCode || "-";
+      const shouldEnd = window.confirm(
+        `End the Table ${tableCode} session? QR ${String(qrNumber).padStart(2, "0")} will become inactive and any open requests will be canceled.`
+      );
+      if (shouldEnd) endQrSession(qrNumber);
+    });
+
+    document.getElementById("qrAssignmentOptions").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-assign-qr][data-assign-table]");
+      if (!button) return;
+      assignQrToTable(Number(button.dataset.assignQr), button.dataset.assignTable);
+    });
+
+    document.getElementById("closeQrAssignmentModal").addEventListener("click", closeQrAssignmentModal);
+    document.getElementById("cancelQrAssignment").addEventListener("click", closeQrAssignmentModal);
+    document.getElementById("qrAssignmentModal").addEventListener("click", (event) => {
+      if (event.target === event.currentTarget) closeQrAssignmentModal();
     });
 
     document.getElementById("refreshRequestsBtn").addEventListener("click", () => {
@@ -5253,7 +5571,9 @@
 
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
-        if (sheet.classList.contains("is-open")) {
+        if (document.getElementById("qrAssignmentModal")?.classList.contains("is-open")) {
+          closeQrAssignmentModal();
+        } else if (sheet.classList.contains("is-open")) {
           closeSheet();
         } else if (removeConfirmModal.classList.contains("is-open")) {
           closeRemoveConfirm();

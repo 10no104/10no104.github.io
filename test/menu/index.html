@@ -2125,9 +2125,9 @@
     function getGuestRequestStatusLabel(status) {
       const labels = {
         new: "Sent",
-        acknowledged: "Server confirmed",
+        acknowledged: "Preparing",
         preparing: "Preparing",
-        ready: "Ready to serve",
+        ready: "Preparing",
         completed: "Served",
         canceled: "Canceled"
       };
@@ -2150,7 +2150,7 @@
       const isCompleted = status === "completed";
       return `
         <div class="guest-order-progress">
-          ${["Sent", "Server confirmed", "Served"].map((label, index) => {
+          ${["Sent", "Preparing", "Served"].map((label, index) => {
             const className = index < currentStage || isCompleted
               ? "is-done"
               : index === currentStage
@@ -2220,10 +2220,14 @@
         message.textContent = "The QR system could not be reached. Please ask your server.";
       } else if (!currentQrSession) {
         title.textContent = `QR ${String(currentQrNumber).padStart(2, "0")} is not active`;
-        message.textContent = "Please ask your server to activate this QR before ordering.";
+        message.textContent = "Please ask your server to assign this QR to your table before ordering.";
       } else {
-        title.textContent = `QR ${String(currentQrNumber).padStart(2, "0")} is active`;
-        message.textContent = "Ordering is open. Sent orders and their live status appear below.";
+        title.textContent = `Table ${currentQrSession.table_code || "-"} · QR ${String(currentQrNumber).padStart(2, "0")}`;
+        message.textContent = "Ordering is open for this table. Sent orders and their live status appear below.";
+        const tableCodeInput = document.getElementById("tableCode");
+        if (tableCodeInput && currentQrSession.table_code) {
+          tableCodeInput.value = currentQrSession.table_code;
+        }
       }
 
       document.querySelectorAll(".menu-add-btn, #drawerSubmitBtn, #serverCallBtn, #serverModalConfirmBtn").forEach((button) => {
@@ -2237,7 +2241,7 @@
       const { url, anonKey } = SUPABASE_CONFIG;
       const branch = String(document.getElementById("storeSelect")?.value || MENU_BRANCH).trim().toLowerCase();
       const endpoint = new URL(`${url}/rest/v1/${DINING_QR_SESSIONS_TABLE}`);
-      endpoint.searchParams.set("select", "id,branch,qr_number,status,started_at,updated_at");
+      endpoint.searchParams.set("select", "id,branch,qr_number,table_code,status,started_at,updated_at");
       endpoint.searchParams.set("branch", `eq.${branch}`);
       endpoint.searchParams.set("qr_number", `eq.${currentQrNumber}`);
       endpoint.searchParams.set("status", "eq.active");
@@ -2414,13 +2418,13 @@
       const activeSession = await requireActiveQrSession();
       const sessionPayload = {
         ...payload,
-        table_code: `QR-${String(activeSession.qr_number).padStart(2, "0")}`,
+        table_code: String(activeSession.table_code || "").trim(),
         qr_number: Number(activeSession.qr_number),
         qr_session_id: Number(activeSession.id)
       };
 
       const endpoint = new URL(`${url}/rest/v1/${DINING_REQUESTS_TABLE}`);
-      endpoint.searchParams.set("select", "id,status,created_at,qr_number,qr_session_id");
+      endpoint.searchParams.set("select", "id,status,created_at,table_code,qr_number,qr_session_id");
       const response = await fetch(endpoint.toString(), {
         method: "POST",
         headers: {
