@@ -2475,6 +2475,7 @@
         sourceErrors: {},
         staff: [],
         periods: [],
+        wageDataMessage: "",
         openPeriodKey: null,
         loaded: false,
         savedRefCode: "",
@@ -2690,6 +2691,45 @@
         }
 
         return matches[0];
+      }
+
+      function createAccessStaff(access = {}) {
+        // Reference code is the access check. Google Sheets only supplies wage history.
+        const staffKey = String(access.staff_key || "").trim();
+        const name = String(access.staff_name || access.name || staffKey || "Staff").trim();
+        const branchScope = normalizeKey(access.branch_scope) || "both";
+
+        return {
+          id: staffKey || name,
+          name,
+          key: normalizeKey(staffKey || name),
+          sourceKey: branchScope,
+          branch: getBranchLabel(branchScope),
+          rows: [],
+          hoursIndex: -1,
+          tipIndex: -1,
+          isAccessOnly: true
+        };
+      }
+
+      function getWageDataMessage(access = {}, staff = null) {
+        const branchScope = normalizeKey(access.branch_scope);
+        const relevantSources = SHEET_SOURCES.filter((source) => (
+          branchScope === "both" || !branchScope || source.key === branchScope
+        ));
+        const missingBranches = relevantSources
+          .filter((source) => state.sourceErrors[source.key])
+          .map((source) => source.branch);
+
+        if (missingBranches.length) {
+          return `${missingBranches.join(" + ")} wage sheet unavailable. Schedule and calendar are still available.`;
+        }
+
+        if (!staff) {
+          return "Wage data was not found in the Google Sheet. Schedule and calendar are still available.";
+        }
+
+        return "";
       }
 
       async function lookupReference(input = "") {
@@ -3437,6 +3477,7 @@
         state.dbSubstituteRequests = [];
         state.substituteRequestTarget = null;
         state.periods = [];
+        state.wageDataMessage = "";
         state.openPeriodKey = null;
         state.scheduleCursor = startOfWeek(new Date());
         state.unavailableDates = new Set();
@@ -3493,7 +3534,7 @@
 
       function renderPeriodCards(periods = []) {
         if (!periods.length) {
-          refs.periodList.innerHTML = `<div class="empty-state">데이터 없음</div>`;
+          refs.periodList.innerHTML = `<div class="empty-state">${escapeHtml(state.wageDataMessage || "No wage records")}</div>`;
           return;
         }
 
@@ -4004,15 +4045,13 @@
             }
           });
 
-          if (!sources.length) throw new Error("No sheets loaded.");
-
           state.sources = sources;
           state.sourceErrors = sourceErrors;
           state.rows = sources[0]?.rows || [];
           state.staff = sources.flatMap((source) => source.staff);
           state.scheduleCursor = startOfWeek(new Date());
           state.loaded = true;
-          setStatus("Ready");
+          setStatus(sources.length ? "Ready" : "Wage sheet unavailable. Schedule and calendar are still available.");
 
           const params = new URLSearchParams(window.location.search);
           const initialId = params.get("id") || getSavedRefCode();
@@ -4045,34 +4084,16 @@
             return;
           }
 
-          const branchScope = normalizeKey(access.branch_scope);
-          if (branchScope && branchScope !== "both" && state.sourceErrors[branchScope]) {
-            resetProfileState(`${getBranchLabel(branchScope)} sheet unavailable`);
-            return;
-          }
-
-          if (branchScope === "both") {
-            const missingBranches = SHEET_SOURCES
-              .filter((source) => state.sourceErrors[source.key])
-              .map((source) => source.branch);
-            if (missingBranches.length) {
-              resetProfileState(`${missingBranches.join(" + ")} sheet unavailable`);
-              return;
-            }
-          }
-
-          const staff = findStaffByKey(access.staff_key, access);
-          if (!staff) {
-            resetProfileState(`No sheet column for ${access.staff_key}`);
-            return;
-          }
-
-          const periods = getPeriods(staff);
+          // A missing sheet column must not invalidate schedule/calendar access.
+          const sheetStaff = findStaffByKey(access.staff_key, access);
+          const staff = sheetStaff || createAccessStaff(access);
+          const periods = sheetStaff ? getPeriods(sheetStaff) : [];
           const defaultOpenPeriod = getMostRecentWorkedPeriod(periods);
 
           state.currentStaff = staff;
           state.currentAccess = access;
           state.periods = periods;
+          state.wageDataMessage = getWageDataMessage(access, sheetStaff);
           state.openPeriodKey = defaultOpenPeriod ? defaultOpenPeriod.id : null;
           state.scheduleCursor = startOfWeek(new Date());
           state.calendarCursor = startOfMonth(new Date());
