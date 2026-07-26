@@ -2898,13 +2898,13 @@
   </style>
 </head>
 <body>
-  <button class="shift-start-gate" id="shiftStartGate" type="button" aria-label="Start shift and enable order alarm">
+  <button class="shift-start-gate" id="shiftStartGate" type="button" aria-label="Start shift and enable alerts">
     <strong>START SHIFT</strong>
-    <span id="shiftStartMessage">Tap anywhere to enable the order alarm</span>
+    <span id="shiftStartMessage">Tap anywhere to enable order and reservation alerts</span>
   </button>
-  <button class="fullscreen-order-alert" id="fullscreenOrderAlert" type="button" aria-label="Open new orders" hidden>
+  <button class="fullscreen-order-alert" id="fullscreenOrderAlert" type="button" aria-label="Open new alerts" hidden>
     <strong id="fullscreenOrderAlertLabel">NEW ORDER ×1</strong>
-    <span>Tap anywhere to view and confirm</span>
+    <span id="fullscreenOrderAlertMessage">Tap anywhere to view and confirm</span>
   </button>
   <div class="shell">
     <section class="order-alert-bar" id="orderAlertBar" role="alert" aria-live="assertive" hidden>
@@ -3316,6 +3316,7 @@
       orderAlarmUnlocked: false,
       orderAlarmUnsupported: false,
       dismissedFullscreenRequestIds: new Set(),
+      dismissedFullscreenReservationKeys: new Set(),
       requestUpdatingIds: new Set()
     };
 
@@ -3744,6 +3745,20 @@
       return state.diningRequests.filter((request) => request.status === "new");
     }
 
+    function getUnconfirmedNewReservations() {
+      return state.reservations.filter((reservation) => {
+        const isNewAlert = reservation.alertType === "new"
+          || (!reservation.alertType && reservation.status === "pending");
+        return isPendingAlert(reservation)
+          && isNewAlert
+          && !state.confirmingAlertIds.has(getAlertQueueKey(reservation));
+      });
+    }
+
+    function hasAudibleOperationsAlerts() {
+      return getUnconfirmedDiningRequests().length > 0 || getUnconfirmedNewReservations().length > 0;
+    }
+
     function playOrderAlarmPattern() {
       const context = orderAlarmAudioContext;
       if (!context || context.state !== "running") return;
@@ -3790,14 +3805,14 @@
     }
 
     function startOrderAlarm() {
-      if (!state.orderAlarmUnlocked || !getUnconfirmedDiningRequests().length) {
+      if (!state.orderAlarmUnlocked || !hasAudibleOperationsAlerts()) {
         stopOrderAlarm();
         return;
       }
       if (orderAlarmIntervalHandle) return;
       ringOrderAlarm();
       orderAlarmIntervalHandle = window.setInterval(() => {
-        if (!getUnconfirmedDiningRequests().length) {
+        if (!hasAudibleOperationsAlerts()) {
           stopOrderAlarm();
           return;
         }
@@ -3832,33 +3847,62 @@
 
     function syncUnconfirmedRequestAlert() {
       const pendingRequests = getUnconfirmedDiningRequests();
-      const pendingCount = pendingRequests.length;
+      const pendingReservations = getUnconfirmedNewReservations();
+      const pendingRequestCount = pendingRequests.length;
+      const pendingReservationCount = pendingReservations.length;
+      const pendingCount = pendingRequestCount + pendingReservationCount;
       const pendingOrders = pendingRequests.filter((request) => request.kind === "order").length;
       const pendingCalls = pendingRequests.filter((request) => request.kind === "service").length;
       const alertBar = document.getElementById("orderAlertBar");
       const alertTitle = document.getElementById("orderAlertTitle");
       const alertMessage = document.getElementById("orderAlertMessage");
+      const alertReviewButton = document.getElementById("orderAlertReviewBtn");
       const fullscreenAlert = document.getElementById("fullscreenOrderAlert");
       const fullscreenAlertLabel = document.getElementById("fullscreenOrderAlertLabel");
+      const fullscreenAlertMessage = document.getElementById("fullscreenOrderAlertMessage");
       const ordersTab = document.querySelector('[data-queen-tab="online"]');
+      const reservationsTab = document.querySelector('[data-queen-tab="reservation"]');
       const pendingRequestIds = new Set(pendingRequests.map((request) => request.id));
+      const pendingReservationKeys = new Set(pendingReservations.map((reservation) => getAlertQueueKey(reservation)));
       state.dismissedFullscreenRequestIds = new Set(
         [...state.dismissedFullscreenRequestIds].filter((requestId) => pendingRequestIds.has(requestId))
       );
+      state.dismissedFullscreenReservationKeys = new Set(
+        [...state.dismissedFullscreenReservationKeys].filter((reservationKey) => pendingReservationKeys.has(reservationKey))
+      );
       const fullscreenShouldShow = pendingRequests.some(
         (request) => !state.dismissedFullscreenRequestIds.has(request.id)
+      ) || pendingReservations.some(
+        (reservation) => !state.dismissedFullscreenReservationKeys.has(getAlertQueueKey(reservation))
       );
-      const newRequestLabel = pendingOrders && pendingCalls
-        ? `NEW ORDER ${pendingOrders} · CALL ${pendingCalls}`
-        : pendingOrders
-          ? `NEW ORDER ×${pendingOrders}`
-          : `NEW CALL ×${pendingCalls}`;
+      const fullscreenLabelParts = [];
+      if (pendingOrders) fullscreenLabelParts.push(`NEW ORDER ×${pendingOrders}`);
+      if (pendingCalls) fullscreenLabelParts.push(`NEW CALL ×${pendingCalls}`);
+      if (pendingReservationCount) fullscreenLabelParts.push(`NEW RESERVATION ×${pendingReservationCount}`);
+      const hasReservationAlert = pendingReservationCount > 0;
 
       document.body.classList.toggle("has-unconfirmed-requests", pendingCount > 0);
       if (fullscreenAlert) fullscreenAlert.hidden = !fullscreenShouldShow;
-      if (fullscreenAlertLabel && pendingCount > 0) fullscreenAlertLabel.textContent = newRequestLabel;
+      if (fullscreenAlert && pendingCount > 0) {
+        fullscreenAlert.setAttribute(
+          "aria-label",
+          hasReservationAlert ? "Open new reservations" : "Open new orders"
+        );
+      }
+      if (fullscreenAlertLabel && pendingCount > 0) {
+        fullscreenAlertLabel.textContent = fullscreenLabelParts.join(" · ");
+      }
+      if (fullscreenAlertMessage && pendingCount > 0) {
+        fullscreenAlertMessage.textContent = hasReservationAlert
+          ? "Tap anywhere to open reservations"
+          : "Tap anywhere to view and confirm";
+      }
       if (alertBar) alertBar.hidden = pendingCount === 0;
-      if (ordersTab) ordersTab.classList.toggle("has-pending", pendingCount > 0);
+      if (ordersTab) ordersTab.classList.toggle("has-pending", pendingRequestCount > 0);
+      if (reservationsTab) reservationsTab.classList.toggle("has-pending", pendingReservationCount > 0);
+      if (alertReviewButton) {
+        alertReviewButton.textContent = hasReservationAlert ? "Review reservations" : "Review & confirm";
+      }
       document.title = pendingCount > 0
         ? `🔔 ${pendingCount} NEW · ${DEFAULT_DOCUMENT_TITLE}`
         : DEFAULT_DOCUMENT_TITLE;
@@ -3867,12 +3911,20 @@
         const requestParts = [];
         if (pendingOrders) requestParts.push(`${pendingOrders} order${pendingOrders === 1 ? "" : "s"}`);
         if (pendingCalls) requestParts.push(`${pendingCalls} call${pendingCalls === 1 ? "" : "s"}`);
+        if (pendingReservationCount) {
+          requestParts.push(`${pendingReservationCount} reservation${pendingReservationCount === 1 ? "" : "s"}`);
+        }
         const tableList = pendingRequests
           .slice(0, 3)
           .map((request) => `Table ${request.table_code || "-"}`)
           .join(", ");
-        alertTitle.textContent = `${pendingCount} new ${pendingCount === 1 ? "request needs" : "requests need"} confirmation`;
-        alertMessage.textContent = `${requestParts.join(" + ")} · ${tableList}. The alarm continues until every new request is confirmed.`;
+        const reservationNames = pendingReservations
+          .slice(0, 2)
+          .map((reservation) => reservation.name || "Guest")
+          .join(", ");
+        const locationParts = [tableList, reservationNames].filter(Boolean);
+        alertTitle.textContent = `${pendingCount} new ${pendingCount === 1 ? "alert needs" : "alerts need"} confirmation`;
+        alertMessage.textContent = `${requestParts.join(" + ")}${locationParts.length ? ` · ${locationParts.join(" · ")}` : ""}. The alarm continues until everything is confirmed.`;
       }
 
       if (pendingCount > 0 && state.orderAlarmUnlocked) {
@@ -5366,8 +5418,10 @@
           alertType: ""
         });
         refreshAfterMutation();
+        syncUnconfirmedRequestAlert();
         window.setTimeout(() => {
           state.confirmingAlertIds.delete(alertKey);
+          syncUnconfirmedRequestAlert();
         }, 2500);
       }
       state.feedbackTransitionLocked = true;
@@ -5688,7 +5742,7 @@
       const gate = event.currentTarget;
       const message = document.getElementById("shiftStartMessage");
       gate.disabled = true;
-      if (message) message.textContent = "Enabling the order alarm…";
+      if (message) message.textContent = "Enabling order and reservation alerts…";
 
       const enabled = await enableOrderAlarm();
       if (enabled) {
@@ -5713,14 +5767,30 @@
         document.getElementById("requestQueue")?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 80);
     };
-    document.getElementById("orderAlertReviewBtn").addEventListener("click", openRequestQueue);
+    const openReservationQueue = () => {
+      document.querySelector('[data-queen-tab="reservation"]')?.click();
+      window.setTimeout(() => {
+        document.getElementById("reservationList")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 80);
+    };
+    const openCurrentAlertDestination = () => {
+      if (getUnconfirmedNewReservations().length) {
+        openReservationQueue();
+        return;
+      }
+      openRequestQueue();
+    };
+    document.getElementById("orderAlertReviewBtn").addEventListener("click", openCurrentAlertDestination);
     document.getElementById("fullscreenOrderAlert").addEventListener("click", () => {
       const alarmReady = enableOrderAlarm();
       getUnconfirmedDiningRequests().forEach((request) => {
         state.dismissedFullscreenRequestIds.add(request.id);
       });
+      getUnconfirmedNewReservations().forEach((reservation) => {
+        state.dismissedFullscreenReservationKeys.add(getAlertQueueKey(reservation));
+      });
       syncUnconfirmedRequestAlert();
-      openRequestQueue();
+      openCurrentAlertDestination();
       alarmReady.then((enabled) => {
         if (enabled) startOrderAlarm();
       });
