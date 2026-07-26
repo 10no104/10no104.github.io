@@ -1524,6 +1524,127 @@
       background: rgba(248, 241, 231, 0.72);
     }
 
+    .staff-calendar-fixed-panel,
+    .staff-calendar-preference-panel {
+      display: grid;
+      gap: 11px;
+      padding: 14px;
+      border: 1px solid rgba(113, 88, 60, 0.13);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.62);
+    }
+
+    .staff-calendar-fixed-head,
+    .staff-calendar-preference-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .staff-calendar-fixed-head h4,
+    .staff-calendar-preference-head h4 {
+      margin: 0;
+      color: #2a1b18;
+      font-size: 0.92rem;
+    }
+
+    .staff-calendar-fixed-notice {
+      margin: 0;
+      padding: 9px 10px;
+      border-radius: 12px;
+      color: #78500c;
+      background: rgba(246, 205, 98, 0.17);
+      font-size: 0.72rem;
+      font-weight: 750;
+      line-height: 1.45;
+    }
+
+    .staff-calendar-fixed-notice b {
+      display: inline-grid;
+      place-items: center;
+      width: 18px;
+      height: 18px;
+      margin-right: 5px;
+      border-radius: 50%;
+      color: #fffaf2;
+      background: #b9871f;
+      font-size: 0.7rem;
+    }
+
+    .staff-calendar-weekday-block {
+      display: grid;
+      gap: 7px;
+    }
+
+    .staff-calendar-weekday-label {
+      color: #7a4d4f;
+      font-size: 0.72rem;
+      font-weight: 900;
+    }
+
+    .staff-calendar-weekday-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .staff-calendar-weekday-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 35px;
+      min-height: 31px;
+      padding: 0 9px;
+      border: 1px solid rgba(113, 88, 60, 0.14);
+      border-radius: 10px;
+      color: #6f665e;
+      background: rgba(248, 241, 231, 0.72);
+      font-size: 0.73rem;
+      font-weight: 900;
+    }
+
+    .staff-calendar-weekday-chip.is-unavailable {
+      border-color: rgba(200, 104, 111, 0.3);
+      color: #8f2438;
+      background: rgba(250, 218, 215, 0.74);
+    }
+
+    .staff-calendar-weekday-chip.is-preferred {
+      border-color: rgba(46, 124, 103, 0.3);
+      color: #245f51;
+      background: rgba(216, 244, 231, 0.74);
+    }
+
+    .staff-calendar-preference-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .staff-calendar-preference-item {
+      display: grid;
+      gap: 4px;
+      min-width: 0;
+      padding: 9px 10px;
+      border-radius: 12px;
+      background: rgba(248, 241, 231, 0.7);
+    }
+
+    .staff-calendar-preference-item span {
+      color: #7a4d4f;
+      font-size: 0.68rem;
+      font-weight: 900;
+    }
+
+    .staff-calendar-preference-item strong {
+      overflow: hidden;
+      color: #2a1b18;
+      font-size: 0.78rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
     .schedule-month-calendar {
       display: grid;
       gap: 12px;
@@ -2909,6 +3030,10 @@
         font-size: 0.5rem;
       }
 
+      .staff-calendar-preference-grid {
+        grid-template-columns: 1fr;
+      }
+
       .panel-head,
       .toolbar,
       .schedule-toolbar,
@@ -3095,6 +3220,39 @@
             <span><i class="is-preferred"></i>선호 날짜</span>
           </div>
           <div class="staff-calendar-date-detail" id="staffCalendarDateDetail" aria-live="polite"></div>
+          <section class="staff-calendar-fixed-panel" aria-label="고정 요일 정보">
+            <div class="staff-calendar-fixed-head">
+              <h4>고정 요일</h4>
+            </div>
+            <p class="staff-calendar-fixed-notice"><b aria-hidden="true">!</b>선호는 보장되지 않으며, 고정 불가 요일이 많으면 해당 주 배정이 어려울 수 있습니다.</p>
+            <div class="staff-calendar-weekday-block">
+              <span class="staff-calendar-weekday-label">고정 불가</span>
+              <div class="staff-calendar-weekday-list" id="staffCalendarFixedUnavailable"></div>
+            </div>
+            <div class="staff-calendar-weekday-block">
+              <span class="staff-calendar-weekday-label">고정 선호</span>
+              <div class="staff-calendar-weekday-list" id="staffCalendarFixedPreferred"></div>
+            </div>
+          </section>
+          <section class="staff-calendar-preference-panel" aria-label="직원 상세 정보">
+            <div class="staff-calendar-preference-head">
+              <h4>본인 상세 정보</h4>
+            </div>
+            <div class="staff-calendar-preference-grid">
+              <div class="staff-calendar-preference-item">
+                <span>성향</span>
+                <strong id="staffCalendarWorkStyle">상관 없음</strong>
+              </div>
+              <div class="staff-calendar-preference-item">
+                <span>주 최대 횟수</span>
+                <strong id="staffCalendarMaxWeeklyShifts">상관 없음</strong>
+              </div>
+              <div class="staff-calendar-preference-item">
+                <span>선호 지점</span>
+                <strong id="staffCalendarPreferredBranch">상관 없음</strong>
+              </div>
+            </div>
+          </section>
         </section>
       </section>
     </main>

@@ -215,6 +215,11 @@
       "staffCalendarSummary",
       "staffCalendarGrid",
       "staffCalendarDateDetail",
+      "staffCalendarFixedUnavailable",
+      "staffCalendarFixedPreferred",
+      "staffCalendarWorkStyle",
+      "staffCalendarMaxWeeklyShifts",
+      "staffCalendarPreferredBranch",
       "menuSessionLabel",
       "menuAuthCard",
       "menuWorkspace",
@@ -651,6 +656,7 @@
 
     state.accessRequests = requestResult.data || [];
     state.employees = employeeResult.data || [];
+    state.calendarDataLoaded = false;
     renderEmployees();
     setEmployeeStatus(
       state.employees.length
@@ -2214,6 +2220,34 @@
     refs.staffCalendarDateDetail.textContent = `${dateLabel} · ${getStaffCalendarStatusLabel(status)}${details.length ? ` · ${details.join(" · ")}` : ""}`;
   }
 
+  function renderStaffCalendarWeekdayList(target, weekdays = [], status = "") {
+    if (!target) return;
+    const labels = ["일", "월", "화", "수", "목", "금", "토"];
+    const values = normalizeWeekdayList(weekdays).sort((a, b) => {
+      const orderA = a === 0 ? 7 : a;
+      const orderB = b === 0 ? 7 : b;
+      return orderA - orderB;
+    });
+    target.innerHTML = values.length
+      ? values.map((value) => `<span class="staff-calendar-weekday-chip ${status ? `is-${status}` : ""}">${labels[value]}</span>`).join("")
+      : '<span class="staff-calendar-weekday-chip">설정 없음</span>';
+  }
+
+  function renderStaffCalendarBottomInfo(staff) {
+    renderStaffCalendarWeekdayList(refs.staffCalendarFixedUnavailable, staff?.fixed_unavailable_weekdays, "unavailable");
+    renderStaffCalendarWeekdayList(refs.staffCalendarFixedPreferred, staff?.fixed_preferred_weekdays, "preferred");
+
+    const workStyleLabels = {
+      cluster: "몰아서 일하기",
+      spread: "띄워서 일하기"
+    };
+    refs.staffCalendarWorkStyle.textContent = workStyleLabels[staff?.work_style] || "상관 없음";
+    refs.staffCalendarMaxWeeklyShifts.textContent = staff?.max_weekly_shifts ? `${staff.max_weekly_shifts}일` : "상관 없음";
+    refs.staffCalendarPreferredBranch.textContent = ["uptown", "downtown"].includes(staff?.preferred_branch)
+      ? formatBranchLabel(staff.preferred_branch)
+      : "상관 없음";
+  }
+
   function renderStaffCalendar() {
     if (!refs.staffCalendarView || !refs.staffCalendarGrid) return;
     const staff = getStaffCalendarByKey(state.calendarSelectedStaffKey);
@@ -2226,6 +2260,7 @@
       refs.staffCalendarSummary.textContent = "";
       refs.staffCalendarGrid.innerHTML = '<div class="empty-state">직원을 선택하면 달력이 표시됩니다.</div>';
       renderStaffCalendarDateDetail(null);
+      renderStaffCalendarBottomInfo(null);
       return;
     }
 
@@ -2285,6 +2320,7 @@
     refs.staffCalendarGrid.innerHTML = cells.join("");
     refs.staffCalendarSummary.textContent = `${staff.name} 기준 이번 달 안되는 날 ${unavailableCount}일 · 선호 날짜 ${preferredCount}일`;
     renderStaffCalendarDateDetail(staff);
+    renderStaffCalendarBottomInfo(staff);
   }
 
   function normalizeBranchScope(value = "") {
