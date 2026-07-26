@@ -142,6 +142,13 @@
     scheduleNotePressTimer: null,
     scheduleNotePressStart: null,
     scheduleNoteSuppressClickUntil: 0,
+    calendarCursor: startOfMonth(new Date()),
+    calendarSelectedDate: formatInputDate(new Date()),
+    calendarSelectedStaffKey: "",
+    calendarStaff: [],
+    calendarAvailability: [],
+    calendarDataLoaded: false,
+    calendarFetchToken: 0,
     sortables: {
       visual: null,
       all: null,
@@ -197,6 +204,17 @@
       "employeeEditStatus",
       "employeeEditorClose",
       "employeeEditorCancel",
+      "staffCalendarStatus",
+      "staffCalendarStaffList",
+      "staffCalendarView",
+      "staffCalendarSelectedName",
+      "staffCalendarSelectedMeta",
+      "staffCalendarPrevBtn",
+      "staffCalendarNextBtn",
+      "staffCalendarMonthLabel",
+      "staffCalendarSummary",
+      "staffCalendarGrid",
+      "staffCalendarDateDetail",
       "menuSessionLabel",
       "menuAuthCard",
       "menuWorkspace",
@@ -652,6 +670,91 @@
     if (!directResult.error && Array.isArray(directResult.data) && directResult.data.length) return directResult;
 
     return rpcResult.error ? directResult : rpcResult;
+  }
+
+  async function fetchStaffCalendarData() {
+    if (!supabaseClient || !state.menuSession) {
+      state.calendarDataLoaded = false;
+      state.calendarStaff = [];
+      state.calendarAvailability = [];
+      setStaffCalendarStatus("관리자 로그인 후 사용할 수 있습니다.", "error");
+      renderStaffCalendar();
+      return;
+    }
+
+    const fetchToken = ++state.calendarFetchToken;
+    setStaffCalendarStatus("직원 달력 데이터를 불러오는 중...");
+
+    const [employeeResult, availabilityResult, preferencesResult] = await Promise.all([
+      fetchEmployeeRefRows(),
+      supabaseClient
+        .from("noble_staff_availability")
+        .select("staff_key,staff_name,branch_scope,availability_date,status,available_start,available_end,note")
+        .order("availability_date", { ascending: true }),
+      supabaseClient
+        .from("noble_staff_preferences")
+        .select("*")
+    ]);
+
+    if (fetchToken !== state.calendarFetchToken) return;
+
+    const preferenceByKey = new Map();
+    (preferencesResult.data || [])
+      .map(normalizeStaffRef)
+      .filter(Boolean)
+      .forEach((preference) => {
+        preferenceByKey.set(normalizeScheduleStaffKey(preference.staff_key || preference.name), preference);
+        preferenceByKey.set(normalizeScheduleStaffKey(preference.name), preference);
+      });
+
+    const applyStaffPreferences = (staff) => {
+      const preference = preferenceByKey.get(normalizeScheduleStaffKey(staff.staff_key || staff.name))
+        || preferenceByKey.get(normalizeScheduleStaffKey(staff.name));
+      return preference
+        ? normalizeStaffRef({
+          ...staff,
+          fixed_unavailable_weekdays: preference.fixed_unavailable_weekdays,
+          fixed_preferred_weekdays: preference.fixed_preferred_weekdays,
+          preferred_branch: preference.preferred_branch,
+          work_style: preference.work_style,
+          max_weekly_shifts: preference.max_weekly_shifts
+        })
+        : staff;
+    };
+
+    const dbStaff = (employeeResult.data || [])
+      .map(normalizeStaffRef)
+      .filter(Boolean)
+      .filter((staff) => staff.active !== false)
+      .filter((staff) => normalizeScheduleStaffKey(staff.job_role) !== "kitchen")
+      .map(applyStaffPreferences);
+    const staffSource = dbStaff.length
+      ? dbStaff
+      : FALLBACK_SERVER_REFS.map(normalizeStaffRef).filter(Boolean).map(applyStaffPreferences);
+    const mergedStaff = new Map();
+    staffSource.forEach((staff) => {
+      mergedStaff.set(normalizeScheduleStaffKey(staff.staff_key || staff.name), staff);
+    });
+
+    state.calendarStaff = Array.from(mergedStaff.values());
+    state.calendarAvailability = availabilityResult.error ? [] : (availabilityResult.data || []);
+    state.calendarDataLoaded = true;
+
+    const selectedStaff = getStaffCalendarByKey(state.calendarSelectedStaffKey);
+    state.calendarSelectedStaffKey = selectedStaff
+      ? normalizeScheduleStaffKey(selectedStaff.staff_key || selectedStaff.name)
+      : normalizeScheduleStaffKey(state.calendarStaff[0]?.staff_key || state.calendarStaff[0]?.name || "");
+    renderStaffCalendar();
+
+    if (employeeResult.error && !dbStaff.length) {
+      setStaffCalendarStatus(employeeResult.error.message || "직원 목록을 불러오지 못했습니다.", "error");
+      return;
+    }
+    if (availabilityResult.error) {
+      setStaffCalendarStatus("직원 목록은 불러왔지만 달력 데이터를 불러오지 못했습니다.", "error");
+      return;
+    }
+    setStaffCalendarStatus("조회 전용 달력", "success");
   }
 
   async function fetchAccessRequestRows() {
@@ -2007,6 +2110,181 @@
 
   function normalizeScheduleStaffKey(name = "") {
     return String(name || "").trim().toLowerCase().replace(/\s+/g, "");
+  }
+
+  function setStaffCalendarStatus(message = "", type = "") {
+    if (!refs.staffCalendarStatus) return;
+    refs.staffCalendarStatus.textContent = message;
+    refs.staffCalendarStatus.className = `status-line${type ? ` is-${type}` : ""}`;
+  }
+
+  function getStaffCalendarPool() {
+    if (!state.menuSession) return [];
+    const source = state.calendarStaff.length
+      ? state.calendarStaff
+      : (state.scheduleStaff.length ? state.scheduleStaff : FALLBACK_SERVER_REFS.map(normalizeStaffRef).filter(Boolean));
+    return source.filter((staff) => staff.active !== false);
+  }
+
+  function getStaffCalendarByKey(key = "") {
+    const normalized = normalizeScheduleStaffKey(key);
+    if (!normalized) return null;
+    return getStaffCalendarPool().find((staff) => (
+      normalizeScheduleStaffKey(staff.staff_key || staff.name) === normalized ||
+      normalizeScheduleStaffKey(staff.name) === normalized
+    )) || null;
+  }
+
+  function getStaffCalendarAvailability(staff, isoDate = "") {
+    if (!staff || !isoDate) return null;
+    const keys = new Set([
+      normalizeScheduleStaffKey(staff.staff_key),
+      normalizeScheduleStaffKey(staff.name)
+    ].filter(Boolean));
+    return state.calendarAvailability.find((item) => {
+      if (String(item.availability_date || "").slice(0, 10) !== isoDate) return false;
+      return keys.has(normalizeScheduleStaffKey(item.staff_key)) ||
+        keys.has(normalizeScheduleStaffKey(item.staff_name));
+    }) || null;
+  }
+
+  function getStaffCalendarDateStatus(staff, isoDate = "") {
+    const date = toSafeDate(isoDate);
+    if (!staff || !date) return "default";
+    const availability = getStaffCalendarAvailability(staff, isoDate);
+    if (availability?.status === "unavailable") return "unavailable";
+    if (availability?.status === "preferred") return "preferred";
+    if (staff.fixed_unavailable_weekdays?.includes(date.getDay())) return "unavailable";
+    if (staff.fixed_preferred_weekdays?.includes(date.getDay())) return "preferred";
+    return "default";
+  }
+
+  function getStaffCalendarStatusLabel(status = "default") {
+    return {
+      default: "가능",
+      unavailable: "안됨",
+      preferred: "선호"
+    }[status] || "가능";
+  }
+
+  function renderStaffCalendarStaffList() {
+    if (!refs.staffCalendarStaffList) return;
+    const staff = getStaffCalendarPool()
+      .slice()
+      .sort((a, b) => normalizeBranchScope(a.branch_scope).localeCompare(normalizeBranchScope(b.branch_scope)) || a.name.localeCompare(b.name));
+    const selectedKey = normalizeScheduleStaffKey(state.calendarSelectedStaffKey);
+
+    refs.staffCalendarStaffList.innerHTML = staff.length
+      ? staff.map((item) => {
+        const itemKey = normalizeScheduleStaffKey(item.staff_key || item.name);
+        const isSelected = itemKey === selectedKey;
+        return `
+          <button class="staff-calendar-staff-button ${isSelected ? "is-selected" : ""}" type="button" data-staff-calendar="${escapeHtml(item.staff_key || item.name)}" aria-pressed="${isSelected ? "true" : "false"}">
+            <strong>${escapeHtml(item.name)}</strong>
+            <small>${escapeHtml(formatBranchLabel(item.branch_scope))}</small>
+          </button>
+        `;
+      }).join("")
+      : '<div class="empty-state">직원 목록이 없습니다.</div>';
+  }
+
+  function renderStaffCalendarDateDetail(staff) {
+    if (!refs.staffCalendarDateDetail) return;
+    const date = toSafeDate(state.calendarSelectedDate);
+    if (!staff || !date) {
+      refs.staffCalendarDateDetail.textContent = "직원을 선택하면 달력이 표시됩니다.";
+      return;
+    }
+
+    const isoDate = formatInputDate(date);
+    const status = getStaffCalendarDateStatus(staff, isoDate);
+    const availability = getStaffCalendarAvailability(staff, isoDate);
+    const details = [
+      availability?.available_start || availability?.available_end
+        ? `${availability.available_start || "open"} - ${availability.available_end || "close"}`
+        : "",
+      availability?.note || ""
+    ].filter(Boolean);
+    const dateLabel = new Intl.DateTimeFormat("ko-KR", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      weekday: "short"
+    }).format(date);
+    refs.staffCalendarDateDetail.textContent = `${dateLabel} · ${getStaffCalendarStatusLabel(status)}${details.length ? ` · ${details.join(" · ")}` : ""}`;
+  }
+
+  function renderStaffCalendar() {
+    if (!refs.staffCalendarView || !refs.staffCalendarGrid) return;
+    const staff = getStaffCalendarByKey(state.calendarSelectedStaffKey);
+
+    renderStaffCalendarStaffList();
+    if (!staff) {
+      refs.staffCalendarView.hidden = true;
+      refs.staffCalendarSelectedName.textContent = "직원을 선택하세요";
+      refs.staffCalendarSelectedMeta.textContent = "";
+      refs.staffCalendarSummary.textContent = "";
+      refs.staffCalendarGrid.innerHTML = '<div class="empty-state">직원을 선택하면 달력이 표시됩니다.</div>';
+      renderStaffCalendarDateDetail(null);
+      return;
+    }
+
+    refs.staffCalendarView.hidden = false;
+    refs.staffCalendarSelectedName.textContent = staff.name;
+    refs.staffCalendarSelectedMeta.textContent = formatBranchLabel(staff.branch_scope);
+
+    const cursor = state.calendarCursor instanceof Date ? startOfMonth(state.calendarCursor) : startOfMonth(new Date());
+    const monthEnd = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0);
+    const today = startOfDay(new Date());
+    const leadingBlanks = (cursor.getDay() + 6) % 7;
+    const cells = [];
+    let unavailableCount = 0;
+    let preferredCount = 0;
+
+    state.calendarCursor = cursor;
+    refs.staffCalendarMonthLabel.textContent = new Intl.DateTimeFormat("ko-KR", {
+      year: "numeric",
+      month: "long"
+    }).format(cursor);
+
+    for (let index = 0; index < leadingBlanks; index += 1) {
+      cells.push('<div class="staff-calendar-day is-empty" aria-hidden="true"></div>');
+    }
+
+    for (let day = 1; day <= monthEnd.getDate(); day += 1) {
+      const date = new Date(cursor.getFullYear(), cursor.getMonth(), day);
+      const isoDate = formatInputDate(date);
+      const status = getStaffCalendarDateStatus(staff, isoDate);
+      const availability = getStaffCalendarAvailability(staff, isoDate);
+      const isToday = isSameDate(date, today);
+      if (status === "unavailable") unavailableCount += 1;
+      if (status === "preferred") preferredCount += 1;
+
+      const classes = [
+        "staff-calendar-day",
+        isToday ? "is-today" : "",
+        status === "unavailable" ? "is-unavailable" : "",
+        status === "preferred" ? "is-preferred" : "",
+        availability?.note ? "has-detail" : ""
+      ].filter(Boolean).join(" ");
+      const dateLabel = new Intl.DateTimeFormat("ko-KR", {
+        month: "long",
+        day: "numeric",
+        weekday: "short"
+      }).format(date);
+      const stateLabel = status === "default" ? "" : getStaffCalendarStatusLabel(status);
+
+      cells.push(`
+        <button class="${classes}" type="button" data-staff-calendar-date="${isoDate}" aria-label="${escapeHtml(`${staff.name} ${dateLabel} ${getStaffCalendarStatusLabel(status)}`)}" aria-pressed="${state.calendarSelectedDate === isoDate ? "true" : "false"}">
+          <strong>${day}</strong>
+          ${stateLabel ? `<span class="calendar-state-label">${stateLabel}</span>` : ""}
+        </button>
+      `);
+    }
+
+    refs.staffCalendarGrid.innerHTML = cells.join("");
+    refs.staffCalendarSummary.textContent = `${staff.name} 기준 이번 달 안되는 날 ${unavailableCount}일 · 선호 날짜 ${preferredCount}일`;
+    renderStaffCalendarDateDetail(staff);
   }
 
   function normalizeBranchScope(value = "") {
@@ -3567,6 +3845,9 @@
       // Do not let an in-flight background request overwrite an in-progress board.
       state.scheduleFetchToken += 1;
     }
+    if (state.activeTab === "calendar" && tabName !== "calendar") {
+      state.calendarFetchToken += 1;
+    }
     state.activeTab = tabName;
     document.querySelectorAll("[data-admin-tab]").forEach((button) => {
       button.classList.toggle("is-active", button.dataset.adminTab === tabName);
@@ -3574,10 +3855,12 @@
     });
     byId("reservationsAdminPanel").classList.toggle("is-active", tabName === "reservations");
     byId("staffAdminPanel").classList.toggle("is-active", tabName === "staff");
+    byId("calendarAdminPanel").classList.toggle("is-active", tabName === "calendar");
     byId("menuAdminPanel").classList.toggle("is-active", tabName === "menu");
     byId("scheduleAdminPanel").classList.toggle("is-active", tabName === "schedule");
     if (tabName === "menu") void refreshMenuSession();
     if (tabName === "staff") void fetchEmployees();
+    if (tabName === "calendar" && !state.calendarDataLoaded) void fetchStaffCalendarData();
     if (tabName === "schedule" && !state.scheduleDataLoaded) void fetchScheduleData();
   }
 
@@ -3618,6 +3901,30 @@
       const button = event.target.closest("[data-edit-employee]");
       if (!button) return;
       openEmployeeEditor(button.dataset.editEmployee);
+    });
+    refs.staffCalendarStaffList.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-staff-calendar]");
+      if (!button) return;
+      const staff = getStaffCalendarByKey(button.dataset.staffCalendar);
+      if (!staff) return;
+      state.calendarSelectedStaffKey = normalizeScheduleStaffKey(staff.staff_key || staff.name);
+      renderStaffCalendar();
+    });
+    refs.staffCalendarPrevBtn.addEventListener("click", () => {
+      const cursor = state.calendarCursor instanceof Date ? state.calendarCursor : new Date();
+      state.calendarCursor = new Date(cursor.getFullYear(), cursor.getMonth() - 1, 1);
+      renderStaffCalendar();
+    });
+    refs.staffCalendarNextBtn.addEventListener("click", () => {
+      const cursor = state.calendarCursor instanceof Date ? state.calendarCursor : new Date();
+      state.calendarCursor = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1);
+      renderStaffCalendar();
+    });
+    refs.staffCalendarGrid.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-staff-calendar-date]");
+      if (!button) return;
+      state.calendarSelectedDate = button.dataset.staffCalendarDate;
+      renderStaffCalendar();
     });
     refs.employeeEditorClose.addEventListener("click", closeEmployeeEditor);
     refs.employeeEditorCancel.addEventListener("click", closeEmployeeEditor);
@@ -3906,9 +4213,18 @@
       supabaseClient.auth.onAuthStateChange((_event, session) => {
         state.menuSession = session;
         updateMenuAuthView();
+        if (!session) {
+          state.calendarDataLoaded = false;
+          state.calendarStaff = [];
+          state.calendarAvailability = [];
+          state.calendarSelectedStaffKey = "";
+          setStaffCalendarStatus("로그인 필요", "error");
+          renderStaffCalendar();
+        }
         if (session) void fetchScheduleCalendarEvents();
         if (session && state.activeTab === "menu" && !state.menuItems.length) void fetchMenuItems();
         if (session && state.activeTab === "staff") void fetchEmployees();
+        if (session && state.activeTab === "calendar" && !state.calendarDataLoaded) void fetchStaffCalendarData();
       });
       void refreshMenuSession();
     } else {
