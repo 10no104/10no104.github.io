@@ -806,6 +806,283 @@
       text-align: center;
     }
 
+    .table-map-title-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .table-map-title-row h3 {
+      margin-bottom: 4px;
+    }
+
+    .table-map-title-row p {
+      margin: 0;
+      color: #79695c;
+      font-size: 0.76rem;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .table-map-editor-link {
+      display: inline-flex;
+      flex: 0 0 auto;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 0 12px;
+      border: 1px solid rgba(95, 39, 49, 0.16);
+      border-radius: 12px;
+      background: rgba(95, 39, 49, 0.07);
+      color: #5f2731;
+      font-size: 0.72rem;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .table-map-layout-shell {
+      grid-column: 1 / -1;
+      min-width: 0;
+    }
+
+    .table-map-canvas-scroll {
+      overflow: auto;
+      padding: 11px;
+      border-radius: 18px;
+      background:
+        linear-gradient(45deg, rgba(77, 49, 32, 0.035) 25%, transparent 25%) 0 0 / 22px 22px,
+        linear-gradient(135deg, rgba(77, 49, 32, 0.035) 25%, transparent 25%) 0 0 / 22px 22px,
+        #e9ddce;
+    }
+
+    .queen-floor-canvas {
+      position: relative;
+      width: 100%;
+      min-width: 620px;
+      overflow: hidden;
+      border: 2px solid rgba(80, 54, 37, 0.2);
+      border-radius: 14px;
+      background-color: #f3eadc;
+      background-image:
+        linear-gradient(rgba(80, 54, 37, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(80, 54, 37, 0.045) 1px, transparent 1px);
+      background-size: 10% 10%;
+      box-shadow:
+        inset 0 0 38px rgba(72, 46, 29, 0.05),
+        0 12px 30px rgba(63, 39, 25, 0.09);
+    }
+
+    .queen-map-item {
+      position: absolute;
+      display: grid;
+      place-items: center;
+      min-width: 18px;
+      min-height: 18px;
+      transform-origin: center;
+    }
+
+    .queen-map-table {
+      padding: 0;
+      border: 2px solid #6c432c;
+      border-radius: 14px;
+      background: linear-gradient(145deg, #a06b45, #77482e);
+      color: #fffaf2;
+      box-shadow:
+        inset 0 0 0 3px rgba(255, 255, 255, 0.1),
+        0 7px 14px rgba(62, 37, 24, 0.18);
+      cursor: pointer;
+    }
+
+    .queen-map-table.is-round {
+      border-radius: 50%;
+    }
+
+    .queen-map-table.is-booth {
+      border-radius: 7px 7px 18px 18px;
+      background: linear-gradient(180deg, #814151 0 28%, #9b6845 28%);
+    }
+
+    .queen-map-table.is-assigned {
+      border-color: #1e5f3d;
+      background: linear-gradient(145deg, #3f9365, #276844);
+      box-shadow:
+        inset 0 0 0 3px rgba(255, 255, 255, 0.11),
+        0 9px 19px rgba(34, 103, 66, 0.25);
+    }
+
+    .queen-map-table.is-selected {
+      z-index: 20;
+      outline: 4px solid #e5b94e;
+      outline-offset: 3px;
+    }
+
+    .queen-map-table-label {
+      overflow: hidden;
+      max-width: 95%;
+      padding: 2px;
+      font-size: clamp(0.56rem, 1.15vw, 0.9rem);
+      font-weight: 950;
+      line-height: 1;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .queen-map-table-state {
+      position: absolute;
+      top: -9px;
+      right: -8px;
+      display: grid;
+      place-items: center;
+      min-width: 28px;
+      min-height: 23px;
+      padding: 0 6px;
+      border: 2px solid #fffaf2;
+      border-radius: 999px;
+      background: #eadfce;
+      color: #6a5748;
+      font-size: 0.58rem;
+      font-weight: 950;
+      box-shadow: 0 4px 10px rgba(62, 37, 24, 0.16);
+    }
+
+    .queen-map-table.is-assigned .queen-map-table-state {
+      background: #1f5f3d;
+      color: #fff;
+    }
+
+    .queen-map-open-count {
+      position: absolute;
+      right: -7px;
+      bottom: -8px;
+      display: grid;
+      place-items: center;
+      min-width: 24px;
+      height: 24px;
+      padding: 0 5px;
+      border: 2px solid #fff8f0;
+      border-radius: 999px;
+      background: #b33146;
+      color: #fff;
+      font-size: 0.58rem;
+      font-weight: 950;
+    }
+
+    .queen-map-obstacle {
+      border: 1px solid rgba(70, 55, 44, 0.35);
+      border-radius: 5px;
+      background: rgba(110, 97, 84, 0.74);
+      color: #fff;
+      box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.08);
+      pointer-events: none;
+    }
+
+    .queen-map-obstacle[data-kind="wall"] {
+      border-color: #54483e;
+      background: repeating-linear-gradient(135deg, #78695e 0 8px, #685a50 8px 16px);
+    }
+
+    .queen-map-obstacle[data-kind="pillar"] {
+      border-radius: 50%;
+      background: #5e554e;
+    }
+
+    .queen-map-obstacle[data-kind="bar"],
+    .queen-map-obstacle[data-kind="service"] {
+      background: linear-gradient(135deg, #3d6d69, #294d4b);
+    }
+
+    .queen-map-obstacle[data-kind="door"] {
+      border: 3px dashed #3e8066;
+      background: rgba(255, 255, 255, 0.58);
+      color: #286248;
+    }
+
+    .queen-map-obstacle[data-kind="window"] {
+      border: 3px solid #5e99bb;
+      background: rgba(117, 190, 224, 0.27);
+      color: #255d7c;
+    }
+
+    .queen-map-obstacle[data-kind="stairs"] {
+      background: repeating-linear-gradient(0deg, #7f746a 0 7px, #a99c90 7px 10px);
+    }
+
+    .queen-map-obstacle-label {
+      overflow: hidden;
+      max-width: 94%;
+      padding: 2px;
+      font-size: clamp(0.45rem, 0.8vw, 0.7rem);
+      font-weight: 900;
+      line-height: 1.05;
+      text-align: center;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .table-map-detail {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      min-height: 78px;
+      margin-top: 10px;
+      padding: 13px 15px;
+      border: 1px solid rgba(95, 39, 49, 0.13);
+      border-radius: 16px;
+      background: rgba(255, 253, 249, 0.9);
+    }
+
+    .table-map-detail-copy {
+      min-width: 0;
+    }
+
+    .table-map-detail-copy strong,
+    .table-map-detail-copy span {
+      display: block;
+    }
+
+    .table-map-detail-copy strong {
+      color: #40271e;
+      font-size: 1.02rem;
+    }
+
+    .table-map-detail-copy span {
+      margin-top: 3px;
+      color: #766457;
+      font-size: 0.72rem;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .table-map-detail-actions {
+      display: flex;
+      flex: 0 0 auto;
+      gap: 7px;
+    }
+
+    .table-map-detail-actions .qr-station-btn {
+      min-width: 92px;
+    }
+
+    .table-map-layout-note {
+      grid-column: 1 / -1;
+      margin: 0 0 11px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(47, 103, 141, 0.08);
+      color: #2f678d;
+      font-size: 0.72rem;
+      font-weight: 800;
+      line-height: 1.45;
+    }
+
+    .table-map-layout-note.is-error {
+      background: rgba(166, 48, 65, 0.08);
+      color: #a03041;
+    }
+
     .online-grid,
     .note-grid {
       display: grid;
@@ -2729,6 +3006,30 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
+      .table-map-title-row,
+      .table-map-detail {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .table-map-editor-link {
+        width: 100%;
+      }
+
+      .table-map-detail-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+      }
+
+      .table-map-detail-actions .qr-station-btn {
+        min-width: 0;
+      }
+
+      .table-map-canvas-scroll {
+        padding: 7px;
+      }
+
       .bottom-nav {
         gap: 6px;
         width: min(100% - 12px, 760px);
@@ -2998,7 +3299,13 @@
       </section>
 
       <section class="purpose-panel">
-        <h3>Table Map</h3>
+        <div class="table-map-title-row">
+          <div>
+            <h3>Table Map</h3>
+            <p>Select a table on the saved floor map to assign a QR, view history, or end its session.</p>
+          </div>
+          <a class="table-map-editor-link" href="./table.html">Edit map</a>
+        </div>
         <div class="table-map-tabs" id="tableMapTabs" aria-label="Table map area">
           <button class="table-map-tab is-active" type="button" data-table-map-zone="first" aria-pressed="true">
             1st Floor <span data-table-map-count="first">0</span>
@@ -3271,6 +3578,7 @@
     };
     const DINING_REQUESTS_TABLE = "dining_requests";
     const DINING_QR_SESSIONS_TABLE = "dining_qr_sessions";
+    const DINING_TABLE_LAYOUTS_TABLE = "dining_table_layouts";
     const DINING_QR_COUNT = 10;
 
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3Iiujn95evZuFiyLNrJUo-_H6rKngdxt0EeBFVw/exec";
@@ -3298,6 +3606,9 @@
       feedbackTransitionLocked: false,
       tableOptions: [],
       activeTableMapZone: "first",
+      tableLayouts: new Map(),
+      tableLayoutLoadError: false,
+      selectedMapTableCode: null,
       activeTableReservation: null,
       selectedTableAssignments: [],
       pendingRemoveReservation: null,
@@ -3423,6 +3734,48 @@
       };
     }
 
+    function clampTableMapNumber(value, minimum, maximum) {
+      return Math.min(maximum, Math.max(minimum, Number(value) || 0));
+    }
+
+    function normalizeDiningTableMapItem(item = {}, index = 0) {
+      const type = item.type === "obstacle" ? "obstacle" : "table";
+      return {
+        id: String(item.id || `${type}-${index}`).slice(0, 80),
+        type,
+        tableCode: type === "table" ? String(item.tableCode || item.label || "").trim().slice(0, 40) : "",
+        label: String(item.label || item.tableCode || (type === "table" ? "Table" : "Reference")).trim().slice(0, 80),
+        obstacleKind: ["wall", "pillar", "bar", "door", "window", "stairs", "service"].includes(item.obstacleKind)
+          ? item.obstacleKind
+          : "wall",
+        shape: ["rectangle", "round", "booth"].includes(item.shape) ? item.shape : "rectangle",
+        x: clampTableMapNumber(item.x, 0, 98),
+        y: clampTableMapNumber(item.y, 0, 98),
+        w: clampTableMapNumber(item.w || 10, 2, 80),
+        h: clampTableMapNumber(item.h || 9, 2, 80),
+        rotation: clampTableMapNumber(item.rotation, -180, 180)
+      };
+    }
+
+    function normalizeDiningTableLayout(row = {}) {
+      let items = row.items;
+      if (typeof items === "string") {
+        try {
+          items = JSON.parse(items);
+        } catch {
+          items = [];
+        }
+      }
+      return {
+        zone: ["first", "second", "patio"].includes(row.zone) ? row.zone : "first",
+        canvasWidth: clampTableMapNumber(row.canvas_width || 1200, 600, 2400),
+        canvasHeight: clampTableMapNumber(row.canvas_height || 800, 400, 1800),
+        items: Array.isArray(items) ? items.map(normalizeDiningTableMapItem) : [],
+        revision: Number(row.revision || 0),
+        updatedAt: row.updated_at || ""
+      };
+    }
+
     function formatRequestMoney(value) {
       return new Intl.NumberFormat("en-CA", {
         style: "currency",
@@ -3538,44 +3891,15 @@
       return "first";
     }
 
-    function renderTableMap() {
-      const grid = document.getElementById("tableMapGrid");
-      if (!grid) return;
+    function getDiningTableMapLayout(zone = state.activeTableMapZone) {
+      return state.tableLayouts.get(zone) || null;
+    }
 
-      const allTableOptions = Array.from(new Map(
-        state.tableOptions
-          .map((tableCode) => String(tableCode || "").trim())
-          .filter(Boolean)
-          .map((tableCode) => [tableCode.toLowerCase(), tableCode])
-      ).values());
-
-      const zoneCounts = { first: 0, second: 0, patio: 0 };
-      allTableOptions.forEach((tableCode) => {
-        zoneCounts[getDiningTableMapZone(tableCode)] += 1;
-      });
-      document.querySelectorAll("[data-table-map-count]").forEach((count) => {
-        count.textContent = String(zoneCounts[count.dataset.tableMapCount] || 0);
-      });
-      document.querySelectorAll("[data-table-map-zone]").forEach((button) => {
-        const isActive = button.dataset.tableMapZone === state.activeTableMapZone;
-        button.classList.toggle("is-active", isActive);
-        button.setAttribute("aria-pressed", isActive ? "true" : "false");
-      });
-
-      if (!allTableOptions.length) {
-        grid.innerHTML = '<div class="table-map-empty">No table options were found in the Table sheet.</div>';
-        return;
-      }
-
-      const tableOptions = allTableOptions.filter(
-        (tableCode) => getDiningTableMapZone(tableCode) === state.activeTableMapZone
-      );
+    function renderFallbackTableCards(tableOptions) {
       if (!tableOptions.length) {
-        grid.innerHTML = '<div class="table-map-empty">No tables are configured for this area.</div>';
-        return;
+        return '<div class="table-map-empty">No tables are configured for this area.</div>';
       }
-
-      grid.innerHTML = tableOptions.map((tableCode) => {
+      return tableOptions.map((tableCode) => {
         const activeSession = getActiveTableSession(tableCode);
         const history = getTableRequestHistory(tableCode);
         const activeRequests = activeSession
@@ -3614,6 +3938,173 @@
           </article>
         `;
       }).join("");
+    }
+
+    function renderSelectedMapTable(tableCode) {
+      if (!tableCode) {
+        return `
+          <div class="table-map-detail">
+            <div class="table-map-detail-copy">
+              <strong>Select a table</strong>
+              <span>Tap a table on the map to assign a QR or review that table.</span>
+            </div>
+          </div>
+        `;
+      }
+
+      const activeSession = getActiveTableSession(tableCode);
+      const history = getTableRequestHistory(tableCode);
+      const activeRequests = activeSession
+        ? history.filter((request) => (
+            request.qr_session_id === activeSession.id
+            && !["completed", "canceled"].includes(request.status)
+          ))
+        : [];
+      const isUpdating = activeSession && state.qrSessionUpdatingNumbers.has(activeSession.qr_number);
+      const detail = activeSession
+        ? `QR ${String(activeSession.qr_number).padStart(2, "0")} · ${activeRequests.length} open request${activeRequests.length === 1 ? "" : "s"} · since ${formatRequestClock(activeSession.started_at)}`
+        : `Available · ${history.length} historical request${history.length === 1 ? "" : "s"}`;
+
+      return `
+        <div class="table-map-detail">
+          <div class="table-map-detail-copy">
+            <strong>Table ${escapeHtml(tableCode)}</strong>
+            <span>${escapeHtml(detail)}</span>
+          </div>
+          <div class="table-map-detail-actions">
+            ${activeSession ? `
+              <button
+                class="qr-station-btn reset"
+                type="button"
+                data-end-qr-session="${activeSession.qr_number}"
+                data-table-code="${escapeHtml(tableCode)}"
+                ${isUpdating ? "disabled" : ""}
+              >${isUpdating ? "Working…" : "End session"}</button>
+            ` : `
+              <button
+                class="qr-station-btn primary"
+                type="button"
+                data-assign-table="${escapeHtml(tableCode)}"
+                ${state.qrSessionLoadError ? "disabled" : ""}
+              >Assign QR</button>
+            `}
+            <button class="qr-station-btn" type="button" data-table-history="${escapeHtml(tableCode)}">History</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSavedTableMap(layout) {
+      const tableItems = layout.items.filter((item) => item.type === "table" && item.tableCode);
+      const obstacleItems = layout.items.filter((item) => item.type === "obstacle");
+      const currentTableCodes = new Set(tableItems.map((item) => item.tableCode.toLowerCase()));
+      if (state.selectedMapTableCode && !currentTableCodes.has(state.selectedMapTableCode.toLowerCase())) {
+        state.selectedMapTableCode = null;
+      }
+
+      const obstacleMarkup = obstacleItems.map((item) => {
+        const x = Math.min(item.x, 100 - item.w);
+        const y = Math.min(item.y, 100 - item.h);
+        const style = `left:${x}%;top:${y}%;width:${item.w}%;height:${item.h}%;transform:rotate(${item.rotation}deg)`;
+        return `
+          <div
+            class="queen-map-item queen-map-obstacle"
+            data-kind="${escapeHtml(item.obstacleKind)}"
+            style="${style}"
+            aria-hidden="true"
+          >
+            <span class="queen-map-obstacle-label">${escapeHtml(item.label)}</span>
+          </div>
+        `;
+      }).join("");
+
+      const tableMarkup = tableItems.map((item) => {
+        const activeSession = getActiveTableSession(item.tableCode);
+        const activeRequests = activeSession
+          ? getTableRequestHistory(item.tableCode).filter((request) => (
+              request.qr_session_id === activeSession.id
+              && !["completed", "canceled"].includes(request.status)
+            ))
+          : [];
+        const x = Math.min(item.x, 100 - item.w);
+        const y = Math.min(item.y, 100 - item.h);
+        const selected = state.selectedMapTableCode?.toLowerCase() === item.tableCode.toLowerCase();
+        const style = `left:${x}%;top:${y}%;width:${item.w}%;height:${item.h}%;transform:rotate(${item.rotation}deg)`;
+        return `
+          <button
+            class="queen-map-item queen-map-table is-${escapeHtml(item.shape)} ${activeSession ? "is-assigned" : ""} ${selected ? "is-selected" : ""}"
+            type="button"
+            data-map-table-code="${escapeHtml(item.tableCode)}"
+            style="${style}"
+            aria-pressed="${selected ? "true" : "false"}"
+            aria-label="Table ${escapeHtml(item.tableCode)}, ${activeSession ? `assigned to QR ${activeSession.qr_number}` : "available"}"
+          >
+            <span class="queen-map-table-label">${escapeHtml(item.label || item.tableCode)}</span>
+            <span class="queen-map-table-state">${activeSession ? `QR ${String(activeSession.qr_number).padStart(2, "0")}` : "OPEN"}</span>
+            ${activeRequests.length ? `<span class="queen-map-open-count">${activeRequests.length}</span>` : ""}
+          </button>
+        `;
+      }).join("");
+
+      return `
+        <div class="table-map-layout-shell">
+          <div class="table-map-canvas-scroll">
+            <div
+              class="queen-floor-canvas"
+              style="aspect-ratio:${layout.canvasWidth} / ${layout.canvasHeight}"
+              aria-label="${escapeHtml(state.activeTableMapZone)} table map"
+            >
+              ${obstacleMarkup}
+              ${tableMarkup}
+              ${tableItems.length ? "" : '<div class="table-map-empty">This saved floor has no tables yet.</div>'}
+            </div>
+          </div>
+          ${renderSelectedMapTable(state.selectedMapTableCode)}
+        </div>
+      `;
+    }
+
+    function renderTableMap() {
+      const grid = document.getElementById("tableMapGrid");
+      if (!grid) return;
+
+      const allTableOptions = Array.from(new Map(
+        state.tableOptions
+          .map((tableCode) => String(tableCode || "").trim())
+          .filter(Boolean)
+          .map((tableCode) => [tableCode.toLowerCase(), tableCode])
+      ).values());
+
+      const zoneCounts = { first: 0, second: 0, patio: 0 };
+      Object.keys(zoneCounts).forEach((zone) => {
+        const layout = getDiningTableMapLayout(zone);
+        const savedTableCount = layout?.items.filter((item) => item.type === "table" && item.tableCode).length || 0;
+        zoneCounts[zone] = layout
+          ? savedTableCount
+          : allTableOptions.filter((tableCode) => getDiningTableMapZone(tableCode) === zone).length;
+      });
+      document.querySelectorAll("[data-table-map-count]").forEach((count) => {
+        count.textContent = String(zoneCounts[count.dataset.tableMapCount] || 0);
+      });
+      document.querySelectorAll("[data-table-map-zone]").forEach((button) => {
+        const isActive = button.dataset.tableMapZone === state.activeTableMapZone;
+        button.classList.toggle("is-active", isActive);
+        button.setAttribute("aria-pressed", isActive ? "true" : "false");
+      });
+
+      const layout = getDiningTableMapLayout();
+      if (layout?.items.length) {
+        grid.innerHTML = renderSavedTableMap(layout);
+        return;
+      }
+
+      const tableOptions = allTableOptions.filter(
+        (tableCode) => getDiningTableMapZone(tableCode) === state.activeTableMapZone
+      );
+      const setupMessage = state.tableLayoutLoadError
+        ? '<p class="table-map-layout-note is-error">Saved table maps are unavailable. Run tools/sql/dining-table-layout-schema.sql in Supabase. The table list remains usable below.</p>'
+        : '<p class="table-map-layout-note">No saved visual map for this floor yet. Use Edit map to place tables. The table list remains usable below.</p>';
+      grid.innerHTML = setupMessage + renderFallbackTableCards(tableOptions);
     }
 
     function closeQrAssignmentModal() {
@@ -4166,12 +4657,32 @@
       return (await response.json()).map(normalizeQrSession);
     }
 
+    async function fetchDiningTableLayouts() {
+      const { url, anonKey } = SUPABASE_CONFIG;
+      if (!url || !anonKey) throw new Error("Missing Supabase configuration");
+      const endpoint = new URL(`${url}/rest/v1/${DINING_TABLE_LAYOUTS_TABLE}`);
+      endpoint.searchParams.set("select", "id,branch,zone,canvas_width,canvas_height,items,revision,updated_at");
+      endpoint.searchParams.set("branch", `eq.${ADMIN_SHEET_CONFIG.branchLabel.toLowerCase()}`);
+      endpoint.searchParams.set("order", "zone.asc");
+      const response = await fetch(endpoint.toString(), {
+        headers: {
+          apikey: anonKey,
+          Authorization: `Bearer ${anonKey}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`Table layouts failed (${response.status}): ${await response.text()}`);
+      }
+      return (await response.json()).map(normalizeDiningTableLayout);
+    }
+
     async function refreshDiningRequests({ manual = false } = {}) {
       const refreshButton = document.getElementById("refreshRequestsBtn");
       if (manual && refreshButton) refreshButton.disabled = true;
-      const [requestResult, qrSessionResult] = await Promise.allSettled([
+      const [requestResult, qrSessionResult, tableLayoutResult] = await Promise.allSettled([
         fetchDiningRequests(),
-        fetchQrSessions()
+        fetchQrSessions(),
+        fetchDiningTableLayouts()
       ]);
 
       if (requestResult.status === "fulfilled") {
@@ -4191,6 +4702,14 @@
       } else {
         console.error("QR session refresh failed", qrSessionResult.reason);
         state.qrSessionLoadError = true;
+      }
+
+      if (tableLayoutResult.status === "fulfilled") {
+        state.tableLayouts = new Map(tableLayoutResult.value.map((layout) => [layout.zone, layout]));
+        state.tableLayoutLoadError = false;
+      } else {
+        console.error("Table layout refresh failed", tableLayoutResult.reason);
+        state.tableLayoutLoadError = true;
       }
 
       if (refreshButton) refreshButton.disabled = false;
@@ -5488,12 +6007,18 @@
           console.error("QR session load failed", error);
           state.qrSessionLoadError = true;
           return [];
+        }),
+        fetchDiningTableLayouts().catch((error) => {
+          console.error("Table layout load failed", error);
+          state.tableLayoutLoadError = true;
+          return [];
         })
       ])
-        .then(([reservations, tableOptions, diningRequests, qrSessions]) => {
+        .then(([reservations, tableOptions, diningRequests, qrSessions, tableLayouts]) => {
           state.tableOptions = tableOptions;
           state.diningRequests = diningRequests;
           state.qrSessions = qrSessions;
+          state.tableLayouts = new Map(tableLayouts.map((layout) => [layout.zone, layout]));
           if (!state.requestLoadError) state.requestsLoadedAt = new Date().toISOString();
           syncReservations(reservations);
           syncPendingFeedbackQueue(reservations);
@@ -5508,10 +6033,11 @@
     }
 
     async function performAutoRefresh() {
-      const [reservationResult, requestResult, qrSessionResult] = await Promise.allSettled([
+      const [reservationResult, requestResult, qrSessionResult, tableLayoutResult] = await Promise.allSettled([
         document.hidden ? Promise.resolve(null) : fetchReservations(),
         fetchDiningRequests(),
-        fetchQrSessions()
+        fetchQrSessions(),
+        fetchDiningTableLayouts()
       ]);
 
       if (reservationResult.status === "fulfilled" && reservationResult.value) {
@@ -5540,6 +6066,16 @@
           console.error("QR session auto refresh failed", qrSessionResult.reason);
         }
         state.qrSessionLoadError = true;
+      }
+
+      if (tableLayoutResult.status === "fulfilled") {
+        state.tableLayouts = new Map(tableLayoutResult.value.map((layout) => [layout.zone, layout]));
+        state.tableLayoutLoadError = false;
+      } else {
+        if (!state.tableLayoutLoadError) {
+          console.error("Table layout auto refresh failed", tableLayoutResult.reason);
+        }
+        state.tableLayoutLoadError = true;
       }
       renderDiningRequests();
     }
@@ -5690,10 +6226,18 @@
       const button = event.target.closest("[data-table-map-zone]");
       if (!button) return;
       state.activeTableMapZone = button.dataset.tableMapZone || "first";
+      state.selectedMapTableCode = null;
       renderTableMap();
     });
 
     document.getElementById("tableMapGrid").addEventListener("click", (event) => {
+      const mapTableButton = event.target.closest("[data-map-table-code]");
+      if (mapTableButton) {
+        state.selectedMapTableCode = mapTableButton.dataset.mapTableCode || null;
+        renderTableMap();
+        return;
+      }
+
       const historyButton = event.target.closest("[data-table-history]");
       if (historyButton) {
         showRequestHistory({ tableCode: historyButton.dataset.tableHistory });

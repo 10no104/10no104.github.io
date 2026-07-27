@@ -1,0 +1,1918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#241711" />
+  <title>Table Map Editor | EHWHA</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #2d2018;
+      --muted: #7a685b;
+      --paper: #fffaf3;
+      --canvas: #f3eadc;
+      --line: rgba(80, 54, 37, 0.16);
+      --wine: #6b2937;
+      --wine-dark: #4b1d28;
+      --gold: #d2a84a;
+      --green: #2d744c;
+      --blue: #2f678d;
+      --shadow: 0 22px 55px rgba(43, 26, 17, 0.13);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background: #e9ddce;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background:
+        radial-gradient(circle at 6% 0%, rgba(210, 168, 74, 0.2), transparent 29rem),
+        linear-gradient(180deg, #f7f0e6 0, #e9ddce 100%);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible,
+    select:focus-visible {
+      outline: 3px solid rgba(47, 103, 141, 0.35);
+      outline-offset: 2px;
+    }
+
+    .app-header {
+      position: sticky;
+      z-index: 50;
+      top: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      min-height: 74px;
+      padding: 12px 22px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+      background:
+        linear-gradient(120deg, rgba(31, 20, 15, 0.98), rgba(75, 29, 40, 0.96)),
+        url("../assets/pattern.webp") center / 480px auto;
+      color: #fff8ee;
+      box-shadow: 0 10px 30px rgba(42, 22, 16, 0.2);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      flex: 0 0 auto;
+      place-items: center;
+      width: 43px;
+      height: 43px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.09);
+      color: #f1ca73;
+      font-size: 1.15rem;
+      font-weight: 950;
+    }
+
+    .brand-copy {
+      min-width: 0;
+    }
+
+    .brand-copy strong,
+    .brand-copy span {
+      display: block;
+    }
+
+    .brand-copy strong {
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-copy span {
+      margin-top: 2px;
+      color: rgba(255, 248, 238, 0.64);
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-link,
+    .header-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 14px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 13px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff8ee;
+      font-size: 0.78rem;
+      font-weight: 900;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .header-button.is-active {
+      border-color: #ebc974;
+      background: #ebc974;
+      color: #3a261b;
+    }
+
+    .page {
+      width: min(1800px, 100%);
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .intro {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 16px;
+      padding: 4px 2px;
+    }
+
+    .intro p {
+      max-width: 760px;
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 650;
+      line-height: 1.55;
+    }
+
+    .intro h1 {
+      margin: 0;
+      color: #3b251a;
+      font-size: clamp(1.7rem, 4vw, 2.55rem);
+      letter-spacing: -0.055em;
+    }
+
+    .save-state {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 38px;
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 250, 243, 0.84);
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .save-state::before {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #9c8e82;
+      content: "";
+    }
+
+    .save-state.is-dirty::before {
+      background: #c07b25;
+    }
+
+    .save-state.is-saved::before {
+      background: var(--green);
+    }
+
+    .save-state.is-error {
+      color: #9a3040;
+    }
+
+    .save-state.is-error::before {
+      background: #b72f43;
+    }
+
+    .floor-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 14px;
+      padding: 7px;
+      border: 1px solid var(--line);
+      border-radius: 19px;
+      background: rgba(255, 250, 243, 0.72);
+      box-shadow: 0 12px 30px rgba(71, 46, 31, 0.07);
+    }
+
+    .floor-tab {
+      min-height: 48px;
+      border: 0;
+      border-radius: 14px;
+      background: transparent;
+      color: #765f4e;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .floor-tab.is-active {
+      background: var(--wine);
+      color: #fffaf3;
+      box-shadow: 0 10px 24px rgba(75, 29, 40, 0.2);
+    }
+
+    .editor-shell {
+      display: grid;
+      grid-template-columns: minmax(210px, 245px) minmax(580px, 1fr) minmax(235px, 275px);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .panel {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: rgba(255, 250, 243, 0.92);
+      box-shadow: var(--shadow);
+    }
+
+    .panel-head {
+      padding: 16px 17px 13px;
+      border-bottom: 1px solid rgba(80, 54, 37, 0.1);
+    }
+
+    .panel-head h2 {
+      margin: 0;
+      font-size: 0.98rem;
+      letter-spacing: -0.025em;
+    }
+
+    .panel-head p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 650;
+      line-height: 1.45;
+    }
+
+    .palette-body,
+    .inspector-body {
+      padding: 14px;
+    }
+
+    .section-label {
+      display: block;
+      margin: 2px 2px 8px;
+      color: #7d6959;
+      font-size: 0.65rem;
+      font-weight: 950;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+    }
+
+    .custom-table-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 7px;
+      margin-bottom: 10px;
+    }
+
+    .compact-input,
+    .field input,
+    .field select {
+      width: 100%;
+      min-height: 40px;
+      border: 1px solid rgba(80, 54, 37, 0.16);
+      border-radius: 11px;
+      background: #fffdf8;
+      color: var(--ink);
+    }
+
+    .compact-input {
+      min-width: 0;
+      padding: 0 10px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .small-button,
+    .tool-button,
+    .primary-button {
+      border: 1px solid rgba(80, 54, 37, 0.15);
+      border-radius: 11px;
+      background: #fffdf8;
+      color: #51372a;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .small-button {
+      min-width: 42px;
+      min-height: 40px;
+      padding: 0 11px;
+    }
+
+    .small-button:disabled,
+    .tool-button:disabled,
+    .primary-button:disabled {
+      cursor: not-allowed;
+      opacity: 0.43;
+    }
+
+    .available-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px;
+      max-height: 278px;
+      overflow: auto;
+      margin-bottom: 14px;
+      padding-right: 3px;
+    }
+
+    .available-table {
+      min-height: 39px;
+      border: 1px solid rgba(107, 41, 55, 0.15);
+      border-radius: 11px;
+      background: rgba(107, 41, 55, 0.06);
+      color: var(--wine-dark);
+      font-size: 0.75rem;
+      font-weight: 950;
+      cursor: pointer;
+    }
+
+    .available-empty {
+      grid-column: 1 / -1;
+      margin: 0;
+      padding: 12px 8px;
+      border-radius: 11px;
+      background: rgba(45, 116, 76, 0.08);
+      color: var(--green);
+      font-size: 0.72rem;
+      font-weight: 800;
+      line-height: 1.45;
+    }
+
+    .obstacle-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px;
+    }
+
+    .obstacle-button {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 42px;
+      padding: 0 9px;
+      border: 1px solid rgba(80, 54, 37, 0.13);
+      border-radius: 11px;
+      background: #f5ede2;
+      color: #5c493b;
+      font-size: 0.7rem;
+      font-weight: 850;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .obstacle-button span:first-child {
+      font-size: 1rem;
+    }
+
+    .palette-action {
+      width: 100%;
+      min-height: 42px;
+      margin-top: 9px;
+      border: 0;
+      border-radius: 12px;
+      background: #ede1d3;
+      color: #533f31;
+      font-size: 0.73rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .canvas-panel {
+      min-width: 0;
+    }
+
+    .canvas-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px;
+      border-bottom: 1px solid rgba(80, 54, 37, 0.1);
+      background: rgba(255, 253, 248, 0.9);
+    }
+
+    .tool-group {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    .tool-button {
+      min-height: 38px;
+      padding: 0 11px;
+      font-size: 0.72rem;
+    }
+
+    .tool-button.is-active {
+      border-color: var(--blue);
+      background: rgba(47, 103, 141, 0.1);
+      color: var(--blue);
+    }
+
+    .primary-button {
+      min-height: 40px;
+      padding: 0 15px;
+      border-color: transparent;
+      background: var(--wine);
+      color: #fffaf3;
+      box-shadow: 0 8px 18px rgba(75, 29, 40, 0.17);
+    }
+
+    .canvas-scroller {
+      overflow: auto;
+      padding: 16px;
+      background:
+        linear-gradient(45deg, rgba(76, 48, 32, 0.035) 25%, transparent 25%) 0 0 / 24px 24px,
+        linear-gradient(135deg, rgba(76, 48, 32, 0.035) 25%, transparent 25%) 0 0 / 24px 24px,
+        #e5d7c6;
+    }
+
+    .map-canvas {
+      position: relative;
+      width: 100%;
+      min-width: 560px;
+      aspect-ratio: 3 / 2;
+      overflow: hidden;
+      border: 2px solid rgba(74, 49, 34, 0.24);
+      border-radius: 13px;
+      background-color: var(--canvas);
+      background-image:
+        linear-gradient(rgba(80, 54, 37, 0.075) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(80, 54, 37, 0.075) 1px, transparent 1px),
+        linear-gradient(rgba(80, 54, 37, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(80, 54, 37, 0.035) 1px, transparent 1px);
+      background-size: 10% 10%, 10% 10%, 2% 2%, 2% 2%;
+      box-shadow: inset 0 0 40px rgba(72, 46, 29, 0.06);
+      touch-action: none;
+      user-select: none;
+    }
+
+    .map-canvas.is-viewing {
+      background-image:
+        linear-gradient(rgba(80, 54, 37, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(80, 54, 37, 0.045) 1px, transparent 1px);
+      background-size: 10% 10%;
+    }
+
+    .map-empty {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 30px;
+      color: rgba(78, 58, 45, 0.58);
+      font-size: 0.9rem;
+      font-weight: 850;
+      line-height: 1.55;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .map-item {
+      position: absolute;
+      display: grid;
+      place-items: center;
+      min-width: 18px;
+      min-height: 18px;
+      padding: 0;
+      transform-origin: center;
+      cursor: grab;
+      touch-action: none;
+    }
+
+    .map-item:active {
+      cursor: grabbing;
+    }
+
+    .map-item.is-selected {
+      z-index: 20;
+      outline: 3px solid #2f7da9;
+      outline-offset: 3px;
+      box-shadow: 0 9px 22px rgba(31, 91, 126, 0.25);
+    }
+
+    .table-item {
+      border: 2px solid #5d3827;
+      border-radius: 15px;
+      background:
+        linear-gradient(145deg, #9a6642, #74472e);
+      color: #fffaf1;
+      box-shadow:
+        inset 0 0 0 3px rgba(255, 255, 255, 0.1),
+        0 7px 14px rgba(62, 37, 24, 0.19);
+    }
+
+    .table-item.is-round {
+      border-radius: 50%;
+    }
+
+    .table-item.is-booth {
+      border-radius: 7px 7px 18px 18px;
+      background: linear-gradient(180deg, #814151 0 28%, #9b6845 28%);
+    }
+
+    .table-label {
+      overflow: hidden;
+      padding: 2px;
+      font-size: clamp(0.55rem, 1.15vw, 0.88rem);
+      font-weight: 950;
+      line-height: 1;
+      text-align: center;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .seat-dots {
+      position: absolute;
+      inset: -6px;
+      border: 3px dotted rgba(85, 52, 34, 0.45);
+      border-radius: inherit;
+      pointer-events: none;
+    }
+
+    .obstacle-item {
+      border: 1px solid rgba(70, 55, 44, 0.35);
+      border-radius: 5px;
+      background: rgba(110, 97, 84, 0.74);
+      color: #fff;
+      box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.08);
+    }
+
+    .obstacle-item[data-kind="wall"] {
+      border-color: #54483e;
+      background:
+        repeating-linear-gradient(135deg, #78695e 0 8px, #685a50 8px 16px);
+    }
+
+    .obstacle-item[data-kind="pillar"] {
+      border-radius: 50%;
+      background: #5e554e;
+    }
+
+    .obstacle-item[data-kind="bar"],
+    .obstacle-item[data-kind="service"] {
+      background: linear-gradient(135deg, #3d6d69, #294d4b);
+    }
+
+    .obstacle-item[data-kind="door"] {
+      border: 3px dashed #3e8066;
+      background: rgba(255, 255, 255, 0.58);
+      color: #286248;
+    }
+
+    .obstacle-item[data-kind="window"] {
+      border: 3px solid #5e99bb;
+      background: rgba(117, 190, 224, 0.27);
+      color: #255d7c;
+    }
+
+    .obstacle-item[data-kind="stairs"] {
+      background:
+        repeating-linear-gradient(0deg, #7f746a 0 7px, #a99c90 7px 10px);
+    }
+
+    .obstacle-label {
+      overflow: hidden;
+      padding: 2px;
+      font-size: clamp(0.45rem, 0.8vw, 0.7rem);
+      font-weight: 900;
+      line-height: 1.1;
+      text-align: center;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .resize-handle {
+      position: absolute;
+      right: -7px;
+      bottom: -7px;
+      display: none;
+      width: 15px;
+      height: 15px;
+      border: 2px solid #fff;
+      border-radius: 5px;
+      background: #2f7da9;
+      box-shadow: 0 2px 6px rgba(26, 69, 94, 0.35);
+      cursor: nwse-resize;
+    }
+
+    .map-item.is-selected .resize-handle {
+      display: block;
+    }
+
+    .canvas-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 11px 15px;
+      border-top: 1px solid rgba(80, 54, 37, 0.1);
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 750;
+    }
+
+    .legend {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .legend i {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      background: #865637;
+    }
+
+    .legend span:last-child i {
+      background: #6d645d;
+    }
+
+    .inspector-placeholder {
+      padding: 18px 4px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      line-height: 1.55;
+      text-align: center;
+    }
+
+    .field {
+      display: grid;
+      gap: 5px;
+      margin-bottom: 10px;
+    }
+
+    .field label {
+      color: #6e5a4b;
+      font-size: 0.66rem;
+      font-weight: 900;
+    }
+
+    .field input,
+    .field select {
+      padding: 0 10px;
+      font-size: 0.76rem;
+      font-weight: 750;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .inspector-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px;
+      margin-top: 14px;
+    }
+
+    .inspector-actions button {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: #f2e7da;
+      color: #5d4738;
+      font-size: 0.7rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .inspector-actions .danger {
+      border-color: rgba(163, 48, 65, 0.2);
+      background: rgba(163, 48, 65, 0.08);
+      color: #9a3040;
+    }
+
+    .map-settings {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      padding-bottom: 13px;
+      border-bottom: 1px solid rgba(80, 54, 37, 0.1);
+    }
+
+    .shortcut-list {
+      margin: 14px 0 0;
+      padding: 0;
+      list-style: none;
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      line-height: 1.7;
+    }
+
+    .shortcut-list kbd {
+      display: inline-block;
+      min-width: 42px;
+      margin-right: 5px;
+      padding: 1px 5px;
+      border: 1px solid rgba(80, 54, 37, 0.16);
+      border-radius: 5px;
+      background: #fff;
+      color: #5b4638;
+      font: inherit;
+      font-size: 0.63rem;
+      text-align: center;
+    }
+
+    .connection-note {
+      margin: 12px 0 0;
+      padding: 10px;
+      border-radius: 10px;
+      background: rgba(47, 103, 141, 0.08);
+      color: #2e617f;
+      font-size: 0.68rem;
+      font-weight: 750;
+      line-height: 1.45;
+    }
+
+    .connection-note.is-error {
+      background: rgba(163, 48, 65, 0.08);
+      color: #9a3040;
+    }
+
+    @media (max-width: 1120px) {
+      .editor-shell {
+        grid-template-columns: 220px minmax(0, 1fr);
+      }
+
+      .inspector-panel {
+        grid-column: 1 / -1;
+      }
+
+      .inspector-body {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .app-header {
+        padding: 10px 12px;
+      }
+
+      .brand-copy span,
+      .header-link {
+        display: none;
+      }
+
+      .page {
+        padding: 13px;
+      }
+
+      .intro {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .editor-shell {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .panel {
+        width: 100%;
+      }
+
+      .canvas-panel {
+        order: -1;
+      }
+
+      .canvas-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .tool-group {
+        width: 100%;
+        overflow-x: auto;
+      }
+
+      .primary-button {
+        margin-left: auto;
+      }
+
+      .canvas-scroller {
+        padding: 9px;
+      }
+
+      .map-canvas {
+        min-width: 650px;
+      }
+
+      .inspector-body {
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-mark">T</div>
+      <div class="brand-copy">
+        <strong>Table Map Editor</strong>
+        <span>Downtown floor planning</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <a class="header-link" href="./queen.html">Open Queen</a>
+      <button class="header-button is-active" id="modeToggle" type="button">Edit mode</button>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="intro">
+      <div>
+        <h1>Build the floor once. Run service from the map.</h1>
+        <p>Place tables and fixed landmarks, save each floor, then use the same layout in Queen to assign QR cards and manage live table sessions.</p>
+      </div>
+      <div class="save-state" id="saveState">Loading map</div>
+    </section>
+
+    <nav class="floor-tabs" id="floorTabs" aria-label="Floor selection">
+      <button class="floor-tab is-active" type="button" data-zone="first">1st Floor</button>
+      <button class="floor-tab" type="button" data-zone="second">2nd Floor</button>
+      <button class="floor-tab" type="button" data-zone="patio">Patio</button>
+    </nav>
+
+    <section class="editor-shell">
+      <aside class="panel palette-panel">
+        <div class="panel-head">
+          <h2>Add to map</h2>
+          <p>Tables come from the Downtown Table sheet. Custom codes are also supported.</p>
+        </div>
+        <div class="palette-body">
+          <span class="section-label">Unplaced tables</span>
+          <div class="custom-table-row">
+            <input class="compact-input" id="customTableCode" type="text" maxlength="40" placeholder="Table code" aria-label="Custom table code" />
+            <button class="small-button" id="addCustomTable" type="button">Add</button>
+          </div>
+          <div class="available-list" id="availableTables"></div>
+          <button class="palette-action" id="placeAllTables" type="button">Place all unplaced tables</button>
+
+          <span class="section-label" style="margin-top:18px;">Reference points</span>
+          <div class="obstacle-grid" id="obstaclePalette">
+            <button class="obstacle-button" type="button" data-obstacle="wall"><span>▰</span><span>Wall</span></button>
+            <button class="obstacle-button" type="button" data-obstacle="pillar"><span>●</span><span>Pillar</span></button>
+            <button class="obstacle-button" type="button" data-obstacle="bar"><span>▥</span><span>Bar</span></button>
+            <button class="obstacle-button" type="button" data-obstacle="door"><span>⌁</span><span>Door</span></button>
+            <button class="obstacle-button" type="button" data-obstacle="window"><span>▭</span><span>Window</span></button>
+            <button class="obstacle-button" type="button" data-obstacle="stairs"><span>▤</span><span>Stairs</span></button>
+            <button class="obstacle-button" type="button" data-obstacle="service"><span>◆</span><span>Service</span></button>
+          </div>
+        </div>
+      </aside>
+
+      <section class="panel canvas-panel">
+        <div class="canvas-toolbar">
+          <div class="tool-group">
+            <button class="tool-button" id="undoButton" type="button" title="Undo (Ctrl+Z)">Undo</button>
+            <button class="tool-button" id="redoButton" type="button" title="Redo (Ctrl+Shift+Z)">Redo</button>
+            <button class="tool-button is-active" id="snapButton" type="button" aria-pressed="true">Snap grid</button>
+            <button class="tool-button" id="reloadButton" type="button">Reload floor</button>
+          </div>
+          <button class="primary-button" id="saveButton" type="button">Save 1st Floor</button>
+        </div>
+        <div class="canvas-scroller">
+          <div class="map-canvas" id="mapCanvas" aria-label="Editable table map"></div>
+        </div>
+        <div class="canvas-foot">
+          <div class="legend">
+            <span><i></i> Table</span>
+            <span><i></i> Fixed reference</span>
+          </div>
+          <span id="mapSummary">0 tables · 0 reference points</span>
+        </div>
+      </section>
+
+      <aside class="panel inspector-panel">
+        <div class="panel-head">
+          <h2>Inspector</h2>
+          <p>Select an item to set its exact size, label, shape, and rotation.</p>
+        </div>
+        <div class="inspector-body" id="inspector"></div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const ADMIN_SHEET_CONFIG = {
+      sheetId: "1xa9OZbctYnlbaAL8lKIgmefM5hvSw0Plk01lxp5G2fc",
+      tableSheetName: "Table",
+      tableOptionColumnIndex: 0,
+      branchLabel: "Downtown"
+    };
+
+    const SUPABASE_CONFIG = {
+      url: "https://pzhzdjsjfdzbzkhnaxmc.supabase.co",
+      anonKey: "sb_publishable_3Ox2JIQXVLwusT-xzIMJ4g_YXTR5q8e"
+    };
+
+    const TABLE_LAYOUTS_TABLE = "dining_table_layouts";
+    const FLOOR_LABELS = {
+      first: "1st Floor",
+      second: "2nd Floor",
+      patio: "Patio"
+    };
+    const OBSTACLE_LABELS = {
+      wall: "Wall",
+      pillar: "Pillar",
+      bar: "Bar",
+      door: "Door",
+      window: "Window",
+      stairs: "Stairs",
+      service: "Service Station"
+    };
+    const DEFAULT_OBSTACLE_SIZES = {
+      wall: [22, 4],
+      pillar: [6, 9],
+      bar: [22, 10],
+      door: [10, 5],
+      window: [18, 4],
+      stairs: [16, 14],
+      service: [14, 10]
+    };
+
+    const state = {
+      zone: "first",
+      mode: "edit",
+      snap: true,
+      selectedId: null,
+      pointer: null,
+      tableOptions: [],
+      layouts: new Map(),
+      databaseAvailable: true,
+      loadError: "",
+      saving: false
+    };
+
+    function escapeHtml(value = "") {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function clone(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function clamp(value, minimum, maximum) {
+      return Math.min(maximum, Math.max(minimum, Number(value) || 0));
+    }
+
+    function roundValue(value) {
+      const increment = state.snap ? 1 : 0.1;
+      return Math.round(Number(value) / increment) * increment;
+    }
+
+    function createId(prefix = "item") {
+      if (window.crypto?.randomUUID) return `${prefix}-${window.crypto.randomUUID()}`;
+      return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+    }
+
+    function getTableZone(tableCode) {
+      const normalized = String(tableCode || "").trim().toUpperCase();
+      if (normalized.startsWith("2")) return "second";
+      if (normalized.startsWith("P")) return "patio";
+      return "first";
+    }
+
+    function defaultLayout(zone) {
+      return {
+        zone,
+        width: 1200,
+        height: 800,
+        items: [],
+        revision: 0,
+        updatedAt: "",
+        dirty: false,
+        undo: [],
+        redo: []
+      };
+    }
+
+    function currentLayout() {
+      if (!state.layouts.has(state.zone)) {
+        state.layouts.set(state.zone, defaultLayout(state.zone));
+      }
+      return state.layouts.get(state.zone);
+    }
+
+    function normalizeItem(item = {}, index = 0) {
+      const type = item.type === "obstacle" ? "obstacle" : "table";
+      const defaultSize = type === "obstacle"
+        ? (DEFAULT_OBSTACLE_SIZES[item.obstacleKind] || [14, 8])
+        : [10, 9];
+      return {
+        id: String(item.id || createId(`${type}-${index}`)).slice(0, 80),
+        type,
+        tableCode: type === "table" ? String(item.tableCode || item.label || "").trim().slice(0, 40) : "",
+        label: String(item.label || item.tableCode || (type === "obstacle" ? "Reference" : "Table")).trim().slice(0, 80),
+        obstacleKind: type === "obstacle" && OBSTACLE_LABELS[item.obstacleKind] ? item.obstacleKind : "wall",
+        shape: type === "table" && ["rectangle", "round", "booth"].includes(item.shape) ? item.shape : "rectangle",
+        seats: type === "table" ? clamp(item.seats || 4, 1, 20) : 0,
+        x: clamp(item.x, 0, 98),
+        y: clamp(item.y, 0, 98),
+        w: clamp(item.w || defaultSize[0], 2, 80),
+        h: clamp(item.h || defaultSize[1], 2, 80),
+        rotation: clamp(item.rotation, -180, 180)
+      };
+    }
+
+    function normalizeLayout(row = {}) {
+      const zone = ["first", "second", "patio"].includes(row.zone) ? row.zone : "first";
+      let items = row.items;
+      if (typeof items === "string") {
+        try {
+          items = JSON.parse(items);
+        } catch {
+          items = [];
+        }
+      }
+      return {
+        zone,
+        width: clamp(row.canvas_width || 1200, 600, 2400),
+        height: clamp(row.canvas_height || 800, 400, 1800),
+        items: Array.isArray(items) ? items.map(normalizeItem) : [],
+        revision: Number(row.revision || 0),
+        updatedAt: row.updated_at || "",
+        dirty: false,
+        undo: [],
+        redo: []
+      };
+    }
+
+    function parseGvizText(text = "") {
+      return JSON.parse(
+        text.replace("/*O_o*/", "").replace("google.visualization.Query.setResponse(", "").slice(0, -2)
+      );
+    }
+
+    function getCellText(cell) {
+      if (!cell) return "";
+      if (typeof cell.f === "string" && cell.f.trim()) return cell.f.trim();
+      return String(cell.v ?? "").trim();
+    }
+
+    async function fetchTableOptions() {
+      const { sheetId, tableSheetName, tableOptionColumnIndex } = ADMIN_SHEET_CONFIG;
+      const endpoint = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?sheet=${encodeURIComponent(tableSheetName)}&tqx=out:json`;
+      const response = await fetch(endpoint);
+      if (!response.ok) throw new Error("Could not load the Downtown Table sheet.");
+      const payload = parseGvizText(await response.text());
+      return (payload.table?.rows || [])
+        .slice(1)
+        .map((row) => getCellText((row.c || [])[tableOptionColumnIndex]))
+        .filter(Boolean);
+    }
+
+    async function fetchLayouts() {
+      const { url, anonKey } = SUPABASE_CONFIG;
+      const endpoint = new URL(`${url}/rest/v1/${TABLE_LAYOUTS_TABLE}`);
+      endpoint.searchParams.set("select", "id,branch,zone,canvas_width,canvas_height,items,revision,updated_at");
+      endpoint.searchParams.set("branch", `eq.${ADMIN_SHEET_CONFIG.branchLabel.toLowerCase()}`);
+      endpoint.searchParams.set("order", "zone.asc");
+      const response = await fetch(endpoint.toString(), {
+        headers: {
+          apikey: anonKey,
+          Authorization: `Bearer ${anonKey}`
+        }
+      });
+      if (!response.ok) {
+        const body = await response.text();
+        throw new Error(`Table layout storage is unavailable (${response.status}): ${body}`);
+      }
+      return (await response.json()).map(normalizeLayout);
+    }
+
+    function setSaveState(message, className = "") {
+      const node = document.getElementById("saveState");
+      node.textContent = message;
+      node.className = `save-state ${className}`.trim();
+    }
+
+    function markDirty() {
+      const layout = currentLayout();
+      layout.dirty = true;
+      setSaveState(`${FLOOR_LABELS[state.zone]} has unsaved changes`, "is-dirty");
+      updateButtons();
+    }
+
+    function captureLayoutSnapshot(layout = currentLayout()) {
+      return {
+        width: layout.width,
+        height: layout.height,
+        items: clone(layout.items)
+      };
+    }
+
+    function applyLayoutSnapshot(layout, snapshot) {
+      layout.width = snapshot.width;
+      layout.height = snapshot.height;
+      layout.items = clone(snapshot.items);
+    }
+
+    function pushUndo(snapshot = null) {
+      const layout = currentLayout();
+      layout.undo.push(snapshot || captureLayoutSnapshot(layout));
+      if (layout.undo.length > 80) layout.undo.shift();
+      layout.redo = [];
+    }
+
+    function mutateLayout(mutator) {
+      const layout = currentLayout();
+      pushUndo();
+      mutator(layout);
+      markDirty();
+      renderAll();
+    }
+
+    function undo() {
+      const layout = currentLayout();
+      const previous = layout.undo.pop();
+      if (!previous) return;
+      layout.redo.push(captureLayoutSnapshot(layout));
+      applyLayoutSnapshot(layout, previous);
+      if (!layout.items.some((item) => item.id === state.selectedId)) state.selectedId = null;
+      markDirty();
+      renderAll();
+    }
+
+    function redo() {
+      const layout = currentLayout();
+      const next = layout.redo.pop();
+      if (!next) return;
+      layout.undo.push(captureLayoutSnapshot(layout));
+      applyLayoutSnapshot(layout, next);
+      if (!layout.items.some((item) => item.id === state.selectedId)) state.selectedId = null;
+      markDirty();
+      renderAll();
+    }
+
+    function findOpenPosition(width = 10, height = 9) {
+      const items = currentLayout().items;
+      const index = items.length;
+      const columns = 7;
+      const x = 3 + (index % columns) * 13;
+      const y = 4 + (Math.floor(index / columns) % 7) * 13;
+      return {
+        x: clamp(x, 0, 100 - width),
+        y: clamp(y, 0, 100 - height)
+      };
+    }
+
+    function addTable(tableCode) {
+      if (state.mode !== "edit") return;
+      const normalizedCode = String(tableCode || "").trim().toUpperCase().slice(0, 40);
+      if (!normalizedCode) return;
+      const existing = currentLayout().items.find(
+        (item) => item.type === "table" && item.tableCode.toLowerCase() === normalizedCode.toLowerCase()
+      );
+      if (existing) {
+        state.selectedId = existing.id;
+        renderAll();
+        return;
+      }
+      mutateLayout((layout) => {
+        const position = findOpenPosition(10, 9);
+        const item = normalizeItem({
+          id: createId("table"),
+          type: "table",
+          tableCode: normalizedCode,
+          label: normalizedCode,
+          shape: "rectangle",
+          seats: 4,
+          x: position.x,
+          y: position.y,
+          w: 10,
+          h: 9,
+          rotation: 0
+        });
+        layout.items.push(item);
+        state.selectedId = item.id;
+      });
+    }
+
+    function addObstacle(kind) {
+      if (state.mode !== "edit" || !OBSTACLE_LABELS[kind]) return;
+      mutateLayout((layout) => {
+        const [width, height] = DEFAULT_OBSTACLE_SIZES[kind];
+        const position = findOpenPosition(width, height);
+        const item = normalizeItem({
+          id: createId("obstacle"),
+          type: "obstacle",
+          obstacleKind: kind,
+          label: OBSTACLE_LABELS[kind],
+          x: position.x,
+          y: position.y,
+          w: width,
+          h: height,
+          rotation: 0
+        });
+        layout.items.push(item);
+        state.selectedId = item.id;
+      });
+    }
+
+    function getUnplacedTableOptions() {
+      const placed = new Set(
+        currentLayout().items
+          .filter((item) => item.type === "table")
+          .map((item) => item.tableCode.toLowerCase())
+      );
+      return Array.from(new Map(
+        state.tableOptions
+          .filter((tableCode) => getTableZone(tableCode) === state.zone)
+          .map((tableCode) => [String(tableCode).toLowerCase(), String(tableCode)])
+      ).values()).filter((tableCode) => !placed.has(tableCode.toLowerCase()));
+    }
+
+    function placeAllTables() {
+      const unplaced = getUnplacedTableOptions();
+      if (!unplaced.length || state.mode !== "edit") return;
+      mutateLayout((layout) => {
+        const startIndex = layout.items.length;
+        unplaced.forEach((tableCode, tableIndex) => {
+          const index = startIndex + tableIndex;
+          const columns = 7;
+          const x = 3 + (index % columns) * 13;
+          const y = 4 + (Math.floor(index / columns) % 7) * 13;
+          layout.items.push(normalizeItem({
+            id: createId("table"),
+            type: "table",
+            tableCode,
+            label: tableCode,
+            shape: "rectangle",
+            seats: 4,
+            x,
+            y,
+            w: 10,
+            h: 9
+          }));
+        });
+      });
+    }
+
+    function deleteSelected() {
+      if (!state.selectedId || state.mode !== "edit") return;
+      mutateLayout((layout) => {
+        layout.items = layout.items.filter((item) => item.id !== state.selectedId);
+        state.selectedId = null;
+      });
+    }
+
+    function duplicateSelected() {
+      const selected = currentLayout().items.find((item) => item.id === state.selectedId);
+      if (!selected || state.mode !== "edit") return;
+      if (selected.type === "table") {
+        const copyCode = window.prompt("Table code for the duplicate", `${selected.tableCode}-COPY`);
+        if (!copyCode) return;
+        if (currentLayout().items.some((item) => (
+          item.type === "table" && item.tableCode.toLowerCase() === copyCode.trim().toLowerCase()
+        ))) {
+          window.alert("That table code is already on this floor.");
+          return;
+        }
+        mutateLayout((layout) => {
+          const copy = normalizeItem({
+            ...clone(selected),
+            id: createId("table"),
+            tableCode: copyCode.trim().toUpperCase(),
+            label: copyCode.trim().toUpperCase(),
+            x: clamp(selected.x + 3, 0, 100 - selected.w),
+            y: clamp(selected.y + 3, 0, 100 - selected.h)
+          });
+          layout.items.push(copy);
+          state.selectedId = copy.id;
+        });
+        return;
+      }
+      mutateLayout((layout) => {
+        const copy = normalizeItem({
+          ...clone(selected),
+          id: createId("obstacle"),
+          x: clamp(selected.x + 3, 0, 100 - selected.w),
+          y: clamp(selected.y + 3, 0, 100 - selected.h)
+        });
+        layout.items.push(copy);
+        state.selectedId = copy.id;
+      });
+    }
+
+    function renderFloorTabs() {
+      document.querySelectorAll("[data-zone]").forEach((button) => {
+        const active = button.dataset.zone === state.zone;
+        button.classList.toggle("is-active", active);
+        button.setAttribute("aria-pressed", active ? "true" : "false");
+      });
+      document.getElementById("saveButton").textContent = `Save ${FLOOR_LABELS[state.zone]}`;
+    }
+
+    function renderPalette() {
+      const available = getUnplacedTableOptions();
+      const list = document.getElementById("availableTables");
+      list.innerHTML = available.length
+        ? available.map((tableCode) => `
+            <button class="available-table" type="button" data-add-table="${escapeHtml(tableCode)}">
+              ${escapeHtml(tableCode)}
+            </button>
+          `).join("")
+        : '<p class="available-empty">All tables for this floor are placed. You can still add a custom table code.</p>';
+      document.getElementById("placeAllTables").disabled = !available.length || state.mode !== "edit";
+      document.querySelectorAll("[data-add-table], [data-obstacle], #addCustomTable").forEach((button) => {
+        button.disabled = state.mode !== "edit";
+      });
+    }
+
+    function renderCanvas() {
+      const layout = currentLayout();
+      const canvas = document.getElementById("mapCanvas");
+      canvas.style.aspectRatio = `${layout.width} / ${layout.height}`;
+      canvas.classList.toggle("is-viewing", state.mode === "view");
+      canvas.innerHTML = layout.items.length
+        ? layout.items.map((item) => {
+            const selected = item.id === state.selectedId;
+            const style = [
+              `left:${item.x}%`,
+              `top:${item.y}%`,
+              `width:${item.w}%`,
+              `height:${item.h}%`,
+              `transform:rotate(${item.rotation}deg)`
+            ].join(";");
+            if (item.type === "table") {
+              return `
+                <button
+                  class="map-item table-item is-${escapeHtml(item.shape)} ${selected ? "is-selected" : ""}"
+                  type="button"
+                  data-item-id="${escapeHtml(item.id)}"
+                  style="${style}"
+                  aria-label="Table ${escapeHtml(item.tableCode)}"
+                >
+                  <span class="seat-dots" aria-hidden="true"></span>
+                  <span class="table-label">${escapeHtml(item.label || item.tableCode)}</span>
+                  ${state.mode === "edit" ? '<span class="resize-handle" data-resize aria-hidden="true"></span>' : ""}
+                </button>
+              `;
+            }
+            return `
+              <button
+                class="map-item obstacle-item ${selected ? "is-selected" : ""}"
+                type="button"
+                data-item-id="${escapeHtml(item.id)}"
+                data-kind="${escapeHtml(item.obstacleKind)}"
+                style="${style}"
+                aria-label="${escapeHtml(item.label)}"
+              >
+                <span class="obstacle-label">${escapeHtml(item.label)}</span>
+                ${state.mode === "edit" ? '<span class="resize-handle" data-resize aria-hidden="true"></span>' : ""}
+              </button>
+            `;
+          }).join("")
+        : '<div class="map-empty">Add tables from the left panel, then place walls and landmarks around them.</div>';
+
+      const tableCount = layout.items.filter((item) => item.type === "table").length;
+      const obstacleCount = layout.items.length - tableCount;
+      document.getElementById("mapSummary").textContent =
+        `${tableCount} table${tableCount === 1 ? "" : "s"} · ${obstacleCount} reference point${obstacleCount === 1 ? "" : "s"}`;
+    }
+
+    function fieldMarkup(label, field, value, options = {}) {
+      if (options.choices) {
+        return `
+          <div class="field">
+            <label for="field-${escapeHtml(field)}">${escapeHtml(label)}</label>
+            <select id="field-${escapeHtml(field)}" data-item-field="${escapeHtml(field)}">
+              ${options.choices.map(([choiceValue, choiceLabel]) => `
+                <option value="${escapeHtml(choiceValue)}" ${String(choiceValue) === String(value) ? "selected" : ""}>
+                  ${escapeHtml(choiceLabel)}
+                </option>
+              `).join("")}
+            </select>
+          </div>
+        `;
+      }
+      return `
+        <div class="field">
+          <label for="field-${escapeHtml(field)}">${escapeHtml(label)}</label>
+          <input
+            id="field-${escapeHtml(field)}"
+            data-item-field="${escapeHtml(field)}"
+            type="${options.type || "text"}"
+            value="${escapeHtml(value)}"
+            ${options.min !== undefined ? `min="${options.min}"` : ""}
+            ${options.max !== undefined ? `max="${options.max}"` : ""}
+            ${options.step !== undefined ? `step="${options.step}"` : ""}
+            ${options.maxlength ? `maxlength="${options.maxlength}"` : ""}
+          />
+        </div>
+      `;
+    }
+
+    function renderInspector() {
+      const inspector = document.getElementById("inspector");
+      const layout = currentLayout();
+      const item = layout.items.find((candidate) => candidate.id === state.selectedId);
+      if (!item) {
+        inspector.innerHTML = `
+          <div>
+            <span class="section-label">Map size</span>
+            <div class="map-settings">
+              ${fieldMarkup("Width", "canvasWidth", layout.width, { type: "number", min: 600, max: 2400, step: 50 })}
+              ${fieldMarkup("Height", "canvasHeight", layout.height, { type: "number", min: 400, max: 1800, step: 50 })}
+            </div>
+            <p class="inspector-placeholder">Select a table or reference point on the map to edit it.</p>
+          </div>
+          <div>
+            <span class="section-label">Shortcuts</span>
+            <ul class="shortcut-list">
+              <li><kbd>Arrows</kbd> Move selected item</li>
+              <li><kbd>Delete</kbd> Remove selected item</li>
+              <li><kbd>Ctrl + Z</kbd> Undo</li>
+              <li><kbd>Ctrl + S</kbd> Save current floor</li>
+            </ul>
+            <p class="connection-note ${state.databaseAvailable ? "" : "is-error"}">
+              ${state.databaseAvailable
+                ? "Saved maps are shared with Queen Table Status."
+                : "Storage is not ready. Run tools/sql/dining-table-layout-schema.sql in Supabase."}
+            </p>
+          </div>
+        `;
+        return;
+      }
+
+      const tableChoices = Array.from(new Map([
+        [item.tableCode?.toLowerCase(), item.tableCode],
+        ...state.tableOptions
+          .filter((tableCode) => getTableZone(tableCode) === state.zone)
+          .map((tableCode) => [tableCode.toLowerCase(), tableCode])
+      ])).filter(([key]) => key).map(([, value]) => [value, value]);
+
+      inspector.innerHTML = `
+        <div>
+          <span class="section-label">${item.type === "table" ? "Table" : "Reference point"}</span>
+          ${item.type === "table"
+            ? fieldMarkup("Table code", "tableCode", item.tableCode, { choices: tableChoices })
+            : fieldMarkup("Type", "obstacleKind", item.obstacleKind, {
+                choices: Object.entries(OBSTACLE_LABELS)
+              })}
+          ${fieldMarkup("Visible label", "label", item.label, { maxlength: 80 })}
+          ${item.type === "table"
+            ? `
+                <div class="field-grid">
+                  ${fieldMarkup("Shape", "shape", item.shape, {
+                    choices: [["rectangle", "Rectangle"], ["round", "Round"], ["booth", "Booth"]]
+                  })}
+                  ${fieldMarkup("Seats", "seats", item.seats, { type: "number", min: 1, max: 20, step: 1 })}
+                </div>
+              `
+            : ""}
+        </div>
+        <div>
+          <span class="section-label">Position and size (%)</span>
+          <div class="field-grid">
+            ${fieldMarkup("Left", "x", item.x, { type: "number", min: 0, max: 98, step: 0.1 })}
+            ${fieldMarkup("Top", "y", item.y, { type: "number", min: 0, max: 98, step: 0.1 })}
+            ${fieldMarkup("Width", "w", item.w, { type: "number", min: 2, max: 80, step: 0.1 })}
+            ${fieldMarkup("Height", "h", item.h, { type: "number", min: 2, max: 80, step: 0.1 })}
+          </div>
+          ${fieldMarkup("Rotation", "rotation", item.rotation, { type: "number", min: -180, max: 180, step: 1 })}
+          <div class="inspector-actions">
+            <button type="button" data-duplicate-item>Duplicate</button>
+            <button class="danger" type="button" data-delete-item>Delete</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function updateButtons() {
+      const layout = currentLayout();
+      document.getElementById("undoButton").disabled = !layout.undo.length || state.mode !== "edit";
+      document.getElementById("redoButton").disabled = !layout.redo.length || state.mode !== "edit";
+      document.getElementById("saveButton").disabled = state.saving || !state.databaseAvailable;
+      document.getElementById("snapButton").classList.toggle("is-active", state.snap);
+      document.getElementById("snapButton").setAttribute("aria-pressed", state.snap ? "true" : "false");
+      const modeToggle = document.getElementById("modeToggle");
+      modeToggle.textContent = state.mode === "edit" ? "Edit mode" : "Preview";
+      modeToggle.classList.toggle("is-active", state.mode === "edit");
+    }
+
+    function renderAll() {
+      renderFloorTabs();
+      renderPalette();
+      renderCanvas();
+      renderInspector();
+      updateButtons();
+    }
+
+    async function saveCurrentLayout() {
+      if (state.saving || !state.databaseAvailable) return;
+      const layout = currentLayout();
+      state.saving = true;
+      setSaveState(`Saving ${FLOOR_LABELS[state.zone]}…`);
+      updateButtons();
+      try {
+        const { url, anonKey } = SUPABASE_CONFIG;
+        const response = await fetch(`${url}/rest/v1/rpc/save_dining_table_layout`, {
+          method: "POST",
+          headers: {
+            apikey: anonKey,
+            Authorization: `Bearer ${anonKey}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            p_branch: ADMIN_SHEET_CONFIG.branchLabel.toLowerCase(),
+            p_zone: state.zone,
+            p_canvas_width: Math.round(layout.width),
+            p_canvas_height: Math.round(layout.height),
+            p_items: layout.items
+          })
+        });
+        if (!response.ok) {
+          throw new Error(`Save failed (${response.status}): ${await response.text()}`);
+        }
+        const saved = await response.json();
+        const normalized = normalizeLayout(Array.isArray(saved) ? saved[0] : saved);
+        normalized.undo = layout.undo;
+        normalized.redo = [];
+        state.layouts.set(state.zone, normalized);
+        setSaveState(`${FLOOR_LABELS[state.zone]} saved · revision ${normalized.revision}`, "is-saved");
+      } catch (error) {
+        console.error(error);
+        setSaveState("Map was not saved. Check Supabase setup.", "is-error");
+      } finally {
+        state.saving = false;
+        renderAll();
+      }
+    }
+
+    async function reloadCurrentLayout() {
+      const layout = currentLayout();
+      if (layout.dirty && !window.confirm("Discard unsaved changes on this floor?")) return;
+      setSaveState(`Reloading ${FLOOR_LABELS[state.zone]}…`);
+      try {
+        const layouts = await fetchLayouts();
+        const saved = layouts.find((candidate) => candidate.zone === state.zone) || defaultLayout(state.zone);
+        state.layouts.set(state.zone, saved);
+        state.selectedId = null;
+        state.databaseAvailable = true;
+        setSaveState(saved.revision ? `${FLOOR_LABELS[state.zone]} loaded · revision ${saved.revision}` : "No saved map yet");
+      } catch (error) {
+        console.error(error);
+        state.databaseAvailable = false;
+        setSaveState("Could not reload map storage", "is-error");
+      }
+      renderAll();
+    }
+
+    function selectZone(zone) {
+      if (!FLOOR_LABELS[zone] || zone === state.zone) return;
+      state.zone = zone;
+      state.selectedId = null;
+      const layout = currentLayout();
+      setSaveState(
+        layout.dirty
+          ? `${FLOOR_LABELS[zone]} has unsaved changes`
+          : layout.revision
+            ? `${FLOOR_LABELS[zone]} loaded · revision ${layout.revision}`
+            : "No saved map yet",
+        layout.dirty ? "is-dirty" : ""
+      );
+      renderAll();
+    }
+
+    function updateItemField(field, rawValue) {
+      const layout = currentLayout();
+      const item = layout.items.find((candidate) => candidate.id === state.selectedId);
+      if (!item || state.mode !== "edit") return;
+      pushUndo();
+
+      if (["x", "y", "w", "h", "rotation", "seats"].includes(field)) {
+        const ranges = {
+          x: [0, 98],
+          y: [0, 98],
+          w: [2, 80],
+          h: [2, 80],
+          rotation: [-180, 180],
+          seats: [1, 20]
+        };
+        item[field] = clamp(rawValue, ranges[field][0], ranges[field][1]);
+        if (field === "x") item.x = Math.min(item.x, 100 - item.w);
+        if (field === "y") item.y = Math.min(item.y, 100 - item.h);
+        if (field === "w") item.w = Math.min(item.w, 100 - item.x);
+        if (field === "h") item.h = Math.min(item.h, 100 - item.y);
+      } else if (field === "tableCode") {
+        const nextCode = String(rawValue || "").trim().toUpperCase().slice(0, 40);
+        const duplicate = layout.items.some((candidate) => (
+          candidate.id !== item.id
+          && candidate.type === "table"
+          && candidate.tableCode.toLowerCase() === nextCode.toLowerCase()
+        ));
+        if (!nextCode || duplicate) {
+          layout.undo.pop();
+          window.alert(duplicate ? "That table code is already on this floor." : "Table code cannot be empty.");
+          renderInspector();
+          return;
+        }
+        const oldCode = item.tableCode;
+        item.tableCode = nextCode;
+        if (!item.label || item.label === oldCode) item.label = nextCode;
+      } else if (field === "label") {
+        item.label = String(rawValue || "").trim().slice(0, 80);
+      } else if (field === "shape" && ["rectangle", "round", "booth"].includes(rawValue)) {
+        item.shape = rawValue;
+      } else if (field === "obstacleKind" && OBSTACLE_LABELS[rawValue]) {
+        const oldDefault = OBSTACLE_LABELS[item.obstacleKind];
+        item.obstacleKind = rawValue;
+        if (!item.label || item.label === oldDefault) item.label = OBSTACLE_LABELS[rawValue];
+      }
+      markDirty();
+      renderAll();
+    }
+
+    function updateCanvasField(field, rawValue) {
+      if (state.mode !== "edit") return;
+      const layout = currentLayout();
+      pushUndo();
+      if (field === "canvasWidth") layout.width = clamp(rawValue, 600, 2400);
+      if (field === "canvasHeight") layout.height = clamp(rawValue, 400, 1800);
+      markDirty();
+      renderAll();
+    }
+
+    function pointerPercent(event) {
+      const rect = document.getElementById("mapCanvas").getBoundingClientRect();
+      return {
+        x: ((event.clientX - rect.left) / rect.width) * 100,
+        y: ((event.clientY - rect.top) / rect.height) * 100
+      };
+    }
+
+    function beginPointerInteraction(event) {
+      const target = event.target.closest("[data-item-id]");
+      if (!target) {
+        if (event.target.id === "mapCanvas") {
+          state.selectedId = null;
+          renderAll();
+        }
+        return;
+      }
+      const item = currentLayout().items.find((candidate) => candidate.id === target.dataset.itemId);
+      if (!item) return;
+      state.selectedId = item.id;
+      renderAll();
+      if (state.mode !== "edit") return;
+
+      event.preventDefault();
+      const point = pointerPercent(event);
+      state.pointer = {
+        pointerId: event.pointerId,
+        action: event.target.closest("[data-resize]") ? "resize" : "move",
+        itemId: item.id,
+        startPoint: point,
+        startItem: clone(item),
+        beforeSnapshot: captureLayoutSnapshot(),
+        moved: false
+      };
+      document.getElementById("mapCanvas").setPointerCapture?.(event.pointerId);
+    }
+
+    function movePointerInteraction(event) {
+      if (!state.pointer || event.pointerId !== state.pointer.pointerId) return;
+      const layout = currentLayout();
+      const item = layout.items.find((candidate) => candidate.id === state.pointer.itemId);
+      if (!item) return;
+      const point = pointerPercent(event);
+      const deltaX = point.x - state.pointer.startPoint.x;
+      const deltaY = point.y - state.pointer.startPoint.y;
+      state.pointer.moved = state.pointer.moved || Math.abs(deltaX) > 0.15 || Math.abs(deltaY) > 0.15;
+
+      if (state.pointer.action === "move") {
+        item.x = clamp(roundValue(state.pointer.startItem.x + deltaX), 0, 100 - item.w);
+        item.y = clamp(roundValue(state.pointer.startItem.y + deltaY), 0, 100 - item.h);
+      } else {
+        item.w = clamp(roundValue(state.pointer.startItem.w + deltaX), 2, 100 - item.x);
+        item.h = clamp(roundValue(state.pointer.startItem.h + deltaY), 2, 100 - item.y);
+      }
+      renderCanvas();
+    }
+
+    function endPointerInteraction(event) {
+      if (!state.pointer || event.pointerId !== state.pointer.pointerId) return;
+      if (state.pointer.moved) {
+        pushUndo(state.pointer.beforeSnapshot);
+        markDirty();
+      }
+      state.pointer = null;
+      renderAll();
+    }
+
+    async function bootstrap() {
+      setSaveState("Loading tables and saved maps");
+      const [tableResult, layoutResult] = await Promise.allSettled([
+        fetchTableOptions(),
+        fetchLayouts()
+      ]);
+
+      if (tableResult.status === "fulfilled") {
+        state.tableOptions = tableResult.value;
+      } else {
+        console.error(tableResult.reason);
+        state.loadError = "The Table sheet could not be loaded.";
+      }
+
+      if (layoutResult.status === "fulfilled") {
+        layoutResult.value.forEach((layout) => state.layouts.set(layout.zone, layout));
+        state.databaseAvailable = true;
+      } else {
+        console.error(layoutResult.reason);
+        state.databaseAvailable = false;
+        state.loadError = "Run tools/sql/dining-table-layout-schema.sql in Supabase before saving.";
+      }
+
+      ["first", "second", "patio"].forEach((zone) => {
+        if (!state.layouts.has(zone)) state.layouts.set(zone, defaultLayout(zone));
+      });
+
+      const layout = currentLayout();
+      if (!state.databaseAvailable) {
+        setSaveState("Map storage needs SQL setup", "is-error");
+      } else if (layout.revision) {
+        setSaveState(`${FLOOR_LABELS[state.zone]} loaded · revision ${layout.revision}`, "is-saved");
+      } else {
+        setSaveState("No saved map yet");
+      }
+      renderAll();
+    }
+
+    document.getElementById("floorTabs").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-zone]");
+      if (button) selectZone(button.dataset.zone);
+    });
+
+    document.getElementById("availableTables").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-add-table]");
+      if (button) addTable(button.dataset.addTable);
+    });
+
+    document.getElementById("addCustomTable").addEventListener("click", () => {
+      const input = document.getElementById("customTableCode");
+      addTable(input.value);
+      input.value = "";
+    });
+
+    document.getElementById("customTableCode").addEventListener("keydown", (event) => {
+      if (event.key !== "Enter") return;
+      event.preventDefault();
+      document.getElementById("addCustomTable").click();
+    });
+
+    document.getElementById("placeAllTables").addEventListener("click", placeAllTables);
+
+    document.getElementById("obstaclePalette").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-obstacle]");
+      if (button) addObstacle(button.dataset.obstacle);
+    });
+
+    document.getElementById("inspector").addEventListener("change", (event) => {
+      const itemField = event.target.dataset.itemField;
+      if (!itemField) return;
+      if (itemField === "canvasWidth" || itemField === "canvasHeight") {
+        updateCanvasField(itemField, event.target.value);
+      } else {
+        updateItemField(itemField, event.target.value);
+      }
+    });
+
+    document.getElementById("inspector").addEventListener("click", (event) => {
+      if (event.target.closest("[data-delete-item]")) deleteSelected();
+      if (event.target.closest("[data-duplicate-item]")) duplicateSelected();
+    });
+
+    const mapCanvas = document.getElementById("mapCanvas");
+    mapCanvas.addEventListener("pointerdown", beginPointerInteraction);
+    mapCanvas.addEventListener("pointermove", movePointerInteraction);
+    mapCanvas.addEventListener("pointerup", endPointerInteraction);
+    mapCanvas.addEventListener("pointercancel", endPointerInteraction);
+
+    document.getElementById("undoButton").addEventListener("click", undo);
+    document.getElementById("redoButton").addEventListener("click", redo);
+    document.getElementById("saveButton").addEventListener("click", saveCurrentLayout);
+    document.getElementById("reloadButton").addEventListener("click", reloadCurrentLayout);
+    document.getElementById("snapButton").addEventListener("click", () => {
+      state.snap = !state.snap;
+      updateButtons();
+    });
+    document.getElementById("modeToggle").addEventListener("click", () => {
+      state.mode = state.mode === "edit" ? "view" : "edit";
+      state.selectedId = null;
+      renderAll();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      const activeTag = document.activeElement?.tagName;
+      if (["INPUT", "SELECT", "TEXTAREA"].includes(activeTag)) return;
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
+        event.preventDefault();
+        saveCurrentLayout();
+        return;
+      }
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "z") {
+        event.preventDefault();
+        if (event.shiftKey) redo();
+        else undo();
+        return;
+      }
+      if (event.key === "Delete" || event.key === "Backspace") {
+        event.preventDefault();
+        deleteSelected();
+        return;
+      }
+      const directions = {
+        ArrowLeft: [-1, 0],
+        ArrowRight: [1, 0],
+        ArrowUp: [0, -1],
+        ArrowDown: [0, 1]
+      };
+      if (!directions[event.key] || !state.selectedId || state.mode !== "edit") return;
+      event.preventDefault();
+      const [deltaX, deltaY] = directions[event.key];
+      mutateLayout((layout) => {
+        const item = layout.items.find((candidate) => candidate.id === state.selectedId);
+        if (!item) return;
+        const step = event.shiftKey ? 5 : 1;
+        item.x = clamp(roundValue(item.x + deltaX * step), 0, 100 - item.w);
+        item.y = clamp(roundValue(item.y + deltaY * step), 0, 100 - item.h);
+      });
+    });
+
+    window.addEventListener("beforeunload", (event) => {
+      if (![...state.layouts.values()].some((layout) => layout.dirty)) return;
+      event.preventDefault();
+      event.returnValue = "";
+    });
+
+    bootstrap();
+  </script>
+</body>
+</html>
