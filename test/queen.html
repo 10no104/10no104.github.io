@@ -750,6 +750,12 @@
       box-shadow: 0 12px 24px rgba(38, 112, 69, 0.09);
     }
 
+    .floor-table-card.is-party-selected {
+      border-color: rgba(43, 117, 160, 0.58);
+      background: linear-gradient(145deg, rgba(225, 243, 252, 0.98), rgba(255, 255, 255, 0.94));
+      box-shadow: inset 0 0 0 2px rgba(43, 117, 160, 0.16), 0 12px 24px rgba(43, 117, 160, 0.12);
+    }
+
     .floor-table-top,
     .floor-table-actions {
       display: flex;
@@ -778,6 +784,11 @@
     .floor-table-card.is-assigned .floor-table-state {
       background: #d8eddd;
       color: #25633d;
+    }
+
+    .floor-table-card.is-party-selected .floor-table-state {
+      background: #d9edf8;
+      color: #285f7d;
     }
 
     .floor-table-session {
@@ -1443,11 +1454,64 @@
       background: rgba(95, 39, 49, 0.06);
     }
 
+    .party-setup-bar.is-building {
+      position: sticky;
+      z-index: 45;
+      top: 8px;
+      border: 1px solid rgba(43, 117, 160, 0.28);
+      background: rgba(241, 249, 253, 0.97);
+      box-shadow: 0 14px 28px rgba(32, 78, 103, 0.14);
+      backdrop-filter: blur(14px);
+    }
+
+    .party-setup-copy {
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+
+    .party-setup-copy > strong {
+      display: block;
+      margin-bottom: 3px;
+      color: #4a2630;
+      font-size: 0.82rem;
+      font-weight: 950;
+    }
+
     .party-setup-bar p {
       margin: 0;
       color: #62463c;
       font-size: 0.72rem;
       font-weight: 800;
+    }
+
+    .party-table-selection {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 9px;
+    }
+
+    .party-table-selection[hidden] {
+      display: none;
+    }
+
+    .party-table-chip {
+      min-height: 30px;
+      padding: 5px 9px;
+      border: 1px solid rgba(43, 117, 160, 0.24);
+      border-radius: 999px;
+      background: #fff;
+      color: #285f7d;
+      font: inherit;
+      font-size: 0.68rem;
+      font-weight: 950;
+      cursor: pointer;
+    }
+
+    .party-table-chip small {
+      margin-left: 3px;
+      color: #6b8290;
+      font-size: 0.58rem;
     }
 
     .party-setup-actions {
@@ -3772,15 +3836,19 @@
         <div class="table-map-title-row">
           <div>
             <h3>Table Map</h3>
-            <p>Select a table on the saved floor map to map its permanent QR, start a Party, or review history.</p>
+            <p>Each table keeps its own QR. Select multiple tables to combine all of them under one Party.</p>
           </div>
           <a class="table-map-editor-link" href="./table.html">Edit map</a>
         </div>
         <div class="party-setup-bar" id="partySetupBar">
-          <p id="partySetupMessage">Start a Party, then select one or more available tables on the map.</p>
+          <div class="party-setup-copy">
+            <strong id="partySetupTitle">Seat a Party</strong>
+            <p id="partySetupMessage">Select every table in the group, then start one Party.</p>
+            <div class="party-table-selection" id="partyTableSelection" aria-live="polite" hidden></div>
+          </div>
           <div class="party-setup-actions">
             <button id="cancelPartySetup" type="button" hidden>Cancel</button>
-            <button class="primary" id="newPartyButton" type="button">New Party</button>
+            <button class="primary" id="newPartyButton" type="button">Seat Party</button>
             <button class="primary" id="confirmPartySetup" type="button" hidden>Start Party</button>
           </div>
         </div>
@@ -4119,6 +4187,7 @@
       partyActionError: "",
       partySetupMode: false,
       partySetupTargetId: null,
+      partySetupSaving: false,
       selectedPartyTableCodes: new Set(),
       guestLookupBusy: false,
       activeTableReservation: null,
@@ -4620,7 +4689,7 @@
         list.innerHTML = `<div class="party-empty">${
           state.partyLoadError
             ? "Existing QR sessions continue to work until the Party architecture SQL is installed."
-            : "No active Parties. Use New Party below when seating a group."
+            : "No active Parties. Use Seat Party below and select every table in the group."
         }</div>`;
         return;
       }
@@ -4628,17 +4697,24 @@
     }
 
     function renderPartySetupBar() {
+      const bar = document.getElementById("partySetupBar");
+      const title = document.getElementById("partySetupTitle");
       const message = document.getElementById("partySetupMessage");
+      const selection = document.getElementById("partyTableSelection");
       const newButton = document.getElementById("newPartyButton");
       const cancelButton = document.getElementById("cancelPartySetup");
       const confirmButton = document.getElementById("confirmPartySetup");
-      if (!message || !newButton || !cancelButton || !confirmButton) return;
+      if (!bar || !title || !message || !selection || !newButton || !cancelButton || !confirmButton) return;
 
       const selectedCount = state.selectedPartyTableCodes.size;
+      bar.classList.toggle("is-building", state.partySetupMode);
       if (!state.partySetupMode) {
+        title.textContent = "Seat a Party";
         message.textContent = state.partyLoadError
           ? "Party setup becomes available after the new architecture SQL is installed."
-          : "Start a Party, then select one or more available tables on the map.";
+          : "Select every table in the group, then start one Party. Each table keeps its own QR.";
+        selection.hidden = true;
+        selection.innerHTML = "";
         newButton.hidden = false;
         newButton.disabled = state.partyLoadError;
         cancelButton.hidden = true;
@@ -4647,12 +4723,44 @@
       }
 
       const targetParty = state.partySetupTargetId ? getDiningParty(state.partySetupTargetId) : null;
-      message.textContent = `${selectedCount} table${selectedCount === 1 ? "" : "s"} selected · Tap available tables on the map.`;
+      const currentPartyTableCodes = targetParty
+        ? getDiningPartyTables(targetParty.id, { activeOnly: true }).map((table) => table.table_code)
+        : [];
+      const selectedTables = [...state.selectedPartyTableCodes]
+        .map((tableCode) => ({
+          tableCode,
+          table: getDiningTableRecord(tableCode)
+        }))
+        .sort((left, right) => left.tableCode.localeCompare(right.tableCode, undefined, { numeric: true }));
+      title.textContent = targetParty ? `Add tables to Party #${targetParty.id}` : "Build one Party";
+      message.textContent = targetParty
+        ? `${currentPartyTableCodes.join(" + ") || "No current tables"} · ${selectedCount} new table${selectedCount === 1 ? "" : "s"} selected.`
+        : selectedCount
+          ? `${selectedCount} table${selectedCount === 1 ? "" : "s"} selected · Continue across any floor, then confirm.`
+          : "Tap every available table in this group. Their permanent QRs will share one Party.";
+      selection.hidden = selectedCount === 0;
+      selection.innerHTML = selectedTables.map(({ tableCode, table }) => `
+        <button
+          class="party-table-chip"
+          type="button"
+          data-party-selection-table="${escapeHtml(tableCode)}"
+          aria-label="Remove Table ${escapeHtml(tableCode)} from Party"
+          ${state.partySetupSaving ? "disabled" : ""}
+        >
+          ${escapeHtml(tableCode)}
+          <small>QR ${String(table?.qr_number || 0).padStart(2, "0")} ×</small>
+        </button>
+      `).join("");
       newButton.hidden = true;
       cancelButton.hidden = false;
+      cancelButton.disabled = state.partySetupSaving;
       confirmButton.hidden = false;
-      confirmButton.disabled = selectedCount === 0;
-      confirmButton.textContent = targetParty ? `Add to Party #${targetParty.id}` : "Start Party";
+      confirmButton.disabled = selectedCount === 0 || state.partySetupSaving;
+      confirmButton.textContent = state.partySetupSaving
+        ? targetParty ? "Adding…" : "Starting…"
+        : targetParty
+          ? `Add ${selectedCount || ""} table${selectedCount === 1 ? "" : "s"}`.replace(/\s+/g, " ").trim()
+          : `Start Party · ${selectedCount}`;
     }
 
     function renderQrStations() {
@@ -4782,8 +4890,11 @@
           : [];
         const isUpdating = activeSession && state.qrSessionUpdatingNumbers.has(activeSession.qr_number);
         const occupied = Boolean(activeParty || activeSession);
-        const sessionCopy = activeParty
-          ? `<strong>Party #${activeParty.id} · QR ${String(tableRecord.qr_number).padStart(2, "0")}</strong><br>${activeRequests.length} open request${activeRequests.length === 1 ? "" : "s"}`
+        const partySelected = state.selectedPartyTableCodes.has(tableRecord?.table_code || tableCode);
+        const sessionCopy = partySelected
+          ? `<strong>QR ${String(tableRecord.qr_number).padStart(2, "0")}</strong><br>Selected for the Party being built.`
+          : activeParty
+            ? `<strong>Party #${activeParty.id} · QR ${String(tableRecord.qr_number).padStart(2, "0")}</strong><br>${activeRequests.length} open request${activeRequests.length === 1 ? "" : "s"}`
           : activeSession
           ? `<strong>QR ${String(activeSession.qr_number).padStart(2, "0")}</strong><br>${activeRequests.length} open request${activeRequests.length === 1 ? "" : "s"} · since ${formatRequestClock(activeSession.started_at)}`
           : tableRecord?.qr_number
@@ -4791,12 +4902,12 @@
             : `${history.length} historical request${history.length === 1 ? "" : "s"}<br>Assign a permanent QR first.`;
         return `
           <article
-            class="floor-table-card ${occupied ? "is-assigned" : ""}"
+            class="floor-table-card ${occupied ? "is-assigned" : ""} ${partySelected ? "is-party-selected" : ""}"
             data-map-table-code="${escapeHtml(tableCode)}"
           >
             <div class="floor-table-top">
               <strong class="floor-table-name">${escapeHtml(tableCode)}</strong>
-              <span class="floor-table-state">${occupied ? "Occupied" : "Available"}</span>
+              <span class="floor-table-state">${partySelected ? "Selected" : occupied ? "Occupied" : "Available"}</span>
             </div>
             <div class="floor-table-session">${sessionCopy}</div>
             <div class="floor-table-actions">
@@ -4814,12 +4925,19 @@
                   data-table-code="${escapeHtml(tableCode)}"
                   ${isUpdating ? "disabled" : ""}
                 >${isUpdating ? "Working…" : "End session"}</button>
+              ` : state.partySetupMode && tableRecord?.qr_number ? `
+                <button
+                  class="qr-station-btn ${partySelected ? "reset" : "primary"}"
+                  type="button"
+                  data-toggle-party-table="${escapeHtml(tableCode)}"
+                  ${state.partySetupSaving ? "disabled" : ""}
+                >${partySelected ? "Remove" : "Add to Party"}</button>
               ` : tableRecord?.qr_number ? `
                 <button
                   class="qr-station-btn primary"
                   type="button"
-                  data-start-party-table="${escapeHtml(tableCode)}"
-                >Start Party</button>
+                  data-build-party-table="${escapeHtml(tableCode)}"
+                >Select for Party</button>
               ` : `
                 <button
                   class="qr-station-btn primary"
@@ -4841,7 +4959,9 @@
           <div class="table-map-detail">
             <div class="table-map-detail-copy">
               <strong>Select a table</strong>
-              <span>Tap a table on the map to assign a QR or review that table.</span>
+              <span>${state.partySetupMode
+                ? "Tap every available table in the Party. You can switch floors without losing the selection."
+                : "Tap a table on the map to map its QR, build a Party, or review history."}</span>
             </div>
           </div>
         `;
@@ -4863,8 +4983,11 @@
           ))
         : [];
       const isUpdating = activeSession && state.qrSessionUpdatingNumbers.has(activeSession.qr_number);
-      const detail = activeParty
-        ? `Party #${activeParty.id} · QR ${String(tableRecord.qr_number).padStart(2, "0")} · ${activeRequests.length} open request${activeRequests.length === 1 ? "" : "s"}`
+      const partySelected = state.selectedPartyTableCodes.has(tableRecord?.table_code || tableCode);
+      const detail = partySelected
+        ? `QR ${String(tableRecord.qr_number).padStart(2, "0")} · Selected for this Party`
+        : activeParty
+          ? `Party #${activeParty.id} · QR ${String(tableRecord.qr_number).padStart(2, "0")} · ${activeRequests.length} open request${activeRequests.length === 1 ? "" : "s"}`
         : activeSession
         ? `QR ${String(activeSession.qr_number).padStart(2, "0")} · ${activeRequests.length} open request${activeRequests.length === 1 ? "" : "s"} · since ${formatRequestClock(activeSession.started_at)}`
         : tableRecord?.qr_number
@@ -4892,12 +5015,19 @@
                 data-table-code="${escapeHtml(tableCode)}"
                 ${isUpdating ? "disabled" : ""}
               >${isUpdating ? "Working…" : "End session"}</button>
+            ` : state.partySetupMode && tableRecord?.qr_number ? `
+              <button
+                class="qr-station-btn ${partySelected ? "reset" : "primary"}"
+                type="button"
+                data-toggle-party-table="${escapeHtml(tableCode)}"
+                ${state.partySetupSaving ? "disabled" : ""}
+              >${partySelected ? "Remove from Party" : "Add to Party"}</button>
             ` : tableRecord?.qr_number ? `
               <button
                 class="qr-station-btn primary"
                 type="button"
-                data-start-party-table="${escapeHtml(tableCode)}"
-              >Start Party</button>
+                data-build-party-table="${escapeHtml(tableCode)}"
+              >Select for Party</button>
             ` : `
               <button
                 class="qr-station-btn primary"
@@ -4954,7 +5084,7 @@
         const x = Math.min(item.x, 100 - item.w);
         const y = Math.min(item.y, 100 - item.h);
         const selected = state.selectedMapTableCode?.toLowerCase() === item.tableCode.toLowerCase();
-        const partySelected = state.selectedPartyTableCodes.has(item.tableCode);
+        const partySelected = state.selectedPartyTableCodes.has(tableRecord?.table_code || item.tableCode);
         const occupied = Boolean(activeParty || activeSession);
         const mappedQr = tableRecord?.qr_number || activeSession?.qr_number || null;
         const style = `left:${x}%;top:${y}%;width:${item.w}%;height:${item.h}%;transform:rotate(${item.rotation}deg)`;
@@ -4964,11 +5094,12 @@
             type="button"
             data-map-table-code="${escapeHtml(item.tableCode)}"
             style="${style}"
-            aria-pressed="${selected ? "true" : "false"}"
-            aria-label="Table ${escapeHtml(item.tableCode)}, ${activeParty ? `Party ${activeParty.id}` : mappedQr ? `QR ${mappedQr}, available` : "QR not mapped"}"
+            ${state.partySetupSaving ? "disabled" : ""}
+            aria-pressed="${state.partySetupMode ? partySelected : selected ? "true" : "false"}"
+            aria-label="Table ${escapeHtml(item.tableCode)}, ${partySelected ? `QR ${mappedQr}, selected for Party` : activeParty ? `Party ${activeParty.id}` : mappedQr ? `QR ${mappedQr}, available` : "QR not mapped"}"
           >
             <span class="queen-map-table-label">${escapeHtml(item.label || item.tableCode)}</span>
-            <span class="queen-map-table-state">${mappedQr ? `QR ${String(mappedQr).padStart(2, "0")}` : "NO QR"}</span>
+            <span class="queen-map-table-state">${partySelected ? `QR ${String(mappedQr).padStart(2, "0")} ✓` : mappedQr ? `QR ${String(mappedQr).padStart(2, "0")}` : "NO QR"}</span>
             ${activeRequests.length ? `<span class="queen-map-open-count">${activeRequests.length}</span>` : ""}
           </button>
         `;
@@ -5206,41 +5337,53 @@
       return responseText ? JSON.parse(responseText) : null;
     }
 
-    function beginPartySetup(partyId = null) {
-      if (state.partyArchitectureAvailable !== true) return;
+    function beginPartySetup(partyId = null, initialTableCode = null) {
+      if (state.partyArchitectureAvailable !== true || state.partySetupSaving) return;
       state.partySetupMode = true;
       state.partySetupTargetId = partyId ? Number(partyId) : null;
       state.selectedPartyTableCodes = new Set();
       state.partyActionError = "";
+      const initialTable = initialTableCode ? getDiningTableRecord(initialTableCode) : null;
+      if (initialTable?.qr_number && !initialTable.current_party_id) {
+        state.selectedPartyTableCodes.add(initialTable.table_code);
+        state.selectedMapTableCode = initialTable.table_code;
+      }
+      renderPartyDashboard();
       renderTableMap();
     }
 
     function cancelPartySetup() {
+      if (state.partySetupSaving) return;
       state.partySetupMode = false;
       state.partySetupTargetId = null;
       state.selectedPartyTableCodes = new Set();
+      renderPartyDashboard();
       renderTableMap();
     }
 
     function togglePartySetupTable(tableCode) {
+      if (state.partySetupSaving) return;
       const tableRecord = getDiningTableRecord(tableCode);
+      const normalizedTableCode = tableRecord?.table_code || String(tableCode || "").trim();
       if (!tableRecord?.qr_number) {
-        state.partyActionError = `Table ${tableCode} needs a permanent QR mapping first.`;
-        state.selectedMapTableCode = tableCode;
+        state.partyActionError = `Table ${normalizedTableCode} needs a permanent QR mapping first.`;
+        state.selectedMapTableCode = normalizedTableCode;
         renderDiningRequests();
         return;
       }
       if (tableRecord.current_party_id) {
-        state.partyActionError = `Table ${tableCode} already belongs to Party #${tableRecord.current_party_id}.`;
+        state.partyActionError = `Table ${normalizedTableCode} already belongs to Party #${tableRecord.current_party_id}.`;
         renderDiningRequests();
         return;
       }
-      if (state.selectedPartyTableCodes.has(tableCode)) {
-        state.selectedPartyTableCodes.delete(tableCode);
+      if (state.selectedPartyTableCodes.has(normalizedTableCode)) {
+        state.selectedPartyTableCodes.delete(normalizedTableCode);
       } else {
-        state.selectedPartyTableCodes.add(tableCode);
+        state.selectedPartyTableCodes.add(normalizedTableCode);
       }
+      state.selectedMapTableCode = normalizedTableCode;
       state.partyActionError = "";
+      renderPartyDashboard();
       renderTableMap();
     }
 
@@ -5260,8 +5403,10 @@
     }
 
     async function savePartySetup(tableCodes, targetPartyId = null) {
-      if (!tableCodes.length || state.partyArchitectureAvailable !== true) return;
+      if (!tableCodes.length || state.partyArchitectureAvailable !== true || state.partySetupSaving) return;
+      state.partySetupSaving = true;
       state.partyActionError = "";
+      renderTableMap();
       try {
         await callQueenDiningRpc(
           targetPartyId ? "add_dining_tables_to_party" : "start_dining_party",
@@ -5277,12 +5422,16 @@
               }
         );
         await refreshPartyOperationData();
-        cancelPartySetup();
+        state.partySetupMode = false;
+        state.partySetupTargetId = null;
+        state.selectedPartyTableCodes = new Set();
       } catch (error) {
         console.error("Party setup failed", error);
         state.partyActionError = targetPartyId
           ? "Tables were not added to the Party. Check their QR mapping and availability."
           : "Party was not started. Every selected table needs a QR and must be available.";
+      } finally {
+        state.partySetupSaving = false;
       }
       renderDiningRequests();
     }
@@ -7482,9 +7631,15 @@
         return;
       }
 
-      const startPartyButton = event.target.closest("[data-start-party-table]");
-      if (startPartyButton) {
-        savePartySetup([startPartyButton.dataset.startPartyTable]);
+      const buildPartyButton = event.target.closest("[data-build-party-table]");
+      if (buildPartyButton) {
+        beginPartySetup(null, buildPartyButton.dataset.buildPartyTable);
+        return;
+      }
+
+      const togglePartyButton = event.target.closest("[data-toggle-party-table]");
+      if (togglePartyButton) {
+        togglePartySetupTable(togglePartyButton.dataset.togglePartyTable);
         return;
       }
 
@@ -7514,6 +7669,11 @@
     document.getElementById("cancelPartySetup").addEventListener("click", cancelPartySetup);
     document.getElementById("confirmPartySetup").addEventListener("click", () => {
       savePartySetup([...state.selectedPartyTableCodes], state.partySetupTargetId);
+    });
+    document.getElementById("partyTableSelection").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-party-selection-table]");
+      if (!button) return;
+      togglePartySetupTable(button.dataset.partySelectionTable);
     });
 
     document.getElementById("partyList").addEventListener("click", (event) => {
