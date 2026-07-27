@@ -1560,30 +1560,37 @@
         0 7px 14px rgba(62, 48, 37, 0.11);
     }
 
-    .floor-table-card.is-party-tone-0,
-    .queen-map-table.is-party-tone-0 {
+    .floor-table-card.is-qr-single,
+    .queen-map-table.is-qr-single {
       border-color: #2b7150;
       background: linear-gradient(145deg, #5da77c, #347556);
     }
 
-    .floor-table-card.is-party-tone-1,
-    .queen-map-table.is-party-tone-1 {
+    .floor-table-card.is-party-tone-0,
+    .queen-map-table.is-party-tone-0 {
       border-color: #276684;
       background: linear-gradient(145deg, #62a6c2, #35728d);
     }
 
-    .floor-table-card.is-party-tone-2,
-    .queen-map-table.is-party-tone-2 {
+    .floor-table-card.is-party-tone-1,
+    .queen-map-table.is-party-tone-1 {
       border-color: #66518a;
       background: linear-gradient(145deg, #9884bd, #6c5792);
     }
 
-    .floor-table-card.is-party-tone-3,
-    .queen-map-table.is-party-tone-3 {
+    .floor-table-card.is-party-tone-2,
+    .queen-map-table.is-party-tone-2 {
       border-color: #9a6545;
       background: linear-gradient(145deg, #c99368, #9f6747);
     }
 
+    .floor-table-card.is-party-tone-3,
+    .queen-map-table.is-party-tone-3 {
+      border-color: #2f7070;
+      background: linear-gradient(145deg, #64a7a4, #397878);
+    }
+
+    .floor-table-card.is-qr-single,
     .floor-table-card.is-party-tone-0,
     .floor-table-card.is-party-tone-1,
     .floor-table-card.is-party-tone-2,
@@ -1591,6 +1598,7 @@
       color: #fff;
     }
 
+    .floor-table-card.is-qr-single .floor-table-session,
     .floor-table-card.is-party-tone-0 .floor-table-session,
     .floor-table-card.is-party-tone-1 .floor-table-session,
     .floor-table-card.is-party-tone-2 .floor-table-session,
@@ -1648,7 +1656,7 @@
     }
 
     .table-map-legend .is-party i {
-      background: linear-gradient(90deg, #4a936c 0 50%, #4e8da9 50%);
+      background: linear-gradient(90deg, #4e8da9 0 50%, #8a73ad 50%);
     }
 
     .table-map-grid.is-drag-selecting,
@@ -4062,7 +4070,7 @@
         <div class="table-map-legend" aria-label="Table state colors">
           <span><i></i>Empty</span>
           <span class="is-active"><i></i>QR active</span>
-          <span class="is-party"><i></i>Same Party = same color</span>
+          <span class="is-party"><i></i>2+ table Party = group color</span>
         </div>
         <div class="party-setup-bar" id="partySetupBar" hidden>
           <div class="party-setup-copy">
@@ -4720,6 +4728,8 @@
 
     function getDiningPartyToneClass(partyId) {
       const numericId = Math.abs(Number(partyId) || 0);
+      const partyTableCount = getDiningPartyTables(numericId, { activeOnly: true }).length;
+      if (partyTableCount <= 1) return "is-qr-single";
       return `is-party-tone-${numericId % 4}`;
     }
 
