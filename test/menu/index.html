@@ -417,6 +417,108 @@
       line-height: 1.6;
     }
 
+    .review-order-section {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+      border: 1px solid rgba(125, 98, 63, 0.14);
+      border-radius: 20px;
+      background: rgba(255, 251, 245, 0.72);
+    }
+
+    .review-order-section + .review-order-section {
+      margin-top: 14px;
+    }
+
+    .review-order-section.is-sent {
+      background: linear-gradient(145deg, rgba(238, 244, 236, 0.92), rgba(255, 252, 247, 0.9));
+      border-color: rgba(50, 105, 70, 0.18);
+    }
+
+    .review-order-section.is-new {
+      border-color: rgba(90, 17, 34, 0.18);
+      background: linear-gradient(145deg, rgba(255, 248, 239, 0.98), rgba(250, 240, 228, 0.92));
+    }
+
+    .review-order-section-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .review-order-section-head strong,
+    .review-order-section-head span {
+      display: block;
+    }
+
+    .review-order-section-head strong {
+      color: #2f2119;
+      font-size: 1rem;
+    }
+
+    .review-order-section-head span {
+      margin-top: 3px;
+      color: #837164;
+      font-size: 0.74rem;
+      font-weight: 750;
+    }
+
+    .review-order-section-total {
+      flex: 0 0 auto;
+      color: #5a1122;
+      font-size: 1.04rem;
+      font-weight: 900;
+    }
+
+    .sent-order-list {
+      display: grid;
+      gap: 7px;
+    }
+
+    .sent-order-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 9px;
+      align-items: baseline;
+      padding: 9px 10px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.72);
+      color: #43352c;
+      font-size: 0.82rem;
+    }
+
+    .sent-order-row strong {
+      color: #2b5f41;
+    }
+
+    .sent-order-row small {
+      color: #725e50;
+      font-weight: 800;
+    }
+
+    .review-order-combined {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 16px;
+      padding: 15px 16px;
+      border-radius: 17px;
+      background: #2f2119;
+      color: #fffaf3;
+    }
+
+    .review-order-combined span {
+      color: rgba(255, 250, 243, 0.72);
+      font-size: 0.78rem;
+      font-weight: 750;
+    }
+
+    .review-order-combined strong {
+      font-size: 1.22rem;
+    }
+
     .order-item {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 64px;
@@ -594,6 +696,22 @@
     .guest-session-panel.is-inactive {
       border-color: rgba(138, 48, 69, 0.25);
       background: linear-gradient(135deg, rgba(255, 244, 244, 0.98), rgba(255, 251, 244, 0.96));
+    }
+
+    .guest-session-panel.is-conflict {
+      border-color: rgba(168, 103, 18, 0.46);
+      background: linear-gradient(135deg, rgba(255, 247, 219, 0.98), rgba(255, 237, 191, 0.96));
+      box-shadow: 0 18px 40px rgba(119, 76, 14, 0.18);
+    }
+
+    .guest-session-panel.is-conflict .guest-qr-number {
+      background: #8a5a12;
+      color: #fffaf0;
+    }
+
+    .guest-session-panel.is-conflict .guest-session-message {
+      color: #65420f;
+      font-weight: 750;
     }
 
     .guest-session-head {
@@ -1486,13 +1604,6 @@
       </div>
     </div>
     <p class="guest-session-message" id="guestSessionMessage">Please wait while this QR is verified.</p>
-    <div class="guest-order-history-head">
-      <h2>Your sent orders</h2>
-      <span id="guestOrdersUpdated">Not loaded</span>
-    </div>
-    <div class="guest-order-history-list" id="guestOrderHistory">
-      <div class="guest-order-history-empty">No orders sent in this session.</div>
-    </div>
   </section>
   <div class="order-layout">
     <div class="menu-stage">
@@ -1506,21 +1617,48 @@
       <div class="cart-drawer-grab" aria-hidden="true"></div>
       <div class="cart-drawer-header">
         <div class="order-card-header">
-          <p class="order-eyebrow">Your Order</p>
-          <h3 id="cartDrawerHeading">Order</h3>
+          <p class="order-eyebrow">Current Bill</p>
+          <h3 id="cartDrawerHeading">Review Order</h3>
         </div>
         <button class="cart-drawer-close" id="cartDrawerCloseBtn" type="button" aria-label="Close order drawer">×</button>
       </div>
       <div class="cart-drawer-body">
         <section class="order-card" aria-label="Order summary">
-          <div class="order-list" id="orderListMobile"></div>
-          <div class="order-summary" id="orderSummaryMobile"></div>
+          <section class="review-order-section is-sent" aria-labelledby="sentOrderHeading">
+            <div class="review-order-section-head">
+              <div>
+                <strong id="sentOrderHeading">Ordered so far</strong>
+                <span>Items already sent to the restaurant</span>
+              </div>
+              <strong class="review-order-section-total" id="sentOrderTotal">$0.00</strong>
+            </div>
+            <div class="sent-order-list" id="sentOrderListMobile"></div>
+            <div class="order-summary" id="sentOrderSummaryMobile"></div>
+          </section>
+          <section class="review-order-section is-new" aria-labelledby="newOrderHeading">
+            <div class="review-order-section-head">
+              <div>
+                <strong id="newOrderHeading">New items</strong>
+                <span>Only these items will be sent now</span>
+              </div>
+              <strong class="review-order-section-total" id="newOrderTotal">$0.00</strong>
+            </div>
+            <div class="order-list" id="orderListMobile"></div>
+            <div class="order-summary" id="orderSummaryMobile"></div>
+          </section>
+          <div class="review-order-combined">
+            <div>
+              <span>Bill total after sending</span>
+              <strong id="combinedOrderItemCount">0 items</strong>
+            </div>
+            <strong id="combinedOrderTotal">$0.00</strong>
+          </div>
           <form id="orderForm">
             <input id="storeSelect" name="store" type="hidden" value="downtown" />
             <input id="tableCode" name="tableCode" type="hidden" value="A12" />
             <input id="guestCount" name="guestCount" type="hidden" value="2" />
             <input id="orderNote" name="orderNote" type="hidden" value="" />
-            <button class="drawer-submit-btn" id="drawerSubmitBtn" type="button">Send order</button>
+            <button class="drawer-submit-btn" id="drawerSubmitBtn" type="button">Send new items</button>
             <p class="order-status" id="orderStatus" aria-live="polite"></p>
           </form>
         </section>
@@ -1650,10 +1788,11 @@
     let qrSessionLoadError = false;
     let isQrSessionRefreshing = false;
     let diningPartyArchitectureAvailable = null;
+    let guestPartyConflict = null;
     let lastNotificationId = 0;
 
     function escapeHtml(text = "") {
-      return text
+      return String(text ?? "")
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;")
@@ -2119,6 +2258,69 @@
       return Number((getCartSubtotal() + getCartTax()).toFixed(2));
     }
 
+    function getSentOrderRequests() {
+      return guestSessionRequests.filter((request) => (
+        request.kind === "order"
+        && request.status !== "canceled"
+      ));
+    }
+
+    function getSentOrderSummary() {
+      const requests = getSentOrderRequests();
+      const groupedItems = new Map();
+      let itemCount = 0;
+      let subtotal = 0;
+      let tax = 0;
+      let total = 0;
+
+      requests.forEach((request) => {
+        const requestSubtotal = Number(request.subtotal || 0);
+        const requestTax = Number(request.tax || 0);
+        const requestTotal = Number(request.total || 0);
+        const fallbackSubtotal = requestSubtotal || Number((requestTotal / (1 + ONTARIO_HST_RATE)).toFixed(2));
+        const fallbackTax = requestTax || Number((requestTotal - fallbackSubtotal).toFixed(2));
+        subtotal += fallbackSubtotal;
+        tax += fallbackTax;
+        total += requestTotal;
+
+        const requestItems = Array.isArray(request.items) ? request.items : [];
+        const requestItemCount = Number(request.item_count || 0)
+          || requestItems.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+        itemCount += requestItemCount;
+
+        requestItems.forEach((item) => {
+          const quantity = Number(item.quantity || 0);
+          const nameKo = String(item.nameKo || "").trim();
+          const nameEn = String(item.nameEn || "").trim();
+          const key = String(item.menuId || nameEn || nameKo || "menu-item").trim().toLowerCase();
+          const lineTotal = Number(
+            item.lineTotal ?? (Number(item.unitPrice || 0) * quantity)
+          );
+          const existing = groupedItems.get(key);
+          if (existing) {
+            existing.quantity += quantity;
+            existing.lineTotal += lineTotal;
+          } else {
+            groupedItems.set(key, {
+              nameKo,
+              nameEn,
+              quantity,
+              lineTotal
+            });
+          }
+        });
+      });
+
+      return {
+        requests,
+        items: [...groupedItems.values()],
+        itemCount,
+        subtotal: Number(subtotal.toFixed(2)),
+        tax: Number(tax.toFixed(2)),
+        total: Number(total.toFixed(2))
+      };
+    }
+
     function addToCart(menuId) {
       if (!currentQrSession) {
         showRequestToast("This QR is not active yet. Please ask your server.", { error: true });
@@ -2205,7 +2407,65 @@
 
     function isPartyArchitectureMissing(error) {
       return error?.status === 404
-        || /PGRST202|resolve_dining_guest|schema cache/i.test(String(error?.message || ""));
+        || /PGRST202|schema cache|could not find[^]*resolve_dining_guest/i.test(String(error?.message || ""));
+    }
+
+    function getGuestPartyConflict(error) {
+      const payload = error?.rpcPayload || {};
+      const errorText = [
+        payload.message,
+        payload.details,
+        error?.message,
+        error?.responseText
+      ].filter(Boolean).join(" ");
+      const isAlreadyPaid = /GUEST_ALREADY_PAID/i.test(errorText);
+      if (!isAlreadyPaid && !/GUEST_PARTY_CONFLICT/i.test(errorText)) return null;
+
+      let detail = {};
+      if (payload.details && typeof payload.details === "string") {
+        try {
+          detail = JSON.parse(payload.details);
+        } catch {
+          detail = {};
+        }
+      } else if (payload.details && typeof payload.details === "object") {
+        detail = payload.details;
+      }
+      return {
+        reason: isAlreadyPaid ? "paid" : "party-conflict",
+        guestId: String(detail.guest_id || readStoredGuestId() || ""),
+        displayCode: String(detail.display_code || "").toUpperCase(),
+        currentPartyId: Number(detail.current_party_id) || null,
+        currentTableCode: String(detail.current_table_code || "").trim(),
+        targetPartyId: Number(detail.target_party_id) || null,
+        targetTableCode: String(detail.target_table_code || "").trim()
+      };
+    }
+
+    function applyGuestPartyConflict(error) {
+      const conflict = getGuestPartyConflict(error);
+      if (!conflict) return false;
+      guestPartyConflict = conflict;
+      diningPartyArchitectureAvailable = true;
+      currentGuest = null;
+      currentQrSession = null;
+      guestSessionRequests = [];
+      qrSessionLoadError = false;
+      return true;
+    }
+
+    function getGuestPartyConflictMessage(error = null) {
+      const conflict = getGuestPartyConflict(error) || guestPartyConflict;
+      if (!conflict) return "";
+      if (conflict.reason === "paid") {
+        const guestLabel = conflict.displayCode ? `Guest ${conflict.displayCode}` : "This Guest";
+        return `${guestLabel}'s bill is already paid. Ordering stays closed on this device until the Party session ends or staff starts a new visit.`;
+      }
+      const tableLabel = conflict.currentTableCode
+        ? `Table ${conflict.currentTableCode}`
+        : "another active table";
+      const guestLabel = conflict.displayCode ? ` (Guest ${conflict.displayCode})` : "";
+      return `This device still has an unpaid bill at ${tableLabel}${guestLabel}. Finish payment before ordering from another Party.`;
     }
 
     async function callDiningRpc(functionName, payload) {
@@ -2224,12 +2484,18 @@
         const error = new Error(`${functionName} failed (${response.status}): ${responseText}`);
         error.status = response.status;
         error.responseText = responseText;
+        try {
+          error.rpcPayload = JSON.parse(responseText);
+        } catch {
+          error.rpcPayload = null;
+        }
         throw error;
       }
       return responseText ? JSON.parse(responseText) : null;
     }
 
     function applyResolvedDiningGuest(resolvedGuest) {
+      guestPartyConflict = null;
       currentGuest = resolvedGuest;
       currentQrSession = resolvedGuest ? {
         id: Number(resolvedGuest.qr_session_id) || null,
@@ -2290,84 +2556,8 @@
       }).format(date);
     }
 
-    function getGuestRequestStatusLabel(status) {
-      const labels = {
-        new: "Sent",
-        acknowledged: "Preparing",
-        preparing: "Preparing",
-        ready: "Preparing",
-        completed: "Served",
-        canceled: "Canceled"
-      };
-      return labels[status] || status;
-    }
-
-    function getGuestRequestProgress(status) {
-      if (status === "canceled") {
-        return '<div class="guest-order-progress"><span class="guest-order-step">Canceled</span></div>';
-      }
-
-      const stageByStatus = {
-        new: 0,
-        acknowledged: 1,
-        preparing: 1,
-        ready: 1,
-        completed: 2
-      };
-      const currentStage = stageByStatus[status] ?? 0;
-      const isCompleted = status === "completed";
-      return `
-        <div class="guest-order-progress">
-          ${["Sent", "Preparing", "Served"].map((label, index) => {
-            const className = index < currentStage || isCompleted
-              ? "is-done"
-              : index === currentStage
-                ? "is-current"
-                : "";
-            return `<span class="guest-order-step ${className}">${label}</span>`;
-          }).join("")}
-        </div>
-      `;
-    }
-
     function renderGuestOrderHistory() {
-      const history = document.getElementById("guestOrderHistory");
-      const updated = document.getElementById("guestOrdersUpdated");
-      if (!history || !updated) return;
-
-      updated.textContent = currentQrSession
-        ? `Updated ${formatGuestRequestTime(new Date().toISOString())}`
-        : "No active session";
-
-      if (!guestSessionRequests.length) {
-        history.innerHTML = `<div class="guest-order-history-empty">${currentQrSession
-          ? "No orders sent in this session."
-          : "Order history appears after Queen activates this QR."}</div>`;
-        return;
-      }
-
-      history.innerHTML = guestSessionRequests.map((request) => {
-        const isOrder = request.kind === "order";
-        const itemSummary = isOrder
-          ? request.items.map((item) => `${Number(item.quantity || 0)}× ${item.nameEn || item.nameKo || "Menu item"}`).join(" · ")
-          : ({ water: "Water request", napkins: "Napkins request", server: "Server requested" }[request.request_type] || "Service request");
-        const tableSuffix = request.table_code ? ` · Table ${request.table_code}` : "";
-        const title = isOrder ? `Order #${request.id}${tableSuffix}` : `Request #${request.id}${tableSuffix}`;
-        return `
-          <article class="guest-order-card is-${escapeHtml(String(request.status))}">
-            <div class="guest-order-card-top">
-              <strong>${escapeHtml(title)}</strong>
-              <time>${escapeHtml(formatGuestRequestTime(request.created_at))}</time>
-            </div>
-            <div class="guest-order-items">${escapeHtml(itemSummary || "Order details unavailable")}</div>
-            ${getGuestRequestProgress(request.status)}
-            <div class="guest-order-card-meta">
-              <span>${escapeHtml(getGuestRequestStatusLabel(request.status))}</span>
-              <strong>${isOrder ? escapeHtml(formatCurrency(request.total)) : ""}</strong>
-            </div>
-          </article>
-        `;
-      }).join("");
+      renderOrderSummary();
     }
 
     function syncQrSessionUi() {
@@ -2376,15 +2566,23 @@
       const title = document.getElementById("guestSessionTitle");
       const message = document.getElementById("guestSessionMessage");
       const billLink = document.getElementById("guestBillLink");
-      const canOrder = Boolean(currentQrSession && !qrSessionLoadError);
+      const canOrder = Boolean(currentQrSession && !qrSessionLoadError && !guestPartyConflict);
       if (!panel || !number || !title || !message) return;
 
       number.textContent = currentQrNumber ? String(currentQrNumber).padStart(2, "0") : "--";
       panel.classList.toggle("is-inactive", !canOrder);
+      panel.classList.toggle("is-conflict", Boolean(guestPartyConflict));
 
       if (!currentQrNumber) {
         title.textContent = "QR number required";
         message.textContent = "Open this menu by scanning one of the numbered dining QR cards.";
+      } else if (guestPartyConflict) {
+        const currentTable = guestPartyConflict.currentTableCode || "another table";
+        const guestCode = guestPartyConflict.displayCode ? `Guest ${guestPartyConflict.displayCode} · ` : "";
+        title.textContent = guestPartyConflict.reason === "paid"
+          ? `${guestCode}Bill already paid`
+          : `${guestCode}Already active at Table ${currentTable}`;
+        message.textContent = getGuestPartyConflictMessage();
       } else if (qrSessionLoadError) {
         title.textContent = `QR ${String(currentQrNumber).padStart(2, "0")} unavailable`;
         message.textContent = "The QR system could not be reached. Please ask your server.";
@@ -2395,8 +2593,8 @@
         const guestCode = currentGuest?.display_code ? `Guest ${currentGuest.display_code} · ` : "";
         title.textContent = `${guestCode}Table ${currentQrSession.table_code || "-"}`;
         message.textContent = currentGuest
-          ? "Your bill follows you across every table in this Party."
-          : "Ordering is open for this table. Sent orders and their live status appear below.";
+          ? "Your bill follows you across every table in this Party. Review Order shows everything sent so far."
+          : "Ordering is open for this table. Review Order shows sent items and new items separately.";
         const tableCodeInput = document.getElementById("tableCode");
         if (tableCodeInput && currentQrSession.table_code) {
           tableCodeInput.value = currentQrSession.table_code;
@@ -2404,13 +2602,17 @@
       }
 
       if (billLink) {
-        billLink.hidden = !currentGuest;
+        billLink.hidden = !currentGuest && !guestPartyConflict?.guestId;
         billLink.href = `../cashier.html?store=${encodeURIComponent(getDiningBranch())}`;
       }
 
-      document.querySelectorAll(".menu-add-btn, #drawerSubmitBtn, #serverCallBtn, #serverModalConfirmBtn").forEach((button) => {
+      document.querySelectorAll(".menu-add-btn, #serverCallBtn, #serverModalConfirmBtn").forEach((button) => {
         button.disabled = !canOrder || isDiningRequestSubmitting;
       });
+      const drawerSubmitButton = document.getElementById("drawerSubmitBtn");
+      if (drawerSubmitButton) {
+        drawerSubmitButton.disabled = !canOrder || isDiningRequestSubmitting || !cartItems.length;
+      }
       renderGuestOrderHistory();
     }
 
@@ -2438,7 +2640,7 @@
     async function fetchGuestSessionRequests({ guestId = null, sessionId = null } = {}) {
       const { url, anonKey } = SUPABASE_CONFIG;
       const endpoint = new URL(`${url}/rest/v1/${DINING_REQUESTS_TABLE}`);
-      endpoint.searchParams.set("select", "id,table_code,kind,request_type,status,items,item_count,total,created_at,updated_at");
+      endpoint.searchParams.set("select", "id,table_code,kind,request_type,status,items,item_count,subtotal,tax,total,created_at,updated_at");
       if (guestId) {
         endpoint.searchParams.set("guest_id", `eq.${guestId}`);
       } else if (sessionId) {
@@ -2457,6 +2659,9 @@
       return (await response.json()).map((request) => ({
         ...request,
         id: Number(request.id),
+        item_count: Number(request.item_count || 0),
+        subtotal: Number(request.subtotal || 0),
+        tax: Number(request.tax || 0),
         total: Number(request.total || 0),
         items: Array.isArray(request.items) ? request.items : [],
         status: String(request.status || "new").toLowerCase(),
@@ -2485,9 +2690,21 @@
           } catch (error) {
             if (isPartyArchitectureMissing(error)) {
               diningPartyArchitectureAvailable = false;
+              guestPartyConflict = null;
               currentGuest = null;
+            } else if (applyGuestPartyConflict(error)) {
+              try {
+                guestSessionRequests = guestPartyConflict?.guestId
+                  ? await fetchGuestSessionRequests({ guestId: guestPartyConflict.guestId })
+                  : [];
+              } catch (historyError) {
+                console.error("Existing Guest bill refresh failed", historyError);
+                guestSessionRequests = [];
+              }
+              return;
             } else if (/not assigned to an active party/i.test(String(error?.message || ""))) {
               diningPartyArchitectureAvailable = true;
+              guestPartyConflict = null;
               currentGuest = null;
               currentQrSession = null;
               guestSessionRequests = [];
@@ -2501,6 +2718,7 @@
 
         if (!resolvedWithPartyArchitecture) {
           const nextSession = await fetchActiveQrSession();
+          guestPartyConflict = null;
           currentQrSession = nextSession;
           currentGuest = null;
           guestSessionRequests = nextSession
@@ -2510,6 +2728,7 @@
         qrSessionLoadError = false;
       } catch (error) {
         if (!qrSessionLoadError) console.error("QR session refresh failed", error);
+        guestPartyConflict = null;
         currentQrSession = null;
         currentGuest = null;
         guestSessionRequests = [];
@@ -2532,6 +2751,7 @@
           return currentQrSession;
         } catch (error) {
           if (!isPartyArchitectureMissing(error)) {
+            applyGuestPartyConflict(error);
             currentGuest = null;
             currentQrSession = null;
             guestSessionRequests = [];
@@ -2540,6 +2760,7 @@
             throw error;
           }
           diningPartyArchitectureAvailable = false;
+          guestPartyConflict = null;
           currentGuest = null;
         }
       }
@@ -2767,31 +2988,64 @@
     function renderOrderSummary() {
       const mobileOrderListEl = document.getElementById("orderListMobile");
       const mobileOrderSummaryEl = document.getElementById("orderSummaryMobile");
+      const sentOrderListEl = document.getElementById("sentOrderListMobile");
+      const sentOrderSummaryEl = document.getElementById("sentOrderSummaryMobile");
+      const sentOrderTotalEl = document.getElementById("sentOrderTotal");
+      const newOrderTotalEl = document.getElementById("newOrderTotal");
+      const combinedOrderTotalEl = document.getElementById("combinedOrderTotal");
+      const combinedOrderItemCountEl = document.getElementById("combinedOrderItemCount");
+      const submitButton = document.getElementById("drawerSubmitBtn");
       const inlineTitleEl = document.getElementById("orderInlineTitle");
       const inlineMetaEl = document.getElementById("orderInlineMeta");
 
-      if (!mobileOrderListEl || !mobileOrderSummaryEl || !inlineTitleEl || !inlineMetaEl) return;
+      if (
+        !mobileOrderListEl
+        || !mobileOrderSummaryEl
+        || !sentOrderListEl
+        || !sentOrderSummaryEl
+        || !sentOrderTotalEl
+        || !newOrderTotalEl
+        || !combinedOrderTotalEl
+        || !combinedOrderItemCountEl
+        || !inlineTitleEl
+        || !inlineMetaEl
+      ) {
+        return;
+      }
 
       const emptyMarkup = `
         <div class="order-empty">
           No items yet.
         </div>
       `;
-      const summaryMarkup = (itemCount, subtotal, tax, total) => `
+      const summaryMarkup = (itemCount, subtotal, tax, total, totalLabel = "Total") => `
         <div class="order-summary-row"><span>Items</span><strong>${itemCount}</strong></div>
         <div class="order-summary-row order-summary-total"><span>Subtotal</span><strong>${formatCurrency(subtotal)}</strong></div>
         <div class="order-summary-row"><span>Tax</span><strong>${formatCurrency(tax)}</strong></div>
-        <div class="order-summary-row order-summary-grand-total"><span>Total</span><strong>${formatCurrency(total)}</strong></div>
+        <div class="order-summary-row order-summary-grand-total"><span>${totalLabel}</span><strong>${formatCurrency(total)}</strong></div>
       `;
-      if (!cartItems.length) {
-        mobileOrderListEl.innerHTML = emptyMarkup;
-        mobileOrderSummaryEl.innerHTML = summaryMarkup(0, 0, 0, 0);
-        inlineTitleEl.textContent = "Your order is empty";
-        inlineMetaEl.textContent = `Table ${document.getElementById("tableCode")?.value || "A12"}`;
-        return;
-      }
+      const sentOrder = getSentOrderSummary();
+      const sentItemsMarkup = sentOrder.items.length
+        ? sentOrder.items.map((item) => `
+            <div class="sent-order-row">
+              <strong>${escapeHtml(item.quantity)}×</strong>
+              <span>${escapeHtml(item.nameEn || item.nameKo || "Menu item")}</span>
+              <small>${escapeHtml(formatCurrency(item.lineTotal))}</small>
+            </div>
+          `).join("")
+        : '<div class="order-empty">No items have been sent yet.</div>';
+      sentOrderListEl.innerHTML = sentItemsMarkup;
+      sentOrderSummaryEl.innerHTML = summaryMarkup(
+        sentOrder.itemCount,
+        sentOrder.subtotal,
+        sentOrder.tax,
+        sentOrder.total,
+        "Ordered total"
+      );
+      sentOrderTotalEl.textContent = formatCurrency(sentOrder.total);
 
-      const itemsMarkup = cartItems
+      const newItemsMarkup = cartItems.length
+        ? cartItems
         .map((item) => `
           <article class="order-item">
             <div class="order-item-main">
@@ -2814,19 +3068,35 @@
             <img class="order-item-thumb" src="${escapeHtml(item.imageUrl || "")}" alt="${escapeHtml(item.nameEn || item.nameKo)}" />
           </article>
         `)
-        .join("");
+        .join("")
+        : emptyMarkup;
       const itemCount = getCartItemCount();
       const subtotal = getCartSubtotal();
       const tax = getCartTax();
       const total = getCartTotal();
+      const combinedItemCount = sentOrder.itemCount + itemCount;
+      const combinedTotal = Number((sentOrder.total + total).toFixed(2));
 
-      mobileOrderListEl.innerHTML = itemsMarkup;
+      mobileOrderListEl.innerHTML = newItemsMarkup;
       mobileOrderSummaryEl.innerHTML = summaryMarkup(itemCount, subtotal, tax, total);
-      bindOrderListInteractions(mobileOrderListEl);
+      newOrderTotalEl.textContent = formatCurrency(total);
+      combinedOrderItemCountEl.textContent = `${combinedItemCount} item${combinedItemCount === 1 ? "" : "s"}`;
+      combinedOrderTotalEl.textContent = formatCurrency(combinedTotal);
+      if (cartItems.length) bindOrderListInteractions(mobileOrderListEl);
+      if (submitButton) {
+        submitButton.disabled = !cartItems.length || !currentQrSession || isDiningRequestSubmitting;
+      }
 
-      inlineTitleEl.textContent = `${itemCount} item${itemCount === 1 ? "" : "s"} selected`;
-      inlineMetaEl.textContent = `Table ${document.getElementById("tableCode")?.value || "A12"} · ${formatCurrency(total)}`;
-
+      if (cartItems.length) {
+        inlineTitleEl.textContent = `${itemCount} new item${itemCount === 1 ? "" : "s"} · ${formatCurrency(total)}`;
+        inlineMetaEl.textContent = `Ordered ${formatCurrency(sentOrder.total)} · After sending ${formatCurrency(combinedTotal)}`;
+      } else if (sentOrder.requests.length) {
+        inlineTitleEl.textContent = `Ordered so far · ${formatCurrency(sentOrder.total)}`;
+        inlineMetaEl.textContent = `${sentOrder.itemCount} item${sentOrder.itemCount === 1 ? "" : "s"} sent`;
+      } else {
+        inlineTitleEl.textContent = "Your order is empty";
+        inlineMetaEl.textContent = `Table ${document.getElementById("tableCode")?.value || "A12"}`;
+      }
     }
 
     function setupOrderForm() {
@@ -2863,9 +3133,10 @@
           refreshQrSession();
         } catch (error) {
           console.error("Order submission failed", error);
-          statusEl.textContent = "Could not send the order. Please try again or call a server.";
+          const conflictMessage = getGuestPartyConflictMessage(error);
+          statusEl.textContent = conflictMessage || "Could not send the order. Please try again or call a server.";
           statusEl.className = "order-status is-error";
-          showRequestToast("Order was not sent. Please try again.", { error: true });
+          showRequestToast(conflictMessage || "Order was not sent. Please try again.", { error: true });
         } finally {
           isDiningRequestSubmitting = false;
           syncQrSessionUi();
@@ -2892,7 +3163,7 @@
       };
 
       inlineBtn.addEventListener("click", () => {
-        if (!cartItems.length) return;
+        if (!cartItems.length && !getSentOrderRequests().length) return;
         openCartDrawer();
       });
 
@@ -3134,10 +3405,11 @@
           refreshQrSession();
         } catch (error) {
           console.error("Server call failed", error);
-          statusEl.textContent = "Could not call a server. Please try again.";
+          const conflictMessage = getGuestPartyConflictMessage(error);
+          statusEl.textContent = conflictMessage || "Could not call a server. Please try again.";
           statusEl.className = "order-status is-error";
-          modalMessage.textContent = "Could not send. Please try again.";
-          showRequestToast("Server request was not sent.", { error: true });
+          modalMessage.textContent = conflictMessage || "Could not send. Please try again.";
+          showRequestToast(conflictMessage || "Server request was not sent.", { error: true });
         } finally {
           isDiningRequestSubmitting = false;
           syncQrSessionUi();
