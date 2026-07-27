@@ -160,7 +160,7 @@
     a { color: inherit; text-decoration: none; }
 
     .shell {
-      width: min(calc(100% - 24px), 1440px);
+      width: min(calc(100% - 24px), 1180px);
       margin: 0 auto;
       padding: 18px 0 40px;
       overflow-x: hidden;
@@ -677,7 +677,7 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
       gap: 12px;
-      min-height: 520px;
+      min-height: 280px;
       padding: 14px;
       border-radius: 22px;
       border: 1px dashed rgba(123, 31, 47, 0.24);
@@ -871,7 +871,7 @@
     .queen-floor-canvas {
       position: relative;
       width: 100%;
-      min-width: 860px;
+      min-width: 620px;
       overflow: hidden;
       border: 2px solid rgba(80, 54, 37, 0.2);
       border-radius: 14px;
@@ -3167,6 +3167,86 @@
       border-color: rgba(123, 31, 47, 0.12);
     }
 
+    .table-order-history-list {
+      display: grid;
+      gap: 10px;
+      max-height: min(56vh, 520px);
+      margin: 14px 0 18px;
+      overflow-y: auto;
+      padding-right: 3px;
+    }
+
+    .table-order-history-entry {
+      display: grid;
+      gap: 8px;
+      padding: 13px;
+      border: 1px solid rgba(113, 88, 60, 0.13);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.82);
+    }
+
+    .table-order-history-head,
+    .table-order-history-meta,
+    .table-order-history-total {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .table-order-history-head strong {
+      color: #38251b;
+      font-size: 0.94rem;
+    }
+
+    .table-order-history-head span {
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: #e4efe7;
+      color: #286344;
+      font-size: 0.66rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .table-order-history-meta {
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      color: #806e60;
+      font-size: 0.72rem;
+      font-weight: 750;
+    }
+
+    .table-order-history-items {
+      display: grid;
+      gap: 5px;
+      padding: 9px 10px;
+      border-radius: 11px;
+      background: #f3ece3;
+      color: #403127;
+      font-size: 0.78rem;
+    }
+
+    .table-order-history-items span,
+    .table-order-history-total {
+      font-weight: 800;
+    }
+
+    .table-order-history-total {
+      color: #5f2731;
+      font-size: 0.82rem;
+    }
+
+    .table-order-history-actions {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+
+    .table-order-history-actions .is-danger {
+      border-color: transparent;
+      background: #7b1f2f;
+      color: #fff;
+    }
+
     .empty-state {
       padding: 18px;
       color: var(--muted);
@@ -3840,14 +3920,6 @@
       .field-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .field.full { grid-column: 1 / -1; }
       .form-actions { grid-template-columns: 1fr 1fr; }
-
-      .purpose-panel {
-        padding: 22px;
-      }
-
-      .queen-floor-canvas {
-        min-width: 940px;
-      }
     }
 
     @media (max-width: 980px) {
@@ -3980,27 +4052,10 @@
       </section>
 
       <section class="purpose-panel">
-        <div class="party-panel-head">
-          <div>
-            <h3>Active Parties</h3>
-            <p>Guest amount and payment status first. Open Details only when you need diagnostics.</p>
-          </div>
-          <div class="party-search">
-            <input id="guestCodeSearch" type="text" maxlength="6" placeholder="Guest code" aria-label="Guest code" />
-            <button id="guestCodeSearchBtn" type="button">Find</button>
-          </div>
-        </div>
-        <p class="party-status" id="partyStatus">Loading Parties…</p>
-        <div class="party-list" id="partyList" aria-live="polite">
-          <div class="party-empty">Loading active Parties…</div>
-        </div>
-      </section>
-
-      <section class="purpose-panel">
         <div class="table-map-title-row">
           <div>
             <h3>Table Map</h3>
-            <p>Tap an available table to select it. Tap more tables or drag across nearby tables to create one Party.</p>
+            <p>Tap empty tables to build a Party. Tap an active table to review orders or end its session.</p>
           </div>
           <a class="table-map-editor-link" href="./table.html">Edit map</a>
         </div>
@@ -4257,6 +4312,25 @@
     </div>
   </div>
 
+  <div class="table-backdrop" id="tableOrderHistoryModal" aria-hidden="true">
+    <div class="table-modal" role="dialog" aria-modal="true" aria-labelledby="tableOrderHistoryTitle">
+      <div class="table-modal-top">
+        <div>
+          <h3 id="tableOrderHistoryTitle">Table Order History</h3>
+          <p id="tableOrderHistoryMeta">Loading table session…</p>
+        </div>
+        <button class="modal-close" id="closeTableOrderHistoryModal" type="button">×</button>
+      </div>
+      <div class="table-order-history-list" id="tableOrderHistoryList">
+        <p class="table-option-empty">No orders yet.</p>
+      </div>
+      <div class="table-modal-actions table-order-history-actions">
+        <button class="pill-btn" id="dismissTableOrderHistory" type="button">Close</button>
+        <button class="pill-btn is-danger" id="endTableSessionFromHistory" type="button" hidden>End Party Session</button>
+      </div>
+    </div>
+  </div>
+
   <div class="table-backdrop" id="guestLookupModal" aria-hidden="true">
     <div class="table-modal" role="dialog" aria-modal="true" aria-labelledby="guestLookupTitle">
       <div class="table-modal-top">
@@ -4380,6 +4454,8 @@
       selectedRequestTableCode: null,
       qrAssignmentTableCodes: [],
       qrAssignmentSelectedNumbers: new Set(),
+      tableOrderHistoryTableCode: null,
+      tableSessionEnding: false,
       orderAlarmUnlocked: false,
       orderAlarmUnsupported: false,
       dismissedFullscreenRequestIds: new Set(),
@@ -5382,6 +5458,101 @@
       grid.innerHTML = setupMessage + renderFallbackTableCards(tableOptions);
     }
 
+    function renderTableOrderHistoryEntry(request, { activePartyId = null, activeSessionId = null } = {}) {
+      const requestTypeLabel = REQUEST_TYPE_LABELS[request.request_type] || request.request_type;
+      const statusLabel = REQUEST_STATUS_LABELS[request.status] || request.status;
+      const isCurrentSession = (
+        (activePartyId && request.party_id === activePartyId)
+        || (activeSessionId && request.qr_session_id === activeSessionId)
+      );
+      const itemsMarkup = request.kind === "order"
+        ? request.items.map((item) => {
+            const quantity = Number(item.quantity || 0);
+            const name = item.nameEn || item.nameKo || "Menu item";
+            return `<span>${escapeHtml(quantity)}× ${escapeHtml(name)}</span>`;
+          }).join("") || "<span>No item details included.</span>"
+        : `<span>${escapeHtml(requestTypeLabel)}</span>`;
+      return `
+        <article class="table-order-history-entry">
+          <div class="table-order-history-head">
+            <strong>${request.kind === "order" ? `Order #${escapeHtml(request.id)}` : `Call #${escapeHtml(request.id)}`}</strong>
+            <span>${escapeHtml(statusLabel)}</span>
+          </div>
+          <div class="table-order-history-meta">
+            <span>${escapeHtml(formatPartyDiagnosticTime(request.created_at))}</span>
+            ${request.qr_number ? `<span>QR ${String(request.qr_number).padStart(2, "0")}</span>` : ""}
+            ${request.party_id ? `<span>Party #${escapeHtml(request.party_id)}</span>` : ""}
+            <span>${isCurrentSession ? "Current session" : "History"}</span>
+          </div>
+          <div class="table-order-history-items">${itemsMarkup}</div>
+          ${request.note ? `<div class="table-order-history-meta">Note: ${escapeHtml(request.note)}</div>` : ""}
+          ${request.kind === "order" ? `
+            <div class="table-order-history-total">
+              <span>${escapeHtml(request.item_count)} item${request.item_count === 1 ? "" : "s"}</span>
+              <strong>${escapeHtml(formatRequestMoney(request.total))}</strong>
+            </div>
+          ` : ""}
+        </article>
+      `;
+    }
+
+    function renderTableOrderHistoryModal() {
+      const tableCode = state.tableOrderHistoryTableCode;
+      const title = document.getElementById("tableOrderHistoryTitle");
+      const meta = document.getElementById("tableOrderHistoryMeta");
+      const list = document.getElementById("tableOrderHistoryList");
+      const endButton = document.getElementById("endTableSessionFromHistory");
+      if (!tableCode || !title || !meta || !list || !endButton) return;
+
+      const tableRecord = getDiningTableRecord(tableCode);
+      const activeParty = tableRecord?.current_party_id ? getDiningParty(tableRecord.current_party_id) : null;
+      const partyQrs = getDiningTableQrs(tableRecord || tableCode);
+      const activeSession = state.partyQrPoolAvailable ? null : getActiveTableSession(tableCode);
+      const history = getTableRequestHistory(tableCode)
+        .slice()
+        .sort((left, right) => new Date(right.created_at) - new Date(left.created_at));
+      const sessionLabel = activeParty
+        ? `Party #${activeParty.id} · ${formatDiningQrList(partyQrs)}`
+        : activeSession
+          ? `QR ${String(activeSession.qr_number).padStart(2, "0")} · Active session`
+          : "No active session";
+
+      title.textContent = `Table ${tableCode} Orders`;
+      meta.textContent = `${sessionLabel} · ${history.length} record${history.length === 1 ? "" : "s"}`;
+      list.innerHTML = history.length
+        ? history.slice(0, 200).map((request) => renderTableOrderHistoryEntry(request, {
+            activePartyId: activeParty?.id || null,
+            activeSessionId: activeSession?.id || null
+          })).join("")
+        : '<p class="table-option-empty">No orders or service calls from this table yet.</p>';
+      endButton.hidden = !activeParty && !activeSession;
+      endButton.disabled = state.tableSessionEnding;
+      endButton.textContent = state.tableSessionEnding
+        ? "Ending…"
+        : activeParty
+          ? "End Party Session"
+          : "End QR Session";
+    }
+
+    function openTableOrderHistoryModal(tableCode) {
+      const normalizedTableCode = String(tableCode || "").trim();
+      if (!normalizedTableCode) return;
+      state.tableOrderHistoryTableCode = normalizedTableCode;
+      renderTableOrderHistoryModal();
+      const modal = document.getElementById("tableOrderHistoryModal");
+      modal?.classList.add("is-open");
+      modal?.setAttribute("aria-hidden", "false");
+      window.setTimeout(() => document.getElementById("dismissTableOrderHistory")?.focus(), 0);
+    }
+
+    function closeTableOrderHistoryModal() {
+      if (state.tableSessionEnding) return;
+      state.tableOrderHistoryTableCode = null;
+      const modal = document.getElementById("tableOrderHistoryModal");
+      modal?.classList.remove("is-open");
+      modal?.setAttribute("aria-hidden", "true");
+    }
+
     function closeQrAssignmentModal() {
       if (state.partySetupSaving) return;
       const modal = document.getElementById("qrAssignmentModal");
@@ -5467,11 +5638,12 @@
     }
 
     async function endQrSession(qrNumber) {
-      if (!Number.isInteger(qrNumber) || qrNumber < 1 || qrNumber > DINING_QR_COUNT) return;
-      if (state.qrSessionUpdatingNumbers.has(qrNumber)) return;
+      if (!Number.isInteger(qrNumber) || qrNumber < 1 || qrNumber > DINING_QR_COUNT) return false;
+      if (state.qrSessionUpdatingNumbers.has(qrNumber)) return false;
       state.qrSessionUpdatingNumbers.add(qrNumber);
       state.qrSessionActionError = "";
       renderDiningRequests();
+      let succeeded = false;
 
       try {
         const { url, anonKey } = SUPABASE_CONFIG;
@@ -5498,6 +5670,7 @@
         state.qrSessionLoadError = false;
         state.requestLoadError = false;
         state.requestsLoadedAt = new Date().toISOString();
+        succeeded = true;
       } catch (error) {
         console.error("QR session end failed", error);
         state.qrSessionActionError = `QR ${String(qrNumber).padStart(2, "0")} session could not be ended. Please try again.`;
@@ -5505,6 +5678,7 @@
         state.qrSessionUpdatingNumbers.delete(qrNumber);
         renderDiningRequests();
       }
+      return succeeded;
     }
 
     async function callQueenDiningRpc(functionName, payload) {
@@ -5671,8 +5845,9 @@
 
     async function closeDiningParty(partyId) {
       const numericPartyId = Number(partyId);
-      if (!Number.isFinite(numericPartyId) || state.partyArchitectureAvailable !== true) return;
+      if (!Number.isFinite(numericPartyId) || state.partyArchitectureAvailable !== true) return false;
       state.partyActionError = "";
+      let succeeded = false;
       try {
         await callQueenDiningRpc("close_dining_party", {
           p_branch: ADMIN_SHEET_CONFIG.branchLabel.toLowerCase(),
@@ -5681,11 +5856,47 @@
         });
         await refreshPartyOperationData();
         state.selectedMapTableCode = null;
+        succeeded = true;
       } catch (error) {
         console.error("Party close failed", error);
         state.partyActionError = `Party #${numericPartyId} could not be closed. Please try again.`;
       }
       renderDiningRequests();
+      return succeeded;
+    }
+
+    async function endSelectedTableSession() {
+      const tableCode = state.tableOrderHistoryTableCode;
+      if (!tableCode || state.tableSessionEnding) return;
+      const tableRecord = getDiningTableRecord(tableCode);
+      const activeParty = tableRecord?.current_party_id ? getDiningParty(tableRecord.current_party_id) : null;
+      const partyQrs = activeParty
+        ? getDiningPartyQrs(activeParty.id)
+        : getDiningTableQrs(tableRecord || tableCode);
+      const activeSession = state.partyQrPoolAvailable ? null : getActiveTableSession(tableCode);
+      if (!activeParty && !activeSession) return;
+
+      const partyTableCodes = activeParty
+        ? getDiningPartyTables(activeParty.id, { activeOnly: true })
+            .map((partyTable) => partyTable.table_code)
+            .filter(Boolean)
+        : [tableCode];
+      const shouldEnd = window.confirm(activeParty
+        ? `End Party #${activeParty.id} session for ${partyTableCodes.join(" + ")}? ${partyQrs.length || "Its"} QR code${partyQrs.length === 1 ? "" : "s"} will return to the available pool.`
+        : `End the Table ${tableCode} session? QR ${String(activeSession.qr_number).padStart(2, "0")} will become inactive.`);
+      if (!shouldEnd) return;
+
+      state.tableSessionEnding = true;
+      renderTableOrderHistoryModal();
+      const succeeded = activeParty
+        ? await closeDiningParty(activeParty.id)
+        : await endQrSession(activeSession.qr_number);
+      state.tableSessionEnding = false;
+      if (succeeded) {
+        closeTableOrderHistoryModal();
+      } else {
+        renderTableOrderHistoryModal();
+      }
     }
 
     async function markDiningGuestPaid(displayCode) {
@@ -6107,6 +6318,9 @@
       renderQrStations();
       renderPartyDashboard();
       renderTableMap();
+      if (document.getElementById("tableOrderHistoryModal")?.classList.contains("is-open")) {
+        renderTableOrderHistoryModal();
+      }
 
       document.querySelectorAll("[data-request-filter]").forEach((button) => {
         button.classList.toggle(
@@ -7943,7 +8157,7 @@
       }
       const historyButton = event.target.closest("[data-table-history]");
       if (historyButton) {
-        showRequestHistory({ tableCode: historyButton.dataset.tableHistory });
+        openTableOrderHistoryModal(historyButton.dataset.tableHistory);
         return;
       }
 
@@ -7982,8 +8196,15 @@
         togglePartySetupTable(tableCode);
         return;
       }
+      const tableRecord = getDiningTableRecord(tableCode);
+      const activeParty = tableRecord?.current_party_id ? getDiningParty(tableRecord.current_party_id) : null;
+      const activePartyQrs = getDiningTableQrs(tableRecord || tableCode);
+      const activeSession = getActiveTableSession(tableCode);
       state.selectedMapTableCode = tableCode;
       renderTableMap();
+      if (activeParty || activePartyQrs.length || activeSession) {
+        openTableOrderHistoryModal(tableCode);
+      }
     });
 
     document.getElementById("cancelPartySetup").addEventListener("click", cancelPartySetup);
@@ -7996,7 +8217,7 @@
       togglePartySetupTable(button.dataset.partySelectionTable);
     });
 
-    document.getElementById("partyList").addEventListener("click", (event) => {
+    document.getElementById("partyList")?.addEventListener("click", (event) => {
       const paidButton = event.target.closest("[data-mark-guest-paid]");
       if (paidButton) {
         const guestCode = paidButton.dataset.markGuestPaid;
@@ -8028,8 +8249,8 @@
       if (input) input.value = code;
       lookupDiningGuestBill(code);
     };
-    document.getElementById("guestCodeSearchBtn").addEventListener("click", runGuestCodeSearch);
-    document.getElementById("guestCodeSearch").addEventListener("keydown", (event) => {
+    document.getElementById("guestCodeSearchBtn")?.addEventListener("click", runGuestCodeSearch);
+    document.getElementById("guestCodeSearch")?.addEventListener("keydown", (event) => {
       if (event.key !== "Enter") return;
       event.preventDefault();
       runGuestCodeSearch();
@@ -8066,6 +8287,13 @@
     document.getElementById("cancelQrAssignment").addEventListener("click", closeQrAssignmentModal);
     document.getElementById("qrAssignmentModal").addEventListener("click", (event) => {
       if (event.target === event.currentTarget) closeQrAssignmentModal();
+    });
+
+    document.getElementById("closeTableOrderHistoryModal").addEventListener("click", closeTableOrderHistoryModal);
+    document.getElementById("dismissTableOrderHistory").addEventListener("click", closeTableOrderHistoryModal);
+    document.getElementById("endTableSessionFromHistory").addEventListener("click", endSelectedTableSession);
+    document.getElementById("tableOrderHistoryModal").addEventListener("click", (event) => {
+      if (event.target === event.currentTarget) closeTableOrderHistoryModal();
     });
 
     document.getElementById("refreshRequestsBtn").addEventListener("click", () => {
@@ -8155,7 +8383,9 @@
 
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
-        if (document.getElementById("guestLookupModal")?.classList.contains("is-open")) {
+        if (document.getElementById("tableOrderHistoryModal")?.classList.contains("is-open")) {
+          closeTableOrderHistoryModal();
+        } else if (document.getElementById("guestLookupModal")?.classList.contains("is-open")) {
           closeGuestLookupModal();
         } else if (document.getElementById("qrAssignmentModal")?.classList.contains("is-open")) {
           closeQrAssignmentModal();
