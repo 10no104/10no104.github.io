@@ -1083,6 +1083,432 @@
       color: #a03041;
     }
 
+    .party-panel-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 13px;
+    }
+
+    .party-panel-head h3 {
+      margin-bottom: 4px;
+    }
+
+    .party-panel-head p {
+      margin: 0;
+      color: #79695c;
+      font-size: 0.75rem;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .party-search {
+      display: flex;
+      flex: 0 0 auto;
+      gap: 6px;
+    }
+
+    .party-search input {
+      width: 120px;
+      min-height: 38px;
+      padding: 0 11px;
+      border: 1px solid rgba(95, 39, 49, 0.16);
+      border-radius: 11px;
+      background: rgba(255, 255, 255, 0.82);
+      color: #38251c;
+      font: inherit;
+      font-size: 0.75rem;
+      font-weight: 850;
+      text-transform: uppercase;
+    }
+
+    .party-search button,
+    .party-primary-btn {
+      min-height: 38px;
+      padding: 0 12px;
+      border: 0;
+      border-radius: 11px;
+      background: #5f2731;
+      color: #fffaf2;
+      font: inherit;
+      font-size: 0.72rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .party-status {
+      min-height: 20px;
+      margin: 0 0 9px;
+      color: #79695c;
+      font-size: 0.72rem;
+      font-weight: 750;
+    }
+
+    .party-status.is-error {
+      color: #a03041;
+    }
+
+    .party-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .party-card {
+      overflow: hidden;
+      border: 1px solid rgba(113, 88, 60, 0.14);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.74);
+    }
+
+    .party-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 14px;
+      border-bottom: 1px solid rgba(113, 88, 60, 0.09);
+    }
+
+    .party-card-head strong,
+    .party-card-head span {
+      display: block;
+    }
+
+    .party-card-head strong {
+      color: #42271f;
+      font-size: 1rem;
+    }
+
+    .party-card-head span {
+      margin-top: 2px;
+      color: #79695c;
+      font-size: 0.7rem;
+      font-weight: 750;
+    }
+
+    .party-active-pill {
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: #dff1e4;
+      color: #286840;
+      font-size: 0.63rem;
+      font-weight: 950;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .party-guest-list {
+      display: grid;
+    }
+
+    .party-guest {
+      border-bottom: 1px solid rgba(113, 88, 60, 0.08);
+    }
+
+    .party-guest:last-child {
+      border-bottom: 0;
+    }
+
+    .party-guest summary {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 10px;
+      align-items: center;
+      min-height: 52px;
+      padding: 10px 14px;
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .party-guest summary::-webkit-details-marker,
+    .party-diagnostics summary::-webkit-details-marker,
+    .party-order-detail summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .party-guest-name {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      color: #39251c;
+      font-size: 0.82rem;
+      font-weight: 900;
+    }
+
+    .party-guest-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #2f8a54;
+      box-shadow: 0 0 0 4px rgba(47, 138, 84, 0.1);
+    }
+
+    .party-guest.is-paid .party-guest-dot,
+    .party-guest.is-expired .party-guest-dot {
+      background: #9a9088;
+      box-shadow: 0 0 0 4px rgba(120, 109, 101, 0.1);
+    }
+
+    .party-guest-amount {
+      color: #4f2d24;
+      font-size: 0.82rem;
+      font-weight: 950;
+    }
+
+    .party-guest-status {
+      min-width: 52px;
+      padding: 5px 7px;
+      border-radius: 999px;
+      background: rgba(47, 138, 84, 0.1);
+      color: #286840;
+      font-size: 0.59rem;
+      font-style: normal;
+      font-weight: 950;
+      text-align: center;
+    }
+
+    .party-guest.is-paid .party-guest-status,
+    .party-guest.is-expired .party-guest-status {
+      background: #ece6de;
+      color: #75695f;
+    }
+
+    .party-guest-detail {
+      padding: 0 14px 14px;
+    }
+
+    .party-debug-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 7px;
+      margin-bottom: 9px;
+    }
+
+    .party-debug-grid div {
+      min-width: 0;
+      padding: 8px;
+      border-radius: 10px;
+      background: #f3ece3;
+    }
+
+    .party-debug-grid span,
+    .party-debug-grid strong {
+      display: block;
+    }
+
+    .party-debug-grid span {
+      color: #817064;
+      font-size: 0.57rem;
+      font-weight: 850;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .party-debug-grid strong {
+      overflow: hidden;
+      margin-top: 3px;
+      color: #4c382c;
+      font-size: 0.67rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .party-order-detail {
+      margin-top: 6px;
+      border: 1px solid rgba(113, 88, 60, 0.1);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.62);
+    }
+
+    .party-order-detail summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 10px;
+      color: #564237;
+      font-size: 0.68rem;
+      font-weight: 850;
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .party-order-detail-body {
+      padding: 0 10px 9px;
+      color: #79695c;
+      font-size: 0.65rem;
+      line-height: 1.55;
+    }
+
+    .party-event-list {
+      display: grid;
+      gap: 4px;
+      margin-top: 7px;
+      padding-top: 7px;
+      border-top: 1px dashed rgba(113, 88, 60, 0.16);
+    }
+
+    .party-event-list span {
+      display: block;
+    }
+
+    .party-guest-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 9px;
+    }
+
+    .party-pay-btn {
+      min-height: 34px;
+      padding: 0 11px;
+      border: 0;
+      border-radius: 10px;
+      background: #2e7048;
+      color: #fff;
+      font: inherit;
+      font-size: 0.68rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .party-diagnostics {
+      border-top: 1px solid rgba(113, 88, 60, 0.1);
+    }
+
+    .party-diagnostics summary {
+      padding: 10px 14px;
+      color: #705d50;
+      font-size: 0.68rem;
+      font-weight: 900;
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .party-diagnostics-body {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 0 14px 13px;
+      color: #7a685c;
+      font-size: 0.66rem;
+      font-weight: 700;
+      line-height: 1.55;
+    }
+
+    .party-detail-actions {
+      display: flex;
+      flex: 0 0 auto;
+      gap: 6px;
+    }
+
+    .party-detail-actions button {
+      min-height: 33px;
+      padding: 0 9px;
+      border: 1px solid rgba(95, 39, 49, 0.14);
+      border-radius: 9px;
+      background: #fffaf3;
+      color: #5f2731;
+      font: inherit;
+      font-size: 0.64rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .party-detail-actions button.is-danger {
+      background: rgba(160, 48, 65, 0.08);
+      color: #9d3042;
+    }
+
+    .party-empty {
+      padding: 20px;
+      border: 1px dashed rgba(113, 88, 60, 0.2);
+      border-radius: 15px;
+      color: #79695c;
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .party-setup-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 11px;
+      padding: 10px 12px;
+      border-radius: 13px;
+      background: rgba(95, 39, 49, 0.06);
+    }
+
+    .party-setup-bar p {
+      margin: 0;
+      color: #62463c;
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    .party-setup-actions {
+      display: flex;
+      flex: 0 0 auto;
+      gap: 6px;
+    }
+
+    .party-setup-actions button {
+      min-height: 36px;
+      padding: 0 11px;
+      border: 1px solid rgba(95, 39, 49, 0.14);
+      border-radius: 10px;
+      background: #fffaf3;
+      color: #5f2731;
+      font: inherit;
+      font-size: 0.68rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .party-setup-actions .primary {
+      border-color: transparent;
+      background: #5f2731;
+      color: #fff;
+    }
+
+    .queen-map-table.is-party-selected {
+      z-index: 21;
+      outline: 4px solid #2b75a0;
+      outline-offset: 3px;
+    }
+
+    .guest-lookup-result {
+      display: grid;
+      gap: 10px;
+      max-height: 65vh;
+      overflow: auto;
+      padding-right: 3px;
+    }
+
+    .guest-lookup-total {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px;
+      border-radius: 14px;
+      background: #f1e6d8;
+    }
+
+    .guest-lookup-total strong {
+      color: #5f2731;
+      font-size: 1.7rem;
+    }
+
+    .guest-lookup-orders {
+      display: grid;
+      gap: 7px;
+    }
+
     .online-grid,
     .note-grid {
       display: grid;
@@ -3030,6 +3456,33 @@
         padding: 7px;
       }
 
+      .party-panel-head,
+      .party-setup-bar,
+      .party-diagnostics-body {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .party-search {
+        width: 100%;
+      }
+
+      .party-search input {
+        flex: 1 1 auto;
+        width: auto;
+      }
+
+      .party-debug-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .party-setup-actions,
+      .party-detail-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+      }
+
       .bottom-nav {
         gap: 6px;
         width: min(100% - 12px, 760px);
@@ -3295,16 +3748,41 @@
       <section class="purpose-hero">
         <p class="purpose-kicker">Downtown floor</p>
         <h2>Table Status</h2>
-        <p>Assign an available QR to a table before seating guests. Ending the table session returns that QR to the inactive pool.</p>
+        <p>QR codes stay mapped to physical tables. Start a Party with one or more tables, then close the Party when the group leaves.</p>
+      </section>
+
+      <section class="purpose-panel">
+        <div class="party-panel-head">
+          <div>
+            <h3>Active Parties</h3>
+            <p>Guest amount and payment status first. Open Details only when you need diagnostics.</p>
+          </div>
+          <div class="party-search">
+            <input id="guestCodeSearch" type="text" maxlength="6" placeholder="Guest code" aria-label="Guest code" />
+            <button id="guestCodeSearchBtn" type="button">Find</button>
+          </div>
+        </div>
+        <p class="party-status" id="partyStatus">Loading Parties…</p>
+        <div class="party-list" id="partyList" aria-live="polite">
+          <div class="party-empty">Loading active Parties…</div>
+        </div>
       </section>
 
       <section class="purpose-panel">
         <div class="table-map-title-row">
           <div>
             <h3>Table Map</h3>
-            <p>Select a table on the saved floor map to assign a QR, view history, or end its session.</p>
+            <p>Select a table on the saved floor map to map its permanent QR, start a Party, or review history.</p>
           </div>
           <a class="table-map-editor-link" href="./table.html">Edit map</a>
+        </div>
+        <div class="party-setup-bar" id="partySetupBar">
+          <p id="partySetupMessage">Start a Party, then select one or more available tables on the map.</p>
+          <div class="party-setup-actions">
+            <button id="cancelPartySetup" type="button" hidden>Cancel</button>
+            <button class="primary" id="newPartyButton" type="button">New Party</button>
+            <button class="primary" id="confirmPartySetup" type="button" hidden>Start Party</button>
+          </div>
         </div>
         <div class="table-map-tabs" id="tableMapTabs" aria-label="Table map area">
           <button class="table-map-tab is-active" type="button" data-table-map-zone="first" aria-pressed="true">
@@ -3326,7 +3804,7 @@
         <summary class="qr-session-summary">
           <div>
             <h3>QR Session Details</h3>
-            <p>Assigned QR codes, inactive cards, and QR-based history.</p>
+            <p>Permanent QR mappings and compatibility session history.</p>
           </div>
           <div class="qr-session-summary-side">
             <span class="qr-session-summary-count" id="qrSessionToggleLabel">0 assigned</span>
@@ -3336,7 +3814,7 @@
         <div class="qr-session-body">
           <div class="qr-session-toolbar">
             <div>
-              <p>Assigned QR codes are active. Unassigned QR codes cannot place orders.</p>
+              <p>QR mappings stay with tables. A table accepts orders only while it belongs to an active Party.</p>
             </div>
             <a class="qr-sheet-link" href="./qr.html">QR Cards 1–10</a>
           </div>
@@ -3540,6 +4018,24 @@
     </div>
   </div>
 
+  <div class="table-backdrop" id="guestLookupModal" aria-hidden="true">
+    <div class="table-modal" role="dialog" aria-modal="true" aria-labelledby="guestLookupTitle">
+      <div class="table-modal-top">
+        <div>
+          <h3 id="guestLookupTitle">Guest Bill</h3>
+          <p id="guestLookupMeta">Search by the 4–6 character Guest Code.</p>
+        </div>
+        <button class="modal-close" id="closeGuestLookupModal" type="button">×</button>
+      </div>
+      <div class="guest-lookup-result" id="guestLookupResult">
+        <div class="table-option-empty">Enter a Guest Code to open a bill.</div>
+      </div>
+      <div class="table-modal-actions">
+        <button class="pill-btn" id="dismissGuestLookup" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
   <div class="feedback-backdrop" id="removeConfirmModal" aria-hidden="true">
     <div class="feedback-modal" role="dialog" aria-modal="true" aria-labelledby="removeConfirmTitle">
       <h3 id="removeConfirmTitle">Remove Reservation?</h3>
@@ -3609,6 +4105,22 @@
       tableLayouts: new Map(),
       tableLayoutLoadError: false,
       selectedMapTableCode: null,
+      partyArchitectureAvailable: null,
+      partySnapshot: {
+        parties: [],
+        tables: [],
+        partyTables: [],
+        guests: [],
+        orders: [],
+        orderEvents: [],
+        guestEvents: []
+      },
+      partyLoadError: false,
+      partyActionError: "",
+      partySetupMode: false,
+      partySetupTargetId: null,
+      selectedPartyTableCodes: new Set(),
+      guestLookupBusy: false,
       activeTableReservation: null,
       selectedTableAssignments: [],
       pendingRemoveReservation: null,
@@ -3712,6 +4224,10 @@
         table_code: String(row.table_code || "").trim(),
         qr_number: Number(row.qr_number) || null,
         qr_session_id: Number(row.qr_session_id) || null,
+        party_id: Number(row.party_id) || null,
+        guest_id: row.guest_id ? String(row.guest_id) : null,
+        table_id: Number(row.table_id) || null,
+        added_by: String(row.added_by || "guest").toLowerCase(),
         guest_count: Number(row.guest_count || 0),
         item_count: Number(row.item_count || 0),
         subtotal: Number(row.subtotal || 0),
@@ -3776,6 +4292,90 @@
       };
     }
 
+    function normalizeDiningPartySnapshot(payload = {}) {
+      return {
+        parties: (Array.isArray(payload.parties) ? payload.parties : []).map((party) => ({
+          ...party,
+          id: Number(party.id),
+          status: String(party.status || "ACTIVE").toUpperCase()
+        })),
+        tables: (Array.isArray(payload.tables) ? payload.tables : []).map((table) => ({
+          ...table,
+          id: Number(table.id),
+          qr_number: Number(table.qr_number) || null,
+          current_party_id: Number(table.current_party_id) || null,
+          table_code: String(table.table_code || "").trim()
+        })),
+        partyTables: (Array.isArray(payload.party_tables) ? payload.party_tables : []).map((partyTable) => ({
+          ...partyTable,
+          id: Number(partyTable.id),
+          party_id: Number(partyTable.party_id),
+          table_id: Number(partyTable.table_id),
+          qr_number: Number(partyTable.qr_number) || null,
+          table_code: String(partyTable.table_code || "").trim()
+        })),
+        guests: (Array.isArray(payload.guests) ? payload.guests : []).map((guest) => ({
+          ...guest,
+          id: String(guest.id || ""),
+          party_id: Number(guest.party_id),
+          display_code: String(guest.display_code || "").toUpperCase(),
+          status: String(guest.status || "ACTIVE").toUpperCase(),
+          device_info: guest.device_info && typeof guest.device_info === "object" ? guest.device_info : {}
+        })),
+        orders: (Array.isArray(payload.orders) ? payload.orders : []).map(normalizeDiningRequest),
+        orderEvents: (Array.isArray(payload.order_events) ? payload.order_events : []).map((event) => ({
+          ...event,
+          id: Number(event.id),
+          request_id: Number(event.request_id),
+          event_type: String(event.event_type || "").toUpperCase(),
+          previous_value: event.previous_value && typeof event.previous_value === "object" ? event.previous_value : {},
+          next_value: event.next_value && typeof event.next_value === "object" ? event.next_value : {}
+        })),
+        guestEvents: (Array.isArray(payload.guest_events) ? payload.guest_events : []).map((event) => ({
+          ...event,
+          id: Number(event.id),
+          guest_id: String(event.guest_id || ""),
+          event_type: String(event.event_type || "").toUpperCase(),
+          detail: event.detail && typeof event.detail === "object" ? event.detail : {}
+        }))
+      };
+    }
+
+    function getDiningTableRecord(tableCode) {
+      const normalizedCode = String(tableCode || "").trim().toLowerCase();
+      return state.partySnapshot.tables.find(
+        (table) => table.table_code.toLowerCase() === normalizedCode
+      ) || null;
+    }
+
+    function getDiningParty(partyId) {
+      const numericId = Number(partyId);
+      return state.partySnapshot.parties.find((party) => party.id === numericId) || null;
+    }
+
+    function getDiningPartyTables(partyId, { activeOnly = false } = {}) {
+      const numericId = Number(partyId);
+      return state.partySnapshot.partyTables.filter((partyTable) => (
+        partyTable.party_id === numericId
+        && (!activeOnly || !partyTable.left_at)
+      ));
+    }
+
+    function getDiningPartyGuests(partyId) {
+      const numericId = Number(partyId);
+      return state.partySnapshot.guests.filter((guest) => guest.party_id === numericId);
+    }
+
+    function getDiningGuestOrders(guestId) {
+      return state.partySnapshot.orders.filter((order) => order.guest_id === guestId);
+    }
+
+    function getDiningGuestTotal(guestId) {
+      return getDiningGuestOrders(guestId)
+        .filter((order) => order.kind === "order" && order.status !== "canceled")
+        .reduce((sum, order) => sum + Number(order.total || 0), 0);
+    }
+
     function formatRequestMoney(value) {
       return new Intl.NumberFormat("en-CA", {
         style: "currency",
@@ -3824,29 +4424,300 @@
       return state.diningRequests.filter((request) => request.table_code.toLowerCase() === normalizedTable);
     }
 
+    function formatPartyDiagnosticTime(value) {
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "—";
+      return new Intl.DateTimeFormat("en-CA", {
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit"
+      }).format(date);
+    }
+
+    function formatDiningEventName(value) {
+      return String(value || "EVENT")
+        .toLowerCase()
+        .replaceAll("_", " ")
+        .replace(/(^|\s)\S/g, (character) => character.toUpperCase());
+    }
+
+    function renderOrderEvent(event) {
+      const previousStatus = event.previous_value?.status;
+      const nextStatus = event.next_value?.status;
+      const previousQuantity = event.previous_value?.quantity;
+      const nextQuantity = event.next_value?.quantity;
+      const change = nextStatus
+        ? `${previousStatus || "—"} → ${nextStatus}`
+        : nextQuantity !== undefined
+          ? `${previousQuantity ?? "—"} → ${nextQuantity}`
+          : event.note || "";
+      return `
+        <span>
+          ${escapeHtml(formatPartyDiagnosticTime(event.created_at))} ·
+          ${escapeHtml(formatDiningEventName(event.event_type))}
+          ${change ? ` · ${escapeHtml(change)}` : ""}
+          · ${escapeHtml(event.actor || "system")}
+        </span>
+      `;
+    }
+
+    function renderPartyOrderDetail(order) {
+      const itemSummary = order.kind === "order"
+        ? order.items.map((item) => (
+            `${Number(item.quantity || 0)}× ${item.nameEn || item.nameKo || "Menu item"}`
+          )).join(" · ")
+        : REQUEST_TYPE_LABELS[order.request_type] || "Service request";
+      const events = state.partySnapshot.orderEvents.filter(
+        (event) => event.request_id === order.id
+      );
+      return `
+        <details class="party-order-detail">
+          <summary>
+            <span>${order.kind === "order" ? `Order #${order.id}` : `Request #${order.id}`} · Table ${escapeHtml(order.table_code || "—")}</span>
+            <strong>${order.kind === "order" ? escapeHtml(formatRequestMoney(order.total)) : escapeHtml(REQUEST_STATUS_LABELS[order.status] || order.status)}</strong>
+          </summary>
+          <div class="party-order-detail-body">
+            ${escapeHtml(itemSummary || "No item detail")}<br />
+            ${escapeHtml(formatPartyDiagnosticTime(order.created_at))} · Added by ${escapeHtml(order.added_by || "guest")} · ${escapeHtml(REQUEST_STATUS_LABELS[order.status] || order.status)}
+            ${order.note ? `<br />Note: ${escapeHtml(order.note)}` : ""}
+            ${events.length ? `<div class="party-event-list">${events.map(renderOrderEvent).join("")}</div>` : ""}
+          </div>
+        </details>
+      `;
+    }
+
+    function renderPartyGuest(guest) {
+      const orders = getDiningGuestOrders(guest.id);
+      const guestEvents = state.partySnapshot.guestEvents.filter(
+        (event) => event.guest_id === guest.id
+      );
+      const total = getDiningGuestTotal(guest.id);
+      const usedTables = Array.from(new Set(orders.map((order) => order.table_code).filter(Boolean)));
+      const currentTable = state.partySnapshot.tables.find(
+        (table) => table.id === Number(guest.current_table_id)
+      ) || null;
+      const statusClass = guest.status === "PAID" ? "is-paid" : guest.status === "ACTIVE" ? "" : "is-expired";
+      const deviceInfo = guest.device_info || {};
+      const lastSeenAt = new Date(guest.last_seen_at).getTime();
+      const connectionStatus = Number.isFinite(lastSeenAt) && Date.now() - lastSeenAt <= 20000
+        ? "Online"
+        : "Not currently connected";
+      const deviceSummary = [
+        deviceInfo.platform,
+        deviceInfo.screen,
+        deviceInfo.language
+      ].filter(Boolean).join(" · ") || "Unavailable";
+
+      return `
+        <details class="party-guest ${statusClass}" data-guest-code="${escapeHtml(guest.display_code)}">
+          <summary>
+            <span class="party-guest-name"><i class="party-guest-dot"></i>Guest ${escapeHtml(guest.display_code)}</span>
+            <strong class="party-guest-amount">${escapeHtml(formatRequestMoney(total))}</strong>
+            <em class="party-guest-status">${escapeHtml(guest.status)}</em>
+          </summary>
+          <div class="party-guest-detail">
+            <div class="party-debug-grid">
+              <div><span>Guest ID</span><strong title="${escapeHtml(guest.id)}">${escapeHtml(guest.id)}</strong></div>
+              <div><span>Display code</span><strong>${escapeHtml(guest.display_code)}</strong></div>
+              <div><span>Tables used</span><strong>${escapeHtml(usedTables.join(" + ") || "None")}</strong></div>
+              <div><span>Current table</span><strong>${escapeHtml(currentTable?.table_code || "—")}</strong></div>
+              <div><span>Current page</span><strong title="${escapeHtml(guest.current_page || "")}">${escapeHtml(guest.current_page || "—")}</strong></div>
+              <div><span>Connection</span><strong>${escapeHtml(connectionStatus)}</strong></div>
+              <div><span>Session status</span><strong>${escapeHtml(guest.status)}</strong></div>
+              <div><span>Created</span><strong>${escapeHtml(formatPartyDiagnosticTime(guest.created_at))}</strong></div>
+              <div><span>Expires</span><strong>${escapeHtml(formatPartyDiagnosticTime(guest.expires_at))}</strong></div>
+              <div><span>Last connected</span><strong>${escapeHtml(formatPartyDiagnosticTime(guest.last_seen_at))}</strong></div>
+              <div><span>Device</span><strong title="${escapeHtml(deviceInfo.userAgent || "")}">${escapeHtml(deviceSummary)}</strong></div>
+              <div><span>Orders</span><strong>${orders.length}</strong></div>
+            </div>
+            ${orders.length
+              ? orders.map(renderPartyOrderDetail).join("")
+              : '<div class="party-order-detail-body">No orders yet.</div>'}
+            ${guestEvents.length ? `
+              <details class="party-order-detail">
+                <summary><span>Session history</span><strong>${guestEvents.length}</strong></summary>
+                <div class="party-order-detail-body party-event-list">
+                  ${guestEvents.map((event) => `
+                    <span>${escapeHtml(formatPartyDiagnosticTime(event.created_at))} · ${escapeHtml(formatDiningEventName(event.event_type))}</span>
+                  `).join("")}
+                </div>
+              </details>
+            ` : ""}
+            ${guest.status === "ACTIVE" ? `
+              <div class="party-guest-actions">
+                <button class="party-pay-btn" type="button" data-mark-guest-paid="${escapeHtml(guest.display_code)}">Mark paid</button>
+              </div>
+            ` : ""}
+          </div>
+        </details>
+      `;
+    }
+
+    function renderPartyCard(party) {
+      const tables = getDiningPartyTables(party.id, { activeOnly: party.status === "ACTIVE" });
+      const guests = getDiningPartyGuests(party.id);
+      const partyOrders = state.partySnapshot.orders.filter((order) => order.party_id === party.id);
+      const activeGuests = guests.filter((guest) => guest.status === "ACTIVE").length;
+      const paidGuests = guests.filter((guest) => guest.status === "PAID").length;
+      const expiredGuests = guests.filter((guest) => guest.status === "EXPIRED").length;
+      const totalSales = guests.reduce((sum, guest) => sum + getDiningGuestTotal(guest.id), 0);
+      const tableCodes = tables.map((table) => table.table_code).filter(Boolean);
+      return `
+        <article class="party-card" data-party-card="${party.id}">
+          <div class="party-card-head">
+            <div>
+              <strong>Party #${party.id}</strong>
+              <span>${escapeHtml(tableCodes.join(" + ") || "No active tables")}</span>
+            </div>
+            <span class="party-active-pill">${escapeHtml(party.status)}</span>
+          </div>
+          <div class="party-guest-list">
+            ${guests.length
+              ? guests.map(renderPartyGuest).join("")
+              : '<div class="party-empty" style="margin:10px;">No Guests have scanned this Party yet.</div>'}
+          </div>
+          <details class="party-diagnostics">
+            <summary>Party details</summary>
+            <div class="party-diagnostics-body">
+              <span>
+                Created ${escapeHtml(formatPartyDiagnosticTime(party.created_at))}<br />
+                ${tables.length} table${tables.length === 1 ? "" : "s"} · ${guests.length} guest${guests.length === 1 ? "" : "s"} ·
+                ${activeGuests} active · ${paidGuests} paid · ${expiredGuests} expired<br />
+                ${partyOrders.length} requests · ${escapeHtml(formatRequestMoney(totalSales))} sales
+              </span>
+              ${party.status === "ACTIVE" ? `
+                <div class="party-detail-actions">
+                  <button type="button" data-add-tables-party="${party.id}">Add tables</button>
+                  <button class="is-danger" type="button" data-close-party="${party.id}">Close Party</button>
+                </div>
+              ` : ""}
+            </div>
+          </details>
+        </article>
+      `;
+    }
+
+    function renderPartyDashboard() {
+      const list = document.getElementById("partyList");
+      const status = document.getElementById("partyStatus");
+      if (!list || !status) return;
+
+      if (state.partyActionError) {
+        status.textContent = state.partyActionError;
+        status.className = "party-status is-error";
+      } else if (state.partyLoadError) {
+        status.textContent = "Party and Guest features need tools/sql/dining-party-guest-architecture.sql.";
+        status.className = "party-status is-error";
+      } else {
+        const activeCount = state.partySnapshot.parties.filter((party) => party.status === "ACTIVE").length;
+        status.textContent = `${activeCount} active Part${activeCount === 1 ? "y" : "ies"} · Advanced details are collapsed by default.`;
+        status.className = "party-status";
+      }
+
+      const activeParties = state.partySnapshot.parties.filter((party) => party.status === "ACTIVE");
+      if (!activeParties.length) {
+        list.innerHTML = `<div class="party-empty">${
+          state.partyLoadError
+            ? "Existing QR sessions continue to work until the Party architecture SQL is installed."
+            : "No active Parties. Use New Party below when seating a group."
+        }</div>`;
+        return;
+      }
+      list.innerHTML = activeParties.map(renderPartyCard).join("");
+    }
+
+    function renderPartySetupBar() {
+      const message = document.getElementById("partySetupMessage");
+      const newButton = document.getElementById("newPartyButton");
+      const cancelButton = document.getElementById("cancelPartySetup");
+      const confirmButton = document.getElementById("confirmPartySetup");
+      if (!message || !newButton || !cancelButton || !confirmButton) return;
+
+      const selectedCount = state.selectedPartyTableCodes.size;
+      if (!state.partySetupMode) {
+        message.textContent = state.partyLoadError
+          ? "Party setup becomes available after the new architecture SQL is installed."
+          : "Start a Party, then select one or more available tables on the map.";
+        newButton.hidden = false;
+        newButton.disabled = state.partyLoadError;
+        cancelButton.hidden = true;
+        confirmButton.hidden = true;
+        return;
+      }
+
+      const targetParty = state.partySetupTargetId ? getDiningParty(state.partySetupTargetId) : null;
+      message.textContent = `${selectedCount} table${selectedCount === 1 ? "" : "s"} selected · Tap available tables on the map.`;
+      newButton.hidden = true;
+      cancelButton.hidden = false;
+      confirmButton.hidden = false;
+      confirmButton.disabled = selectedCount === 0;
+      confirmButton.textContent = targetParty ? `Add to Party #${targetParty.id}` : "Start Party";
+    }
+
     function renderQrStations() {
       const grid = document.getElementById("qrStationGrid");
       const status = document.getElementById("qrSessionStatus");
       const toggleLabel = document.getElementById("qrSessionToggleLabel");
       if (!grid || !status) return;
 
-      const activeCount = state.qrSessions.filter((session) => session.status === "active" && session.table_code).length;
+      const permanentMode = state.partyArchitectureAvailable === true;
+      const activeCount = permanentMode
+        ? state.partySnapshot.tables.filter((table) => table.qr_number).length
+        : state.qrSessions.filter((session) => session.status === "active" && session.table_code).length;
       if (toggleLabel) {
-        toggleLabel.textContent = `${activeCount} assigned`;
+        toggleLabel.textContent = `${activeCount} ${permanentMode ? "mapped" : "assigned"}`;
       }
 
       if (state.qrSessionActionError) {
         status.textContent = state.qrSessionActionError;
         status.className = "qr-session-status is-error";
-      } else if (state.qrSessionLoadError) {
+      } else if (!permanentMode && state.qrSessionLoadError) {
         status.textContent = "QR table assignments are unavailable. Run tools/sql/dining-qr-table-assignment.sql in Supabase.";
         status.className = "qr-session-status is-error";
+      } else if (permanentMode) {
+        status.textContent = `${activeCount} of ${DINING_QR_COUNT} QR codes permanently mapped to physical tables.`;
+        status.className = "qr-session-status";
       } else {
         status.textContent = `${activeCount} of ${DINING_QR_COUNT} QR codes assigned · Session history is retained after checkout.`;
         status.className = "qr-session-status";
       }
 
       grid.innerHTML = Array.from({ length: DINING_QR_COUNT }, (_, index) => index + 1).map((qrNumber) => {
+        if (permanentMode) {
+          const tableRecord = state.partySnapshot.tables.find((table) => table.qr_number === qrNumber) || null;
+          const activeParty = tableRecord?.current_party_id ? getDiningParty(tableRecord.current_party_id) : null;
+          const history = tableRecord ? getTableRequestHistory(tableRecord.table_code) : [];
+          const activeRequests = activeParty
+            ? history.filter((request) => (
+                request.party_id === activeParty.id
+                && !["completed", "canceled"].includes(request.status)
+              ))
+            : [];
+          const stateLabel = activeParty ? "In use" : tableRecord ? "Mapped" : "Unassigned";
+          const meta = activeParty
+            ? `Table ${escapeHtml(tableRecord.table_code)}<br>Party #${activeParty.id}`
+            : tableRecord
+              ? `Table ${escapeHtml(tableRecord.table_code)}<br>Ready for the next Party`
+              : "No Table mapping<br>Assign from the table map";
+          return `
+            <article class="qr-station-card ${activeParty ? "is-active" : ""}">
+              <div class="qr-station-top">
+                <strong class="qr-station-number">QR ${String(qrNumber).padStart(2, "0")}</strong>
+                <span class="qr-station-state">${stateLabel}</span>
+              </div>
+              <div class="qr-station-meta">${meta}</div>
+              <div class="qr-station-stats"><span>${history.length} records</span><span>${activeRequests.length} open</span></div>
+              <div class="qr-station-actions">
+                ${activeParty ? `
+                  <button class="qr-station-btn reset" type="button" data-close-party="${activeParty.id}">Close Party</button>
+                ` : ""}
+                <button class="qr-station-btn ${activeParty ? "" : "is-wide"}" type="button" data-qr-history="${qrNumber}">History</button>
+              </div>
+            </article>
+          `;
+        }
+
         const activeSession = getActiveQrSession(qrNumber);
         const history = state.diningRequests.filter((request) => request.qr_number === qrNumber);
         const activeRequests = activeSession
@@ -3900,24 +4771,42 @@
         return '<div class="table-map-empty">No tables are configured for this area.</div>';
       }
       return tableOptions.map((tableCode) => {
+        const tableRecord = getDiningTableRecord(tableCode);
+        const activeParty = tableRecord?.current_party_id ? getDiningParty(tableRecord.current_party_id) : null;
         const activeSession = getActiveTableSession(tableCode);
         const history = getTableRequestHistory(tableCode);
-        const activeRequests = activeSession
-          ? history.filter((request) => request.qr_session_id === activeSession.id && !["completed", "canceled"].includes(request.status))
+        const activeRequests = activeParty
+          ? history.filter((request) => request.party_id === activeParty.id && !["completed", "canceled"].includes(request.status))
+          : activeSession
+            ? history.filter((request) => request.qr_session_id === activeSession.id && !["completed", "canceled"].includes(request.status))
           : [];
         const isUpdating = activeSession && state.qrSessionUpdatingNumbers.has(activeSession.qr_number);
-        const sessionCopy = activeSession
+        const occupied = Boolean(activeParty || activeSession);
+        const sessionCopy = activeParty
+          ? `<strong>Party #${activeParty.id} · QR ${String(tableRecord.qr_number).padStart(2, "0")}</strong><br>${activeRequests.length} open request${activeRequests.length === 1 ? "" : "s"}`
+          : activeSession
           ? `<strong>QR ${String(activeSession.qr_number).padStart(2, "0")}</strong><br>${activeRequests.length} open request${activeRequests.length === 1 ? "" : "s"} · since ${formatRequestClock(activeSession.started_at)}`
-          : `${history.length} historical request${history.length === 1 ? "" : "s"}<br>Assign a QR when guests are seated.`;
+          : tableRecord?.qr_number
+            ? `<strong>QR ${String(tableRecord.qr_number).padStart(2, "0")}</strong><br>Ready for a new Party.`
+            : `${history.length} historical request${history.length === 1 ? "" : "s"}<br>Assign a permanent QR first.`;
         return `
-          <article class="floor-table-card ${activeSession ? "is-assigned" : ""}">
+          <article
+            class="floor-table-card ${occupied ? "is-assigned" : ""}"
+            data-map-table-code="${escapeHtml(tableCode)}"
+          >
             <div class="floor-table-top">
               <strong class="floor-table-name">${escapeHtml(tableCode)}</strong>
-              <span class="floor-table-state">${activeSession ? "Occupied" : "Available"}</span>
+              <span class="floor-table-state">${occupied ? "Occupied" : "Available"}</span>
             </div>
             <div class="floor-table-session">${sessionCopy}</div>
             <div class="floor-table-actions">
-              ${activeSession ? `
+              ${activeParty ? `
+                <button
+                  class="qr-station-btn reset"
+                  type="button"
+                  data-close-party="${activeParty.id}"
+                >Close Party</button>
+              ` : activeSession ? `
                 <button
                   class="qr-station-btn reset"
                   type="button"
@@ -3925,13 +4814,19 @@
                   data-table-code="${escapeHtml(tableCode)}"
                   ${isUpdating ? "disabled" : ""}
                 >${isUpdating ? "Working…" : "End session"}</button>
+              ` : tableRecord?.qr_number ? `
+                <button
+                  class="qr-station-btn primary"
+                  type="button"
+                  data-start-party-table="${escapeHtml(tableCode)}"
+                >Start Party</button>
               ` : `
                 <button
                   class="qr-station-btn primary"
                   type="button"
                   data-assign-table="${escapeHtml(tableCode)}"
-                  ${state.qrSessionLoadError ? "disabled" : ""}
-                >Assign QR</button>
+                  ${state.partyArchitectureAvailable !== true && state.qrSessionLoadError ? "disabled" : ""}
+                >Map QR</button>
               `}
               <button class="qr-station-btn" type="button" data-table-history="${escapeHtml(tableCode)}">History</button>
             </div>
@@ -3952,18 +4847,29 @@
         `;
       }
 
+      const tableRecord = getDiningTableRecord(tableCode);
+      const activeParty = tableRecord?.current_party_id ? getDiningParty(tableRecord.current_party_id) : null;
       const activeSession = getActiveTableSession(tableCode);
       const history = getTableRequestHistory(tableCode);
-      const activeRequests = activeSession
+      const activeRequests = activeParty
         ? history.filter((request) => (
+            request.party_id === activeParty.id
+            && !["completed", "canceled"].includes(request.status)
+          ))
+        : activeSession
+          ? history.filter((request) => (
             request.qr_session_id === activeSession.id
             && !["completed", "canceled"].includes(request.status)
           ))
         : [];
       const isUpdating = activeSession && state.qrSessionUpdatingNumbers.has(activeSession.qr_number);
-      const detail = activeSession
+      const detail = activeParty
+        ? `Party #${activeParty.id} · QR ${String(tableRecord.qr_number).padStart(2, "0")} · ${activeRequests.length} open request${activeRequests.length === 1 ? "" : "s"}`
+        : activeSession
         ? `QR ${String(activeSession.qr_number).padStart(2, "0")} · ${activeRequests.length} open request${activeRequests.length === 1 ? "" : "s"} · since ${formatRequestClock(activeSession.started_at)}`
-        : `Available · ${history.length} historical request${history.length === 1 ? "" : "s"}`;
+        : tableRecord?.qr_number
+          ? `QR ${String(tableRecord.qr_number).padStart(2, "0")} · Available for a new Party`
+          : `No permanent QR · ${history.length} historical request${history.length === 1 ? "" : "s"}`;
 
       return `
         <div class="table-map-detail">
@@ -3972,7 +4878,13 @@
             <span>${escapeHtml(detail)}</span>
           </div>
           <div class="table-map-detail-actions">
-            ${activeSession ? `
+            ${activeParty ? `
+              <button
+                class="qr-station-btn reset"
+                type="button"
+                data-close-party="${activeParty.id}"
+              >Close Party</button>
+            ` : activeSession ? `
               <button
                 class="qr-station-btn reset"
                 type="button"
@@ -3980,13 +4892,19 @@
                 data-table-code="${escapeHtml(tableCode)}"
                 ${isUpdating ? "disabled" : ""}
               >${isUpdating ? "Working…" : "End session"}</button>
+            ` : tableRecord?.qr_number ? `
+              <button
+                class="qr-station-btn primary"
+                type="button"
+                data-start-party-table="${escapeHtml(tableCode)}"
+              >Start Party</button>
             ` : `
               <button
                 class="qr-station-btn primary"
                 type="button"
                 data-assign-table="${escapeHtml(tableCode)}"
-                ${state.qrSessionLoadError ? "disabled" : ""}
-              >Assign QR</button>
+                ${state.partyArchitectureAvailable !== true && state.qrSessionLoadError ? "disabled" : ""}
+              >Map QR</button>
             `}
             <button class="qr-station-btn" type="button" data-table-history="${escapeHtml(tableCode)}">History</button>
           </div>
@@ -4019,9 +4937,16 @@
       }).join("");
 
       const tableMarkup = tableItems.map((item) => {
+        const tableRecord = getDiningTableRecord(item.tableCode);
+        const activeParty = tableRecord?.current_party_id ? getDiningParty(tableRecord.current_party_id) : null;
         const activeSession = getActiveTableSession(item.tableCode);
-        const activeRequests = activeSession
+        const activeRequests = activeParty
           ? getTableRequestHistory(item.tableCode).filter((request) => (
+              request.party_id === activeParty.id
+              && !["completed", "canceled"].includes(request.status)
+            ))
+          : activeSession
+            ? getTableRequestHistory(item.tableCode).filter((request) => (
               request.qr_session_id === activeSession.id
               && !["completed", "canceled"].includes(request.status)
             ))
@@ -4029,18 +4954,21 @@
         const x = Math.min(item.x, 100 - item.w);
         const y = Math.min(item.y, 100 - item.h);
         const selected = state.selectedMapTableCode?.toLowerCase() === item.tableCode.toLowerCase();
+        const partySelected = state.selectedPartyTableCodes.has(item.tableCode);
+        const occupied = Boolean(activeParty || activeSession);
+        const mappedQr = tableRecord?.qr_number || activeSession?.qr_number || null;
         const style = `left:${x}%;top:${y}%;width:${item.w}%;height:${item.h}%;transform:rotate(${item.rotation}deg)`;
         return `
           <button
-            class="queen-map-item queen-map-table is-${escapeHtml(item.shape)} ${activeSession ? "is-assigned" : ""} ${selected ? "is-selected" : ""}"
+            class="queen-map-item queen-map-table is-${escapeHtml(item.shape)} ${occupied ? "is-assigned" : ""} ${selected ? "is-selected" : ""} ${partySelected ? "is-party-selected" : ""}"
             type="button"
             data-map-table-code="${escapeHtml(item.tableCode)}"
             style="${style}"
             aria-pressed="${selected ? "true" : "false"}"
-            aria-label="Table ${escapeHtml(item.tableCode)}, ${activeSession ? `assigned to QR ${activeSession.qr_number}` : "available"}"
+            aria-label="Table ${escapeHtml(item.tableCode)}, ${activeParty ? `Party ${activeParty.id}` : mappedQr ? `QR ${mappedQr}, available` : "QR not mapped"}"
           >
             <span class="queen-map-table-label">${escapeHtml(item.label || item.tableCode)}</span>
-            <span class="queen-map-table-state">${activeSession ? `QR ${String(activeSession.qr_number).padStart(2, "0")}` : "OPEN"}</span>
+            <span class="queen-map-table-state">${mappedQr ? `QR ${String(mappedQr).padStart(2, "0")}` : "NO QR"}</span>
             ${activeRequests.length ? `<span class="queen-map-open-count">${activeRequests.length}</span>` : ""}
           </button>
         `;
@@ -4067,9 +4995,13 @@
     function renderTableMap() {
       const grid = document.getElementById("tableMapGrid");
       if (!grid) return;
+      renderPartySetupBar();
 
       const allTableOptions = Array.from(new Map(
-        state.tableOptions
+        [
+          ...state.tableOptions,
+          ...state.partySnapshot.tables.map((table) => table.table_code)
+        ]
           .map((tableCode) => String(tableCode || "").trim())
           .filter(Boolean)
           .map((tableCode) => [tableCode.toLowerCase(), tableCode])
@@ -4120,9 +5052,18 @@
       const meta = document.getElementById("qrAssignmentMeta");
       if (!options || !empty || !meta) return;
       const tableCode = state.qrAssignmentTableCode;
+      const currentTable = getDiningTableRecord(tableCode);
       const availableQrNumbers = Array.from({ length: DINING_QR_COUNT }, (_, index) => index + 1)
-        .filter((qrNumber) => !getActiveQrSession(qrNumber));
-      meta.textContent = `Choose one available QR for Table ${tableCode || "-"}.`;
+        .filter((qrNumber) => {
+          if (state.partyArchitectureAvailable === true) {
+            const mappedTable = state.partySnapshot.tables.find((table) => table.qr_number === qrNumber);
+            return !mappedTable || mappedTable.id === currentTable?.id;
+          }
+          return !getActiveQrSession(qrNumber);
+        });
+      meta.textContent = state.partyArchitectureAvailable === true
+        ? `Choose the permanent QR for Table ${tableCode || "-"}.`
+        : `Choose one available QR for Table ${tableCode || "-"}.`;
       empty.hidden = availableQrNumbers.length > 0;
       options.innerHTML = availableQrNumbers.map((qrNumber) => `
         <button
@@ -4136,7 +5077,8 @@
     }
 
     function openQrAssignmentModal(tableCode) {
-      if (!tableCode || getActiveTableSession(tableCode)) return;
+      const tableRecord = getDiningTableRecord(tableCode);
+      if (!tableCode || getActiveTableSession(tableCode) || tableRecord?.current_party_id) return;
       state.qrAssignmentTableCode = tableCode;
       renderQrAssignmentOptions();
       const modal = document.getElementById("qrAssignmentModal");
@@ -4156,7 +5098,8 @@
 
       try {
         const { url, anonKey } = SUPABASE_CONFIG;
-        const endpoint = `${url}/rest/v1/rpc/assign_dining_qr_session`;
+        const permanentMode = state.partyArchitectureAvailable === true;
+        const endpoint = `${url}/rest/v1/rpc/${permanentMode ? "assign_dining_table_qr" : "assign_dining_qr_session"}`;
         const response = await fetch(endpoint, {
           method: "POST",
           headers: {
@@ -4164,19 +5107,30 @@
             Authorization: `Bearer ${anonKey}`,
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({
-            p_branch: ADMIN_SHEET_CONFIG.branchLabel.toLowerCase(),
-            p_qr_number: qrNumber,
-            p_table_code: normalizedTableCode
-          })
+          body: JSON.stringify(permanentMode
+            ? {
+                p_branch: ADMIN_SHEET_CONFIG.branchLabel.toLowerCase(),
+                p_table_code: normalizedTableCode,
+                p_qr_number: qrNumber
+              }
+            : {
+                p_branch: ADMIN_SHEET_CONFIG.branchLabel.toLowerCase(),
+                p_qr_number: qrNumber,
+                p_table_code: normalizedTableCode
+              })
         });
         if (!response.ok) {
           throw new Error(`QR assignment failed (${response.status}): ${await response.text()}`);
         }
 
-        const [sessions, requests] = await Promise.all([fetchQrSessions(), fetchDiningRequests()]);
+        const [sessions, requests, partySnapshot] = await Promise.all([
+          fetchQrSessions(),
+          fetchDiningRequests(),
+          permanentMode ? fetchDiningAdminSnapshot() : Promise.resolve(null)
+        ]);
         state.qrSessions = sessions;
         state.diningRequests = requests;
+        if (partySnapshot) state.partySnapshot = partySnapshot;
         state.qrSessionLoadError = false;
         state.requestLoadError = false;
         state.requestsLoadedAt = new Date().toISOString();
@@ -4229,6 +5183,208 @@
       } finally {
         state.qrSessionUpdatingNumbers.delete(qrNumber);
         renderDiningRequests();
+      }
+    }
+
+    async function callQueenDiningRpc(functionName, payload) {
+      const { url, anonKey } = SUPABASE_CONFIG;
+      const response = await fetch(`${url}/rest/v1/rpc/${functionName}`, {
+        method: "POST",
+        headers: {
+          apikey: anonKey,
+          Authorization: `Bearer ${anonKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+      const responseText = await response.text();
+      if (!response.ok) {
+        const error = new Error(`${functionName} failed (${response.status}): ${responseText}`);
+        error.status = response.status;
+        throw error;
+      }
+      return responseText ? JSON.parse(responseText) : null;
+    }
+
+    function beginPartySetup(partyId = null) {
+      if (state.partyArchitectureAvailable !== true) return;
+      state.partySetupMode = true;
+      state.partySetupTargetId = partyId ? Number(partyId) : null;
+      state.selectedPartyTableCodes = new Set();
+      state.partyActionError = "";
+      renderTableMap();
+    }
+
+    function cancelPartySetup() {
+      state.partySetupMode = false;
+      state.partySetupTargetId = null;
+      state.selectedPartyTableCodes = new Set();
+      renderTableMap();
+    }
+
+    function togglePartySetupTable(tableCode) {
+      const tableRecord = getDiningTableRecord(tableCode);
+      if (!tableRecord?.qr_number) {
+        state.partyActionError = `Table ${tableCode} needs a permanent QR mapping first.`;
+        state.selectedMapTableCode = tableCode;
+        renderDiningRequests();
+        return;
+      }
+      if (tableRecord.current_party_id) {
+        state.partyActionError = `Table ${tableCode} already belongs to Party #${tableRecord.current_party_id}.`;
+        renderDiningRequests();
+        return;
+      }
+      if (state.selectedPartyTableCodes.has(tableCode)) {
+        state.selectedPartyTableCodes.delete(tableCode);
+      } else {
+        state.selectedPartyTableCodes.add(tableCode);
+      }
+      state.partyActionError = "";
+      renderTableMap();
+    }
+
+    async function refreshPartyOperationData() {
+      const [snapshot, sessions, requests] = await Promise.all([
+        fetchDiningAdminSnapshot(),
+        fetchQrSessions(),
+        fetchDiningRequests()
+      ]);
+      state.partySnapshot = snapshot;
+      state.qrSessions = sessions;
+      state.diningRequests = requests;
+      state.partyLoadError = false;
+      state.qrSessionLoadError = false;
+      state.requestLoadError = false;
+      state.requestsLoadedAt = new Date().toISOString();
+    }
+
+    async function savePartySetup(tableCodes, targetPartyId = null) {
+      if (!tableCodes.length || state.partyArchitectureAvailable !== true) return;
+      state.partyActionError = "";
+      try {
+        await callQueenDiningRpc(
+          targetPartyId ? "add_dining_tables_to_party" : "start_dining_party",
+          targetPartyId
+            ? {
+                p_branch: ADMIN_SHEET_CONFIG.branchLabel.toLowerCase(),
+                p_party_id: Number(targetPartyId),
+                p_table_codes: tableCodes
+              }
+            : {
+                p_branch: ADMIN_SHEET_CONFIG.branchLabel.toLowerCase(),
+                p_table_codes: tableCodes
+              }
+        );
+        await refreshPartyOperationData();
+        cancelPartySetup();
+      } catch (error) {
+        console.error("Party setup failed", error);
+        state.partyActionError = targetPartyId
+          ? "Tables were not added to the Party. Check their QR mapping and availability."
+          : "Party was not started. Every selected table needs a QR and must be available.";
+      }
+      renderDiningRequests();
+    }
+
+    async function closeDiningParty(partyId) {
+      const numericPartyId = Number(partyId);
+      if (!Number.isFinite(numericPartyId) || state.partyArchitectureAvailable !== true) return;
+      state.partyActionError = "";
+      try {
+        await callQueenDiningRpc("close_dining_party", {
+          p_branch: ADMIN_SHEET_CONFIG.branchLabel.toLowerCase(),
+          p_party_id: numericPartyId,
+          p_reason: "table-checkout"
+        });
+        await refreshPartyOperationData();
+        state.selectedMapTableCode = null;
+      } catch (error) {
+        console.error("Party close failed", error);
+        state.partyActionError = `Party #${numericPartyId} could not be closed. Please try again.`;
+      }
+      renderDiningRequests();
+    }
+
+    async function markDiningGuestPaid(displayCode) {
+      const normalizedCode = String(displayCode || "").trim().toUpperCase();
+      if (!normalizedCode) return;
+      state.partyActionError = "";
+      try {
+        const bill = await callQueenDiningRpc("mark_dining_guest_paid", {
+          p_branch: ADMIN_SHEET_CONFIG.branchLabel.toLowerCase(),
+          p_display_code: normalizedCode
+        });
+        await refreshPartyOperationData();
+        if (document.getElementById("guestLookupModal")?.classList.contains("is-open")) {
+          renderGuestLookupBill(bill);
+        }
+      } catch (error) {
+        console.error("Guest payment update failed", error);
+        state.partyActionError = `Guest ${normalizedCode} was not marked paid. Please try again.`;
+      }
+      renderDiningRequests();
+    }
+
+    function closeGuestLookupModal() {
+      const modal = document.getElementById("guestLookupModal");
+      modal?.classList.remove("is-open");
+      modal?.setAttribute("aria-hidden", "true");
+    }
+
+    function renderGuestLookupBill(bill) {
+      const result = document.getElementById("guestLookupResult");
+      const meta = document.getElementById("guestLookupMeta");
+      if (!result || !meta) return;
+      const guest = bill?.guest;
+      if (!guest) {
+        result.innerHTML = '<div class="table-option-empty">Guest not found.</div>';
+        return;
+      }
+      const orders = Array.isArray(bill.orders) ? bill.orders : [];
+      const tables = Array.isArray(bill.tables) ? bill.tables : [];
+      const status = String(guest.status || "ACTIVE").toUpperCase();
+      meta.textContent = `Guest ${guest.display_code} · Party #${bill.party_id} · ${tables.map((table) => table.table_code).join(" + ") || "No tables"}`;
+      result.innerHTML = `
+        <div class="guest-lookup-total">
+          <div><span>Guest ${escapeHtml(guest.display_code)}</span><br /><small>${escapeHtml(status)}</small></div>
+          <strong>${escapeHtml(formatRequestMoney(bill.total))}</strong>
+        </div>
+        <div class="guest-lookup-orders">
+          ${orders.length
+            ? orders.map((order) => {
+                const normalizedOrder = normalizeDiningRequest(order);
+                return renderPartyOrderDetail(normalizedOrder);
+              }).join("")
+            : '<div class="table-option-empty">No orders on this bill.</div>'}
+        </div>
+        ${status === "ACTIVE" ? `
+          <button class="party-pay-btn" type="button" data-mark-guest-paid="${escapeHtml(guest.display_code)}">Mark Guest paid</button>
+        ` : ""}
+      `;
+    }
+
+    async function lookupDiningGuestBill(displayCode) {
+      const normalizedCode = String(displayCode || "").trim().toUpperCase();
+      if (!normalizedCode || state.guestLookupBusy) return;
+      const modal = document.getElementById("guestLookupModal");
+      const result = document.getElementById("guestLookupResult");
+      state.guestLookupBusy = true;
+      modal?.classList.add("is-open");
+      modal?.setAttribute("aria-hidden", "false");
+      if (result) result.innerHTML = '<div class="table-option-empty">Loading Guest bill…</div>';
+      try {
+        const bill = await callQueenDiningRpc("lookup_dining_guest_bill", {
+          p_branch: ADMIN_SHEET_CONFIG.branchLabel.toLowerCase(),
+          p_guest_id: null,
+          p_display_code: normalizedCode
+        });
+        renderGuestLookupBill(bill);
+      } catch (error) {
+        console.error("Guest lookup failed", error);
+        if (result) result.innerHTML = '<div class="table-option-empty">Guest not found. Check the code and try again.</div>';
+      } finally {
+        state.guestLookupBusy = false;
       }
     }
 
@@ -4567,6 +5723,7 @@
       }
       syncUnconfirmedRequestAlert();
       renderQrStations();
+      renderPartyDashboard();
       renderTableMap();
 
       document.querySelectorAll("[data-request-filter]").forEach((button) => {
@@ -4609,7 +5766,7 @@
       const { url, anonKey } = SUPABASE_CONFIG;
       if (!url || !anonKey) throw new Error("Missing Supabase configuration");
       const endpoint = new URL(`${url}/rest/v1/${DINING_REQUESTS_TABLE}`);
-      endpoint.searchParams.set("select", "id,branch,table_code,qr_number,qr_session_id,guest_count,kind,request_type,status,source,note,items,item_count,subtotal,tax,total,created_at,updated_at");
+      endpoint.searchParams.set("select", "id,branch,table_code,qr_number,qr_session_id,party_id,guest_id,table_id,added_by,guest_count,kind,request_type,status,source,note,items,item_count,subtotal,tax,total,created_at,updated_at");
       endpoint.searchParams.set("branch", `eq.${ADMIN_SHEET_CONFIG.branchLabel.toLowerCase()}`);
       endpoint.searchParams.set("order", "created_at.desc");
       endpoint.searchParams.set("limit", "1000");
@@ -4622,7 +5779,7 @@
       });
       if (!response.ok) {
         const responseText = await response.text();
-        const isLegacySchema = response.status === 400 && /qr_number|qr_session_id/i.test(responseText);
+        const isLegacySchema = response.status === 400 && /qr_number|qr_session_id|party_id|guest_id|table_id|added_by/i.test(responseText);
         if (!isLegacySchema) {
           throw new Error(`Request queue failed (${response.status}): ${responseText}`);
         }
@@ -4676,13 +5833,36 @@
       return (await response.json()).map(normalizeDiningTableLayout);
     }
 
+    async function fetchDiningAdminSnapshot() {
+      const { url, anonKey } = SUPABASE_CONFIG;
+      if (!url || !anonKey) throw new Error("Missing Supabase configuration");
+      const response = await fetch(`${url}/rest/v1/rpc/get_dining_admin_snapshot`, {
+        method: "POST",
+        headers: {
+          apikey: anonKey,
+          Authorization: `Bearer ${anonKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          p_branch: ADMIN_SHEET_CONFIG.branchLabel.toLowerCase()
+        })
+      });
+      if (!response.ok) {
+        const error = new Error(`Party snapshot failed (${response.status}): ${await response.text()}`);
+        error.status = response.status;
+        throw error;
+      }
+      return normalizeDiningPartySnapshot(await response.json());
+    }
+
     async function refreshDiningRequests({ manual = false } = {}) {
       const refreshButton = document.getElementById("refreshRequestsBtn");
       if (manual && refreshButton) refreshButton.disabled = true;
-      const [requestResult, qrSessionResult, tableLayoutResult] = await Promise.allSettled([
+      const [requestResult, qrSessionResult, tableLayoutResult, partyResult] = await Promise.allSettled([
         fetchDiningRequests(),
         fetchQrSessions(),
-        fetchDiningTableLayouts()
+        fetchDiningTableLayouts(),
+        fetchDiningAdminSnapshot()
       ]);
 
       if (requestResult.status === "fulfilled") {
@@ -4710,6 +5890,15 @@
       } else {
         console.error("Table layout refresh failed", tableLayoutResult.reason);
         state.tableLayoutLoadError = true;
+      }
+
+      if (partyResult.status === "fulfilled") {
+        state.partySnapshot = partyResult.value;
+        state.partyArchitectureAvailable = true;
+        state.partyLoadError = false;
+      } else {
+        state.partyArchitectureAvailable = false;
+        state.partyLoadError = true;
       }
 
       if (refreshButton) refreshButton.disabled = false;
@@ -6012,18 +7201,35 @@
           console.error("Table layout load failed", error);
           state.tableLayoutLoadError = true;
           return [];
+        }),
+        fetchDiningAdminSnapshot().catch((error) => {
+          console.error("Party architecture load failed", error);
+          state.partyArchitectureAvailable = false;
+          state.partyLoadError = true;
+          return normalizeDiningPartySnapshot();
         })
       ])
-        .then(([reservations, tableOptions, diningRequests, qrSessions, tableLayouts]) => {
+        .then(([reservations, tableOptions, diningRequests, qrSessions, tableLayouts, partySnapshot]) => {
           state.tableOptions = tableOptions;
           state.diningRequests = diningRequests;
           state.qrSessions = qrSessions;
           state.tableLayouts = new Map(tableLayouts.map((layout) => [layout.zone, layout]));
+          state.partySnapshot = partySnapshot;
+          if (!state.partyLoadError) state.partyArchitectureAvailable = true;
           if (!state.requestLoadError) state.requestsLoadedAt = new Date().toISOString();
           syncReservations(reservations);
           syncPendingFeedbackQueue(reservations);
           autoRemoveExpiredReservations(reservations);
           renderDiningRequests();
+          const requestedGuestCode = String(
+            new URLSearchParams(window.location.search).get("guest") || ""
+          ).trim().toUpperCase();
+          if (/^[A-Z2-9]{4,6}$/.test(requestedGuestCode)) {
+            const searchInput = document.getElementById("guestCodeSearch");
+            if (searchInput) searchInput.value = requestedGuestCode;
+            document.querySelector('[data-queen-tab="tables"]')?.click();
+            lookupDiningGuestBill(requestedGuestCode);
+          }
         })
         .catch((error) => {
           console.error(error);
@@ -6033,11 +7239,12 @@
     }
 
     async function performAutoRefresh() {
-      const [reservationResult, requestResult, qrSessionResult, tableLayoutResult] = await Promise.allSettled([
+      const [reservationResult, requestResult, qrSessionResult, tableLayoutResult, partyResult] = await Promise.allSettled([
         document.hidden ? Promise.resolve(null) : fetchReservations(),
         fetchDiningRequests(),
         fetchQrSessions(),
-        fetchDiningTableLayouts()
+        fetchDiningTableLayouts(),
+        fetchDiningAdminSnapshot()
       ]);
 
       if (reservationResult.status === "fulfilled" && reservationResult.value) {
@@ -6076,6 +7283,18 @@
           console.error("Table layout auto refresh failed", tableLayoutResult.reason);
         }
         state.tableLayoutLoadError = true;
+      }
+
+      if (partyResult.status === "fulfilled") {
+        state.partySnapshot = partyResult.value;
+        state.partyArchitectureAvailable = true;
+        state.partyLoadError = false;
+      } else {
+        if (!state.partyLoadError) {
+          console.error("Party architecture auto refresh failed", partyResult.reason);
+        }
+        state.partyArchitectureAvailable = false;
+        state.partyLoadError = true;
       }
       renderDiningRequests();
     }
@@ -6212,6 +7431,16 @@
         return;
       }
 
+      const closePartyButton = event.target.closest("[data-close-party]");
+      if (closePartyButton) {
+        const partyId = Number(closePartyButton.dataset.closeParty);
+        const shouldClose = window.confirm(
+          `Close Party #${partyId}? Active Guests will expire and open requests will be canceled. Permanent QR mappings will stay in place.`
+        );
+        if (shouldClose) closeDiningParty(partyId);
+        return;
+      }
+
       const endButton = event.target.closest("[data-end-qr-session]");
       if (!endButton) return;
       const qrNumber = Number(endButton.dataset.endQrSession);
@@ -6231,13 +7460,6 @@
     });
 
     document.getElementById("tableMapGrid").addEventListener("click", (event) => {
-      const mapTableButton = event.target.closest("[data-map-table-code]");
-      if (mapTableButton) {
-        state.selectedMapTableCode = mapTableButton.dataset.mapTableCode || null;
-        renderTableMap();
-        return;
-      }
-
       const historyButton = event.target.closest("[data-table-history]");
       if (historyButton) {
         showRequestHistory({ tableCode: historyButton.dataset.tableHistory });
@@ -6250,14 +7472,101 @@
         return;
       }
 
+      const closePartyButton = event.target.closest("[data-close-party]");
+      if (closePartyButton) {
+        const partyId = Number(closePartyButton.dataset.closeParty);
+        const shouldClose = window.confirm(
+          `Close Party #${partyId}? Active Guests will expire and open requests will be canceled. Permanent QR mappings will stay in place.`
+        );
+        if (shouldClose) closeDiningParty(partyId);
+        return;
+      }
+
+      const startPartyButton = event.target.closest("[data-start-party-table]");
+      if (startPartyButton) {
+        savePartySetup([startPartyButton.dataset.startPartyTable]);
+        return;
+      }
+
       const endButton = event.target.closest("[data-end-qr-session]");
-      if (!endButton) return;
-      const qrNumber = Number(endButton.dataset.endQrSession);
-      const tableCode = endButton.dataset.tableCode || "-";
-      const shouldEnd = window.confirm(
-        `End the Table ${tableCode} session? QR ${String(qrNumber).padStart(2, "0")} will become inactive and any open requests will be canceled.`
+      if (endButton) {
+        const qrNumber = Number(endButton.dataset.endQrSession);
+        const tableCode = endButton.dataset.tableCode || "-";
+        const shouldEnd = window.confirm(
+          `End the Table ${tableCode} session? QR ${String(qrNumber).padStart(2, "0")} will become inactive and any open requests will be canceled.`
+        );
+        if (shouldEnd) endQrSession(qrNumber);
+        return;
+      }
+
+      const mapTableButton = event.target.closest("[data-map-table-code]");
+      if (!mapTableButton) return;
+      const tableCode = mapTableButton.dataset.mapTableCode || null;
+      if (state.partySetupMode && tableCode) {
+        togglePartySetupTable(tableCode);
+        return;
+      }
+      state.selectedMapTableCode = tableCode;
+      renderTableMap();
+    });
+
+    document.getElementById("newPartyButton").addEventListener("click", () => beginPartySetup());
+    document.getElementById("cancelPartySetup").addEventListener("click", cancelPartySetup);
+    document.getElementById("confirmPartySetup").addEventListener("click", () => {
+      savePartySetup([...state.selectedPartyTableCodes], state.partySetupTargetId);
+    });
+
+    document.getElementById("partyList").addEventListener("click", (event) => {
+      const paidButton = event.target.closest("[data-mark-guest-paid]");
+      if (paidButton) {
+        const guestCode = paidButton.dataset.markGuestPaid;
+        if (window.confirm(`Mark Guest ${guestCode} as PAID?`)) {
+          markDiningGuestPaid(guestCode);
+        }
+        return;
+      }
+
+      const addTablesButton = event.target.closest("[data-add-tables-party]");
+      if (addTablesButton) {
+        beginPartySetup(Number(addTablesButton.dataset.addTablesParty));
+        document.getElementById("tableMapGrid")?.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+
+      const closePartyButton = event.target.closest("[data-close-party]");
+      if (!closePartyButton) return;
+      const partyId = Number(closePartyButton.dataset.closeParty);
+      const shouldClose = window.confirm(
+        `Close Party #${partyId}? Active Guests will expire and open requests will be canceled. Permanent QR mappings will stay in place.`
       );
-      if (shouldEnd) endQrSession(qrNumber);
+      if (shouldClose) closeDiningParty(partyId);
+    });
+
+    const runGuestCodeSearch = () => {
+      const input = document.getElementById("guestCodeSearch");
+      const code = String(input?.value || "").trim().toUpperCase();
+      if (input) input.value = code;
+      lookupDiningGuestBill(code);
+    };
+    document.getElementById("guestCodeSearchBtn").addEventListener("click", runGuestCodeSearch);
+    document.getElementById("guestCodeSearch").addEventListener("keydown", (event) => {
+      if (event.key !== "Enter") return;
+      event.preventDefault();
+      runGuestCodeSearch();
+    });
+
+    document.getElementById("guestLookupResult").addEventListener("click", (event) => {
+      const paidButton = event.target.closest("[data-mark-guest-paid]");
+      if (!paidButton) return;
+      const guestCode = paidButton.dataset.markGuestPaid;
+      if (window.confirm(`Mark Guest ${guestCode} as PAID?`)) {
+        markDiningGuestPaid(guestCode);
+      }
+    });
+    document.getElementById("closeGuestLookupModal").addEventListener("click", closeGuestLookupModal);
+    document.getElementById("dismissGuestLookup").addEventListener("click", closeGuestLookupModal);
+    document.getElementById("guestLookupModal").addEventListener("click", (event) => {
+      if (event.target === event.currentTarget) closeGuestLookupModal();
     });
 
     document.getElementById("qrAssignmentOptions").addEventListener("click", (event) => {
@@ -6359,8 +7668,12 @@
 
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
-        if (document.getElementById("qrAssignmentModal")?.classList.contains("is-open")) {
+        if (document.getElementById("guestLookupModal")?.classList.contains("is-open")) {
+          closeGuestLookupModal();
+        } else if (document.getElementById("qrAssignmentModal")?.classList.contains("is-open")) {
           closeQrAssignmentModal();
+        } else if (state.partySetupMode) {
+          cancelPartySetup();
         } else if (sheet.classList.contains("is-open")) {
           closeSheet();
         } else if (removeConfirmModal.classList.contains("is-open")) {

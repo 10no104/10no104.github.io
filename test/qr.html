@@ -122,7 +122,36 @@
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 18px;
       width: min(1120px, 94vw);
-      margin: 26px auto 46px;
+      margin: 26px auto;
+    }
+
+    .cashier-section {
+      width: min(1120px, 94vw);
+      margin: 0 auto 46px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(84, 62, 45, 0.16);
+    }
+
+    .cashier-section > h2,
+    .cashier-section > p {
+      margin: 0;
+    }
+
+    .cashier-section > h2 {
+      color: #4c2430;
+      font-size: 1.35rem;
+    }
+
+    .cashier-section > p {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .cashier-card-wrap {
+      width: min(360px, 100%);
+      margin-top: 15px;
     }
 
     .qr-card {
@@ -259,6 +288,12 @@
 
       body { background: #fff; }
       .controls { display: none; }
+      .cashier-section {
+        width: 100%;
+        margin: 0;
+        padding-top: 0.25in;
+        page-break-before: always;
+      }
       .sheet {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 0.16in;
@@ -301,12 +336,17 @@
           <input id="menuBaseUrl" type="url" value="https://www.ehwa.ca/test/menu/" />
         </label>
         <button class="control-btn" id="refreshCodes" type="button">Refresh</button>
-        <button class="control-btn primary" id="printCodes" type="button">Print all 10</button>
+        <button class="control-btn primary" id="printCodes" type="button">Print all QRs</button>
       </div>
     </div>
   </header>
 
   <main class="sheet" id="qrSheet" aria-live="polite"></main>
+  <section class="cashier-section">
+    <h2>Permanent Cashier QR</h2>
+    <p>Place this single QR at the cashier so each customer can open their own bill.</p>
+    <div class="cashier-card-wrap" id="cashierQrCard"></div>
+  </section>
 
   <script src="./vendor/qrcode.min.js"></script>
   <script>
@@ -320,6 +360,13 @@
       url.searchParams.set("qr", String(qrNumber));
       url.searchParams.set("store", QR_BRANCH);
       return url.toString();
+    }
+
+    function buildCashierUrl(baseUrl) {
+      const menuUrl = new URL(String(baseUrl || "https://www.ehwa.ca/test/menu/").trim(), window.location.href);
+      const cashierUrl = new URL("../cashier.html", menuUrl);
+      cashierUrl.searchParams.set("store", QR_BRANCH);
+      return cashierUrl.toString();
     }
 
     function drawCenteredNumber(canvas, qrNumber) {
@@ -384,6 +431,48 @@
       return canvas;
     }
 
+    function renderCashierCard(baseUrl) {
+      const targetUrl = buildCashierUrl(baseUrl);
+      const root = document.getElementById("cashierQrCard");
+      root.innerHTML = `
+        <article class="qr-card">
+          <div class="brand">
+            <img src="../assets/logo-dark.webp" alt="EHWA" />
+            <div><strong>EHWA</strong><span>Downtown cashier</span></div>
+          </div>
+          <div class="qr-heading"><span>Scan to identify your bill</span><strong>CASHIER</strong></div>
+          <div class="qr-canvas-wrap" aria-label="Permanent Cashier QR"></div>
+          <p class="qr-copy">Your Guest Code, current order, and total will appear on your phone.</p>
+          <div class="qr-url" title="${targetUrl}">${targetUrl}</div>
+          <button class="download-btn" type="button">Download Cashier QR</button>
+        </article>
+      `;
+      const canvasWrap = root.querySelector(".qr-canvas-wrap");
+      const downloadButton = root.querySelector(".download-btn");
+      canvasWrap.innerHTML = "";
+      new window.QRCode(canvasWrap, {
+        text: targetUrl,
+        width: QR_SIZE,
+        height: QR_SIZE,
+        colorDark: "#211713",
+        colorLight: "#ffffff",
+        correctLevel: window.QRCode.CorrectLevel.H
+      });
+      const canvas = canvasWrap.querySelector("canvas");
+      canvasWrap.querySelectorAll("img").forEach((image) => image.remove());
+      if (!canvas) {
+        downloadButton.disabled = true;
+        return;
+      }
+      canvas.style.display = "block";
+      downloadButton.addEventListener("click", () => {
+        const link = document.createElement("a");
+        link.download = "ehwa-downtown-cashier-qr.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
+    }
+
     async function renderQrSheet() {
       const sheet = document.getElementById("qrSheet");
       const baseUrl = document.getElementById("menuBaseUrl").value;
@@ -415,6 +504,7 @@
           downloadButton.textContent = "QR generation failed";
         }
       }
+      renderCashierCard(baseUrl);
     }
 
     document.getElementById("refreshCodes").addEventListener("click", renderQrSheet);

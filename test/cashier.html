@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#2a1712" />
+  <title>Your Bill | EHWA Downtown</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #2d2018;
+      --muted: #78675b;
+      --wine: #6a2032;
+      --paper: #fffaf3;
+      --line: rgba(92, 61, 40, 0.14);
+      --green: #267046;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background:
+        radial-gradient(circle at 50% 0, rgba(212, 175, 55, 0.2), transparent 34rem),
+        linear-gradient(180deg, #f7efe4, #e8dac9);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 70px;
+      padding: 12px max(16px, calc((100vw - 720px) / 2));
+      background:
+        linear-gradient(120deg, rgba(35, 21, 15, 0.98), rgba(94, 27, 44, 0.96)),
+        url("../assets/pattern.webp") center / 460px auto;
+      color: #fff8ee;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand img {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+    }
+
+    .brand strong,
+    .brand span {
+      display: block;
+    }
+
+    .brand strong {
+      font-size: 0.95rem;
+    }
+
+    .brand span {
+      margin-top: 2px;
+      color: rgba(255, 248, 238, 0.66);
+      font-size: 0.66rem;
+      font-weight: 800;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+    }
+
+    .refresh-btn {
+      min-height: 40px;
+      padding: 0 13px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.09);
+      color: #fff;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .page {
+      width: min(720px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 24px 0 48px;
+    }
+
+    .bill-card,
+    .empty-card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(249, 242, 232, 0.96)),
+        url("../assets/pattern.webp") center / 480px auto;
+      box-shadow: 0 24px 55px rgba(58, 36, 22, 0.14);
+    }
+
+    .bill-hero {
+      padding: 24px;
+      background: linear-gradient(135deg, #301d16, #6a2032);
+      color: #fff8ef;
+    }
+
+    .bill-hero p {
+      margin: 0;
+      color: #e8c56d;
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .bill-hero h1 {
+      margin: 8px 0 0;
+      font-size: clamp(2.4rem, 10vw, 4.7rem);
+      letter-spacing: 0.04em;
+      line-height: 0.95;
+    }
+
+    .bill-hero-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 17px;
+      color: rgba(255, 248, 239, 0.72);
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+
+    .status-pill {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      font-size: 0.68rem;
+      font-weight: 950;
+    }
+
+    .status-pill.is-paid {
+      background: #dff2e5;
+      color: var(--green);
+    }
+
+    .total-panel {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 22px 24px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .total-panel span,
+    .total-panel strong {
+      display: block;
+    }
+
+    .total-panel span {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 850;
+      text-transform: uppercase;
+    }
+
+    .total-panel strong {
+      margin-top: 4px;
+      color: var(--wine);
+      font-size: clamp(2rem, 8vw, 3.3rem);
+      letter-spacing: -0.06em;
+    }
+
+    .total-panel small {
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 750;
+      text-align: right;
+    }
+
+    .order-list {
+      display: grid;
+      gap: 9px;
+      padding: 18px 24px;
+    }
+
+    .order-row {
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .order-row-head,
+    .order-row-total {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .order-row-head strong {
+      color: #4e2830;
+      font-size: 0.88rem;
+    }
+
+    .order-row-head time {
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 750;
+    }
+
+    .order-items {
+      margin: 9px 0;
+      color: #58483d;
+      font-size: 0.79rem;
+      line-height: 1.55;
+    }
+
+    .order-row-total {
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 850;
+    }
+
+    .order-row-total strong {
+      color: var(--ink);
+      font-size: 0.9rem;
+    }
+
+    .payment-panel {
+      display: grid;
+      grid-template-columns: 170px minmax(0, 1fr);
+      gap: 18px;
+      align-items: center;
+      margin: 0 24px 24px;
+      padding: 18px;
+      border-radius: 20px;
+      background: #efe3d4;
+    }
+
+    .payment-qr {
+      overflow: hidden;
+      width: 170px;
+      padding: 8px;
+      border-radius: 15px;
+      background: #fff;
+    }
+
+    .payment-qr canvas {
+      display: block !important;
+      width: 100% !important;
+      height: auto !important;
+    }
+
+    .payment-copy h2 {
+      margin: 0;
+      font-size: 1.14rem;
+    }
+
+    .payment-copy p {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .empty-card {
+      padding: 42px 24px;
+      text-align: center;
+    }
+
+    .empty-card h1 {
+      margin: 0;
+      font-size: 1.55rem;
+    }
+
+    .empty-card p {
+      max-width: 470px;
+      margin: 10px auto 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .empty-card a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      margin-top: 18px;
+      padding: 0 16px;
+      border-radius: 999px;
+      background: var(--wine);
+      color: #fff;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    @media (max-width: 560px) {
+      .payment-panel {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        text-align: center;
+      }
+
+      .bill-hero,
+      .total-panel,
+      .order-list {
+        padding-inline: 18px;
+      }
+
+      .payment-panel {
+        margin-inline: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="../assets/logo-dark.webp" alt="EHWA" />
+      <div><strong>EHWA Downtown</strong><span>Cashier bill check</span></div>
+    </div>
+    <button class="refresh-btn" id="refreshBill" type="button">Refresh</button>
+  </header>
+
+  <main class="page" id="billRoot">
+    <section class="empty-card">
+      <h1>Finding your bill…</h1>
+      <p>Please wait while we identify this browser's current dining Guest.</p>
+    </section>
+  </main>
+
+  <script src="./vendor/qrcode.min.js"></script>
+  <script>
+    const SUPABASE_CONFIG = {
+      url: "https://pzhzdjsjfdzbzkhnaxmc.supabase.co",
+      anonKey: "sb_publishable_3Ox2JIQXVLwusT-xzIMJ4g_YXTR5q8e"
+    };
+    const STORAGE_PREFIX = "ehwa_dining_guest";
+    const branch = (() => {
+      const candidate = new URLSearchParams(window.location.search).get("store") || "downtown";
+      return /^[a-z0-9_-]{1,40}$/.test(candidate) ? candidate : "downtown";
+    })();
+
+    function escapeHtml(value = "") {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function formatMoney(value) {
+      return new Intl.NumberFormat("en-CA", {
+        style: "currency",
+        currency: "CAD"
+      }).format(Number(value || 0));
+    }
+
+    function formatTime(value) {
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "";
+      return new Intl.DateTimeFormat("en-CA", {
+        hour: "numeric",
+        minute: "2-digit"
+      }).format(date);
+    }
+
+    function readGuestId() {
+      try {
+        const stored = JSON.parse(window.localStorage.getItem(`${STORAGE_PREFIX}:${branch}`) || "null");
+        const guestId = String(stored?.guest_id || "");
+        return /^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(guestId) ? guestId : null;
+      } catch {
+        return null;
+      }
+    }
+
+    async function lookupBill() {
+      const guestId = readGuestId();
+      const displayCode = new URLSearchParams(window.location.search).get("guest");
+      if (!guestId && !displayCode) return null;
+      const { url, anonKey } = SUPABASE_CONFIG;
+      const response = await fetch(`${url}/rest/v1/rpc/lookup_dining_guest_bill`, {
+        method: "POST",
+        headers: {
+          apikey: anonKey,
+          Authorization: `Bearer ${anonKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          p_branch: branch,
+          p_guest_id: displayCode ? null : guestId,
+          p_display_code: displayCode ? String(displayCode).trim().toUpperCase() : null
+        })
+      });
+      if (!response.ok) {
+        throw new Error(`Bill lookup failed (${response.status}): ${await response.text()}`);
+      }
+      return response.json();
+    }
+
+    function renderPaymentQr(displayCode) {
+      const container = document.getElementById("paymentQr");
+      if (!container || typeof window.QRCode !== "function") return;
+      const paymentUrl = new URL("./queen.html", window.location.href);
+      paymentUrl.searchParams.set("guest", displayCode);
+      paymentUrl.searchParams.set("view", "guest");
+      new window.QRCode(container, {
+        text: paymentUrl.toString(),
+        width: 360,
+        height: 360,
+        colorDark: "#241713",
+        colorLight: "#ffffff",
+        correctLevel: window.QRCode.CorrectLevel.H
+      });
+      container.querySelectorAll("img").forEach((image) => image.remove());
+    }
+
+    function renderBill(bill) {
+      const root = document.getElementById("billRoot");
+      const guest = bill?.guest;
+      if (!guest) {
+        root.innerHTML = `
+          <section class="empty-card">
+            <h1>No current Guest found</h1>
+            <p>Open the menu by scanning your table QR first, then scan the Cashier QR with the same browser.</p>
+            <a href="./menu/">Return to menu</a>
+          </section>
+        `;
+        return;
+      }
+
+      const orders = (Array.isArray(bill.orders) ? bill.orders : [])
+        .filter((order) => order.kind === "order" && order.status !== "canceled");
+      const tableCodes = Array.from(new Set(
+        (Array.isArray(bill.tables) ? bill.tables : [])
+          .map((table) => table.table_code)
+          .filter(Boolean)
+      ));
+      const status = String(guest.status || "ACTIVE").toUpperCase();
+
+      root.innerHTML = `
+        <section class="bill-card">
+          <div class="bill-hero">
+            <p>Your Guest Code</p>
+            <h1>${escapeHtml(guest.display_code)}</h1>
+            <div class="bill-hero-meta">
+              <span>Party #${escapeHtml(bill.party_id)} · ${escapeHtml(tableCodes.join(" + ") || "Table")}</span>
+              <span class="status-pill ${status === "PAID" ? "is-paid" : ""}">${escapeHtml(status)}</span>
+            </div>
+          </div>
+          <div class="total-panel">
+            <div><span>Current total</span><strong>${escapeHtml(formatMoney(bill.total))}</strong></div>
+            <small>${orders.length} order${orders.length === 1 ? "" : "s"}<br />Tax included</small>
+          </div>
+          <div class="order-list">
+            ${orders.length ? orders.map((order) => {
+              const items = Array.isArray(order.items) ? order.items : [];
+              const summary = items.map((item) => (
+                `${Number(item.quantity || 0)}× ${item.nameEn || item.nameKo || "Menu item"}`
+              )).join(" · ");
+              return `
+                <article class="order-row">
+                  <div class="order-row-head">
+                    <strong>Table ${escapeHtml(order.table_code || "-")}</strong>
+                    <time>${escapeHtml(formatTime(order.created_at))}</time>
+                  </div>
+                  <div class="order-items">${escapeHtml(summary || "Order details")}</div>
+                  <div class="order-row-total">
+                    <span>${escapeHtml(String(order.status || "").toUpperCase())}</span>
+                    <strong>${escapeHtml(formatMoney(order.total))}</strong>
+                  </div>
+                </article>
+              `;
+            }).join("") : '<div class="order-row">No orders on this bill yet.</div>'}
+          </div>
+          <div class="payment-panel">
+            <div class="payment-qr" id="paymentQr" aria-label="Payment QR"></div>
+            <div class="payment-copy">
+              <h2>Show this at the cashier</h2>
+              <p>The cashier can scan this payment QR or search your Guest Code <strong>${escapeHtml(guest.display_code)}</strong>. Only this Guest's bill will open.</p>
+            </div>
+          </div>
+        </section>
+      `;
+      renderPaymentQr(guest.display_code);
+    }
+
+    async function refreshBill() {
+      const root = document.getElementById("billRoot");
+      try {
+        const bill = await lookupBill();
+        renderBill(bill);
+      } catch (error) {
+        console.error(error);
+        root.innerHTML = `
+          <section class="empty-card">
+            <h1>Bill unavailable</h1>
+            <p>Please ask the cashier to search your Guest Code, or refresh this page.</p>
+          </section>
+        `;
+      }
+    }
+
+    document.getElementById("refreshBill").addEventListener("click", refreshBill);
+    refreshBill();
+  </script>
+</body>
+</html>

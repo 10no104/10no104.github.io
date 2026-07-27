@@ -654,6 +654,28 @@
       cursor: pointer;
     }
 
+    .guest-session-actions {
+      display: flex;
+      flex: 0 0 auto;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .guest-bill-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 0 13px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      background: #5a1122;
+      color: #fffaf3;
+      font-size: 0.78rem;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
     .guest-session-message {
       margin: 0;
       padding: 11px 13px;
@@ -1182,6 +1204,22 @@
     }
 
     @media (max-width: 640px) {
+      .guest-session-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .guest-session-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+      }
+
+      .guest-session-refresh,
+      .guest-bill-link {
+        width: 100%;
+      }
+
       .order-layout {
         width: min(calc(100% - 20px), 420px);
         grid-template-columns: 1fr;
@@ -1419,7 +1457,7 @@
     <div class="menu-sticky-inner">
       <div class="menu-homebar">
         <a class="menu-home-link" href="../../index.html" aria-label="Go to test hub">
-          <img class="menu-home-logo" src="../../../assets/logo-dark.webp" alt="EHWA home" />
+          <img class="menu-home-logo" src="../../assets/logo-dark.webp" alt="EHWA home" />
         </a>
       </div>
       <section class="tabs" aria-label="Categories" id="tabs"></section>
@@ -1442,7 +1480,10 @@
         <div class="guest-qr-number" id="guestQrNumber">--</div>
         <div><span>Dining session</span><strong id="guestSessionTitle">Checking QR status…</strong></div>
       </div>
-      <button class="guest-session-refresh" id="guestOrdersRefresh" type="button">Refresh</button>
+      <div class="guest-session-actions">
+        <a class="guest-bill-link" id="guestBillLink" href="../cashier.html" hidden>View bill</a>
+        <button class="guest-session-refresh" id="guestOrdersRefresh" type="button">Refresh</button>
+      </div>
     </div>
     <p class="guest-session-message" id="guestSessionMessage">Please wait while this QR is verified.</p>
     <div class="guest-order-history-head">
@@ -1525,6 +1566,7 @@
     };
     const DINING_REQUESTS_TABLE = "dining_requests";
     const DINING_QR_SESSIONS_TABLE = "dining_qr_sessions";
+    const DINING_GUEST_STORAGE_PREFIX = "ehwa_dining_guest";
     const QR_SESSION_REFRESH_MS = 5000;
     const SHEET_CONFIG = {
       sheetId: "1xa9OZbctYnlbaAL8lKIgmefM5hvSw0Plk01lxp5G2fc",
@@ -1602,10 +1644,13 @@
     let isDiningRequestSubmitting = false;
     let currentQrNumber = null;
     let currentQrSession = null;
+    let currentGuest = null;
     let guestSessionRequests = [];
     let qrSessionRefreshHandle = null;
     let qrSessionLoadError = false;
     let isQrSessionRefreshing = false;
+    let diningPartyArchitectureAvailable = null;
+    let lastNotificationId = 0;
 
     function escapeHtml(text = "") {
       return text
@@ -2113,6 +2158,129 @@
       return Number.isInteger(qrNumber) && qrNumber >= 1 && qrNumber <= 10 ? qrNumber : null;
     }
 
+    function getDiningBranch() {
+      return String(document.getElementById("storeSelect")?.value || MENU_BRANCH).trim().toLowerCase();
+    }
+
+    function getGuestStorageKey(branch = getDiningBranch()) {
+      return `${DINING_GUEST_STORAGE_PREFIX}:${branch}`;
+    }
+
+    function readStoredGuestId() {
+      try {
+        const value = JSON.parse(window.localStorage.getItem(getGuestStorageKey()) || "null");
+        const guestId = String(value?.guest_id || "");
+        return /^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(guestId) ? guestId : null;
+      } catch {
+        return null;
+      }
+    }
+
+    function storeResolvedGuest(guest) {
+      if (!guest?.guest_id) return;
+      try {
+        window.localStorage.setItem(getGuestStorageKey(), JSON.stringify({
+          guest_id: guest.guest_id,
+          display_code: guest.display_code,
+          party_id: guest.party_id,
+          expires_at: guest.expires_at
+        }));
+      } catch {
+        // Ordering still works when browser storage is unavailable.
+      }
+    }
+
+    function getGuestDeviceInfo() {
+      const screenSize = window.screen
+        ? `${window.screen.width || 0}x${window.screen.height || 0}`
+        : "";
+      return {
+        userAgent: String(navigator.userAgent || "").slice(0, 500),
+        platform: String(navigator.platform || "").slice(0, 100),
+        language: String(navigator.language || "").slice(0, 40),
+        screen: screenSize,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || ""
+      };
+    }
+
+    function isPartyArchitectureMissing(error) {
+      return error?.status === 404
+        || /PGRST202|resolve_dining_guest|schema cache/i.test(String(error?.message || ""));
+    }
+
+    async function callDiningRpc(functionName, payload) {
+      const { url, anonKey } = SUPABASE_CONFIG;
+      const response = await fetch(`${url}/rest/v1/rpc/${functionName}`, {
+        method: "POST",
+        headers: {
+          apikey: anonKey,
+          Authorization: `Bearer ${anonKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+      const responseText = await response.text();
+      if (!response.ok) {
+        const error = new Error(`${functionName} failed (${response.status}): ${responseText}`);
+        error.status = response.status;
+        error.responseText = responseText;
+        throw error;
+      }
+      return responseText ? JSON.parse(responseText) : null;
+    }
+
+    function applyResolvedDiningGuest(resolvedGuest) {
+      currentGuest = resolvedGuest;
+      currentQrSession = resolvedGuest ? {
+        id: Number(resolvedGuest.qr_session_id) || null,
+        branch: getDiningBranch(),
+        qr_number: Number(resolvedGuest.qr_number),
+        table_code: String(resolvedGuest.table_code || ""),
+        table_id: Number(resolvedGuest.table_id),
+        party_id: Number(resolvedGuest.party_id),
+        status: "active"
+      } : null;
+      if (resolvedGuest) storeResolvedGuest(resolvedGuest);
+    }
+
+    async function resolveDiningGuest() {
+      if (!currentQrNumber) return null;
+      const resolved = await callDiningRpc("resolve_dining_guest", {
+        p_branch: getDiningBranch(),
+        p_qr_number: currentQrNumber,
+        p_guest_id: readStoredGuestId(),
+        p_device_info: getGuestDeviceInfo(),
+        p_current_page: `${window.location.pathname}${window.location.search}`.slice(0, 300)
+      });
+      diningPartyArchitectureAvailable = true;
+      applyResolvedDiningGuest(resolved);
+      return resolved;
+    }
+
+    async function fetchGuestNotifications() {
+      if (!currentGuest?.guest_id || !diningPartyArchitectureAvailable) return [];
+      const notifications = await callDiningRpc("get_dining_guest_notifications", {
+        p_branch: getDiningBranch(),
+        p_guest_id: currentGuest.guest_id
+      });
+      return Array.isArray(notifications) ? notifications : [];
+    }
+
+    async function showAndReadGuestNotifications() {
+      const notifications = await fetchGuestNotifications();
+      if (!notifications.length) return;
+      const newest = notifications[notifications.length - 1];
+      if (Number(newest.id) > lastNotificationId) {
+        lastNotificationId = Number(newest.id);
+        showRequestToast([newest.title, newest.message].filter(Boolean).join(" · "));
+      }
+      await callDiningRpc("read_dining_guest_notifications", {
+        p_branch: getDiningBranch(),
+        p_guest_id: currentGuest.guest_id,
+        p_notification_ids: notifications.map((notification) => Number(notification.id)).filter(Number.isFinite)
+      });
+    }
+
     function formatGuestRequestTime(value) {
       const date = new Date(value);
       if (Number.isNaN(date.getTime())) return "Time unavailable";
@@ -2183,7 +2351,8 @@
         const itemSummary = isOrder
           ? request.items.map((item) => `${Number(item.quantity || 0)}× ${item.nameEn || item.nameKo || "Menu item"}`).join(" · ")
           : ({ water: "Water request", napkins: "Napkins request", server: "Server requested" }[request.request_type] || "Service request");
-        const title = isOrder ? `Order #${request.id}` : `Request #${request.id}`;
+        const tableSuffix = request.table_code ? ` · Table ${request.table_code}` : "";
+        const title = isOrder ? `Order #${request.id}${tableSuffix}` : `Request #${request.id}${tableSuffix}`;
         return `
           <article class="guest-order-card is-${escapeHtml(String(request.status))}">
             <div class="guest-order-card-top">
@@ -2206,6 +2375,7 @@
       const number = document.getElementById("guestQrNumber");
       const title = document.getElementById("guestSessionTitle");
       const message = document.getElementById("guestSessionMessage");
+      const billLink = document.getElementById("guestBillLink");
       const canOrder = Boolean(currentQrSession && !qrSessionLoadError);
       if (!panel || !number || !title || !message) return;
 
@@ -2220,14 +2390,22 @@
         message.textContent = "The QR system could not be reached. Please ask your server.";
       } else if (!currentQrSession) {
         title.textContent = `QR ${String(currentQrNumber).padStart(2, "0")} is not active`;
-        message.textContent = "Please ask your server to assign this QR to your table before ordering.";
+        message.textContent = "Please ask your server to start this table before ordering.";
       } else {
-        title.textContent = `Table ${currentQrSession.table_code || "-"} · QR ${String(currentQrNumber).padStart(2, "0")}`;
-        message.textContent = "Ordering is open for this table. Sent orders and their live status appear below.";
+        const guestCode = currentGuest?.display_code ? `Guest ${currentGuest.display_code} · ` : "";
+        title.textContent = `${guestCode}Table ${currentQrSession.table_code || "-"}`;
+        message.textContent = currentGuest
+          ? "Your bill follows you across every table in this Party."
+          : "Ordering is open for this table. Sent orders and their live status appear below.";
         const tableCodeInput = document.getElementById("tableCode");
         if (tableCodeInput && currentQrSession.table_code) {
           tableCodeInput.value = currentQrSession.table_code;
         }
+      }
+
+      if (billLink) {
+        billLink.hidden = !currentGuest;
+        billLink.href = `../cashier.html?store=${encodeURIComponent(getDiningBranch())}`;
       }
 
       document.querySelectorAll(".menu-add-btn, #drawerSubmitBtn, #serverCallBtn, #serverModalConfirmBtn").forEach((button) => {
@@ -2257,11 +2435,17 @@
       return rows[0] || null;
     }
 
-    async function fetchGuestSessionRequests(sessionId) {
+    async function fetchGuestSessionRequests({ guestId = null, sessionId = null } = {}) {
       const { url, anonKey } = SUPABASE_CONFIG;
       const endpoint = new URL(`${url}/rest/v1/${DINING_REQUESTS_TABLE}`);
-      endpoint.searchParams.set("select", "id,kind,request_type,status,items,item_count,total,created_at,updated_at");
-      endpoint.searchParams.set("qr_session_id", `eq.${sessionId}`);
+      endpoint.searchParams.set("select", "id,table_code,kind,request_type,status,items,item_count,total,created_at,updated_at");
+      if (guestId) {
+        endpoint.searchParams.set("guest_id", `eq.${guestId}`);
+      } else if (sessionId) {
+        endpoint.searchParams.set("qr_session_id", `eq.${sessionId}`);
+      } else {
+        return [];
+      }
       endpoint.searchParams.set("order", "created_at.desc");
       endpoint.searchParams.set("limit", "50");
       const response = await fetch(endpoint.toString(), {
@@ -2287,13 +2471,47 @@
       if (manual && refreshButton) refreshButton.disabled = true;
 
       try {
-        const nextSession = await fetchActiveQrSession();
-        currentQrSession = nextSession;
-        guestSessionRequests = nextSession ? await fetchGuestSessionRequests(nextSession.id) : [];
+        let resolvedWithPartyArchitecture = false;
+        if (diningPartyArchitectureAvailable !== false) {
+          try {
+            const resolvedGuest = await resolveDiningGuest();
+            resolvedWithPartyArchitecture = Boolean(resolvedGuest);
+            guestSessionRequests = resolvedGuest
+              ? await fetchGuestSessionRequests({ guestId: resolvedGuest.guest_id })
+              : [];
+            showAndReadGuestNotifications().catch((error) => {
+              console.error("Guest notification refresh failed", error);
+            });
+          } catch (error) {
+            if (isPartyArchitectureMissing(error)) {
+              diningPartyArchitectureAvailable = false;
+              currentGuest = null;
+            } else if (/not assigned to an active party/i.test(String(error?.message || ""))) {
+              diningPartyArchitectureAvailable = true;
+              currentGuest = null;
+              currentQrSession = null;
+              guestSessionRequests = [];
+              qrSessionLoadError = false;
+              return;
+            } else {
+              throw error;
+            }
+          }
+        }
+
+        if (!resolvedWithPartyArchitecture) {
+          const nextSession = await fetchActiveQrSession();
+          currentQrSession = nextSession;
+          currentGuest = null;
+          guestSessionRequests = nextSession
+            ? await fetchGuestSessionRequests({ sessionId: nextSession.id })
+            : [];
+        }
         qrSessionLoadError = false;
       } catch (error) {
         if (!qrSessionLoadError) console.error("QR session refresh failed", error);
         currentQrSession = null;
+        currentGuest = null;
         guestSessionRequests = [];
         qrSessionLoadError = true;
       } finally {
@@ -2305,6 +2523,27 @@
 
     async function requireActiveQrSession() {
       if (!currentQrNumber) throw new Error("A numbered QR link is required");
+      if (diningPartyArchitectureAvailable !== false) {
+        try {
+          const resolvedGuest = await resolveDiningGuest();
+          if (!resolvedGuest || !currentQrSession) throw new Error("This QR is not active");
+          qrSessionLoadError = false;
+          syncQrSessionUi();
+          return currentQrSession;
+        } catch (error) {
+          if (!isPartyArchitectureMissing(error)) {
+            currentGuest = null;
+            currentQrSession = null;
+            guestSessionRequests = [];
+            qrSessionLoadError = false;
+            syncQrSessionUi();
+            throw error;
+          }
+          diningPartyArchitectureAvailable = false;
+          currentGuest = null;
+        }
+      }
+
       const activeSession = await fetchActiveQrSession();
       if (!activeSession) {
         currentQrSession = null;
@@ -2416,6 +2655,19 @@
       const { url, anonKey } = SUPABASE_CONFIG;
       if (!url || !anonKey) throw new Error("Missing Supabase configuration");
       const activeSession = await requireActiveQrSession();
+      if (diningPartyArchitectureAvailable && currentGuest?.guest_id) {
+        const result = await callDiningRpc("submit_dining_request_v2", {
+          p_branch: getDiningBranch(),
+          p_qr_number: Number(activeSession.qr_number),
+          p_guest_id: currentGuest.guest_id,
+          p_kind: payload.kind,
+          p_request_type: payload.request_type,
+          p_note: payload.note || "",
+          p_items: payload.items || []
+        });
+        return Array.isArray(result) ? (result[0] || null) : result;
+      }
+
       const sessionPayload = {
         ...payload,
         table_code: String(activeSession.table_code || "").trim(),
@@ -2606,7 +2858,7 @@
           renderOrderSummary();
           statusEl.textContent = `Order${requestNumber} sent.`;
           statusEl.className = "order-status is-success";
-          showRequestToast(`Order${requestNumber} sent from QR ${String(currentQrNumber).padStart(2, "0")}.`);
+          showRequestToast(`Order${requestNumber} sent.`);
           closeCartDrawer();
           refreshQrSession();
         } catch (error) {
@@ -2877,7 +3129,7 @@
           await submitDiningRequest(buildServerRequestPayload(formValues));
           statusEl.textContent = `Request sent: ${selectedServerRequestType}.`;
           statusEl.className = "order-status is-success";
-          showRequestToast(`${selectedServerRequestType} request sent from QR ${String(currentQrNumber).padStart(2, "0")}.`);
+          showRequestToast(`${selectedServerRequestType} request sent.`);
           closeServerModal();
           refreshQrSession();
         } catch (error) {
