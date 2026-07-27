@@ -1454,6 +1454,11 @@
       background: rgba(95, 39, 49, 0.06);
     }
 
+    .party-setup-bar[hidden],
+    .table-map-tabs[hidden] {
+      display: none;
+    }
+
     .party-setup-bar.is-building {
       position: sticky;
       z-index: 45;
@@ -1543,6 +1548,21 @@
       z-index: 21;
       outline: 4px solid #2b75a0;
       outline-offset: 3px;
+    }
+
+    .table-map-grid.is-drag-selecting,
+    .table-map-grid.is-drag-selecting * {
+      cursor: crosshair !important;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .queen-map-table {
+      touch-action: none;
+    }
+
+    .floor-table-card {
+      touch-action: pan-y;
     }
 
     .guest-lookup-result {
@@ -3836,20 +3856,19 @@
         <div class="table-map-title-row">
           <div>
             <h3>Table Map</h3>
-            <p>Each table keeps its own QR. Select multiple tables to combine all of them under one Party.</p>
+            <p>Tap an available table to select it. Tap more tables or drag across nearby tables to create one Party.</p>
           </div>
           <a class="table-map-editor-link" href="./table.html">Edit map</a>
         </div>
-        <div class="party-setup-bar" id="partySetupBar">
+        <div class="party-setup-bar" id="partySetupBar" hidden>
           <div class="party-setup-copy">
-            <strong id="partySetupTitle">Seat a Party</strong>
-            <p id="partySetupMessage">Select every table in the group, then start one Party.</p>
+            <strong id="partySetupTitle">Selected tables</strong>
+            <p id="partySetupMessage">Tap or drag across nearby tables.</p>
             <div class="party-table-selection" id="partyTableSelection" aria-live="polite" hidden></div>
           </div>
           <div class="party-setup-actions">
-            <button id="cancelPartySetup" type="button" hidden>Cancel</button>
-            <button class="primary" id="newPartyButton" type="button">Seat Party</button>
-            <button class="primary" id="confirmPartySetup" type="button" hidden>Start Party</button>
+            <button id="cancelPartySetup" type="button">Clear</button>
+            <button class="primary" id="confirmPartySetup" type="button">Start Party</button>
           </div>
         </div>
         <div class="table-map-tabs" id="tableMapTabs" aria-label="Table map area">
@@ -4187,6 +4206,7 @@
       partyActionError: "",
       partySetupMode: false,
       partySetupTargetId: null,
+      partySetupZone: null,
       partySetupSaving: false,
       selectedPartyTableCodes: new Set(),
       guestLookupBusy: false,
@@ -4211,6 +4231,8 @@
       dismissedFullscreenReservationKeys: new Set(),
       requestUpdatingIds: new Set()
     };
+    let tablePartyDrag = null;
+    let suppressTableMapClick = false;
 
     function escapeHtml(value = "") {
       return String(value)
@@ -4689,7 +4711,7 @@
         list.innerHTML = `<div class="party-empty">${
           state.partyLoadError
             ? "Existing QR sessions continue to work until the Party architecture SQL is installed."
-            : "No active Parties. Use Seat Party below and select every table in the group."
+            : "No active Parties. Tap an available table below, then tap or drag across nearby tables."
         }</div>`;
         return;
       }
@@ -4701,24 +4723,18 @@
       const title = document.getElementById("partySetupTitle");
       const message = document.getElementById("partySetupMessage");
       const selection = document.getElementById("partyTableSelection");
-      const newButton = document.getElementById("newPartyButton");
       const cancelButton = document.getElementById("cancelPartySetup");
       const confirmButton = document.getElementById("confirmPartySetup");
-      if (!bar || !title || !message || !selection || !newButton || !cancelButton || !confirmButton) return;
+      const mapTabs = document.getElementById("tableMapTabs");
+      if (!bar || !title || !message || !selection || !cancelButton || !confirmButton || !mapTabs) return;
 
       const selectedCount = state.selectedPartyTableCodes.size;
       bar.classList.toggle("is-building", state.partySetupMode);
+      bar.hidden = !state.partySetupMode;
+      mapTabs.hidden = state.partySetupMode;
       if (!state.partySetupMode) {
-        title.textContent = "Seat a Party";
-        message.textContent = state.partyLoadError
-          ? "Party setup becomes available after the new architecture SQL is installed."
-          : "Select every table in the group, then start one Party. Each table keeps its own QR.";
         selection.hidden = true;
         selection.innerHTML = "";
-        newButton.hidden = false;
-        newButton.disabled = state.partyLoadError;
-        cancelButton.hidden = true;
-        confirmButton.hidden = true;
         return;
       }
 
@@ -4732,12 +4748,12 @@
           table: getDiningTableRecord(tableCode)
         }))
         .sort((left, right) => left.tableCode.localeCompare(right.tableCode, undefined, { numeric: true }));
-      title.textContent = targetParty ? `Add tables to Party #${targetParty.id}` : "Build one Party";
+      title.textContent = targetParty ? `Add nearby tables to Party #${targetParty.id}` : "Selected tables";
       message.textContent = targetParty
         ? `${currentPartyTableCodes.join(" + ") || "No current tables"} · ${selectedCount} new table${selectedCount === 1 ? "" : "s"} selected.`
         : selectedCount
-          ? `${selectedCount} table${selectedCount === 1 ? "" : "s"} selected · Continue across any floor, then confirm.`
-          : "Tap every available table in this group. Their permanent QRs will share one Party.";
+          ? `${selectedCount} nearby table${selectedCount === 1 ? "" : "s"} selected · Tap or drag to adjust.`
+          : "Tap or drag across the nearby available tables to add them.";
       selection.hidden = selectedCount === 0;
       selection.innerHTML = selectedTables.map(({ tableCode, table }) => `
         <button
@@ -4751,10 +4767,7 @@
           <small>QR ${String(table?.qr_number || 0).padStart(2, "0")} ×</small>
         </button>
       `).join("");
-      newButton.hidden = true;
-      cancelButton.hidden = false;
       cancelButton.disabled = state.partySetupSaving;
-      confirmButton.hidden = false;
       confirmButton.disabled = selectedCount === 0 || state.partySetupSaving;
       confirmButton.textContent = state.partySetupSaving
         ? targetParty ? "Adding…" : "Starting…"
@@ -4870,6 +4883,19 @@
       return "first";
     }
 
+    function findDiningTableMapZone(tableCode) {
+      const normalizedTable = String(tableCode || "").trim().toLowerCase();
+      for (const [zone, layout] of state.tableLayouts.entries()) {
+        if (layout.items.some((item) => (
+          item.type === "table"
+          && String(item.tableCode || "").trim().toLowerCase() === normalizedTable
+        ))) {
+          return zone;
+        }
+      }
+      return getDiningTableMapZone(tableCode);
+    }
+
     function getDiningTableMapLayout(zone = state.activeTableMapZone) {
       return state.tableLayouts.get(zone) || null;
     }
@@ -4925,27 +4951,14 @@
                   data-table-code="${escapeHtml(tableCode)}"
                   ${isUpdating ? "disabled" : ""}
                 >${isUpdating ? "Working…" : "End session"}</button>
-              ` : state.partySetupMode && tableRecord?.qr_number ? `
-                <button
-                  class="qr-station-btn ${partySelected ? "reset" : "primary"}"
-                  type="button"
-                  data-toggle-party-table="${escapeHtml(tableCode)}"
-                  ${state.partySetupSaving ? "disabled" : ""}
-                >${partySelected ? "Remove" : "Add to Party"}</button>
-              ` : tableRecord?.qr_number ? `
-                <button
-                  class="qr-station-btn primary"
-                  type="button"
-                  data-build-party-table="${escapeHtml(tableCode)}"
-                >Select for Party</button>
-              ` : `
+              ` : !tableRecord?.qr_number ? `
                 <button
                   class="qr-station-btn primary"
                   type="button"
                   data-assign-table="${escapeHtml(tableCode)}"
                   ${state.partyArchitectureAvailable !== true && state.qrSessionLoadError ? "disabled" : ""}
                 >Map QR</button>
-              `}
+              ` : ""}
               <button class="qr-station-btn" type="button" data-table-history="${escapeHtml(tableCode)}">History</button>
             </div>
           </article>
@@ -4960,7 +4973,7 @@
             <div class="table-map-detail-copy">
               <strong>Select a table</strong>
               <span>${state.partySetupMode
-                ? "Tap every available table in the Party. You can switch floors without losing the selection."
+                ? "Tap or drag across the nearby available tables on this map."
                 : "Tap a table on the map to map its QR, build a Party, or review history."}</span>
             </div>
           </div>
@@ -5015,27 +5028,14 @@
                 data-table-code="${escapeHtml(tableCode)}"
                 ${isUpdating ? "disabled" : ""}
               >${isUpdating ? "Working…" : "End session"}</button>
-            ` : state.partySetupMode && tableRecord?.qr_number ? `
-              <button
-                class="qr-station-btn ${partySelected ? "reset" : "primary"}"
-                type="button"
-                data-toggle-party-table="${escapeHtml(tableCode)}"
-                ${state.partySetupSaving ? "disabled" : ""}
-              >${partySelected ? "Remove from Party" : "Add to Party"}</button>
-            ` : tableRecord?.qr_number ? `
-              <button
-                class="qr-station-btn primary"
-                type="button"
-                data-build-party-table="${escapeHtml(tableCode)}"
-              >Select for Party</button>
-            ` : `
+            ` : !tableRecord?.qr_number ? `
               <button
                 class="qr-station-btn primary"
                 type="button"
                 data-assign-table="${escapeHtml(tableCode)}"
                 ${state.partyArchitectureAvailable !== true && state.qrSessionLoadError ? "disabled" : ""}
               >Map QR</button>
-            `}
+            ` : ""}
             <button class="qr-station-btn" type="button" data-table-history="${escapeHtml(tableCode)}">History</button>
           </div>
         </div>
@@ -5337,16 +5337,19 @@
       return responseText ? JSON.parse(responseText) : null;
     }
 
-    function beginPartySetup(partyId = null, initialTableCode = null) {
+    function beginPartySetup(partyId = null) {
       if (state.partyArchitectureAvailable !== true || state.partySetupSaving) return;
       state.partySetupMode = true;
       state.partySetupTargetId = partyId ? Number(partyId) : null;
+      state.partySetupZone = state.activeTableMapZone;
       state.selectedPartyTableCodes = new Set();
       state.partyActionError = "";
-      const initialTable = initialTableCode ? getDiningTableRecord(initialTableCode) : null;
-      if (initialTable?.qr_number && !initialTable.current_party_id) {
-        state.selectedPartyTableCodes.add(initialTable.table_code);
-        state.selectedMapTableCode = initialTable.table_code;
+      if (state.partySetupTargetId) {
+        const firstPartyTable = getDiningPartyTables(state.partySetupTargetId, { activeOnly: true })[0];
+        if (firstPartyTable?.table_code) {
+          state.activeTableMapZone = findDiningTableMapZone(firstPartyTable.table_code);
+          state.partySetupZone = state.activeTableMapZone;
+        }
       }
       renderPartyDashboard();
       renderTableMap();
@@ -5356,12 +5359,23 @@
       if (state.partySetupSaving) return;
       state.partySetupMode = false;
       state.partySetupTargetId = null;
+      state.partySetupZone = null;
       state.selectedPartyTableCodes = new Set();
       renderPartyDashboard();
       renderTableMap();
     }
 
-    function togglePartySetupTable(tableCode) {
+    function isTableAvailableForPartySelection(tableCode) {
+      const tableRecord = getDiningTableRecord(tableCode);
+      return Boolean(
+        state.partyArchitectureAvailable === true
+        && tableRecord?.qr_number
+        && !tableRecord.current_party_id
+        && !getActiveTableSession(tableRecord.table_code)
+      );
+    }
+
+    function togglePartySetupTable(tableCode, { addOnly = false } = {}) {
       if (state.partySetupSaving) return;
       const tableRecord = getDiningTableRecord(tableCode);
       const normalizedTableCode = tableRecord?.table_code || String(tableCode || "").trim();
@@ -5376,13 +5390,29 @@
         renderDiningRequests();
         return;
       }
+      if (getActiveTableSession(normalizedTableCode)) {
+        state.partyActionError = `Table ${normalizedTableCode} still has an active compatibility session.`;
+        renderDiningRequests();
+        return;
+      }
+      if (!state.partySetupMode) {
+        state.partySetupMode = true;
+        state.partySetupTargetId = null;
+        state.partySetupZone = state.activeTableMapZone;
+        state.selectedPartyTableCodes = new Set();
+      }
+      if (state.partySetupZone && state.partySetupZone !== state.activeTableMapZone) return;
       if (state.selectedPartyTableCodes.has(normalizedTableCode)) {
-        state.selectedPartyTableCodes.delete(normalizedTableCode);
+        if (!addOnly) state.selectedPartyTableCodes.delete(normalizedTableCode);
       } else {
         state.selectedPartyTableCodes.add(normalizedTableCode);
       }
       state.selectedMapTableCode = normalizedTableCode;
       state.partyActionError = "";
+      if (!state.partySetupTargetId && state.selectedPartyTableCodes.size === 0) {
+        state.partySetupMode = false;
+        state.partySetupZone = null;
+      }
       renderPartyDashboard();
       renderTableMap();
     }
@@ -5424,6 +5454,7 @@
         await refreshPartyOperationData();
         state.partySetupMode = false;
         state.partySetupTargetId = null;
+        state.partySetupZone = null;
         state.selectedPartyTableCodes = new Set();
       } catch (error) {
         console.error("Party setup failed", error);
@@ -7608,7 +7639,88 @@
       renderTableMap();
     });
 
-    document.getElementById("tableMapGrid").addEventListener("click", (event) => {
+    const tableMapGridElement = document.getElementById("tableMapGrid");
+
+    function getPointerTableCode(clientX, clientY) {
+      const element = document.elementFromPoint(clientX, clientY);
+      const table = element?.closest("[data-map-table-code]");
+      return table && tableMapGridElement.contains(table)
+        ? table.dataset.mapTableCode || null
+        : null;
+    }
+
+    function finishTablePartyDrag(event, { canceled = false } = {}) {
+      if (!tablePartyDrag || event.pointerId !== tablePartyDrag.pointerId) return;
+      if (tablePartyDrag.active && !canceled) {
+        suppressTableMapClick = true;
+        window.setTimeout(() => {
+          suppressTableMapClick = false;
+        }, 0);
+      }
+      tableMapGridElement.classList.remove("is-drag-selecting");
+      if (tableMapGridElement.hasPointerCapture?.(event.pointerId)) {
+        tableMapGridElement.releasePointerCapture(event.pointerId);
+      }
+      tablePartyDrag = null;
+    }
+
+    tableMapGridElement.addEventListener("pointerdown", (event) => {
+      if (!event.isPrimary || event.button !== 0 || state.partySetupSaving) return;
+      if (event.target.closest(".floor-table-actions button, .table-map-detail-actions button")) return;
+      const table = event.target.closest("[data-map-table-code]");
+      const tableCode = table?.dataset.mapTableCode || null;
+      if (!tableCode || !isTableAvailableForPartySelection(tableCode)) return;
+      tablePartyDrag = {
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        startY: event.clientY,
+        originTableCode: tableCode,
+        active: false,
+        visited: new Set()
+      };
+    });
+
+    tableMapGridElement.addEventListener("pointermove", (event) => {
+      if (!tablePartyDrag || event.pointerId !== tablePartyDrag.pointerId) return;
+      const distance = Math.hypot(
+        event.clientX - tablePartyDrag.startX,
+        event.clientY - tablePartyDrag.startY
+      );
+      if (!tablePartyDrag.active && distance < 8) return;
+      if (!tablePartyDrag.active) {
+        tablePartyDrag.active = true;
+        tableMapGridElement.setPointerCapture?.(event.pointerId);
+        tableMapGridElement.classList.add("is-drag-selecting");
+        tablePartyDrag.visited.add(tablePartyDrag.originTableCode);
+        togglePartySetupTable(tablePartyDrag.originTableCode, { addOnly: true });
+      }
+      event.preventDefault();
+      const tableCode = getPointerTableCode(event.clientX, event.clientY);
+      if (
+        !tableCode
+        || tablePartyDrag.visited.has(tableCode)
+        || !isTableAvailableForPartySelection(tableCode)
+      ) {
+        return;
+      }
+      tablePartyDrag.visited.add(tableCode);
+      togglePartySetupTable(tableCode, { addOnly: true });
+    });
+
+    window.addEventListener("pointerup", (event) => {
+      finishTablePartyDrag(event);
+    });
+    window.addEventListener("pointercancel", (event) => {
+      finishTablePartyDrag(event, { canceled: true });
+    });
+
+    tableMapGridElement.addEventListener("click", (event) => {
+      if (suppressTableMapClick) {
+        event.preventDefault();
+        event.stopPropagation();
+        suppressTableMapClick = false;
+        return;
+      }
       const historyButton = event.target.closest("[data-table-history]");
       if (historyButton) {
         showRequestHistory({ tableCode: historyButton.dataset.tableHistory });
@@ -7631,18 +7743,6 @@
         return;
       }
 
-      const buildPartyButton = event.target.closest("[data-build-party-table]");
-      if (buildPartyButton) {
-        beginPartySetup(null, buildPartyButton.dataset.buildPartyTable);
-        return;
-      }
-
-      const togglePartyButton = event.target.closest("[data-toggle-party-table]");
-      if (togglePartyButton) {
-        togglePartySetupTable(togglePartyButton.dataset.togglePartyTable);
-        return;
-      }
-
       const endButton = event.target.closest("[data-end-qr-session]");
       if (endButton) {
         const qrNumber = Number(endButton.dataset.endQrSession);
@@ -7657,7 +7757,14 @@
       const mapTableButton = event.target.closest("[data-map-table-code]");
       if (!mapTableButton) return;
       const tableCode = mapTableButton.dataset.mapTableCode || null;
-      if (state.partySetupMode && tableCode) {
+      if (
+        tableCode
+        && state.partyArchitectureAvailable === true
+        && (
+          state.partySetupMode
+          || isTableAvailableForPartySelection(tableCode)
+        )
+      ) {
         togglePartySetupTable(tableCode);
         return;
       }
@@ -7665,7 +7772,6 @@
       renderTableMap();
     });
 
-    document.getElementById("newPartyButton").addEventListener("click", () => beginPartySetup());
     document.getElementById("cancelPartySetup").addEventListener("click", cancelPartySetup);
     document.getElementById("confirmPartySetup").addEventListener("click", () => {
       savePartySetup([...state.selectedPartyTableCodes], state.partySetupTargetId);
