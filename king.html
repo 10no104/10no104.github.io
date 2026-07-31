@@ -73,6 +73,12 @@
       margin-bottom: 14px;
     }
 
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     .brand {
       display: inline-flex;
       align-items: center;
@@ -3060,7 +3066,10 @@
           <h1>운영 관리</h1>
         </div>
       </div>
-      <a class="pill-btn" href="./modify.html">수정 페이지</a>
+      <div class="topbar-actions">
+        <a class="pill-btn" href="./settlement.html">정산</a>
+        <a class="pill-btn" href="./modify.html">수정 페이지</a>
+      </div>
     </header>
 
     <section class="hero">
@@ -3169,8 +3178,9 @@
         </div>
         <div class="toolbar">
           <div class="segmented">
+            <button class="pill-btn primary" id="employeeAddBtn" type="button">직원 추가</button>
             <button class="pill-btn" id="employeeRefreshBtn" type="button">직원 새로고침</button>
-            <button class="pill-btn" id="employeeShowInactiveBtn" type="button" aria-pressed="false">그만둔 서버 보기</button>
+            <button class="pill-btn" id="employeeShowInactiveBtn" type="button" aria-pressed="false">그만둔 직원 보기</button>
           </div>
           <div class="status-line" id="employeeStatus"></div>
         </div>
@@ -3555,9 +3565,23 @@
             </select>
           </div>
           <div class="field">
+            <label for="employeeEditDepartment">정산 부서</label>
+            <select id="employeeEditDepartment" name="settlement_department">
+              <option value="hall">홀</option>
+              <option value="kitchen">주방</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="employeeEditTipEligible">팁 배분</label>
+            <select id="employeeEditTipEligible" name="settlement_tip_eligible">
+              <option value="true">포함</option>
+              <option value="false">제외</option>
+            </select>
+          </div>
+          <div class="field">
             <label for="employeeEditStatus">근무 여부</label>
             <select id="employeeEditStatus" name="active">
-              <option value="true">아직 서버</option>
+              <option value="true">근무중</option>
               <option value="false">그만둠</option>
             </select>
           </div>
@@ -3590,6 +3614,6 @@
     </div>
   </div>
 
-  <script src="js/king-admin.js?v=20260726-1"></script>
+  <script src="js/king-admin.js?v=20260730-3"></script>
 </body>
 </html>

@@ -2694,7 +2694,7 @@
       }
 
       function createAccessStaff(access = {}) {
-        // Reference code is the access check. Google Sheets only supplies wage history.
+        // Reference code is the access check. Wage history can come from Supabase or the legacy sheets.
         const staffKey = String(access.staff_key || "").trim();
         const name = String(access.staff_name || access.name || staffKey || "Staff").trim();
         const branchScope = normalizeKey(access.branch_scope) || "both";
@@ -2726,7 +2726,7 @@
         }
 
         if (!staff) {
-          return "Wage data was not found in the Google Sheet. Schedule and calendar are still available.";
+          return "Wage data was not found. Schedule and calendar are still available.";
         }
 
         return "";
@@ -3021,6 +3021,77 @@
         }
 
         return getSingleSourcePeriods(staff);
+      }
+
+      function getDbWagePeriods(rows = []) {
+        const groups = new Map();
+
+        rows.forEach((row) => {
+          const startDate = row.period_start ? new Date(`${row.period_start}T00:00:00`) : null;
+          const endDate = row.period_end ? new Date(`${row.period_end}T00:00:00`) : null;
+          const dateObj = row.work_date ? new Date(`${row.work_date}T00:00:00`) : null;
+          if (!dateObj || Number.isNaN(dateObj.getTime())) return;
+
+          const key = `${row.period_start || ""}:${row.period_end || ""}`;
+          if (!groups.has(key)) {
+            groups.set(key, {
+              id: `db-period-${key}`,
+              records: [],
+              startDate,
+              endDate,
+              totalHours: 0,
+              totalTip: 0,
+              totalHallTip: 0,
+              workedDays: 0,
+              branch: "",
+              label: startDate && endDate
+                ? `${formatPeriodDate(startDate)} - ${formatPeriodDate(endDate)}`
+                : "Settlement period"
+            });
+          }
+
+          const period = groups.get(key);
+          const branch = getBranchLabel(row.branch);
+          const hours = parseNumber(row.hours);
+          const tip = parseNumber(row.tips);
+          period.records.push({
+            day: formatScheduleDay(dateObj),
+            date: `${dateObj.getMonth() + 1}월 ${dateObj.getDate()}일`,
+            dateObj,
+            branch,
+            hallTip: parseNumber(row.department_tip),
+            hourlyTip: parseNumber(row.hourly_tip),
+            hours,
+            tip,
+            isSummary: false
+          });
+          period.totalHours += hours;
+          period.totalTip += tip;
+          period.totalHallTip += parseNumber(row.department_tip);
+        });
+
+        return Array.from(groups.values())
+          .map((period) => {
+            period.records.sort((a, b) => {
+              const dateDiff = a.dateObj.getTime() - b.dateObj.getTime();
+              return dateDiff || a.branch.localeCompare(b.branch);
+            });
+            period.workedDays = period.records.length;
+            const branches = Array.from(new Set(period.records.map((record) => record.branch)));
+            period.branch = branches.join(" + ");
+            return period;
+          })
+          .sort((a, b) => (b.endDate?.getTime() || 0) - (a.endDate?.getTime() || 0));
+      }
+
+      async function loadDbWagePeriods(input = "") {
+        const refCode = String(input || "").trim();
+        if (!refCode || !supabaseClient) return [];
+        const { data, error } = await supabaseClient.rpc("noble_get_wage_history_v1", {
+          input_ref: refCode
+        });
+        if (error) throw error;
+        return getDbWagePeriods(Array.isArray(data) ? data : []);
       }
 
       function getRoleLabel(value = "") {
@@ -4084,16 +4155,31 @@
             return;
           }
 
-          // A missing sheet column must not invalidate schedule/calendar access.
+          // A missing wage record must not invalidate schedule/calendar access.
           const sheetStaff = findStaffByKey(access.staff_key, access);
-          const staff = sheetStaff || createAccessStaff(access);
-          const periods = sheetStaff ? getPeriods(sheetStaff) : [];
+          let staff = createAccessStaff(access);
+          let periods = [];
+          let wageDataMessage = "";
+
+          try {
+            periods = await loadDbWagePeriods(input);
+          } catch (error) {
+            console.warn("DB wage history unavailable", error);
+          }
+
+          if (!periods.length && sheetStaff) {
+            staff = sheetStaff;
+            periods = getPeriods(sheetStaff);
+          }
+          if (!periods.length) {
+            wageDataMessage = getWageDataMessage(access, sheetStaff);
+          }
           const defaultOpenPeriod = getMostRecentWorkedPeriod(periods);
 
           state.currentStaff = staff;
           state.currentAccess = access;
           state.periods = periods;
-          state.wageDataMessage = getWageDataMessage(access, sheetStaff);
+          state.wageDataMessage = wageDataMessage;
           state.openPeriodKey = defaultOpenPeriod ? defaultOpenPeriod.id : null;
           state.scheduleCursor = startOfWeek(new Date());
           state.calendarCursor = startOfMonth(new Date());

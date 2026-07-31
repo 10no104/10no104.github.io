@@ -186,6 +186,7 @@
       "reservationStatus",
       "reservationList",
       "employeeCountLabel",
+      "employeeAddBtn",
       "employeeRefreshBtn",
       "employeeShowInactiveBtn",
       "employeeStatus",
@@ -201,6 +202,8 @@
       "employeeEditPhone",
       "employeeEditSin",
       "employeeEditBranch",
+      "employeeEditDepartment",
+      "employeeEditTipEligible",
       "employeeEditStatus",
       "employeeEditorClose",
       "employeeEditorCancel",
@@ -592,6 +595,8 @@
   function renderEmployeeCard(item) {
     const isActive = item.active !== false;
     const name = item.staff_key || item.name || item.ref_code || "-";
+    const settlementDepartment = item.settlement_department === "kitchen" ? "주방" : "홀";
+    const settlementTip = item.settlement_tip_eligible === false ? "팁 제외" : "팁 포함";
     return `
       <article class="employee-card ${isActive ? "" : "is-inactive"}">
         <div class="employee-top">
@@ -601,12 +606,14 @@
           </div>
           <div class="badge-row">
             <span class="status-badge ${escapeHtml(normalizeBranchScope(item.branch_scope))}">${escapeHtml(formatBranchLabel(item.branch_scope))}</span>
-            <span class="status-badge ${isActive ? "active" : "hidden"}">${isActive ? "아직 서버" : "그만둠"}</span>
+            <span class="status-badge ${isActive ? "active" : "hidden"}">${isActive ? "근무중" : "그만둠"}</span>
+            <span class="status-badge ${item.settlement_linked ? "active" : "hidden"}">${item.settlement_linked ? "임금 연결" : "임금 미연결"}</span>
           </div>
         </div>
         <div class="employee-meta-grid">
           <div class="meta-box"><span>전화번호</span><strong>${escapeHtml(item.phone_number || "-")}</strong></div>
           <div class="meta-box"><span>근무 위치</span><strong>${escapeHtml(formatBranchLabel(item.branch_scope))}</strong></div>
+          <div class="meta-box"><span>정산 연결</span><strong>${escapeHtml(`${settlementDepartment} · ${settlementTip}`)}</strong></div>
         </div>
         ${!isActive ? `<div class="reservation-notes">근무 아님${item.inactive_at ? ` · ${escapeHtml(formatDateTimeLabel(item.inactive_at))}` : ""}</div>` : ""}
         <div class="employee-actions">
@@ -621,7 +628,7 @@
     refs.employeeCountLabel.textContent = `직원 ${visibleEmployees.length}명 / 요청 ${state.accessRequests.length}개`;
     refs.employeeShowInactiveBtn.classList.toggle("is-active", state.employeeShowInactive);
     refs.employeeShowInactiveBtn.setAttribute("aria-pressed", state.employeeShowInactive ? "true" : "false");
-    refs.employeeShowInactiveBtn.textContent = state.employeeShowInactive ? "근무중만 보기" : "그만둔 서버 보기";
+    refs.employeeShowInactiveBtn.textContent = state.employeeShowInactive ? "근무중만 보기" : "그만둔 직원 보기";
     refs.accessRequestList.innerHTML = state.accessRequests.length
       ? state.accessRequests.map(renderAccessRequestCard).join("")
       : '<div class="empty-state">추가 요청이 없습니다.</div>';
@@ -804,6 +811,20 @@
     refs.employeeEditorForm.reset();
   }
 
+  function openNewEmployeeEditor() {
+    refs.employeeEditorTitle.textContent = "신규 직원 등록";
+    refs.employeeEditorForm.reset();
+    refs.employeeEditId.value = "";
+    refs.employeeEditRequestId.value = "";
+    refs.employeeEditBranch.value = "downtown";
+    refs.employeeEditDepartment.value = "hall";
+    refs.employeeEditTipEligible.value = "true";
+    refs.employeeEditStatus.value = "true";
+    refs.employeeEditorModal.setAttribute("aria-hidden", "false");
+    refs.employeeEditorModal.classList.add("is-open");
+    refs.employeeEditName.focus();
+  }
+
   function openEmployeeEditorFromRequest(id = "") {
     const request = state.accessRequests.find((item) => item.id === id);
     if (!request) return;
@@ -816,6 +837,8 @@
     refs.employeeEditPhone.value = request.phone_number || "";
     refs.employeeEditSin.value = request.smart_server_number || "";
     refs.employeeEditBranch.value = normalizeBranchScope(request.branch_scope || "both");
+    refs.employeeEditDepartment.value = "hall";
+    refs.employeeEditTipEligible.value = "true";
     refs.employeeEditStatus.value = "true";
     refs.employeeEditorModal.setAttribute("aria-hidden", "false");
     refs.employeeEditorModal.classList.add("is-open");
@@ -837,6 +860,8 @@
     refs.employeeEditPhone.value = employee.phone_number || "";
     refs.employeeEditSin.value = employee.sin_number || "";
     refs.employeeEditBranch.value = normalizeBranchScope(employee.branch_scope || "both");
+    refs.employeeEditDepartment.value = employee.settlement_department === "kitchen" ? "kitchen" : "hall";
+    refs.employeeEditTipEligible.value = employee.settlement_tip_eligible === false ? "false" : "true";
     refs.employeeEditStatus.value = employee.active === false ? "false" : "true";
     refs.employeeEditorModal.setAttribute("aria-hidden", "false");
     refs.employeeEditorModal.classList.add("is-open");
@@ -846,13 +871,18 @@
   function getEmployeeEditorPayload() {
     const active = refs.employeeEditStatus.value !== "false";
     const current = state.employees.find((item) => String(item.id || "") === refs.employeeEditId.value);
+    const settlementDepartment = refs.employeeEditDepartment.value === "kitchen" ? "kitchen" : "hall";
     return {
+      id: refs.employeeEditId.value || null,
+      request_id: refs.employeeEditRequestId.value || null,
       ref_code: refs.employeeEditRefCode.value.trim(),
       staff_key: refs.employeeEditName.value.trim(),
-      job_role: "server",
+      job_role: settlementDepartment === "kitchen" ? "kitchen" : "server",
       branch_scope: normalizeBranchScope(refs.employeeEditBranch.value || "both"),
       phone_number: refs.employeeEditPhone.value.trim() || null,
       sin_number: refs.employeeEditSin.value.trim() || null,
+      settlement_department: settlementDepartment,
+      settlement_tip_eligible: refs.employeeEditTipEligible.value !== "false",
       active,
       inactive_at: active ? null : (current?.active === false && current?.inactive_at ? current.inactive_at : new Date().toISOString())
     };
@@ -871,31 +901,22 @@
       return;
     }
 
-    setEmployeeStatus("직원을 저장하는 중...");
-    const employeeId = refs.employeeEditId.value;
-    const requestId = refs.employeeEditRequestId.value;
-    const result = employeeId
-      ? await supabaseClient.from("employee_refs").update(payload).eq("id", employeeId).select("*").single()
-      : await supabaseClient.from("employee_refs").insert(payload).select("*").single();
+    setEmployeeStatus("직원과 임금 연결을 저장하는 중...");
+    const result = await supabaseClient.rpc("king_save_employee_with_settlement_v1", {
+      input_payload: payload
+    });
 
     if (result.error) {
-      setEmployeeStatus(result.error.message || "직원 저장에 실패했습니다.", "error");
+      setEmployeeStatus(
+        result.error.message || "직원과 임금 연결 저장에 실패했습니다. 통합 SQL을 확인해주세요.",
+        "error"
+      );
       return;
-    }
-
-    if (requestId) {
-      const requestUpdate = await supabaseClient
-        .from("noble_access_requests")
-        .update({ status: "done" })
-        .eq("id", requestId);
-      if (requestUpdate.error) {
-        setEmployeeStatus(requestUpdate.error.message || "직원은 저장됐지만 요청 상태 변경에 실패했습니다.", "error");
-      }
     }
 
     closeEmployeeEditor();
     await fetchEmployees();
-    setEmployeeStatus("직원을 저장했습니다.", "success");
+    setEmployeeStatus("직원과 임금 정산 연결을 저장했습니다.", "success");
   }
 
   function formatBranchLabel(branch = "") {
@@ -3918,6 +3939,7 @@
       renderReservations();
     });
     refs.reservationRefreshBtn.addEventListener("click", () => void fetchReservations());
+    refs.employeeAddBtn.addEventListener("click", openNewEmployeeEditor);
     refs.employeeRefreshBtn.addEventListener("click", () => void fetchEmployees());
     refs.employeeShowInactiveBtn.addEventListener("click", () => {
       state.employeeShowInactive = !state.employeeShowInactive;
