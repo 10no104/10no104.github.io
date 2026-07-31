@@ -703,9 +703,36 @@
         display: block;
       }
 
-      .poster-frame::before,
-      .poster-frame .poster {
+      .poster-frame::before {
         display: none;
+      }
+
+      .poster-frame[data-side="front"] .poster {
+        display: block;
+        overflow: visible;
+        background: transparent;
+        box-shadow: none;
+      }
+
+      .poster-frame[data-side="front"] .poster::before,
+      .poster-frame[data-side="front"] .poster::after {
+        display: none;
+      }
+
+      .poster-frame[data-side="front"] .poster > * {
+        display: none;
+      }
+
+      /* Keep only the front QR in its original poster position while sizing it for print. */
+      .poster-frame[data-side="front"] .qr-wrap {
+        display: block;
+        width: calc(var(--qr-output-size) + 4mm);
+      }
+
+      .poster-frame[data-side="front"] .qr-frame {
+        padding: 1.8mm;
+        border-width: 0.2mm;
+        box-shadow: none;
       }
     }
 
