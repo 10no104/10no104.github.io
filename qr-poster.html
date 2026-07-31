@@ -656,7 +656,14 @@
 
     @media print {
       @page {
+        size: A4 portrait;
         margin: 0;
+      }
+
+      html,
+      body {
+        width: 210mm;
+        min-height: 297mm;
       }
 
       body {
@@ -668,33 +675,37 @@
       }
 
       .poster-stage {
+        position: relative;
         display: block;
+        width: 210mm;
+        height: 297mm;
         min-height: 0;
         padding: 0;
         overflow: visible;
       }
 
       .poster-frame {
+        display: none;
+        position: absolute;
+        left: 75mm;
+        top: 88.5mm;
         width: var(--poster-output-width);
         height: var(--poster-output-height);
         aspect-ratio: auto;
-        padding: 0.8mm 0.4mm;
-        break-after: page;
+        padding: 0;
+        border: 0.35mm solid #1d1d1d;
+        background: transparent;
         box-shadow: none;
+        break-after: auto;
       }
 
-      .poster-frame::before {
-        inset: 0.8mm;
+      .poster-frame[data-side="front"] {
+        display: block;
       }
 
-      /* Keep the printed front QR paper at 40 x 40mm inside a 60 x 120mm poster. */
-      .poster--front .qr-wrap {
-        width: calc(var(--qr-output-size) + 4mm);
-      }
-
-      .poster--front .qr-frame {
-        padding: 1.8mm;
-        border-width: 0.2mm;
+      .poster-frame::before,
+      .poster-frame .poster {
+        display: none;
       }
     }
 
