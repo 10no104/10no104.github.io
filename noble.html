@@ -398,6 +398,8 @@
 
     .request-dialog {
       width: min(100%, 430px);
+      max-height: calc(100dvh - 36px);
+      overflow-y: auto;
       padding: 18px;
       border: 1px solid rgba(255, 226, 189, 0.18);
       border-radius: 28px;
@@ -1840,6 +1842,7 @@
       }
 
       .request-dialog {
+        max-height: calc(100dvh - 20px);
         border-radius: 24px;
       }
 
@@ -2366,6 +2369,14 @@
           </select>
         </div>
         <div class="request-field">
+          <label for="requestRole">Role</label>
+          <select id="requestRole" name="role" required>
+            <option value="">Select role</option>
+            <option value="server">Server</option>
+            <option value="kitchen">Kitchen</option>
+          </select>
+        </div>
+        <div class="request-field">
           <label for="requestPhone">Phone</label>
           <input id="requestPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required />
         </div>
@@ -2560,6 +2571,7 @@
           "requestForm",
           "requestName",
           "requestBranch",
+          "requestRole",
           "requestPhone",
           "requestSmartServerNumber",
           "requestStatus",
@@ -3356,13 +3368,14 @@
         const payload = {
           name: refs.requestName.value.trim(),
           branch: refs.requestBranch.value,
+          role: refs.requestRole.value,
           phone: refs.requestPhone.value.trim(),
           smartServerNumber: refs.requestSmartServerNumber.value.trim(),
           submittedAt: new Date().toISOString()
         };
 
-        if (!payload.name || !payload.branch || !payload.phone || !payload.smartServerNumber) {
-          refs.requestStatus.textContent = "Name, branch, phone, server number are required.";
+        if (!payload.name || !payload.branch || !payload.role || !payload.phone || !payload.smartServerNumber) {
+          refs.requestStatus.textContent = "Name, branch, role, phone, server number are required.";
           return;
         }
 
@@ -3370,9 +3383,10 @@
 
         try {
           if (!supabaseClient) throw new Error("Supabase client is not available.");
-          const { error } = await supabaseClient.rpc("noble_submit_access_request_v2", {
+          const { error } = await supabaseClient.rpc("noble_submit_access_request_v3", {
             p_name: payload.name,
             p_branch_scope: normalizeKey(payload.branch),
+            p_job_role: payload.role,
             p_smart_server_number: payload.smartServerNumber,
             p_phone_number: payload.phone
           });

@@ -547,6 +547,7 @@
   }
 
   function renderAccessRequestCard(item) {
+    const jobRole = normalizeScheduleStaffKey(item.job_role) === "kitchen" ? "kitchen" : "server";
     return `
       <article class="request-card">
         <div class="request-top">
@@ -556,6 +557,7 @@
           </div>
           <div class="badge-row">
             <span class="status-badge ${escapeHtml(item.branch_scope || "both")}">${escapeHtml(formatBranchLabel(item.branch_scope || "both"))}</span>
+            <span class="status-badge ${jobRole}">${escapeHtml(formatJobRoleLabel(jobRole))}</span>
             <span class="status-badge hidden">${escapeHtml(item.status || "pending")}</span>
           </div>
         </div>
@@ -769,8 +771,11 @@
   }
 
   async function fetchAccessRequestRows() {
+    const currentResult = await supabaseClient.rpc("king_get_access_requests_v2");
+    if (!currentResult.error && Array.isArray(currentResult.data)) return currentResult;
+
     const rpcResult = await supabaseClient.rpc("king_get_access_requests");
-    if (!rpcResult.error && Array.isArray(rpcResult.data) && rpcResult.data.length) return rpcResult;
+    if (!rpcResult.error && Array.isArray(rpcResult.data)) return rpcResult;
 
     const directResult = await supabaseClient
       .from("noble_access_requests")
@@ -834,7 +839,7 @@
     refs.employeeEditPhone.value = request.phone_number || "";
     refs.employeeEditSin.value = request.smart_server_number || "";
     refs.employeeEditBranch.value = normalizeBranchScope(request.branch_scope || "both");
-    refs.employeeEditRole.value = "server";
+    refs.employeeEditRole.value = normalizeScheduleStaffKey(request.job_role) === "kitchen" ? "kitchen" : "server";
     refs.employeeEditStatus.value = "true";
     refs.employeeEditorModal.setAttribute("aria-hidden", "false");
     refs.employeeEditorModal.classList.add("is-open");
