@@ -2455,8 +2455,8 @@
       "use strict";
 
       const KITCHEN_SHEET_URLS = {
-        downtown: "https://docs.google.com/spreadsheets/d/10_BB26BvHbZAvdwRXbNR5Nn-3cjawm_s/gviz/tq?tqx=out:csv&gid=1502183673",
-        uptown: "https://docs.google.com/spreadsheets/d/1oUFLwbTKZ_CAFpu73I2NjF-ORpT_E_1X1vT3nnllIs4/gviz/tq?tqx=out:csv&gid=959867883"
+        downtown: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRNRIMOfYbtWYBKCmX3pq-1oA-a-XPBafNLjij_scpvXLoBbbdsJB9u03mrbYfNxQ/pub?gid=1502183673&single=true&output=csv",
+        uptown: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRyxvWzpEOBMt3j30NR9omQJ7ShrLCVsyZldSnTshwhw9f5aHAN6dYTknnRAOCIs2omY2ZS5JeZMzBS/pub?gid=959867883&single=true&output=csv"
       };
       const SHEET_SOURCES = [
         {
@@ -2726,9 +2726,10 @@
       function buildStaff(header = [], source = {}) {
         const staff = [];
 
-        for (let index = BASE_COLUMN_COUNT; index < header.length; index += 2) {
+        for (let index = BASE_COLUMN_COUNT; index < header.length; index += 1) {
           const name = String(header[index] || "").trim();
           if (!name) continue;
+          const nextHeader = String(header[index + 1] || "").trim();
           staff.push({
             id: name,
             name,
@@ -2738,7 +2739,7 @@
             branch: source.branch || DEFAULT_BRANCH,
             rows: source.rows || state.rows,
             hoursIndex: index,
-            tipIndex: index + 1
+            tipIndex: nextHeader ? -1 : index + 1
           });
         }
 
@@ -2804,7 +2805,9 @@
           .map((source) => `${source.branch}${jobRole === "kitchen" ? " Kitchen" : ""}`);
 
         if (missingBranches.length) {
-          return `${missingBranches.join(" + ")} wage sheet unavailable. Schedule and calendar are still available.`;
+          return jobRole === "kitchen"
+            ? `${missingBranches.join(" + ")} wage sheet unavailable.`
+            : `${missingBranches.join(" + ")} wage sheet unavailable. Schedule and calendar are still available.`;
         }
 
         if (!staff) {
