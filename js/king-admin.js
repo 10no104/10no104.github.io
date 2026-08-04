@@ -200,7 +200,6 @@
       "employeeEditName",
       "employeeEditRefCode",
       "employeeEditPhone",
-      "employeeEditSin",
       "employeeEditBranch",
       "employeeEditRole",
       "employeeEditStatus",
@@ -837,7 +836,6 @@
     refs.employeeEditName.value = request.name || "";
     refs.employeeEditRefCode.value = request.smart_server_number || "";
     refs.employeeEditPhone.value = request.phone_number || "";
-    refs.employeeEditSin.value = request.smart_server_number || "";
     refs.employeeEditBranch.value = normalizeBranchScope(request.branch_scope || "both");
     refs.employeeEditRole.value = normalizeScheduleStaffKey(request.job_role) === "kitchen" ? "kitchen" : "server";
     refs.employeeEditStatus.value = "true";
@@ -859,7 +857,6 @@
     refs.employeeEditName.value = employee.staff_key || "";
     refs.employeeEditRefCode.value = employee.ref_code || "";
     refs.employeeEditPhone.value = employee.phone_number || "";
-    refs.employeeEditSin.value = employee.sin_number || "";
     refs.employeeEditBranch.value = normalizeBranchScope(employee.branch_scope || "both");
     refs.employeeEditRole.value = normalizeScheduleStaffKey(employee.job_role) === "kitchen" ? "kitchen" : "server";
     refs.employeeEditStatus.value = employee.active === false ? "false" : "true";
@@ -877,7 +874,6 @@
       job_role: refs.employeeEditRole.value === "kitchen" ? "kitchen" : "server",
       branch_scope: normalizeBranchScope(refs.employeeEditBranch.value || "both"),
       phone_number: refs.employeeEditPhone.value.trim() || null,
-      sin_number: refs.employeeEditSin.value.trim() || null,
       active,
       inactive_at: active ? null : (current?.active === false && current?.inactive_at ? current.inactive_at : new Date().toISOString())
     };
