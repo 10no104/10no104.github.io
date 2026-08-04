@@ -2888,6 +2888,13 @@
         return record.branch || DEFAULT_BRANCH;
       }
 
+      function compareWageRecordsNewestFirst(a, b) {
+        const dateA = a.dateObj?.getTime() || 0;
+        const dateB = b.dateObj?.getTime() || 0;
+        if (dateA !== dateB) return dateB - dateA;
+        return formatRecordBranch(a).localeCompare(formatRecordBranch(b));
+      }
+
       function getDailyRecords(staff) {
         const rows = staff.rows || state.rows;
         const tracker = createDateTracker(rows);
@@ -2913,8 +2920,12 @@
       }
 
       function summarizePeriod(records, index) {
-        const visibleRecords = records.filter((record) => record.hours > 0 || record.tip > 0);
-        const allDates = records.filter((record) => record.dateObj);
+        const visibleRecords = records
+          .filter((record) => record.hours > 0 || record.tip > 0)
+          .sort(compareWageRecordsNewestFirst);
+        const allDates = records
+          .filter((record) => record.dateObj)
+          .sort((a, b) => a.dateObj.getTime() - b.dateObj.getTime());
         const startDate = allDates[0]?.dateObj || null;
         const endDate = allDates[allDates.length - 1]?.dateObj || null;
         const totalHours = visibleRecords.reduce((sum, record) => sum + record.hours, 0);
@@ -2956,7 +2967,9 @@
           periods.push(summarizePeriod(current, periods.length));
         }
 
-        return periods.reverse();
+        return periods.sort((a, b) => (
+          (b.endDate?.getTime() || 0) - (a.endDate?.getTime() || 0)
+        ));
       }
 
       function getPeriodKey(period) {
@@ -2986,12 +2999,7 @@
         });
 
         return Array.from(groups.values()).map((period, index) => {
-          const records = period.records.sort((a, b) => {
-            const dateA = a.dateObj?.getTime() || 0;
-            const dateB = b.dateObj?.getTime() || 0;
-            if (dateA !== dateB) return dateA - dateB;
-            return formatRecordBranch(a).localeCompare(formatRecordBranch(b));
-          });
+          const records = period.records.sort(compareWageRecordsNewestFirst);
           const totalHours = records.reduce((sum, record) => sum + record.hours, 0);
           const totalTip = records.reduce((sum, record) => sum + record.tip, 0);
           const totalHallTip = records.reduce((sum, record) => sum + record.hallTip, 0);

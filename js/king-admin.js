@@ -186,6 +186,7 @@
       "reservationStatus",
       "reservationList",
       "employeeCountLabel",
+      "employeeAddBtn",
       "employeeRefreshBtn",
       "employeeShowInactiveBtn",
       "employeeStatus",
@@ -802,6 +803,18 @@
     refs.employeeEditorModal.setAttribute("aria-hidden", "true");
     refs.employeeEditorModal.classList.remove("is-open");
     refs.employeeEditorForm.reset();
+  }
+
+  function openNewEmployeeEditor() {
+    refs.employeeEditorTitle.textContent = "신규 직원 등록";
+    refs.employeeEditorForm.reset();
+    refs.employeeEditId.value = "";
+    refs.employeeEditRequestId.value = "";
+    refs.employeeEditBranch.value = "downtown";
+    refs.employeeEditStatus.value = "true";
+    refs.employeeEditorModal.setAttribute("aria-hidden", "false");
+    refs.employeeEditorModal.classList.add("is-open");
+    refs.employeeEditName.focus();
   }
 
   function openEmployeeEditorFromRequest(id = "") {
@@ -3918,6 +3931,7 @@
       renderReservations();
     });
     refs.reservationRefreshBtn.addEventListener("click", () => void fetchReservations());
+    refs.employeeAddBtn.addEventListener("click", openNewEmployeeEditor);
     refs.employeeRefreshBtn.addEventListener("click", () => void fetchEmployees());
     refs.employeeShowInactiveBtn.addEventListener("click", () => {
       state.employeeShowInactive = !state.employeeShowInactive;
