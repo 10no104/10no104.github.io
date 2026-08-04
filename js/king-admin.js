@@ -202,6 +202,7 @@
       "employeeEditPhone",
       "employeeEditSin",
       "employeeEditBranch",
+      "employeeEditRole",
       "employeeEditStatus",
       "employeeEditorClose",
       "employeeEditorCancel",
@@ -593,6 +594,7 @@
   function renderEmployeeCard(item) {
     const isActive = item.active !== false;
     const name = item.staff_key || item.name || item.ref_code || "-";
+    const jobRole = normalizeScheduleStaffKey(item.job_role) === "kitchen" ? "kitchen" : "server";
     return `
       <article class="employee-card ${isActive ? "" : "is-inactive"}">
         <div class="employee-top">
@@ -602,12 +604,14 @@
           </div>
           <div class="badge-row">
             <span class="status-badge ${escapeHtml(normalizeBranchScope(item.branch_scope))}">${escapeHtml(formatBranchLabel(item.branch_scope))}</span>
-            <span class="status-badge ${isActive ? "active" : "hidden"}">${isActive ? "아직 서버" : "그만둠"}</span>
+            <span class="status-badge ${jobRole}">${escapeHtml(formatJobRoleLabel(jobRole))}</span>
+            <span class="status-badge ${isActive ? "active" : "hidden"}">${isActive ? "근무중" : "그만둠"}</span>
           </div>
         </div>
         <div class="employee-meta-grid">
           <div class="meta-box"><span>전화번호</span><strong>${escapeHtml(item.phone_number || "-")}</strong></div>
           <div class="meta-box"><span>근무 위치</span><strong>${escapeHtml(formatBranchLabel(item.branch_scope))}</strong></div>
+          <div class="meta-box"><span>직군</span><strong>${escapeHtml(formatJobRoleLabel(jobRole))}</strong></div>
         </div>
         ${!isActive ? `<div class="reservation-notes">근무 아님${item.inactive_at ? ` · ${escapeHtml(formatDateTimeLabel(item.inactive_at))}` : ""}</div>` : ""}
         <div class="employee-actions">
@@ -622,7 +626,7 @@
     refs.employeeCountLabel.textContent = `직원 ${visibleEmployees.length}명 / 요청 ${state.accessRequests.length}개`;
     refs.employeeShowInactiveBtn.classList.toggle("is-active", state.employeeShowInactive);
     refs.employeeShowInactiveBtn.setAttribute("aria-pressed", state.employeeShowInactive ? "true" : "false");
-    refs.employeeShowInactiveBtn.textContent = state.employeeShowInactive ? "근무중만 보기" : "그만둔 서버 보기";
+    refs.employeeShowInactiveBtn.textContent = state.employeeShowInactive ? "근무중만 보기" : "그만둔 직원 보기";
     refs.accessRequestList.innerHTML = state.accessRequests.length
       ? state.accessRequests.map(renderAccessRequestCard).join("")
       : '<div class="empty-state">추가 요청이 없습니다.</div>';
@@ -811,6 +815,7 @@
     refs.employeeEditId.value = "";
     refs.employeeEditRequestId.value = "";
     refs.employeeEditBranch.value = "downtown";
+    refs.employeeEditRole.value = "server";
     refs.employeeEditStatus.value = "true";
     refs.employeeEditorModal.setAttribute("aria-hidden", "false");
     refs.employeeEditorModal.classList.add("is-open");
@@ -829,6 +834,7 @@
     refs.employeeEditPhone.value = request.phone_number || "";
     refs.employeeEditSin.value = request.smart_server_number || "";
     refs.employeeEditBranch.value = normalizeBranchScope(request.branch_scope || "both");
+    refs.employeeEditRole.value = "server";
     refs.employeeEditStatus.value = "true";
     refs.employeeEditorModal.setAttribute("aria-hidden", "false");
     refs.employeeEditorModal.classList.add("is-open");
@@ -850,6 +856,7 @@
     refs.employeeEditPhone.value = employee.phone_number || "";
     refs.employeeEditSin.value = employee.sin_number || "";
     refs.employeeEditBranch.value = normalizeBranchScope(employee.branch_scope || "both");
+    refs.employeeEditRole.value = normalizeScheduleStaffKey(employee.job_role) === "kitchen" ? "kitchen" : "server";
     refs.employeeEditStatus.value = employee.active === false ? "false" : "true";
     refs.employeeEditorModal.setAttribute("aria-hidden", "false");
     refs.employeeEditorModal.classList.add("is-open");
@@ -862,7 +869,7 @@
     return {
       ref_code: refs.employeeEditRefCode.value.trim(),
       staff_key: refs.employeeEditName.value.trim(),
-      job_role: "server",
+      job_role: refs.employeeEditRole.value === "kitchen" ? "kitchen" : "server",
       branch_scope: normalizeBranchScope(refs.employeeEditBranch.value || "both"),
       phone_number: refs.employeeEditPhone.value.trim() || null,
       sin_number: refs.employeeEditSin.value.trim() || null,
@@ -918,6 +925,10 @@
     if (normalized === "uptown") return "업타운";
     if (normalized === "all") return "전체";
     return branch || "-";
+  }
+
+  function formatJobRoleLabel(role = "") {
+    return normalizeScheduleStaffKey(role) === "kitchen" ? "주방" : "서버";
   }
 
   function formatOrderScopeLabel(value = "") {

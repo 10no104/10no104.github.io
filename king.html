@@ -459,6 +459,7 @@
 
     .status-badge.downtown { background: rgba(123, 31, 47, 0.12); color: #792133; }
     .status-badge.uptown { background: rgba(47, 115, 187, 0.12); color: #255b94; }
+    .status-badge.kitchen { background: rgba(179, 112, 31, 0.14); color: #805115; }
     .status-badge.active { background: rgba(84, 139, 42, 0.14); color: #3d6f21; }
     .status-badge.hidden { background: rgba(120, 113, 108, 0.14); color: #5b514b; }
 
@@ -3556,9 +3557,16 @@
             </select>
           </div>
           <div class="field">
+            <label for="employeeEditRole">직군</label>
+            <select id="employeeEditRole" name="job_role">
+              <option value="server">서버</option>
+              <option value="kitchen">주방</option>
+            </select>
+          </div>
+          <div class="field">
             <label for="employeeEditStatus">근무 여부</label>
             <select id="employeeEditStatus" name="active">
-              <option value="true">아직 서버</option>
+              <option value="true">근무중</option>
               <option value="false">그만둠</option>
             </select>
           </div>
@@ -3591,6 +3599,6 @@
     </div>
   </div>
 
-  <script src="js/king-admin.js?v=20260803-1"></script>
+  <script src="js/king-admin.js?v=20260803-2"></script>
 </body>
 </html>

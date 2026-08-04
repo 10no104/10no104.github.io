@@ -604,6 +604,17 @@
       flex: none;
     }
 
+    body.is-former-staff .app-status-badge {
+      border-color: rgba(219, 112, 87, 0.3);
+      background: rgba(122, 48, 38, 0.2);
+      color: #ffe5dc;
+    }
+
+    body.is-former-staff .app-status-badge::before {
+      background: #df765f;
+      box-shadow: 0 0 12px rgba(223, 118, 95, 0.5);
+    }
+
     .view-stack {
       position: relative;
       z-index: 1;
@@ -1709,6 +1720,15 @@
       backdrop-filter: blur(16px);
     }
 
+    .bottom-nav.is-wage-only {
+      grid-template-columns: minmax(0, 1fr);
+      width: min(360px, calc(100% - 22px));
+    }
+
+    .nav-tab[hidden] {
+      display: none;
+    }
+
     .nav-tab {
       display: grid;
       gap: 6px;
@@ -2286,7 +2306,7 @@
         </div>
       </div>
 
-      <nav class="bottom-nav" aria-label="Noble sections">
+      <nav class="bottom-nav" id="bottomNav" aria-label="Noble sections">
         <button class="nav-tab is-active" type="button" data-tab="wage" aria-pressed="true">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M4 7h16"></path>
@@ -2423,16 +2443,38 @@
     (function () {
       "use strict";
 
+      const KITCHEN_SHEET_URLS = {
+        downtown: "https://docs.google.com/spreadsheets/d/10_BB26BvHbZAvdwRXbNR5Nn-3cjawm_s/gviz/tq?tqx=out:csv&gid=1502183673",
+        uptown: "https://docs.google.com/spreadsheets/d/1oUFLwbTKZ_CAFpu73I2NjF-ORpT_E_1X1vT3nnllIs4/gviz/tq?tqx=out:csv&gid=959867883"
+      };
       const SHEET_SOURCES = [
         {
+          id: "server:downtown",
           key: "downtown",
+          jobRole: "server",
           branch: "Downtown",
           csvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRNRIMOfYbtWYBKCmX3pq-1oA-a-XPBafNLjij_scpvXLoBbbdsJB9u03mrbYfNxQ/pub?gid=1128274968&single=true&output=csv"
         },
         {
+          id: "server:uptown",
           key: "uptown",
+          jobRole: "server",
           branch: "Uptown",
           csvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRyxvWzpEOBMt3j30NR9omQJ7ShrLCVsyZldSnTshwhw9f5aHAN6dYTknnRAOCIs2omY2ZS5JeZMzBS/pub?gid=624949641&single=true&output=csv"
+        },
+        {
+          id: "kitchen:downtown",
+          key: "downtown",
+          jobRole: "kitchen",
+          branch: "Downtown",
+          csvUrl: KITCHEN_SHEET_URLS.downtown
+        },
+        {
+          id: "kitchen:uptown",
+          key: "uptown",
+          jobRole: "kitchen",
+          branch: "Uptown",
+          csvUrl: KITCHEN_SHEET_URLS.uptown
         }
       ];
       const SUPABASE_CONFIG = {
@@ -2524,6 +2566,7 @@
           "appUserName",
           "appUserMeta",
           "appStatus",
+          "bottomNav",
           "viewStack",
           "payHeadlineValue",
           "payHeadlineNote",
@@ -2583,6 +2626,26 @@
 
       function normalizeKey(value = "") {
         return String(value).trim().toLowerCase().replace(/\s+/g, "");
+      }
+
+      function normalizeJobRole(value = "") {
+        return normalizeKey(value) === "kitchen" ? "kitchen" : "server";
+      }
+
+      function isFormerEmployee(access = state.currentAccess) {
+        return Boolean(access) && access.active === false;
+      }
+
+      function isWageOnlyAccess(access = state.currentAccess) {
+        return Boolean(access) && (
+          isFormerEmployee(access) || normalizeJobRole(access.job_role) === "kitchen"
+        );
+      }
+
+      function getAccessStatus(access = state.currentAccess) {
+        if (isFormerEmployee(access)) return "그만둔 직원 · 과거 임금만 조회 가능";
+        if (normalizeJobRole(access?.job_role) === "kitchen") return "주방 · 임금 조회만 가능";
+        return "Ready";
       }
 
       function parseNumber(value = "") {
@@ -2659,6 +2722,7 @@
             name,
             key: normalizeKey(name),
             sourceKey: source.key || "",
+            jobRole: normalizeJobRole(source.jobRole),
             branch: source.branch || DEFAULT_BRANCH,
             rows: source.rows || state.rows,
             hoursIndex: index,
@@ -2674,7 +2738,11 @@
         if (!key) return null;
 
         const branchScope = normalizeKey(access.branch_scope);
-        const matches = state.staff.filter((item) => item.key === key || normalizeKey(item.id) === key);
+        const jobRole = normalizeJobRole(access.job_role);
+        const matches = state.staff.filter((item) => (
+          normalizeJobRole(item.jobRole) === jobRole &&
+          (item.key === key || normalizeKey(item.id) === key)
+        ));
         if (!matches.length) return null;
 
         if (branchScope && branchScope !== "both") {
@@ -2714,12 +2782,14 @@
 
       function getWageDataMessage(access = {}, staff = null) {
         const branchScope = normalizeKey(access.branch_scope);
+        const jobRole = normalizeJobRole(access.job_role);
         const relevantSources = SHEET_SOURCES.filter((source) => (
-          branchScope === "both" || !branchScope || source.key === branchScope
+          normalizeJobRole(source.jobRole) === jobRole &&
+          (branchScope === "both" || !branchScope || source.key === branchScope)
         ));
         const missingBranches = relevantSources
-          .filter((source) => state.sourceErrors[source.key])
-          .map((source) => source.branch);
+          .filter((source) => state.sourceErrors[source.id])
+          .map((source) => `${source.branch}${jobRole === "kitchen" ? " Kitchen" : ""}`);
 
         if (missingBranches.length) {
           return `${missingBranches.join(" + ")} wage sheet unavailable. Schedule and calendar are still available.`;
@@ -2737,9 +2807,13 @@
         if (!refCode) return null;
         if (!supabaseClient) throw new Error("Supabase client is not available.");
 
-        const { data, error } = await supabaseClient.rpc("lookup_employee_ref", { input_ref: refCode });
-        if (error) throw error;
-        return Array.isArray(data) ? data[0] : data;
+        const currentResult = await supabaseClient.rpc("noble_lookup_employee_v2", { input_ref: refCode });
+        if (!currentResult.error) return currentResult.data || null;
+
+        const legacyResult = await supabaseClient.rpc("lookup_employee_ref", { input_ref: refCode });
+        if (legacyResult.error) throw currentResult.error;
+        const legacyAccess = Array.isArray(legacyResult.data) ? legacyResult.data[0] : legacyResult.data;
+        return legacyAccess ? { ...legacyAccess, active: true } : null;
       }
 
       async function loadDbSchedule(input = "", selectedWeek = state.scheduleCursor) {
@@ -3476,6 +3550,24 @@
         refs.preferenceStatus.className = ["preference-status", tone ? `is-${tone}` : ""].filter(Boolean).join(" ");
       }
 
+      function syncAccessMode() {
+        const wageOnly = isWageOnlyAccess();
+        if (wageOnly) state.activeTab = "wage";
+
+        document.body.classList.toggle("is-former-staff", isFormerEmployee());
+        refs.bottomNav.classList.toggle("is-wage-only", wageOnly);
+        refs.navTabs.forEach((button) => {
+          const tabId = button.dataset.tab;
+          const isActive = tabId === state.activeTab;
+          button.hidden = wageOnly && tabId !== "wage";
+          button.classList.toggle("is-active", isActive);
+          button.setAttribute("aria-pressed", isActive ? "true" : "false");
+        });
+        refs.views.forEach((view) => {
+          view.classList.toggle("is-active", view.dataset.view === state.activeTab);
+        });
+      }
+
       function resetProfileState(message) {
         state.currentStaff = null;
         state.currentAccess = null;
@@ -3487,6 +3579,7 @@
         state.periods = [];
         state.wageDataMessage = "";
         state.openPeriodKey = null;
+        state.activeTab = "wage";
         state.scheduleCursor = startOfWeek(new Date());
         state.unavailableDates = new Set();
         state.preferredDates = new Set();
@@ -3497,6 +3590,7 @@
         state.calendarLongPressTriggered = false;
         state.availabilityDirty = false;
         state.preferencesDirty = false;
+        syncAccessMode();
         renderIdentity();
         renderWageView();
         renderScheduleView();
@@ -3518,7 +3612,11 @@
 
         refs.changeReferenceButton.setAttribute("aria-expanded", String(document.body.classList.contains("is-reference-open")));
         refs.appUserName.textContent = state.currentStaff.name;
-        refs.appUserMeta.textContent = `${getBranchLabel(state.currentAccess.branch_scope)} · ${getRoleLabel(state.currentAccess.job_role)}`;
+        refs.appUserMeta.textContent = [
+          getBranchLabel(state.currentAccess.branch_scope),
+          getRoleLabel(state.currentAccess.job_role),
+          isFormerEmployee() ? "그만둔 직원" : "근무중"
+        ].join(" · ");
       }
 
       function getPayHeadline(access = {}) {
@@ -3974,6 +4072,7 @@
       }
 
       function renderAll() {
+        syncAccessMode();
         renderIdentity();
         renderWageView();
         renderScheduleView();
@@ -4005,6 +4104,7 @@
 
       function setActiveTab(tabId) {
         if (!TAB_ORDER.includes(tabId)) return;
+        if (isWageOnlyAccess() && tabId !== "wage") return;
 
         const previousIndex = TAB_ORDER.indexOf(state.activeTab);
         const nextIndex = TAB_ORDER.indexOf(tabId);
@@ -4025,6 +4125,7 @@
       }
 
       async function fetchSheetSource(sourceConfig) {
+        if (!sourceConfig.csvUrl) throw new Error(`${sourceConfig.branch} ${sourceConfig.jobRole} CSV is not configured`);
         const response = await fetch(sourceConfig.csvUrl, { cache: "no-store" });
         if (!response.ok) throw new Error(`${sourceConfig.branch} CSV request failed: ${response.status}`);
 
@@ -4039,17 +4140,24 @@
 
       async function loadData() {
         try {
-          const settledSources = await Promise.allSettled(SHEET_SOURCES.map(fetchSheetSource));
+          const configuredSources = SHEET_SOURCES.filter((source) => source.csvUrl);
+          const settledSources = await Promise.allSettled(configuredSources.map(fetchSheetSource));
           const sources = settledSources
             .filter((result) => result.status === "fulfilled")
             .map((result) => result.value);
           const sourceErrors = {};
 
+          SHEET_SOURCES
+            .filter((source) => !source.csvUrl)
+            .forEach((source) => {
+              sourceErrors[source.id] = new Error(`${source.branch} ${source.jobRole} CSV is not configured`);
+            });
+
           settledSources.forEach((result, index) => {
             if (result.status === "rejected") {
-              const source = SHEET_SOURCES[index];
-              sourceErrors[source.key] = result.reason;
-              console.warn(`${source.branch} sheet failed`, result.reason);
+              const source = configuredSources[index];
+              sourceErrors[source.id] = result.reason;
+              console.warn(`${source.branch} ${source.jobRole} sheet failed`, result.reason);
             }
           });
 
@@ -4107,13 +4215,23 @@
           state.calendarCursor = startOfMonth(new Date());
           state.savedRefCode = input;
           saveRefCode(input);
-          await loadDbSchedule(input, state.scheduleCursor);
-          await loadDbSubstituteRequests(input);
-          loadUnavailableDates();
-          await loadDbPreferences(input);
+          if (!isWageOnlyAccess(access)) {
+            await loadDbSchedule(input, state.scheduleCursor);
+            await loadDbSubstituteRequests(input);
+            loadUnavailableDates();
+            await loadDbPreferences(input);
+          } else {
+            state.dbScheduleRows = [];
+            state.dbScheduleWeekStart = "";
+            state.dbSubstituteRequests = [];
+            state.unavailableDates = new Set();
+            state.preferredDates = new Set();
+            state.dateDetails = {};
+            state.staffPreferences = createEmptyStaffPreferences();
+          }
           document.body.classList.remove("is-reference-open");
           renderAll();
-          setStatus("Ready");
+          setStatus(getAccessStatus(access));
         } catch (error) {
           console.error(error);
           resetProfileState("Lookup failed.");
