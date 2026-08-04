@@ -2634,20 +2634,37 @@
       return;
     }
 
-    target.innerHTML = items.map((item) => {
-      const date = toSafeDate(item.availability_date);
-      const time = item.available_start || item.available_end
-        ? `${item.available_start || "open"} - ${item.available_end || "close"}`
-        : "";
-      const detail = [time, item.note].filter(Boolean).join(" · ");
-      return `
-        <div class="availability-row is-${escapeHtml(status)}">
-          <span>${escapeHtml(item.staff_name || item.staff_key || "-")}</span>
-          <span class="availability-meta">
-            <b>${escapeHtml(date ? formatScheduleDayLabel(date) : item.availability_date || "-")}</b>
-            ${detail ? `<small>${escapeHtml(detail)}</small>` : ""}
+    const groupedByDate = new Map();
+    items.forEach((item) => {
+      const isoDate = String(item.availability_date || "");
+      const group = groupedByDate.get(isoDate) || [];
+      group.push(item);
+      groupedByDate.set(isoDate, group);
+    });
+
+    target.innerHTML = Array.from(groupedByDate.entries()).map(([isoDate, dateItems]) => {
+      const date = toSafeDate(isoDate);
+      const people = dateItems.map((item) => {
+        const time = item.available_start || item.available_end
+          ? `${item.available_start || "open"} - ${item.available_end || "close"}`
+          : "";
+        const detail = [time, item.note].filter(Boolean).join(" · ");
+        return `
+          <span class="availability-person">
+            <strong>${escapeHtml(item.staff_name || item.staff_key || "-")}</strong>
+            ${detail ? `<small title="${escapeHtml(detail)}">${escapeHtml(detail)}</small>` : ""}
           </span>
-        </div>
+        `;
+      }).join("");
+
+      return `
+        <section class="availability-date-group is-${escapeHtml(status)}" aria-label="${escapeHtml(date ? formatScheduleDayLabel(date) : isoDate || "-")}">
+          <div class="availability-date-label">
+            <strong>${escapeHtml(date ? formatScheduleDayLabel(date) : isoDate || "-")}</strong>
+            <small>${dateItems.length}명</small>
+          </div>
+          <div class="availability-people">${people}</div>
+        </section>
       `;
     }).join("");
   }

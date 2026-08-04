@@ -1939,7 +1939,7 @@
     .availability-card h4 {
       margin: 0 0 9px;
       font-size: 0.96rem;
-      letter-spacing: -0.02em;
+      letter-spacing: 0;
     }
 
     .schedule-staff-card {
@@ -2178,50 +2178,82 @@
       gap: 7px;
     }
 
-    .availability-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      padding: 8px 9px;
-      border-radius: 13px;
-      background: rgba(247, 239, 228, 0.68);
-      color: #3a291d;
-      font-size: 0.82rem;
-      font-weight: 800;
-    }
-
-    .availability-meta {
-      display: inline-flex;
-      align-items: baseline;
-      justify-content: flex-end;
+    .availability-date-group {
+      display: grid;
+      grid-template-columns: minmax(104px, 0.28fr) minmax(0, 1fr);
+      align-items: stretch;
+      gap: 10px;
       min-width: 0;
-      gap: 5px;
-      text-align: right;
+      padding: 8px;
+      border-left: 3px solid currentColor;
+      border-radius: 8px;
     }
 
-    .availability-meta b {
+    .availability-date-label {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .availability-date-label strong {
       white-space: nowrap;
+      font-size: 0.82rem;
       font-weight: 900;
     }
 
-    .availability-meta small {
+    .availability-date-label small {
+      font-size: 0.68rem;
+      font-weight: 850;
+      opacity: 0.72;
+    }
+
+    .availability-people {
+      display: flex;
+      align-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .availability-person {
+      display: inline-grid;
+      gap: 2px;
+      min-width: 64px;
+      max-width: 100%;
+      padding: 6px 8px;
+      border: 1px solid currentColor;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.62);
+      font-size: 0.8rem;
+      line-height: 1.15;
+    }
+
+    .availability-person strong {
+      overflow-wrap: anywhere;
+      font-weight: 900;
+    }
+
+    .availability-person small {
       overflow: hidden;
-      max-width: 116px;
+      max-width: 180px;
       color: currentColor;
-      font-size: 0.72rem;
+      font-size: 0.66rem;
       font-weight: 750;
       text-overflow: ellipsis;
       white-space: nowrap;
-      opacity: 0.8;
+      opacity: 0.76;
     }
 
-    .availability-row.is-unavailable {
+    .availability-date-group.is-unavailable {
       background: rgba(123, 31, 47, 0.1);
       color: #7b1f2f;
     }
 
-    .availability-row.is-preferred {
+    .availability-date-group.is-preferred {
       background: rgba(36, 95, 81, 0.1);
       color: #245f51;
     }
@@ -3035,6 +3067,11 @@
         grid-template-columns: 1fr;
       }
 
+      .availability-date-group {
+        grid-template-columns: 86px minmax(0, 1fr);
+        gap: 8px;
+      }
+
       .panel-head,
       .toolbar,
       .schedule-toolbar,
@@ -3595,6 +3632,6 @@
     </div>
   </div>
 
-  <script src="js/king-admin.js?v=20260803-4"></script>
+  <script src="js/king-admin.js?v=20260803-5"></script>
 </body>
 </html>
