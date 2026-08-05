@@ -1958,6 +1958,263 @@
         padding-inline: 28px;
       }
     }
+
+    /* Keep the menu's original visual language while using Queen-style page tabs. */
+    body.menu-page {
+      padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .page-sections {
+      width: 100%;
+      margin: 0;
+    }
+
+    .page-section {
+      display: none;
+      padding: 0;
+    }
+
+    .page-section.is-active-section {
+      display: block;
+    }
+
+    .menu-section .section-shell {
+      width: min(1040px, calc(100% - 40px));
+      margin: 8px auto 56px;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .menu-section .section-heading {
+      display: none;
+    }
+
+    .status-section .section-shell,
+    .final-bill-section .section-shell {
+      width: min(960px, 92vw);
+      margin: 18px auto 56px;
+      padding: 18px;
+      border: 1px solid rgba(125, 98, 63, 0.14);
+      border-radius: 24px;
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.96), rgba(250, 244, 235, 0.94)),
+        url("../../../assets/pattern.webp") center / 420px auto;
+      box-shadow: 0 18px 36px rgba(36, 24, 17, 0.08);
+    }
+
+    .status-section .section-heading,
+    .final-bill-section .section-heading {
+      margin-bottom: 18px;
+    }
+
+    .status-section .section-heading h2,
+    .final-bill-section .section-heading h2 {
+      font-size: clamp(1.45rem, 4vw, 2rem);
+      letter-spacing: -0.045em;
+    }
+
+    .status-section .guest-session-panel {
+      margin-bottom: 14px;
+      box-shadow: none;
+    }
+
+    .order-section-cart {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      width: 100%;
+      margin: 0 0 20px;
+      padding: 14px 16px;
+      border: 1px solid rgba(90, 17, 34, 0.14);
+      border-radius: 18px;
+      background: linear-gradient(135deg, #5a1122 0%, #d4af37 100%);
+      color: #fffaf3;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+      box-shadow: 0 14px 26px rgba(90, 17, 34, 0.18);
+    }
+
+    .order-section-cart span:first-child {
+      display: grid;
+      gap: 3px;
+    }
+
+    .order-section-cart small {
+      font-size: 0.64rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      opacity: 0.72;
+    }
+
+    .order-section-cart strong {
+      font-size: 0.96rem;
+    }
+
+    .order-section-cart-action {
+      flex: 0 0 auto;
+      padding: 9px 11px;
+      border-radius: 999px;
+      background: #fffaf3;
+      color: #3b2418;
+      font-size: 0.74rem;
+      font-weight: 900;
+    }
+
+    .final-bill-total-card.is-table {
+      background: linear-gradient(145deg, #3b2418, #6a2032);
+    }
+
+    .final-bill-total-card.is-device {
+      background: linear-gradient(145deg, rgba(255, 252, 247, 0.98), rgba(238, 244, 236, 0.92));
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+      z-index: 90;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      width: min(860px, calc(100% - 22px));
+      min-height: 0;
+      padding: 10px;
+      transform: translateX(-50%);
+      border: 1px solid rgba(255, 226, 189, 0.12);
+      border-radius: 28px;
+      background: rgba(22, 13, 12, 0.91);
+      box-shadow: 0 18px 36px rgba(0, 0, 0, 0.24);
+      backdrop-filter: blur(16px);
+    }
+
+    .bottom-nav-item {
+      position: relative;
+      display: grid;
+      gap: 6px;
+      justify-items: center;
+      min-height: 62px;
+      padding: 10px 8px;
+      border: none;
+      border-radius: 22px;
+      background: transparent;
+      color: rgba(255, 240, 221, 0.68);
+      font: inherit;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+
+    .bottom-nav-item svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .bottom-nav-item > span {
+      min-height: auto;
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      line-height: 1.1;
+    }
+
+    .bottom-nav-item.is-active {
+      background: linear-gradient(135deg, rgba(123, 31, 47, 0.98), rgba(212, 175, 55, 0.92));
+      color: #fffaf2;
+      transform: translateY(-2px);
+      box-shadow: 0 16px 28px rgba(123, 31, 47, 0.28);
+    }
+
+    .bottom-nav-badge {
+      top: 5px;
+      right: max(8px, calc(50% - 28px));
+      min-width: 20px;
+      height: 20px;
+      padding: 0 5px;
+      border: 0;
+      background: #f2c75c;
+      color: #3e2118;
+      font-size: 0.68rem;
+      font-weight: 900;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.22);
+    }
+
+    body.menu-page.is-detail-view .menu-sticky-shell {
+      display: none;
+    }
+
+    body.menu-page.is-detail-view .menu-sticky-spacer {
+      height: 0 !important;
+    }
+
+    body.menu-page.is-detail-view .to-top,
+    body.menu-page.is-detail-view .server-call-btn {
+      display: none !important;
+    }
+
+    @media (max-width: 640px) {
+      .menu-section .section-shell {
+        width: min(calc(100% - 20px), 420px);
+        margin-bottom: 40px;
+      }
+
+      .status-section .section-shell,
+      .final-bill-section .section-shell {
+        width: min(calc(100% - 20px), 420px);
+        margin-top: 14px;
+        padding: 16px;
+      }
+
+      .status-section .section-heading,
+      .final-bill-section .section-heading {
+        display: flex;
+        align-items: flex-start;
+      }
+
+      .order-section-cart {
+        padding: 13px 14px;
+      }
+
+      .guest-order-status-line,
+      .final-bill-identity,
+      .final-bill-order-head,
+      .final-bill-order-meta {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .guest-order-status-copy {
+        text-align: left;
+      }
+
+      #statusLastUpdated {
+        align-self: flex-start;
+      }
+
+      .bottom-nav {
+        gap: 6px;
+        padding: 8px;
+        border-radius: 24px;
+      }
+
+      .bottom-nav-item {
+        min-height: 58px;
+        padding: 8px 5px;
+        border-radius: 18px;
+      }
+
+      .bottom-nav-item > span {
+        font-size: 0.7rem;
+      }
+    }
   </style>
 </head>
 <body class="menu-page">
@@ -1977,7 +2234,7 @@
     </div>
   </div>
   <div class="page-sections">
-    <section class="page-section menu-section" id="menuSection" aria-labelledby="menuSectionTitle">
+    <section class="page-section menu-section is-active-section" id="menuSection" aria-labelledby="menuSectionTitle">
       <div class="section-shell menu-stage">
         <div class="section-heading">
           <div>
@@ -1998,8 +2255,8 @@
         <div class="section-heading">
           <div>
             <p class="section-eyebrow">LIVE STATUS</p>
-            <h2 id="statusSectionTitle">Order status</h2>
-            <p>Check whether the restaurant has confirmed each order from this device.</p>
+            <h2 id="statusSectionTitle">Order &amp; status</h2>
+            <p>Add or review this device's order, then follow the restaurant's progress.</p>
           </div>
           <span class="section-context" id="statusSummary">Waiting for orders</span>
         </div>
@@ -2015,6 +2272,13 @@
           </div>
           <p class="guest-session-message" id="guestSessionMessage">Please wait while this QR is verified.</p>
         </section>
+        <button class="order-section-cart" id="openOrderDrawerButton" type="button">
+          <span>
+            <small>THIS DEVICE</small>
+            <strong id="orderSectionCartSummary">No new items</strong>
+          </span>
+          <span class="order-section-cart-action">Review &amp; send</span>
+        </button>
         <div class="guest-order-history-head">
           <div>
             <h3>Your recent orders</h3>
@@ -2032,9 +2296,9 @@
           <div>
             <p class="section-eyebrow">FINAL BILL</p>
             <h2 id="finalBillSectionTitle">Final Bill</h2>
-            <p>See the table total and the part ordered from this device.</p>
+            <p>See the total across all assigned tables and this device's share.</p>
           </div>
-          <a class="guest-bill-link" id="guestBillLink" href="../cashier.html" hidden>Open cashier view</a>
+          <a class="guest-bill-link" id="guestBillLink" href="../cashier.html" hidden>Payment code / QR</a>
         </div>
         <div class="final-bill-identity">
           <span id="finalBillTableLabel">Table —</span>
@@ -2060,7 +2324,7 @@
           </div>
           <div>
             <span class="final-bill-dot is-other"></span>
-            <span>Other orders at this table</span>
+            <span>Other devices in this party</span>
             <strong id="finalBillOtherTotal">$0.00</strong>
           </div>
         </div>
@@ -2071,20 +2335,30 @@
 
   <nav class="bottom-nav" id="bottomNav" aria-label="Dining sections">
     <button class="bottom-nav-item is-active" type="button" data-section-target="menuSection" aria-current="page">
-      <span class="bottom-nav-icon" aria-hidden="true">⌂</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 6h16"></path>
+        <path d="M4 12h16"></path>
+        <path d="M4 18h10"></path>
+      </svg>
       <span>메뉴</span>
     </button>
     <button class="bottom-nav-item" type="button" data-section-target="statusSection">
-      <span class="bottom-nav-icon" aria-hidden="true">◷</span>
-      <span>현황</span>
-    </button>
-    <button class="bottom-nav-item bottom-nav-order" id="bottomOrderButton" type="button" aria-label="Open order review">
-      <span class="bottom-nav-icon" aria-hidden="true">＋</span>
-      <span>주문</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M5 8h14"></path>
+        <path d="M7 8l1 12h8l1-12"></path>
+        <path d="M9 8a3 3 0 0 1 6 0"></path>
+        <path d="M9 13h6"></path>
+      </svg>
+      <span>주문 · 현황</span>
       <b class="bottom-nav-badge" id="bottomOrderBadge" hidden>0</b>
     </button>
     <button class="bottom-nav-item" type="button" data-section-target="finalBillSection">
-      <span class="bottom-nav-icon" aria-hidden="true">$</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"></path>
+        <path d="M9 8h6"></path>
+        <path d="M9 12h6"></path>
+        <path d="M9 16h3"></path>
+      </svg>
       <span>Final Bill</span>
     </button>
   </nav>
@@ -2261,7 +2535,7 @@
     let currentQrSession = null;
     let currentGuest = null;
     let guestSessionRequests = [];
-    let tableSessionRequests = [];
+    let partySessionRequests = [];
     let qrSessionRefreshHandle = null;
     let qrSessionLoadError = false;
     let isQrSessionRefreshing = false;
@@ -2802,18 +3076,14 @@
       return summarizeOrderRequests(getSentOrderRequests());
     }
 
-    function getTableOrderRequests() {
-      const source = currentQrSession?.table_id
-        ? tableSessionRequests
+    function getPartyOrderRequests() {
+      const source = currentGuest?.party_id
+        ? partySessionRequests
         : guestSessionRequests;
       return source.filter((request) => (
         request.kind === "order"
         && request.status !== "canceled"
       ));
-    }
-
-    function getTableBillSummary() {
-      return summarizeOrderRequests(getTableOrderRequests());
     }
 
     function addToCart(menuId) {
@@ -2822,21 +3092,6 @@
         return;
       }
 
-      .guest-order-status-line,
-      .final-bill-identity,
-      .final-bill-order-head,
-      .final-bill-order-meta {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .guest-order-status-copy {
-        text-align: left;
-      }
-
-      #statusLastUpdated {
-        justify-self: start;
-      }
       const menuItem = allMenus.find((item) => getMenuId(item) === menuId);
       if (!menuItem) return;
 
@@ -2961,7 +3216,7 @@
       currentGuest = null;
       currentQrSession = null;
       guestSessionRequests = [];
-      tableSessionRequests = [];
+      partySessionRequests = [];
       qrSessionLoadError = false;
       return true;
     }
@@ -2971,7 +3226,7 @@
       if (!conflict) return "";
       if (conflict.reason === "paid") {
         const guestLabel = conflict.displayCode ? `Guest ${conflict.displayCode}` : "This Guest";
-        return `${guestLabel}'s bill is already paid. Ordering stays closed on this device until the Party session ends or staff starts a new visit.`;
+        return `${guestLabel}'s bill is paid. Scan the QR for a newly assigned table to start a new bill on this device.`;
       }
       const tableLabel = conflict.currentTableCode
         ? `Table ${conflict.currentTableCode}`
@@ -3201,14 +3456,17 @@
       if (!tableTotalEl || !deviceTotalEl || !tableMetaEl || !deviceMetaEl || !mineTotalEl || !otherTotalEl || !tableLabelEl || !guestLabelEl || !orderListEl) return;
 
       const tableCode = currentQrSession?.table_code || document.getElementById("tableCode")?.value || "—";
-      const tableOrders = getTableOrderRequests();
-      const deviceOrders = tableOrders.filter(isCurrentDeviceOrder);
-      const otherOrders = tableOrders.filter((request) => !isCurrentDeviceOrder(request));
-      const tableSummary = summarizeOrderRequests(tableOrders);
+      const partyOrders = getPartyOrderRequests();
+      const deviceOrders = partyOrders.filter(isCurrentDeviceOrder);
+      const otherOrders = partyOrders.filter((request) => !isCurrentDeviceOrder(request));
+      const tableSummary = summarizeOrderRequests(partyOrders);
       const deviceSummary = summarizeOrderRequests(deviceOrders);
       const otherSummary = summarizeOrderRequests(otherOrders);
+      const partyTables = [...new Set(partyOrders.map((request) => request.table_code).filter(Boolean))];
 
-      tableLabelEl.textContent = `Table ${tableCode}`;
+      tableLabelEl.textContent = currentGuest?.party_id
+        ? `Party #${currentGuest.party_id} · ${partyTables.join(" + ") || `Table ${tableCode}`}`
+        : `Table ${tableCode}`;
       guestLabelEl.textContent = currentGuest?.display_code
         ? `Guest ${currentGuest.display_code} · this device`
         : "This device";
@@ -3217,22 +3475,22 @@
       deviceTotalEl.textContent = formatCurrency(deviceSummary.total);
       mineTotalEl.textContent = formatCurrency(deviceSummary.total);
       otherTotalEl.textContent = formatCurrency(otherSummary.total);
-      tableMetaEl.textContent = `${tableOrders.length} sent order${tableOrders.length === 1 ? "" : "s"}`;
+      tableMetaEl.textContent = `${partyOrders.length} sent order${partyOrders.length === 1 ? "" : "s"}${partyTables.length ? ` · ${partyTables.length} table${partyTables.length === 1 ? "" : "s"}` : ""}`;
       deviceMetaEl.textContent = `${deviceOrders.length} from this device`;
 
-      if (!tableOrders.length) {
-        orderListEl.innerHTML = `<div class="final-bill-empty">No sent orders on this table yet. New items will appear after you send them.</div>`;
+      if (!partyOrders.length) {
+        orderListEl.innerHTML = `<div class="final-bill-empty">No sent orders in this party yet. New items will appear after you send them.</div>`;
         return;
       }
 
-      orderListEl.innerHTML = tableOrders.map((request) => {
+      orderListEl.innerHTML = partyOrders.map((request) => {
         const isMine = isCurrentDeviceOrder(request);
         const meta = getOrderStatusMeta(request.status);
         return `
           <article class="final-bill-order-card ${isMine ? "is-mine" : ""}">
             <div class="final-bill-order-head">
               <div>
-                <span class="final-bill-source">${isMine ? "This device" : "Same table"}</span>
+                <span class="final-bill-source">${isMine ? "This device" : `Table ${escapeHtml(request.table_code || "—")}`}</span>
                 <strong>Order #${escapeHtml(request.id || "—")}</strong>
               </div>
               <time>${escapeHtml(formatGuestRequestTime(request.created_at))}</time>
@@ -3295,7 +3553,8 @@
       }
 
       if (billLink) {
-        billLink.hidden = !currentGuest && !guestPartyConflict?.guestId;
+        billLink.hidden = guestPartyConflict?.reason === "paid"
+          || (!currentGuest && !guestPartyConflict?.guestId);
         billLink.href = `../cashier.html?store=${encodeURIComponent(getDiningBranch())}`;
       }
 
@@ -3373,17 +3632,16 @@
       return normalizeDiningRequests(await response.json());
     }
 
-    async function fetchTableSessionRequests({ tableId = null, partyId = null, sessionId = null } = {}) {
-      if (!tableId && !partyId && !sessionId) return [];
+    async function fetchPartySessionRequests({ partyId = null, guestId = null, sessionId = null } = {}) {
+      if (!partyId && !guestId && !sessionId) return [];
       const { url, anonKey } = SUPABASE_CONFIG;
       const endpoint = new URL(`${url}/rest/v1/${DINING_REQUESTS_TABLE}`);
       endpoint.searchParams.set("select", "id,party_id,guest_id,table_id,table_code,kind,request_type,status,items,item_count,subtotal,tax,total,created_at,updated_at");
-      if (tableId) {
-        endpoint.searchParams.set("table_id", `eq.${tableId}`);
-      }
       if (partyId) {
         endpoint.searchParams.set("party_id", `eq.${partyId}`);
-      } else if (sessionId && !tableId) {
+      } else if (guestId) {
+        endpoint.searchParams.set("guest_id", `eq.${guestId}`);
+      } else if (sessionId) {
         endpoint.searchParams.set("qr_session_id", `eq.${sessionId}`);
       }
       endpoint.searchParams.set("order", "created_at.desc");
@@ -3392,8 +3650,9 @@
         headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` }
       });
       if (!response.ok) {
+        if (guestId) return fetchGuestSessionRequests({ guestId });
         if (sessionId) return fetchGuestSessionRequests({ sessionId });
-        throw new Error(`Table order history failed (${response.status}): ${await response.text()}`);
+        throw new Error(`Party order history failed (${response.status}): ${await response.text()}`);
       }
       return normalizeDiningRequests(await response.json());
     }
@@ -3410,16 +3669,17 @@
           try {
             const resolvedGuest = await resolveDiningGuest();
             resolvedWithPartyArchitecture = Boolean(resolvedGuest);
-            guestSessionRequests = resolvedGuest
-              ? await fetchGuestSessionRequests({ guestId: resolvedGuest.guest_id })
-              : [];
-            tableSessionRequests = resolvedGuest
-              ? await fetchTableSessionRequests({
-                tableId: currentQrSession?.table_id,
-                partyId: currentGuest?.party_id,
-                sessionId: currentQrSession?.id
+            partySessionRequests = resolvedGuest
+              ? await fetchPartySessionRequests({
+                partyId: resolvedGuest.party_id,
+                guestId: resolvedGuest.guest_id,
+                sessionId: resolvedGuest.qr_session_id
               })
               : [];
+            const hasGuestOwnership = partySessionRequests.some((request) => request.guest_id);
+            guestSessionRequests = hasGuestOwnership
+              ? partySessionRequests.filter((request) => request.guest_id === resolvedGuest.guest_id)
+              : partySessionRequests;
             showAndReadGuestNotifications().catch((error) => {
               console.error("Guest notification refresh failed", error);
             });
@@ -3428,15 +3688,17 @@
               diningPartyArchitectureAvailable = false;
               guestPartyConflict = null;
               currentGuest = null;
-              tableSessionRequests = [];
+              partySessionRequests = [];
             } else if (applyGuestPartyConflict(error)) {
               try {
-                guestSessionRequests = guestPartyConflict?.guestId
+                guestSessionRequests = guestPartyConflict?.reason !== "paid" && guestPartyConflict?.guestId
                   ? await fetchGuestSessionRequests({ guestId: guestPartyConflict.guestId })
                   : [];
+                partySessionRequests = guestSessionRequests;
               } catch (historyError) {
                 console.error("Existing Guest bill refresh failed", historyError);
                 guestSessionRequests = [];
+                partySessionRequests = [];
               }
               return;
             } else if (/not assigned to an active party/i.test(String(error?.message || ""))) {
@@ -3445,7 +3707,7 @@
               currentGuest = null;
               currentQrSession = null;
               guestSessionRequests = [];
-              tableSessionRequests = [];
+              partySessionRequests = [];
               qrSessionLoadError = false;
               return;
             } else {
@@ -3462,7 +3724,7 @@
           guestSessionRequests = nextSession
             ? await fetchGuestSessionRequests({ sessionId: nextSession.id })
             : [];
-          tableSessionRequests = guestSessionRequests;
+          partySessionRequests = guestSessionRequests;
         }
         qrSessionLoadError = false;
       } catch (error) {
@@ -3471,7 +3733,7 @@
         currentQrSession = null;
         currentGuest = null;
         guestSessionRequests = [];
-        tableSessionRequests = [];
+        partySessionRequests = [];
         qrSessionLoadError = true;
       } finally {
         isQrSessionRefreshing = false;
@@ -3736,6 +3998,8 @@
       const combinedOrderItemCountEl = document.getElementById("combinedOrderItemCount");
       const submitButton = document.getElementById("drawerSubmitBtn");
       const orderBadgeEl = document.getElementById("bottomOrderBadge");
+      const sectionCartSummaryEl = document.getElementById("orderSectionCartSummary");
+      const sectionCartActionEl = document.querySelector(".order-section-cart-action");
 
       if (
         !mobileOrderListEl
@@ -3824,8 +4088,23 @@
         submitButton.disabled = !cartItems.length || !currentQrSession || isDiningRequestSubmitting;
       }
       if (orderBadgeEl) {
-        orderBadgeEl.textContent = String(itemCount);
-        orderBadgeEl.hidden = !itemCount;
+        const activeRequestCount = sentOrder.requests.filter((request) => (
+          request.status !== "completed" && request.status !== "canceled"
+        )).length;
+        const badgeCount = itemCount || activeRequestCount;
+        orderBadgeEl.textContent = String(badgeCount);
+        orderBadgeEl.hidden = !badgeCount;
+      }
+      if (sectionCartSummaryEl) {
+        const latestRequest = sentOrder.requests[0];
+        sectionCartSummaryEl.textContent = itemCount
+          ? `${itemCount} new item${itemCount === 1 ? "" : "s"} · ${formatCurrency(total)}`
+          : latestRequest
+            ? `Order #${latestRequest.id} · ${getOrderStatusMeta(latestRequest.status).label}`
+            : "No new items";
+      }
+      if (sectionCartActionEl) {
+        sectionCartActionEl.textContent = itemCount ? "Review & send" : "View order";
       }
     }
 
@@ -3875,7 +4154,7 @@
     }
 
     function setupCartDrawer() {
-      const inlineBtn = document.getElementById("bottomOrderButton");
+      const inlineBtn = document.getElementById("openOrderDrawerButton");
       const closeBtn = document.getElementById("cartDrawerCloseBtn");
       const backdrop = document.getElementById("cartDrawerBackdrop");
       const drawer = backdrop?.querySelector(".cart-drawer");
@@ -3893,7 +4172,6 @@
       };
 
       inlineBtn.addEventListener("click", () => {
-        if (!cartItems.length && !getSentOrderRequests().length) return;
         openCartDrawer();
       });
 
@@ -4195,12 +4473,16 @@
         .filter(Boolean);
 
       const setActive = (sectionId) => {
+        sections.forEach((section) => {
+          section.classList.toggle("is-active-section", section.id === sectionId);
+        });
         buttons.forEach((button) => {
           const active = button.dataset.sectionTarget === sectionId;
           button.classList.toggle("is-active", active);
           if (active) button.setAttribute("aria-current", "page");
           else button.removeAttribute("aria-current");
         });
+        document.body.classList.toggle("is-detail-view", sectionId !== "menuSection");
       };
 
       buttons.forEach((button) => {
@@ -4208,22 +4490,11 @@
           const section = document.getElementById(button.dataset.sectionTarget || "");
           if (!section) return;
           setActive(section.id);
-          section.scrollIntoView({ behavior: "smooth", block: "start" });
+          window.scrollTo({ top: 0, behavior: "smooth" });
         });
       });
 
-      if (typeof IntersectionObserver === "function") {
-        const observer = new IntersectionObserver((entries) => {
-          const visible = entries
-            .filter((entry) => entry.isIntersecting)
-            .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-          if (visible) setActive(visible.target.id);
-        }, {
-          rootMargin: "-18% 0px -58% 0px",
-          threshold: [0.1, 0.35, 0.65]
-        });
-        sections.forEach((section) => observer.observe(section));
-      }
+      setActive("menuSection");
     }
 
     function setupStickyHeaderState() {
@@ -4319,15 +4590,7 @@
 
     async function bootstrap() {
       setInitialOrderFields();
-      const qrSessionPromise = refreshQrSession();
-      try {
-        allMenus = await fetchMenusFromSupabase();
-      } catch (error) {
-        console.error(error);
-        allMenus = await fetchMenusFromGoogleSheet().catch(() => SAMPLE_MENU);
-      }
-      await qrSessionPromise;
-
+      allMenus = SAMPLE_MENU;
       renderTabs();
       renderSubtabs();
       renderMenu();
@@ -4337,6 +4600,22 @@
       setupSectionNavigation();
       setupOrderForm();
       setupCartDrawer();
+
+      const qrSessionPromise = refreshQrSession();
+      try {
+        const remoteMenus = await fetchMenusFromSupabase();
+        if (remoteMenus.length) allMenus = remoteMenus;
+      } catch (error) {
+        console.error(error);
+        const sheetMenus = await fetchMenusFromGoogleSheet().catch(() => SAMPLE_MENU);
+        if (sheetMenus.length) allMenus = sheetMenus;
+      }
+      renderTabs();
+      renderSubtabs();
+      renderMenu();
+      renderOrderSummary();
+
+      await qrSessionPromise;
       syncQrSessionUi();
 
       document.getElementById("guestOrdersRefresh").addEventListener("click", () => {
