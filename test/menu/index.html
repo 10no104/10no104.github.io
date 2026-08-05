@@ -20,6 +20,7 @@
     body.menu-page {
       position: relative;
       min-height: 100vh;
+      padding-bottom: calc(94px + env(safe-area-inset-bottom));
       background:
         radial-gradient(circle at top left, rgba(212, 175, 55, 0.18), transparent 28%),
         radial-gradient(circle at 85% 12%, rgba(90, 17, 34, 0.12), transparent 22%),
@@ -112,8 +113,7 @@
     .menu-page.is-sticky-resetting .menu-sticky-shell,
     .menu-page.is-sticky-resetting .menu-sticky-inner,
     .menu-page.is-sticky-resetting .menu-home-link,
-    .menu-page.is-sticky-resetting .menu-home-logo,
-    .menu-page.is-sticky-resetting .order-inline-bar {
+    .menu-page.is-sticky-resetting .menu-home-logo {
       transition: none !important;
     }
 
@@ -287,6 +287,414 @@
       align-items: start;
     }
 
+    .page-sections {
+      width: min(1040px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .page-section {
+      scroll-margin-top: 24px;
+      padding: 28px 0 0;
+    }
+
+    .section-shell {
+      min-width: 0;
+      padding: 28px;
+      border: 1px solid rgba(125, 98, 63, 0.14);
+      border-radius: 30px;
+      background:
+        linear-gradient(180deg, rgba(255, 252, 247, 0.82), rgba(251, 246, 238, 0.72)),
+        url("../../../assets/pattern.webp") center / 520px auto;
+      box-shadow: 0 22px 42px rgba(45, 30, 17, 0.08);
+    }
+
+    .menu-section .section-shell {
+      padding-bottom: 18px;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 22px;
+    }
+
+    .section-heading h1,
+    .section-heading h2 {
+      margin: 0;
+      color: #2f2119;
+      font-size: clamp(1.8rem, 4vw, 2.7rem);
+      letter-spacing: -0.06em;
+      line-height: 1;
+    }
+
+    .section-heading p:not(.section-eyebrow) {
+      max-width: 540px;
+      margin: 10px 0 0;
+      color: #78675b;
+      font-size: 0.9rem;
+      font-weight: 700;
+      line-height: 1.55;
+    }
+
+    .section-eyebrow {
+      margin: 0 0 8px;
+      color: #8a6b1f;
+      font-size: 0.7rem;
+      font-weight: 950;
+      letter-spacing: 0.16em;
+    }
+
+    .section-context {
+      flex: 0 0 auto;
+      margin-top: 4px;
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: rgba(90, 17, 34, 0.08);
+      color: #672236;
+      font-size: 0.74rem;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .status-section .guest-session-panel {
+      width: 100%;
+      margin: 0 0 24px;
+    }
+
+    .status-section .guest-order-history-head {
+      margin-bottom: 12px;
+    }
+
+    .status-section .guest-order-history-head h3 {
+      margin: 0;
+      color: #2f2119;
+      font-size: 1.16rem;
+      letter-spacing: -0.04em;
+    }
+
+    .status-section .guest-order-history-head > div span {
+      display: block;
+      margin-top: 4px;
+      color: #8a786a;
+      font-size: 0.78rem;
+      font-weight: 750;
+    }
+
+    #statusLastUpdated {
+      color: #8a786a;
+      font-size: 0.72rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .guest-order-card.is-confirmed {
+      border-color: rgba(38, 112, 70, 0.28);
+      box-shadow: inset 3px 0 0 #267046;
+    }
+
+    .guest-order-card.is-waiting {
+      border-color: rgba(168, 103, 18, 0.3);
+      box-shadow: inset 3px 0 0 #a86712;
+    }
+
+    .guest-order-card.is-finished {
+      border-color: rgba(90, 17, 34, 0.16);
+    }
+
+    .guest-order-status-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .guest-order-status-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 25px;
+      padding: 0 9px;
+      border-radius: 999px;
+      background: #f2e8d7;
+      color: #8a5a12;
+      font-size: 0.68rem;
+      font-weight: 950;
+    }
+
+    .guest-order-status-chip.is-confirmed {
+      background: #dcecdf;
+      color: #267046;
+    }
+
+    .guest-order-status-chip.is-finished {
+      background: #eee5ed;
+      color: #672236;
+    }
+
+    .guest-order-status-copy {
+      color: #78675b;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-align: right;
+    }
+
+    .final-bill-section .section-heading {
+      align-items: center;
+    }
+
+    .final-bill-section .guest-bill-link {
+      flex: 0 0 auto;
+    }
+
+    .final-bill-identity {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+      color: #78675b;
+      font-size: 0.78rem;
+      font-weight: 850;
+    }
+
+    .final-bill-identity span:last-child {
+      color: #672236;
+    }
+
+    .final-bill-totals {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .final-bill-total-card {
+      display: grid;
+      gap: 6px;
+      padding: 18px;
+      border: 1px solid rgba(125, 98, 63, 0.14);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.64);
+    }
+
+    .final-bill-total-card.is-table {
+      background: linear-gradient(145deg, rgba(90, 17, 34, 0.98), rgba(112, 37, 55, 0.9));
+      color: #fffaf3;
+    }
+
+    .final-bill-total-card.is-device {
+      background: linear-gradient(145deg, rgba(238, 244, 236, 0.98), rgba(255, 252, 247, 0.94));
+    }
+
+    .final-bill-total-card span {
+      font-size: 0.76rem;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .final-bill-total-card strong {
+      font-size: clamp(1.9rem, 7vw, 3rem);
+      letter-spacing: -0.07em;
+      line-height: 1;
+    }
+
+    .final-bill-total-card.is-device strong {
+      color: #267046;
+    }
+
+    .final-bill-total-card small {
+      font-size: 0.74rem;
+      font-weight: 750;
+      opacity: 0.72;
+    }
+
+    .final-bill-breakdown {
+      display: grid;
+      gap: 1px;
+      margin-top: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(125, 98, 63, 0.13);
+      border-radius: 18px;
+      background: rgba(125, 98, 63, 0.1);
+    }
+
+    .final-bill-breakdown > div {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 9px;
+      padding: 12px 14px;
+      background: rgba(255, 252, 247, 0.86);
+      color: #5e4b3f;
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+
+    .final-bill-breakdown strong {
+      color: #2f2119;
+      font-size: 0.88rem;
+    }
+
+    .final-bill-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #8d7b6c;
+    }
+
+    .final-bill-dot.is-mine {
+      background: #267046;
+    }
+
+    .final-bill-dot.is-other {
+      background: #8d7b6c;
+    }
+
+    .final-bill-order-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .final-bill-order-card {
+      display: grid;
+      gap: 8px;
+      padding: 14px;
+      border: 1px solid rgba(125, 98, 63, 0.13);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.74);
+    }
+
+    .final-bill-order-card.is-mine {
+      border-color: rgba(38, 112, 70, 0.28);
+      background: linear-gradient(145deg, rgba(238, 244, 236, 0.92), rgba(255, 255, 255, 0.8));
+    }
+
+    .final-bill-order-head,
+    .final-bill-order-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .final-bill-order-head strong {
+      color: #4e2830;
+      font-size: 0.9rem;
+    }
+
+    .final-bill-order-head time,
+    .final-bill-order-meta {
+      color: #817063;
+      font-size: 0.72rem;
+      font-weight: 750;
+    }
+
+    .final-bill-order-items {
+      color: #4f4036;
+      font-size: 0.8rem;
+      line-height: 1.55;
+    }
+
+    .final-bill-source {
+      display: inline-flex;
+      align-items: center;
+      min-height: 23px;
+      padding: 0 8px;
+      border-radius: 999px;
+      background: #eee5db;
+      color: #756355;
+      font-size: 0.65rem;
+      font-weight: 950;
+    }
+
+    .final-bill-order-card.is-mine .final-bill-source {
+      background: #dcecdf;
+      color: #267046;
+    }
+
+    .final-bill-empty {
+      padding: 18px 16px;
+      border: 1px dashed rgba(125, 98, 63, 0.22);
+      border-radius: 18px;
+      color: #847365;
+      font-size: 0.84rem;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      bottom: 0;
+      z-index: 120;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      width: min(100%, 720px);
+      min-height: 72px;
+      padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+      border: 1px solid rgba(120, 103, 77, 0.16);
+      border-bottom: 0;
+      border-radius: 24px 24px 0 0;
+      background: rgba(255, 252, 247, 0.94);
+      box-shadow: 0 -12px 32px rgba(45, 30, 17, 0.14);
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+      transform: translateX(-50%);
+    }
+
+    .bottom-nav-item {
+      position: relative;
+      display: grid;
+      place-items: center;
+      gap: 2px;
+      min-height: 56px;
+      border: 0;
+      border-radius: 16px;
+      background: transparent;
+      color: #8a786a;
+      font: inherit;
+      font-size: 0.67rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .bottom-nav-item.is-active {
+      background: rgba(90, 17, 34, 0.09);
+      color: #672236;
+    }
+
+    .bottom-nav-item:focus-visible {
+      outline: 3px solid rgba(47, 115, 187, 0.28);
+      outline-offset: -2px;
+    }
+
+    .bottom-nav-icon {
+      display: grid;
+      place-items: center;
+      min-height: 22px;
+      font-size: 1.18rem;
+      line-height: 1;
+    }
+
+    .bottom-nav-badge {
+      position: absolute;
+      top: 5px;
+      right: calc(50% - 25px);
+      display: grid;
+      place-items: center;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border: 2px solid #fffaf3;
+      border-radius: 999px;
+      background: #5a1122;
+      color: #fff;
+      font-size: 0.62rem;
+      line-height: 1;
+    }
+
     .menu-stage {
       min-width: 0;
     }
@@ -300,60 +708,6 @@
 
     .menu-stage .wrap::before {
       inset: -10px 0 -18px;
-    }
-
-    .order-inline-bar {
-      width: 100%;
-      z-index: 30;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin: 0;
-      padding: 12px 14px;
-      border-radius: 20px;
-      background: linear-gradient(135deg, #5a1122 0%, #d4af37 100%);
-      color: #fffaf3;
-      box-shadow: 0 18px 30px rgba(90, 17, 34, 0.2);
-    }
-
-    .order-inline-copy {
-      display: grid;
-      gap: 0;
-      flex: 1 1 auto;
-      min-width: 0;
-    }
-
-    .order-inline-copy strong {
-      font-size: 1rem;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
-    }
-
-    .order-inline-copy span {
-      display: none;
-    }
-
-    .order-inline-btn {
-      appearance: none;
-      border: 0;
-      cursor: pointer;
-      flex: 0 0 auto;
-      min-height: 36px;
-      padding: 0 11px;
-      border-radius: 999px;
-      background: #fffaf3;
-      color: #211813;
-      font: inherit;
-      font-weight: 700;
-      font-size: 0.86rem;
-      white-space: nowrap;
-    }
-
-    .menu-page.is-scrolled .order-inline-bar {
-      padding: 12px 14px;
-      border-radius: 18px;
-      box-shadow: 0 12px 24px rgba(19, 12, 9, 0.16);
     }
 
     .order-shell {
@@ -794,6 +1148,10 @@
       text-decoration: none;
     }
 
+    .guest-bill-link[hidden] {
+      display: none;
+    }
+
     .guest-session-message {
       margin: 0;
       padding: 11px 13px;
@@ -880,7 +1238,7 @@
 
     .guest-order-progress {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 6px;
     }
 
@@ -1080,7 +1438,7 @@
     .server-call-btn {
       position: fixed;
       right: 16px;
-      bottom: 18px;
+      bottom: calc(88px + env(safe-area-inset-bottom));
       z-index: 39;
       border: none;
       border-radius: 999px;
@@ -1108,7 +1466,7 @@
     }
 
     .menu-page .to-top {
-      bottom: 76px;
+      bottom: calc(88px + env(safe-area-inset-bottom));
     }
 
     .server-modal-backdrop {
@@ -1322,6 +1680,61 @@
     }
 
     @media (max-width: 640px) {
+      .page-sections {
+        width: min(calc(100% - 20px), 420px);
+      }
+
+      .page-section {
+        padding-top: 18px;
+      }
+
+      .section-shell {
+        padding: 20px 16px;
+        border-radius: 24px;
+      }
+
+      .section-heading {
+        display: grid;
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+
+      .section-heading h1,
+      .section-heading h2 {
+        font-size: 2rem;
+      }
+
+      .section-context {
+        justify-self: start;
+        margin-top: 0;
+      }
+
+      .final-bill-section .section-heading {
+        display: flex;
+        align-items: flex-start;
+      }
+
+      .final-bill-section .guest-bill-link {
+        min-height: 36px;
+        padding-inline: 10px;
+        font-size: 0.7rem;
+      }
+
+      .final-bill-totals {
+        grid-template-columns: 1fr;
+      }
+
+      .final-bill-total-card strong {
+        font-size: 2.5rem;
+      }
+
+      .bottom-nav {
+        width: 100%;
+        border-right: 0;
+        border-left: 0;
+        border-radius: 18px 18px 0 0;
+      }
+
       .guest-session-head {
         align-items: flex-start;
         flex-direction: column;
@@ -1329,7 +1742,7 @@
 
       .guest-session-actions {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: 1fr;
         width: 100%;
       }
 
@@ -1343,28 +1756,6 @@
         grid-template-columns: 1fr;
         gap: 14px;
         margin-bottom: 40px;
-      }
-
-      .order-inline-bar {
-        display: grid;
-        grid-template-columns: 1fr;
-        align-items: stretch;
-        gap: 12px;
-        border-radius: 18px;
-      }
-
-      .order-inline-copy {
-        width: 100%;
-      }
-
-      .order-inline-copy strong {
-        font-size: 0.96rem;
-        line-height: 1.15;
-      }
-
-      .order-inline-btn {
-        width: 100%;
-        justify-content: center;
       }
 
       .order-shell {
@@ -1583,35 +1974,121 @@
         <p class="subtabs-context" id="subtabsContext"></p>
         <section class="subtabs" aria-label="Subcategories" id="subtabs"></section>
       </section>
-      <div class="order-inline-bar" id="orderInlineBar">
-        <div class="order-inline-copy">
-          <strong id="orderInlineTitle">Your order is empty</strong>
-          <span id="orderInlineMeta">Add items to start.</span>
+    </div>
+  </div>
+  <div class="page-sections">
+    <section class="page-section menu-section" id="menuSection" aria-labelledby="menuSectionTitle">
+      <div class="section-shell menu-stage">
+        <div class="section-heading">
+          <div>
+            <p class="section-eyebrow">EHWA MENU</p>
+            <h1 id="menuSectionTitle">Choose your dishes</h1>
+            <p>Tap an item to add it to this device's order.</p>
+          </div>
+          <span class="section-context" id="menuTableContext">Table —</span>
         </div>
-        <button class="order-inline-btn" id="orderInlineBtn" type="button">Review order</button>
+        <main class="wrap">
+          <section class="menu-list menu-grid" id="menuList"></section>
+        </main>
       </div>
-    </div>
+    </section>
+
+    <section class="page-section status-section" id="statusSection" aria-labelledby="statusSectionTitle">
+      <div class="section-shell">
+        <div class="section-heading">
+          <div>
+            <p class="section-eyebrow">LIVE STATUS</p>
+            <h2 id="statusSectionTitle">Order status</h2>
+            <p>Check whether the restaurant has confirmed each order from this device.</p>
+          </div>
+          <span class="section-context" id="statusSummary">Waiting for orders</span>
+        </div>
+        <section class="guest-session-panel is-inactive" id="guestSessionPanel" aria-live="polite">
+          <div class="guest-session-head">
+            <div class="guest-session-title">
+              <div class="guest-qr-number" id="guestQrNumber">--</div>
+              <div><span>Dining session</span><strong id="guestSessionTitle">Checking QR status…</strong></div>
+            </div>
+            <div class="guest-session-actions">
+              <button class="guest-session-refresh" id="guestOrdersRefresh" type="button">Refresh</button>
+            </div>
+          </div>
+          <p class="guest-session-message" id="guestSessionMessage">Please wait while this QR is verified.</p>
+        </section>
+        <div class="guest-order-history-head">
+          <div>
+            <h3>Your recent orders</h3>
+            <span>Only orders from this device are shown here.</span>
+          </div>
+          <span id="statusLastUpdated">—</span>
+        </div>
+        <div class="guest-order-history-list" id="guestOrderHistory" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="page-section final-bill-section" id="finalBillSection" aria-labelledby="finalBillSectionTitle">
+      <div class="section-shell">
+        <div class="section-heading">
+          <div>
+            <p class="section-eyebrow">FINAL BILL</p>
+            <h2 id="finalBillSectionTitle">Final Bill</h2>
+            <p>See the table total and the part ordered from this device.</p>
+          </div>
+          <a class="guest-bill-link" id="guestBillLink" href="../cashier.html" hidden>Open cashier view</a>
+        </div>
+        <div class="final-bill-identity">
+          <span id="finalBillTableLabel">Table —</span>
+          <span id="finalBillGuestLabel">This device</span>
+        </div>
+        <div class="final-bill-totals">
+          <article class="final-bill-total-card is-table">
+            <span>Table total</span>
+            <strong id="finalBillTableTotal">$0.00</strong>
+            <small id="finalBillTableMeta">0 sent orders</small>
+          </article>
+          <article class="final-bill-total-card is-device">
+            <span>This device</span>
+            <strong id="finalBillDeviceTotal">$0.00</strong>
+            <small id="finalBillDeviceMeta">0 sent orders</small>
+          </article>
+        </div>
+        <div class="final-bill-breakdown">
+          <div>
+            <span class="final-bill-dot is-mine"></span>
+            <span>This device's orders</span>
+            <strong id="finalBillMineTotal">$0.00</strong>
+          </div>
+          <div>
+            <span class="final-bill-dot is-other"></span>
+            <span>Other orders at this table</span>
+            <strong id="finalBillOtherTotal">$0.00</strong>
+          </div>
+        </div>
+        <div class="final-bill-order-list" id="finalBillOrderList" aria-live="polite"></div>
+      </div>
+    </section>
   </div>
-  <section class="guest-session-panel is-inactive" id="guestSessionPanel" aria-live="polite">
-    <div class="guest-session-head">
-      <div class="guest-session-title">
-        <div class="guest-qr-number" id="guestQrNumber">--</div>
-        <div><span>Dining session</span><strong id="guestSessionTitle">Checking QR status…</strong></div>
-      </div>
-      <div class="guest-session-actions">
-        <a class="guest-bill-link" id="guestBillLink" href="../cashier.html" hidden>View bill</a>
-        <button class="guest-session-refresh" id="guestOrdersRefresh" type="button">Refresh</button>
-      </div>
-    </div>
-    <p class="guest-session-message" id="guestSessionMessage">Please wait while this QR is verified.</p>
-  </section>
-  <div class="order-layout">
-    <div class="menu-stage">
-      <main class="wrap">
-        <section class="menu-list menu-grid" id="menuList"></section>
-      </main>
-    </div>
-  </div>
+
+  <nav class="bottom-nav" id="bottomNav" aria-label="Dining sections">
+    <button class="bottom-nav-item is-active" type="button" data-section-target="menuSection" aria-current="page">
+      <span class="bottom-nav-icon" aria-hidden="true">⌂</span>
+      <span>메뉴</span>
+    </button>
+    <button class="bottom-nav-item" type="button" data-section-target="statusSection">
+      <span class="bottom-nav-icon" aria-hidden="true">◷</span>
+      <span>현황</span>
+    </button>
+    <button class="bottom-nav-item bottom-nav-order" id="bottomOrderButton" type="button" aria-label="Open order review">
+      <span class="bottom-nav-icon" aria-hidden="true">＋</span>
+      <span>주문</span>
+      <b class="bottom-nav-badge" id="bottomOrderBadge" hidden>0</b>
+    </button>
+    <button class="bottom-nav-item" type="button" data-section-target="finalBillSection">
+      <span class="bottom-nav-icon" aria-hidden="true">$</span>
+      <span>Final Bill</span>
+    </button>
+  </nav>
+
   <div class="cart-drawer-backdrop" id="cartDrawerBackdrop" hidden>
     <div class="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cartDrawerHeading">
       <div class="cart-drawer-grab" aria-hidden="true"></div>
@@ -1784,6 +2261,7 @@
     let currentQrSession = null;
     let currentGuest = null;
     let guestSessionRequests = [];
+    let tableSessionRequests = [];
     let qrSessionRefreshHandle = null;
     let qrSessionLoadError = false;
     let isQrSessionRefreshing = false;
@@ -2265,8 +2743,7 @@
       ));
     }
 
-    function getSentOrderSummary() {
-      const requests = getSentOrderRequests();
+    function summarizeOrderRequests(requests = []) {
       const groupedItems = new Map();
       let itemCount = 0;
       let subtotal = 0;
@@ -2321,10 +2798,44 @@
       };
     }
 
+    function getSentOrderSummary() {
+      return summarizeOrderRequests(getSentOrderRequests());
+    }
+
+    function getTableOrderRequests() {
+      const source = currentQrSession?.table_id
+        ? tableSessionRequests
+        : guestSessionRequests;
+      return source.filter((request) => (
+        request.kind === "order"
+        && request.status !== "canceled"
+      ));
+    }
+
+    function getTableBillSummary() {
+      return summarizeOrderRequests(getTableOrderRequests());
+    }
+
     function addToCart(menuId) {
       if (!currentQrSession) {
         showRequestToast("This QR is not active yet. Please ask your server.", { error: true });
         return;
+      }
+
+      .guest-order-status-line,
+      .final-bill-identity,
+      .final-bill-order-head,
+      .final-bill-order-meta {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .guest-order-status-copy {
+        text-align: left;
+      }
+
+      #statusLastUpdated {
+        justify-self: start;
       }
       const menuItem = allMenus.find((item) => getMenuId(item) === menuId);
       if (!menuItem) return;
@@ -2450,6 +2961,7 @@
       currentGuest = null;
       currentQrSession = null;
       guestSessionRequests = [];
+      tableSessionRequests = [];
       qrSessionLoadError = false;
       return true;
     }
@@ -2556,7 +3068,188 @@
       }).format(date);
     }
 
+    function getOrderStatusMeta(status = "new") {
+      const normalized = String(status || "new").toLowerCase();
+      if (normalized === "canceled") {
+        return {
+          label: "Canceled",
+          detail: "This order was canceled.",
+          step: 0,
+          tone: "canceled"
+        };
+      }
+      if (normalized === "completed") {
+        return {
+          label: "Served",
+          detail: "This order has been served.",
+          step: 3,
+          tone: "finished"
+        };
+      }
+      if (normalized === "preparing" || normalized === "ready") {
+        return {
+          label: normalized === "ready" ? "Ready" : "Preparing",
+          detail: "The restaurant confirmed this order and is preparing it.",
+          step: 2,
+          tone: "confirmed"
+        };
+      }
+      if (normalized === "acknowledged") {
+        return {
+          label: "Server confirmed",
+          detail: "The restaurant has confirmed this order.",
+          step: 1,
+          tone: "confirmed"
+        };
+      }
+      return {
+        label: "Waiting for server",
+        detail: "Sent successfully. Waiting for the restaurant to confirm it.",
+        step: 1,
+        tone: "waiting"
+      };
+    }
+
+    function getOrderItemSummary(request) {
+      const items = Array.isArray(request?.items) ? request.items : [];
+      return items.map((item) => {
+        const quantity = Number(item.quantity || 0);
+        const name = item.nameEn || item.nameKo || "Menu item";
+        return `${quantity}× ${name}`;
+      }).join(" · ") || "Order details";
+    }
+
+    function renderStatusSection() {
+      const historyEl = document.getElementById("guestOrderHistory");
+      const summaryEl = document.getElementById("statusSummary");
+      const updatedEl = document.getElementById("statusLastUpdated");
+      if (!historyEl || !summaryEl || !updatedEl) return;
+
+      const requests = getSentOrderRequests()
+        .slice()
+        .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+      const latest = requests[0];
+      const latestMeta = latest ? getOrderStatusMeta(latest.status) : null;
+      summaryEl.textContent = latest
+        ? `${latestMeta.label} · Order #${latest.id || "—"}`
+        : "Waiting for orders";
+      updatedEl.textContent = latest?.updated_at
+        ? `Updated ${formatGuestRequestTime(latest.updated_at)}`
+        : "—";
+
+      if (!requests.length) {
+        historyEl.innerHTML = `<div class="guest-order-history-empty">No orders from this device yet. Your sent orders will appear here.</div>`;
+        return;
+      }
+
+      historyEl.innerHTML = requests.map((request) => {
+        const meta = getOrderStatusMeta(request.status);
+        const steps = ["Sent", "Confirmed", "Preparing", "Served"]
+          .map((label, index) => {
+            const classes = [
+              index < meta.step ? "is-done" : "",
+              index === meta.step ? "is-current" : ""
+            ].filter(Boolean).join(" ");
+            return `<span class="guest-order-step ${classes}">${label}</span>`;
+          })
+          .join("");
+        const cardClasses = [
+          "guest-order-card",
+          meta.tone === "waiting" ? "is-waiting" : "",
+          meta.tone === "confirmed" ? "is-confirmed" : "",
+          meta.tone === "finished" ? "is-finished" : "",
+          meta.tone === "canceled" ? "is-canceled" : ""
+        ].filter(Boolean).join(" ");
+
+        return `
+          <article class="${cardClasses}">
+            <div class="guest-order-card-top">
+              <strong>Order #${escapeHtml(request.id || "—")}</strong>
+              <time>${escapeHtml(formatGuestRequestTime(request.created_at))}</time>
+            </div>
+            <div class="guest-order-items">${escapeHtml(getOrderItemSummary(request))}</div>
+            <div class="guest-order-status-line">
+              <span class="guest-order-status-chip ${meta.tone === "confirmed" ? "is-confirmed" : ""} ${meta.tone === "finished" ? "is-finished" : ""}">${escapeHtml(meta.label)}</span>
+              <span class="guest-order-status-copy">${escapeHtml(meta.detail)}</span>
+            </div>
+            <div class="guest-order-progress" aria-label="Order progress">${steps}</div>
+            <div class="guest-order-card-meta">
+              <span>${escapeHtml(request.item_count || 0)} item${request.item_count === 1 ? "" : "s"}</span>
+              <strong>${escapeHtml(formatCurrency(request.total))}</strong>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function isCurrentDeviceOrder(request) {
+      if (!currentGuest?.guest_id) return true;
+      return !request.guest_id || request.guest_id === currentGuest.guest_id;
+    }
+
+    function renderFinalBill() {
+      const tableTotalEl = document.getElementById("finalBillTableTotal");
+      const deviceTotalEl = document.getElementById("finalBillDeviceTotal");
+      const tableMetaEl = document.getElementById("finalBillTableMeta");
+      const deviceMetaEl = document.getElementById("finalBillDeviceMeta");
+      const mineTotalEl = document.getElementById("finalBillMineTotal");
+      const otherTotalEl = document.getElementById("finalBillOtherTotal");
+      const tableLabelEl = document.getElementById("finalBillTableLabel");
+      const guestLabelEl = document.getElementById("finalBillGuestLabel");
+      const menuTableContextEl = document.getElementById("menuTableContext");
+      const orderListEl = document.getElementById("finalBillOrderList");
+      if (!tableTotalEl || !deviceTotalEl || !tableMetaEl || !deviceMetaEl || !mineTotalEl || !otherTotalEl || !tableLabelEl || !guestLabelEl || !orderListEl) return;
+
+      const tableCode = currentQrSession?.table_code || document.getElementById("tableCode")?.value || "—";
+      const tableOrders = getTableOrderRequests();
+      const deviceOrders = tableOrders.filter(isCurrentDeviceOrder);
+      const otherOrders = tableOrders.filter((request) => !isCurrentDeviceOrder(request));
+      const tableSummary = summarizeOrderRequests(tableOrders);
+      const deviceSummary = summarizeOrderRequests(deviceOrders);
+      const otherSummary = summarizeOrderRequests(otherOrders);
+
+      tableLabelEl.textContent = `Table ${tableCode}`;
+      guestLabelEl.textContent = currentGuest?.display_code
+        ? `Guest ${currentGuest.display_code} · this device`
+        : "This device";
+      if (menuTableContextEl) menuTableContextEl.textContent = `Table ${tableCode}`;
+      tableTotalEl.textContent = formatCurrency(tableSummary.total);
+      deviceTotalEl.textContent = formatCurrency(deviceSummary.total);
+      mineTotalEl.textContent = formatCurrency(deviceSummary.total);
+      otherTotalEl.textContent = formatCurrency(otherSummary.total);
+      tableMetaEl.textContent = `${tableOrders.length} sent order${tableOrders.length === 1 ? "" : "s"}`;
+      deviceMetaEl.textContent = `${deviceOrders.length} from this device`;
+
+      if (!tableOrders.length) {
+        orderListEl.innerHTML = `<div class="final-bill-empty">No sent orders on this table yet. New items will appear after you send them.</div>`;
+        return;
+      }
+
+      orderListEl.innerHTML = tableOrders.map((request) => {
+        const isMine = isCurrentDeviceOrder(request);
+        const meta = getOrderStatusMeta(request.status);
+        return `
+          <article class="final-bill-order-card ${isMine ? "is-mine" : ""}">
+            <div class="final-bill-order-head">
+              <div>
+                <span class="final-bill-source">${isMine ? "This device" : "Same table"}</span>
+                <strong>Order #${escapeHtml(request.id || "—")}</strong>
+              </div>
+              <time>${escapeHtml(formatGuestRequestTime(request.created_at))}</time>
+            </div>
+            <div class="final-bill-order-items">${escapeHtml(getOrderItemSummary(request))}</div>
+            <div class="final-bill-order-meta">
+              <span>${escapeHtml(meta.label)}</span>
+              <strong>${escapeHtml(formatCurrency(request.total))}</strong>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
     function renderGuestOrderHistory() {
+      renderStatusSection();
+      renderFinalBill();
       renderOrderSummary();
     }
 
@@ -2593,8 +3286,8 @@
         const guestCode = currentGuest?.display_code ? `Guest ${currentGuest.display_code} · ` : "";
         title.textContent = `${guestCode}Table ${currentQrSession.table_code || "-"}`;
         message.textContent = currentGuest
-          ? "Your bill follows you across every table in this Party. Review Order shows everything sent so far."
-          : "Ordering is open for this table. Review Order shows sent items and new items separately.";
+          ? "Your bill follows you across every table in this Party. Status and Final Bill update automatically."
+          : "Ordering is open for this table. Status and Final Bill show what has been sent.";
         const tableCodeInput = document.getElementById("tableCode");
         if (tableCodeInput && currentQrSession.table_code) {
           tableCodeInput.value = currentQrSession.table_code;
@@ -2637,6 +3330,27 @@
       return rows[0] || null;
     }
 
+    function normalizeDiningRequest(request = {}) {
+      return {
+        ...request,
+        id: Number(request.id),
+        party_id: request.party_id == null ? null : Number(request.party_id),
+        guest_id: request.guest_id ? String(request.guest_id) : null,
+        table_id: request.table_id == null ? null : Number(request.table_id),
+        item_count: Number(request.item_count || 0),
+        subtotal: Number(request.subtotal || 0),
+        tax: Number(request.tax || 0),
+        total: Number(request.total || 0),
+        items: Array.isArray(request.items) ? request.items : [],
+        status: String(request.status || "new").toLowerCase(),
+        kind: String(request.kind || "service").toLowerCase()
+      };
+    }
+
+    function normalizeDiningRequests(rows = []) {
+      return (Array.isArray(rows) ? rows : []).map(normalizeDiningRequest);
+    }
+
     async function fetchGuestSessionRequests({ guestId = null, sessionId = null } = {}) {
       const { url, anonKey } = SUPABASE_CONFIG;
       const endpoint = new URL(`${url}/rest/v1/${DINING_REQUESTS_TABLE}`);
@@ -2656,17 +3370,32 @@
       if (!response.ok) {
         throw new Error(`Guest order history failed (${response.status}): ${await response.text()}`);
       }
-      return (await response.json()).map((request) => ({
-        ...request,
-        id: Number(request.id),
-        item_count: Number(request.item_count || 0),
-        subtotal: Number(request.subtotal || 0),
-        tax: Number(request.tax || 0),
-        total: Number(request.total || 0),
-        items: Array.isArray(request.items) ? request.items : [],
-        status: String(request.status || "new").toLowerCase(),
-        kind: String(request.kind || "service").toLowerCase()
-      }));
+      return normalizeDiningRequests(await response.json());
+    }
+
+    async function fetchTableSessionRequests({ tableId = null, partyId = null, sessionId = null } = {}) {
+      if (!tableId && !partyId && !sessionId) return [];
+      const { url, anonKey } = SUPABASE_CONFIG;
+      const endpoint = new URL(`${url}/rest/v1/${DINING_REQUESTS_TABLE}`);
+      endpoint.searchParams.set("select", "id,party_id,guest_id,table_id,table_code,kind,request_type,status,items,item_count,subtotal,tax,total,created_at,updated_at");
+      if (tableId) {
+        endpoint.searchParams.set("table_id", `eq.${tableId}`);
+      }
+      if (partyId) {
+        endpoint.searchParams.set("party_id", `eq.${partyId}`);
+      } else if (sessionId && !tableId) {
+        endpoint.searchParams.set("qr_session_id", `eq.${sessionId}`);
+      }
+      endpoint.searchParams.set("order", "created_at.desc");
+      endpoint.searchParams.set("limit", "100");
+      const response = await fetch(endpoint.toString(), {
+        headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` }
+      });
+      if (!response.ok) {
+        if (sessionId) return fetchGuestSessionRequests({ sessionId });
+        throw new Error(`Table order history failed (${response.status}): ${await response.text()}`);
+      }
+      return normalizeDiningRequests(await response.json());
     }
 
     async function refreshQrSession({ manual = false } = {}) {
@@ -2684,6 +3413,13 @@
             guestSessionRequests = resolvedGuest
               ? await fetchGuestSessionRequests({ guestId: resolvedGuest.guest_id })
               : [];
+            tableSessionRequests = resolvedGuest
+              ? await fetchTableSessionRequests({
+                tableId: currentQrSession?.table_id,
+                partyId: currentGuest?.party_id,
+                sessionId: currentQrSession?.id
+              })
+              : [];
             showAndReadGuestNotifications().catch((error) => {
               console.error("Guest notification refresh failed", error);
             });
@@ -2692,6 +3428,7 @@
               diningPartyArchitectureAvailable = false;
               guestPartyConflict = null;
               currentGuest = null;
+              tableSessionRequests = [];
             } else if (applyGuestPartyConflict(error)) {
               try {
                 guestSessionRequests = guestPartyConflict?.guestId
@@ -2708,6 +3445,7 @@
               currentGuest = null;
               currentQrSession = null;
               guestSessionRequests = [];
+              tableSessionRequests = [];
               qrSessionLoadError = false;
               return;
             } else {
@@ -2724,6 +3462,7 @@
           guestSessionRequests = nextSession
             ? await fetchGuestSessionRequests({ sessionId: nextSession.id })
             : [];
+          tableSessionRequests = guestSessionRequests;
         }
         qrSessionLoadError = false;
       } catch (error) {
@@ -2732,6 +3471,7 @@
         currentQrSession = null;
         currentGuest = null;
         guestSessionRequests = [];
+        tableSessionRequests = [];
         qrSessionLoadError = true;
       } finally {
         isQrSessionRefreshing = false;
@@ -2995,8 +3735,7 @@
       const combinedOrderTotalEl = document.getElementById("combinedOrderTotal");
       const combinedOrderItemCountEl = document.getElementById("combinedOrderItemCount");
       const submitButton = document.getElementById("drawerSubmitBtn");
-      const inlineTitleEl = document.getElementById("orderInlineTitle");
-      const inlineMetaEl = document.getElementById("orderInlineMeta");
+      const orderBadgeEl = document.getElementById("bottomOrderBadge");
 
       if (
         !mobileOrderListEl
@@ -3007,8 +3746,6 @@
         || !newOrderTotalEl
         || !combinedOrderTotalEl
         || !combinedOrderItemCountEl
-        || !inlineTitleEl
-        || !inlineMetaEl
       ) {
         return;
       }
@@ -3086,16 +3823,9 @@
       if (submitButton) {
         submitButton.disabled = !cartItems.length || !currentQrSession || isDiningRequestSubmitting;
       }
-
-      if (cartItems.length) {
-        inlineTitleEl.textContent = `${itemCount} new item${itemCount === 1 ? "" : "s"} · ${formatCurrency(total)}`;
-        inlineMetaEl.textContent = `Ordered ${formatCurrency(sentOrder.total)} · After sending ${formatCurrency(combinedTotal)}`;
-      } else if (sentOrder.requests.length) {
-        inlineTitleEl.textContent = `Ordered so far · ${formatCurrency(sentOrder.total)}`;
-        inlineMetaEl.textContent = `${sentOrder.itemCount} item${sentOrder.itemCount === 1 ? "" : "s"} sent`;
-      } else {
-        inlineTitleEl.textContent = "Your order is empty";
-        inlineMetaEl.textContent = `Table ${document.getElementById("tableCode")?.value || "A12"}`;
+      if (orderBadgeEl) {
+        orderBadgeEl.textContent = String(itemCount);
+        orderBadgeEl.hidden = !itemCount;
       }
     }
 
@@ -3145,7 +3875,7 @@
     }
 
     function setupCartDrawer() {
-      const inlineBtn = document.getElementById("orderInlineBtn");
+      const inlineBtn = document.getElementById("bottomOrderButton");
       const closeBtn = document.getElementById("cartDrawerCloseBtn");
       const backdrop = document.getElementById("cartDrawerBackdrop");
       const drawer = backdrop?.querySelector(".cart-drawer");
@@ -3456,6 +4186,46 @@
       });
     }
 
+    function setupSectionNavigation() {
+      const nav = document.getElementById("bottomNav");
+      if (!nav) return;
+      const buttons = [...nav.querySelectorAll("[data-section-target]")];
+      const sections = buttons
+        .map((button) => document.getElementById(button.dataset.sectionTarget || ""))
+        .filter(Boolean);
+
+      const setActive = (sectionId) => {
+        buttons.forEach((button) => {
+          const active = button.dataset.sectionTarget === sectionId;
+          button.classList.toggle("is-active", active);
+          if (active) button.setAttribute("aria-current", "page");
+          else button.removeAttribute("aria-current");
+        });
+      };
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const section = document.getElementById(button.dataset.sectionTarget || "");
+          if (!section) return;
+          setActive(section.id);
+          section.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+
+      if (typeof IntersectionObserver === "function") {
+        const observer = new IntersectionObserver((entries) => {
+          const visible = entries
+            .filter((entry) => entry.isIntersecting)
+            .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+          if (visible) setActive(visible.target.id);
+        }, {
+          rootMargin: "-18% 0px -58% 0px",
+          threshold: [0.1, 0.35, 0.65]
+        });
+        sections.forEach((section) => observer.observe(section));
+      }
+    }
+
     function setupStickyHeaderState() {
       const page = document.body;
       const stickyShell = document.querySelector(".menu-sticky-shell");
@@ -3564,6 +4334,7 @@
       renderOrderSummary();
       setupStickyHeaderState();
       setupToTopButton();
+      setupSectionNavigation();
       setupOrderForm();
       setupCartDrawer();
       syncQrSessionUi();
