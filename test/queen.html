@@ -54,11 +54,11 @@
       position: fixed;
       inset: 0;
       z-index: 110;
-      border: 12px solid rgba(60, 187, 255, 0.9);
+      border: 12px solid rgba(242, 199, 92, 0.92);
       background: transparent;
       box-shadow:
-        inset 0 0 74px rgba(28, 108, 255, 0.5),
-        inset 0 0 0 6px rgba(112, 232, 255, 0.46);
+        inset 0 0 74px rgba(123, 31, 47, 0.52),
+        inset 0 0 0 6px rgba(242, 199, 92, 0.34);
       pointer-events: none;
       animation: unconfirmed-side-flash 0.9s ease-in-out infinite alternate;
     }
@@ -66,11 +66,11 @@
     @keyframes unconfirmed-side-flash {
       from {
         opacity: 0.34;
-        border-color: rgba(115, 230, 255, 0.72);
+        border-color: rgba(255, 226, 154, 0.72);
       }
       to {
         opacity: 1;
-        border-color: rgba(42, 111, 255, 0.98);
+        border-color: rgba(242, 199, 92, 0.98);
       }
     }
 
@@ -85,7 +85,9 @@
       min-height: 100dvh;
       padding: 32px;
       border: 0;
-      background: #1557d5;
+      background:
+        radial-gradient(circle at top left, rgba(242, 199, 92, 0.34), transparent 34%),
+        linear-gradient(135deg, #4b1321 0%, #7b1f2f 54%, #a2741e 100%);
       color: #fffdf4;
       text-align: center;
       cursor: pointer;
@@ -106,7 +108,7 @@
       font-weight: 900;
       line-height: 0.9;
       letter-spacing: -0.07em;
-      text-shadow: 0 16px 40px rgba(0, 31, 94, 0.48);
+      text-shadow: 0 16px 40px rgba(48, 10, 18, 0.5);
     }
 
     .fullscreen-order-alert span {
@@ -127,7 +129,9 @@
       min-height: 100dvh;
       padding: 32px;
       border: 0;
-      background: #102a56;
+      background:
+        radial-gradient(circle at top left, rgba(212, 175, 55, 0.2), transparent 36%),
+        linear-gradient(135deg, #17100d, #4b1822);
       color: #fff;
       text-align: center;
       cursor: pointer;
@@ -191,11 +195,11 @@
       align-items: center;
       margin-bottom: 14px;
       padding: 14px 16px;
-      border: 2px solid rgba(125, 229, 255, 0.9);
+      border: 2px solid rgba(242, 199, 92, 0.86);
       border-radius: 22px;
-      background: linear-gradient(135deg, #0d47a1 0%, #1565c0 52%, #008ea8 100%);
+      background: linear-gradient(135deg, #5a1122 0%, #7b1f2f 58%, #a47720 100%);
       color: #fff;
-      box-shadow: 0 20px 44px rgba(0, 61, 153, 0.42);
+      box-shadow: 0 20px 44px rgba(70, 14, 28, 0.38);
       animation: alert-bar-flash 0.82s ease-in-out infinite alternate;
     }
 
@@ -255,13 +259,13 @@
       border: 0;
       border-radius: 999px;
       background: #eef8ff;
-      color: #083f95;
+      color: #5a1122;
       font: inherit;
       font-size: 0.84rem;
       font-weight: 900;
       white-space: nowrap;
       cursor: pointer;
-      box-shadow: 0 10px 18px rgba(0, 49, 117, 0.24);
+      box-shadow: 0 10px 18px rgba(70, 14, 28, 0.24);
     }
 
     .brand {
@@ -2316,20 +2320,31 @@
     }
 
     .request-card.is-new {
-      border-color: rgba(21, 87, 213, 0.34);
-      box-shadow: 0 16px 30px rgba(21, 87, 213, 0.13);
+      border-color: rgba(212, 175, 55, 0.44);
+      box-shadow: 0 16px 30px rgba(123, 31, 47, 0.13);
       animation: new-request-card-flash 0.9s ease-in-out infinite alternate;
     }
 
     @keyframes new-request-card-flash {
       from {
-        border-color: rgba(87, 218, 255, 0.56);
-        box-shadow: 0 12px 24px rgba(21, 87, 213, 0.12);
+        border-color: rgba(242, 199, 92, 0.54);
+        box-shadow: 0 12px 24px rgba(123, 31, 47, 0.12);
       }
       to {
-        border-color: rgba(38, 105, 255, 0.94);
-        box-shadow: 0 18px 34px rgba(38, 105, 255, 0.3);
+        border-color: rgba(123, 31, 47, 0.72);
+        box-shadow: 0 18px 34px rgba(123, 31, 47, 0.22);
       }
+    }
+
+    .request-card.is-acknowledged {
+      border-color: rgba(38, 112, 70, 0.26);
+      box-shadow: inset 3px 0 0 #267046, 0 14px 26px rgba(50, 31, 20, 0.07);
+    }
+
+    .request-card.is-preparing,
+    .request-card.is-ready {
+      border-color: rgba(168, 103, 18, 0.28);
+      box-shadow: inset 3px 0 0 #a86712, 0 14px 26px rgba(50, 31, 20, 0.07);
     }
 
     .request-card.is-service {
@@ -2393,6 +2408,50 @@
     .request-status-badge {
       background: rgba(55, 119, 79, 0.12);
       color: #286344;
+    }
+
+    .request-device-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: rgba(212, 175, 55, 0.14);
+      color: #765812;
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .request-progress {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 5px;
+    }
+
+    .request-progress-step {
+      display: grid;
+      place-items: center;
+      min-height: 34px;
+      padding: 5px 4px;
+      border-radius: 10px;
+      background: #eee6dc;
+      color: #8b786a;
+      font-size: 0.68rem;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .request-progress-step.is-done {
+      background: #dcecdf;
+      color: #267046;
+    }
+
+    .request-progress-step.is-current {
+      background: linear-gradient(135deg, #5a1122, #a47720);
+      color: #fffaf3;
+      box-shadow: 0 8px 16px rgba(90, 17, 34, 0.16);
     }
 
     .request-items {
@@ -2558,14 +2617,14 @@
     }
 
     .nav-tab.has-pending:not(.is-active) {
-      background: rgba(21, 87, 213, 0.38);
-      color: #e9faff;
+      background: rgba(123, 31, 47, 0.54);
+      color: #fff3dc;
       animation: pending-nav-flash 0.8s ease-in-out infinite alternate;
     }
 
     @keyframes pending-nav-flash {
-      from { box-shadow: inset 0 0 0 1px rgba(117, 229, 255, 0.38); }
-      to { box-shadow: inset 0 0 0 2px rgba(78, 177, 255, 0.96), 0 10px 22px rgba(21, 87, 213, 0.32); }
+      from { box-shadow: inset 0 0 0 1px rgba(242, 199, 92, 0.38); }
+      to { box-shadow: inset 0 0 0 2px rgba(242, 199, 92, 0.9), 0 10px 22px rgba(123, 31, 47, 0.28); }
     }
 
     .panel {
@@ -4038,6 +4097,12 @@
         font-size: 0.68rem;
       }
 
+      .request-progress-step {
+        min-height: 32px;
+        padding-inline: 2px;
+        font-size: 0.62rem;
+      }
+
       .action-btn {
         gap: 4px;
         padding: 0 5px;
@@ -4286,14 +4351,14 @@
       <section class="purpose-hero">
         <p class="purpose-kicker">Downtown floor</p>
         <h2>Table Status</h2>
-        <p>QR codes stay mapped to physical tables. Start a Party with one or more tables, then close the Party when the group leaves.</p>
+        <p>Select every table for the group, assign one reusable QR to the Party, then close the Party after checkout.</p>
       </section>
 
       <section class="purpose-panel">
         <div class="table-map-title-row">
           <div>
             <h3>Table Map</h3>
-            <p>Tap empty tables to build a Party. Tap an active table to review orders or end its session.</p>
+            <p>Tap one or more empty tables before starting a Party. One QR works across all selected tables.</p>
           </div>
           <a class="table-map-editor-link" href="./table.html">Edit map</a>
         </div>
@@ -4329,11 +4394,22 @@
         </div>
       </section>
 
+      <section class="purpose-panel">
+        <div class="party-panel-head">
+          <div>
+            <h3>Active Parties</h3>
+            <p>Review tables, Guest device bills, and checkout from one place.</p>
+          </div>
+        </div>
+        <p class="party-status" id="partyStatus">Loading active Parties…</p>
+        <div class="party-list" id="partyList" aria-live="polite"></div>
+      </section>
+
       <details class="purpose-panel qr-session-control-panel">
         <summary class="qr-session-summary">
           <div>
             <h3>QR Session Details</h3>
-            <p>Active Party QR assignments and compatibility session history.</p>
+            <p>Active Party QR assignments and retained session history.</p>
           </div>
           <div class="qr-session-summary-side">
             <span class="qr-session-summary-count" id="qrSessionToggleLabel">0 assigned</span>
@@ -4343,7 +4419,7 @@
         <div class="qr-session-body">
           <div class="qr-session-toolbar">
             <div>
-              <p>QR mappings stay with tables. A table accepts orders only while it belongs to an active Party.</p>
+              <p>Each Party uses one QR. Every selected table shares that Party and bill.</p>
             </div>
             <a class="qr-sheet-link" href="./qr.html">QR Cards 1–10</a>
           </div>
@@ -4356,8 +4432,8 @@
     <section class="app-view placeholder-view is-active" data-view="online">
       <section class="purpose-hero">
         <p class="purpose-kicker">Live table service</p>
-        <h2>Orders &amp; Calls</h2>
-        <p>Orders and service calls sent from the table menu appear here. Work the queue in arrival order and update each request as the floor handles it.</p>
+        <h2>Orders &amp; Status</h2>
+        <p>Confirm each order, start preparation, then mark it served. The customer menu follows the same status in real time.</p>
         <div class="request-overview" aria-label="Active request summary">
           <div class="request-metric">
             <span>Open</span>
@@ -4440,7 +4516,7 @@
           <path d="M9 8a3 3 0 0 1 6 0"></path>
           <path d="M9 13h6"></path>
         </svg>
-        <span>온라인</span>
+        <span>주문 · 현황</span>
         <b class="nav-count" id="requestNavCount" hidden>0</b>
       </button>
       <button class="nav-tab" type="button" data-queen-tab="tables" aria-pressed="false">
@@ -4450,7 +4526,7 @@
           <path d="M10 4v16"></path>
           <path d="M15 14h2"></path>
         </svg>
-        <span>테이블 현황</span>
+        <span>테이블 · QR</span>
       </button>
       <button class="nav-tab" type="button" data-queen-tab="reservation" aria-pressed="false">
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -4542,8 +4618,8 @@
     <div class="table-modal" role="dialog" aria-modal="true" aria-labelledby="qrAssignmentTitle">
       <div class="table-modal-top">
         <div>
-          <h3 id="qrAssignmentTitle">Assign QR Codes</h3>
-          <p id="qrAssignmentMeta">Choose one or more available QR codes for the selected tables.</p>
+          <h3 id="qrAssignmentTitle">Assign one QR</h3>
+          <p id="qrAssignmentMeta">Choose one available QR for the entire Party.</p>
         </div>
         <button class="modal-close" id="closeQrAssignmentModal" type="button">×</button>
       </div>
@@ -4691,7 +4767,6 @@
       partyLoadError: false,
       partyActionError: "",
       partySetupMode: false,
-      partySetupTargetId: null,
       partySetupZone: null,
       partySetupSaving: false,
       selectedPartyTableCodes: new Set(),
@@ -4788,10 +4863,10 @@
     }
 
     const REQUEST_STATUS_LABELS = {
-      new: "New",
-      acknowledged: "Preparing",
+      new: "Sent",
+      acknowledged: "Confirmed",
       preparing: "Preparing",
-      ready: "Preparing",
+      ready: "Ready",
       completed: "Served",
       canceled: "Canceled"
     };
@@ -5236,7 +5311,6 @@
               </span>
               ${party.status === "ACTIVE" ? `
                 <div class="party-detail-actions">
-                  <button type="button" data-add-tables-party="${party.id}">Add tables</button>
                   <button class="is-danger" type="button" data-close-party="${party.id}">Review &amp; Checkout</button>
                 </div>
               ` : ""}
@@ -5258,7 +5332,7 @@
         status.textContent = "Party and Guest features need tools/sql/dining-party-guest-architecture.sql.";
         status.className = "party-status is-error";
       } else if (!state.partyQrPoolAvailable) {
-        status.textContent = "Table-first multi-QR seating needs tools/sql/dining-party-qr-pool.sql.";
+        status.textContent = "Party QR seating needs tools/sql/dining-party-qr-pool.sql.";
         status.className = "party-status is-error";
       } else {
         const activeCount = state.partySnapshot.parties.filter((party) => party.status === "ACTIVE").length;
@@ -5271,7 +5345,7 @@
         list.innerHTML = `<div class="party-empty">${
           state.partyLoadError
             ? "Existing QR sessions continue to work until the Party architecture SQL is installed."
-            : "No active Parties. Tap an available table below, then tap or drag across nearby tables."
+            : "No active Parties. Tap an available table on the map above, then select the rest of the group tables."
         }</div>`;
         return;
       }
@@ -5298,22 +5372,16 @@
         return;
       }
 
-      const targetParty = state.partySetupTargetId ? getDiningParty(state.partySetupTargetId) : null;
-      const currentPartyTableCodes = targetParty
-        ? getDiningPartyTables(targetParty.id, { activeOnly: true }).map((table) => table.table_code)
-        : [];
       const selectedTables = [...state.selectedPartyTableCodes]
         .map((tableCode) => ({
           tableCode,
           table: getDiningTableRecord(tableCode)
         }))
         .sort((left, right) => left.tableCode.localeCompare(right.tableCode, undefined, { numeric: true }));
-      title.textContent = targetParty ? `Add nearby tables to Party #${targetParty.id}` : "Selected tables";
-      message.textContent = targetParty
-        ? `${currentPartyTableCodes.join(" + ") || "No current tables"} · ${selectedCount} new table${selectedCount === 1 ? "" : "s"} selected.`
-        : selectedCount
-          ? `${selectedCount} nearby table${selectedCount === 1 ? "" : "s"} selected · Tap or drag to adjust.`
-          : "Tap or drag across the nearby available tables to add them.";
+      title.textContent = "Selected tables";
+      message.textContent = selectedCount
+        ? `${selectedCount} nearby table${selectedCount === 1 ? "" : "s"} selected · Tap or drag to adjust.`
+        : "Tap or drag across the nearby available tables to add them.";
       selection.hidden = selectedCount === 0;
       selection.innerHTML = selectedTables.map(({ tableCode, table }) => `
         <button
@@ -5331,7 +5399,7 @@
       confirmButton.disabled = selectedCount === 0 || state.partySetupSaving;
       confirmButton.textContent = state.partySetupSaving
         ? "Assigning…"
-        : `Next · Choose QR${selectedCount > 1 ? "s" : ""}`;
+        : "Next · Choose one QR";
     }
 
     function renderQrStations() {
@@ -5494,7 +5562,7 @@
           partySelected ? "is-party-selected" : ""
         ].filter(Boolean).join(" ");
         const sessionCopy = partySelected
-          ? "<strong>Selected</strong><br>Choose one or more QR codes in the next step."
+          ? "<strong>Selected</strong><br>Choose one Party QR in the next step."
           : activeParty
             ? `<strong>Party #${activeParty.id} · ${escapeHtml(formatDiningQrList(partyQrs))}</strong><br>${activeRequests.length} open request${activeRequests.length === 1 ? "" : "s"}`
           : activeSession
@@ -5568,7 +5636,7 @@
       const isUpdating = activeSession && state.qrSessionUpdatingNumbers.has(activeSession.qr_number);
       const partySelected = state.selectedPartyTableCodes.has(tableRecord?.table_code || tableCode);
       const detail = partySelected
-        ? "Selected · Choose QR codes in the next step"
+        ? "Selected · Choose one Party QR in the next step"
         : activeParty
           ? `Party #${activeParty.id} · ${formatDiningQrList(partyQrs)} · ${activeRequests.length} open request${activeRequests.length === 1 ? "" : "s"}`
         : activeSession
@@ -5987,13 +6055,13 @@
         && state.qrAssignmentGuestCount <= 100;
       const availableQrNumbers = Array.from({ length: DINING_QR_COUNT }, (_, index) => index + 1)
         .filter((qrNumber) => !getActiveDiningPartyQr(qrNumber));
-      meta.textContent = `${tableCodes.length} table${tableCodes.length === 1 ? "" : "s"} selected · ${validGuestCount ? `${state.qrAssignmentGuestCount} guest${state.qrAssignmentGuestCount === 1 ? "" : "s"}` : "Enter a valid headcount"} · Choose one or more available QR codes.`;
+      meta.textContent = `${tableCodes.length} table${tableCodes.length === 1 ? "" : "s"} selected · ${validGuestCount ? `${state.qrAssignmentGuestCount} guest${state.qrAssignmentGuestCount === 1 ? "" : "s"}` : "Enter a valid headcount"} · Choose one QR for this Party.`;
       if (document.activeElement !== guestCountInput) {
         guestCountInput.value = validGuestCount ? String(state.qrAssignmentGuestCount) : "";
       }
       guestCountInput.disabled = state.partySetupSaving;
       summary.textContent = selectedQrNumbers.length
-        ? `${selectedQrNumbers.length} selected · ${selectedQrNumbers.map((qrNumber) => `QR ${String(qrNumber).padStart(2, "0")}`).join(", ")}`
+        ? `QR ${String(selectedQrNumbers[0]).padStart(2, "0")} selected for the Party`
         : "No QR selected";
       empty.hidden = availableQrNumbers.length > 0;
       options.innerHTML = availableQrNumbers.map((qrNumber) => `
@@ -6007,16 +6075,16 @@
       `).join("");
 
       preview.hidden = selectedQrNumbers.length === 0;
-      preview.innerHTML = selectedQrNumbers.map((qrNumber, index) => {
-        const tableCode = tableCodes[index % tableCodes.length] || "—";
-        return `<span>QR ${String(qrNumber).padStart(2, "0")} → Table ${escapeHtml(tableCode)}</span>`;
-      }).join("");
+      preview.innerHTML = selectedQrNumbers.map((qrNumber) => (
+        `<span>QR ${String(qrNumber).padStart(2, "0")} → ${escapeHtml(tableCodes.join(" + ") || "Party")}</span>`
+      )).join("");
       confirmButton.disabled = selectedQrNumbers.length === 0 || !validGuestCount || state.partySetupSaving;
+      const selectedQrLabel = selectedQrNumbers.length
+        ? `QR ${String(selectedQrNumbers[0]).padStart(2, "0")}`
+        : "Choose QR";
       confirmButton.textContent = state.partySetupSaving
         ? "Assigning…"
-        : state.partySetupTargetId
-          ? `Add tables · ${selectedQrNumbers.length} QR${selectedQrNumbers.length === 1 ? "" : "s"}`
-          : `Start Party · ${selectedQrNumbers.length} QR${selectedQrNumbers.length === 1 ? "" : "s"}`;
+        : `Start Party · ${selectedQrLabel}`;
     }
 
     function openQrAssignmentModal() {
@@ -6029,8 +6097,7 @@
       }
       state.qrAssignmentTableCodes = tableCodes;
       state.qrAssignmentSelectedNumbers = new Set();
-      const targetParty = state.partySetupTargetId ? getDiningParty(state.partySetupTargetId) : null;
-      state.qrAssignmentGuestCount = Math.max(1, Number(targetParty?.expected_guest_count) || 1);
+      state.qrAssignmentGuestCount = 1;
       renderQrAssignmentOptions();
       const modal = document.getElementById("qrAssignmentModal");
       modal?.classList.add("is-open");
@@ -6048,11 +6115,9 @@
       ) {
         return;
       }
-      if (state.qrAssignmentSelectedNumbers.has(qrNumber)) {
-        state.qrAssignmentSelectedNumbers.delete(qrNumber);
-      } else {
-        state.qrAssignmentSelectedNumbers.add(qrNumber);
-      }
+      state.qrAssignmentSelectedNumbers = state.qrAssignmentSelectedNumbers.has(qrNumber)
+        ? new Set()
+        : new Set([qrNumber]);
       renderQrAssignmentOptions();
     }
 
@@ -6120,34 +6185,9 @@
       return responseText ? JSON.parse(responseText) : null;
     }
 
-    function beginPartySetup(partyId = null) {
-      if (
-        state.partyArchitectureAvailable !== true
-        || !state.partyQrPoolAvailable
-        || state.partySetupSaving
-      ) {
-        return;
-      }
-      state.partySetupMode = true;
-      state.partySetupTargetId = partyId ? Number(partyId) : null;
-      state.partySetupZone = state.activeTableMapZone;
-      state.selectedPartyTableCodes = new Set();
-      state.partyActionError = "";
-      if (state.partySetupTargetId) {
-        const firstPartyTable = getDiningPartyTables(state.partySetupTargetId, { activeOnly: true })[0];
-        if (firstPartyTable?.table_code) {
-          state.activeTableMapZone = findDiningTableMapZone(firstPartyTable.table_code);
-          state.partySetupZone = state.activeTableMapZone;
-        }
-      }
-      renderPartyDashboard();
-      renderTableMap();
-    }
-
     function cancelPartySetup() {
       if (state.partySetupSaving) return;
       state.partySetupMode = false;
-      state.partySetupTargetId = null;
       state.partySetupZone = null;
       state.selectedPartyTableCodes = new Set();
       renderPartyDashboard();
@@ -6185,7 +6225,6 @@
       }
       if (!state.partySetupMode) {
         state.partySetupMode = true;
-        state.partySetupTargetId = null;
         state.partySetupZone = state.activeTableMapZone;
         state.selectedPartyTableCodes = new Set();
       }
@@ -6197,7 +6236,7 @@
       }
       state.selectedMapTableCode = normalizedTableCode;
       state.partyActionError = "";
-      if (!state.partySetupTargetId && state.selectedPartyTableCodes.size === 0) {
+      if (state.selectedPartyTableCodes.size === 0) {
         state.partySetupMode = false;
         state.partySetupZone = null;
       }
@@ -6221,7 +6260,7 @@
       state.requestsLoadedAt = new Date().toISOString();
     }
 
-    async function savePartySetup(tableCodes, qrNumbers, targetPartyId = null, expectedGuestCount = 1) {
+    async function savePartySetup(tableCodes, qrNumbers, expectedGuestCount = 1) {
       if (
         !tableCodes.length
         || !qrNumbers.length
@@ -6242,23 +6281,20 @@
           p_branch: ADMIN_SHEET_CONFIG.branchLabel.toLowerCase(),
           p_table_codes: tableCodes,
           p_qr_numbers: qrNumbers,
-          p_party_id: targetPartyId ? Number(targetPartyId) : null,
+          p_party_id: null,
           p_expected_guest_count: expectedGuestCount
         });
         await refreshPartyOperationData();
         state.partySetupSaving = false;
         closeQrAssignmentModal();
         state.partySetupMode = false;
-        state.partySetupTargetId = null;
         state.partySetupZone = null;
         state.selectedPartyTableCodes = new Set();
       } catch (error) {
         console.error("Party setup failed", error);
         state.partyActionError = /p_expected_guest_count|PGRST202|schema cache/i.test(String(error?.message || ""))
           ? "Run tools/sql/dining-party-operational-guards.sql in Supabase, then try again."
-          : targetPartyId
-            ? "Tables or QR codes were not added. Check that all selections are still available."
-            : "Party was not started. Check that the selected tables and QR codes are still available.";
+          : "Party was not started. Check that the selected tables and QR are still available.";
       } finally {
         state.partySetupSaving = false;
       }
@@ -6660,18 +6696,49 @@
           : { status: "completed", label: "Done" };
       }
       const orderFlow = {
-        new: { status: "preparing", label: "Confirm order" },
-        acknowledged: { status: "completed", label: "Mark served" },
+        new: { status: "acknowledged", label: "Confirm order" },
+        acknowledged: { status: "preparing", label: "Start preparing" },
         preparing: { status: "completed", label: "Mark served" },
         ready: { status: "completed", label: "Mark served" }
       };
       return orderFlow[request.status] || { status: "completed", label: "Complete" };
     }
 
+    function getRequestGuestLabel(request) {
+      if (!request.guest_id) return "";
+      const guest = state.partySnapshot.guests.find(
+        (candidate) => candidate.id === String(request.guest_id)
+      );
+      return guest?.display_code ? `Guest ${guest.display_code}` : "Guest device";
+    }
+
+    function renderRequestProgress(request) {
+      if (request.kind !== "order" || request.status === "canceled") return "";
+      const currentStep = request.status === "completed"
+        ? 3
+        : ["preparing", "ready"].includes(request.status)
+          ? 2
+          : request.status === "acknowledged"
+            ? 1
+            : 0;
+      return `
+        <div class="request-progress" aria-label="Order progress">
+          ${["Sent", "Confirmed", "Preparing", "Served"].map((label, index) => {
+            const classes = [
+              index < currentStep ? "is-done" : "",
+              index === currentStep ? "is-current" : ""
+            ].filter(Boolean).join(" ");
+            return `<span class="request-progress-step ${classes}">${label}</span>`;
+          }).join("")}
+        </div>
+      `;
+    }
+
     function renderDiningRequestCard(request) {
       const nextAction = getNextRequestAction(request);
       const requestTypeLabel = REQUEST_TYPE_LABELS[request.request_type] || request.request_type;
       const statusLabel = REQUEST_STATUS_LABELS[request.status] || request.status;
+      const guestLabel = getRequestGuestLabel(request);
       const locationLabel = `Table ${request.table_code || "-"}`;
       const isUpdating = state.requestUpdatingIds.has(request.id);
       const itemsMarkup = request.kind === "order"
@@ -6704,12 +6771,14 @@
               <div class="request-card-meta">
                 <span class="request-kind-badge">${escapeHtml(requestTypeLabel)}</span>
                 <span class="request-status-badge">${escapeHtml(statusLabel)}</span>
+                ${guestLabel ? `<span class="request-device-badge">${escapeHtml(guestLabel)}</span>` : ""}
               </div>
               <div class="request-table-code">${escapeHtml(locationLabel)}</div>
             </div>
             <div class="request-age">${escapeHtml(formatRequestClock(request.created_at))}<br />${escapeHtml(formatRequestAge(request.created_at))}</div>
           </div>
           ${itemsMarkup}
+          ${renderRequestProgress(request)}
           ${request.note ? `<p class="request-note"><strong>Note:</strong> ${escapeHtml(request.note)}</p>` : ""}
           <div class="request-card-actions">
             <button
@@ -8657,13 +8726,6 @@
         return;
       }
 
-      const addTablesButton = event.target.closest("[data-add-tables-party]");
-      if (addTablesButton) {
-        beginPartySetup(Number(addTablesButton.dataset.addTablesParty));
-        document.getElementById("tableMapGrid")?.scrollIntoView({ behavior: "smooth", block: "center" });
-        return;
-      }
-
       const closePartyButton = event.target.closest("[data-close-party]");
       if (!closePartyButton) return;
       const partyId = Number(closePartyButton.dataset.closeParty);
@@ -8711,7 +8773,6 @@
       savePartySetup(
         [...state.qrAssignmentTableCodes],
         [...state.qrAssignmentSelectedNumbers],
-        state.partySetupTargetId,
         state.qrAssignmentGuestCount
       );
     });
