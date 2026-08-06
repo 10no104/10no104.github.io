@@ -2445,6 +2445,278 @@
         font-size: 0.7rem;
       }
     }
+
+    /* Phone layout: keep the full category navigator at the top, then condense it into one calm row. */
+    @media (max-width: 640px) {
+      .menu-sticky-shell,
+      .menu-page.is-scrolled .menu-sticky-shell {
+        padding: 10px 0 8px;
+        background: linear-gradient(180deg, rgba(247, 242, 234, 0.97), rgba(247, 242, 234, 0.9));
+        box-shadow: none;
+      }
+
+      .menu-sticky-inner,
+      .menu-page.is-scrolled .menu-sticky-inner {
+        width: calc(100% - 16px);
+        overflow: hidden;
+        transition: max-height 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+          padding 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+          gap 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+          border-radius 0.28s ease,
+          box-shadow 0.28s ease;
+      }
+
+      .menu-sticky-inner {
+        max-height: 500px;
+      }
+
+      .menu-page.is-scrolled .menu-sticky-shell {
+        padding: 6px 0;
+        background: rgba(247, 242, 234, 0.92);
+        -webkit-backdrop-filter: blur(14px);
+        backdrop-filter: blur(14px);
+        box-shadow: 0 8px 24px rgba(35, 23, 16, 0.08);
+      }
+
+      .menu-page.is-scrolled .menu-sticky-inner {
+        display: grid;
+        grid-template-columns: 38px minmax(0, 1fr);
+        align-items: center;
+        max-height: 54px;
+        gap: 6px;
+        padding: 6px;
+        border-radius: 16px;
+        box-shadow: 0 8px 22px rgba(42, 28, 18, 0.1);
+      }
+
+      .menu-page.is-scrolled .menu-sticky-inner:has(.subtabs-wrap:not(.hidden)) {
+        max-height: 98px;
+      }
+
+      .menu-page.is-scrolled .menu-homebar {
+        grid-column: 1;
+        grid-row: 1;
+        width: 38px;
+        justify-content: center;
+      }
+
+      .menu-page.is-scrolled .menu-home-link {
+        width: 36px;
+        height: 36px;
+        margin: 0;
+        border-radius: 12px;
+        box-shadow: none;
+      }
+
+      .menu-page.is-scrolled .menu-home-logo {
+        width: 23px;
+        height: 23px;
+      }
+
+      .menu-page.is-scrolled .menu-sticky-shell .tabs {
+        grid-column: 2;
+        grid-row: 1;
+        width: 100%;
+        min-width: 0;
+        flex-wrap: nowrap !important;
+        justify-content: flex-start;
+        gap: 6px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 0;
+        scroll-padding-inline: 4px;
+        scrollbar-width: none;
+      }
+
+      .menu-page.is-scrolled .menu-sticky-shell .tabs::-webkit-scrollbar {
+        display: none;
+      }
+
+      .menu-page.is-scrolled .menu-sticky-shell .tab {
+        flex: 0 0 auto;
+        min-width: max-content;
+        min-height: 36px;
+        padding: 8px 12px;
+        font-size: 0.78rem;
+        line-height: 1;
+      }
+
+      .menu-page.is-scrolled .menu-sticky-shell .subtabs-wrap:not(.hidden) {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        width: 100%;
+        min-width: 0;
+      }
+
+      .menu-page.is-scrolled .menu-sticky-shell .subtabs-context {
+        display: none;
+      }
+
+      .menu-page.is-scrolled .menu-sticky-shell .subtabs {
+        width: 100%;
+        flex-wrap: nowrap !important;
+        justify-content: flex-start;
+        gap: 6px;
+        overflow-x: auto;
+        padding: 0;
+        scrollbar-width: none;
+      }
+
+      .menu-page.is-scrolled .menu-sticky-shell .subtab {
+        flex: 0 0 auto;
+        min-height: 32px;
+        padding: 7px 11px;
+        font-size: 0.72rem;
+      }
+    }
+
+    .final-bill-receipt {
+      overflow: hidden;
+      border: 1px solid rgba(125, 98, 63, 0.14);
+      border-radius: 20px;
+      background: rgba(255, 253, 249, 0.88);
+    }
+
+    .final-bill-receipt .final-bill-identity {
+      margin: 0;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(125, 98, 63, 0.12);
+      background: rgba(90, 17, 34, 0.035);
+    }
+
+    .final-bill-order-list {
+      display: grid;
+      gap: 0;
+    }
+
+    .final-bill-line {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 14px;
+      min-height: 62px;
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(125, 98, 63, 0.11);
+    }
+
+    .final-bill-line.is-mine {
+      background: rgba(38, 112, 70, 0.065);
+    }
+
+    .final-bill-line-copy {
+      display: grid;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .final-bill-line-copy strong {
+      color: #3b2418;
+      font-size: 0.92rem;
+      line-height: 1.35;
+    }
+
+    .final-bill-line-copy small {
+      color: #7a695d;
+      font-size: 0.7rem;
+      font-weight: 750;
+    }
+
+    .final-bill-line-price {
+      color: #3b2418;
+      font-size: 0.92rem;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .final-bill-mine-tag {
+      display: inline-flex;
+      align-items: center;
+      width: max-content;
+      margin-right: 5px;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: #267046;
+      color: #fff;
+      font-size: 0.62rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .final-bill-summary {
+      display: grid;
+      gap: 0;
+      border-top: 1px solid rgba(90, 17, 34, 0.16);
+      background: rgba(90, 17, 34, 0.045);
+    }
+
+    .final-bill-summary-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      min-height: 48px;
+      padding: 10px 16px;
+      color: #6e5b4f;
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    .final-bill-summary-row + .final-bill-summary-row {
+      border-top: 1px solid rgba(125, 98, 63, 0.1);
+    }
+
+    .final-bill-summary-row strong {
+      color: #3b2418;
+      font-size: 1rem;
+    }
+
+    .final-bill-summary-row.is-total {
+      min-height: 60px;
+      color: #3b2418;
+      font-size: 0.9rem;
+    }
+
+    .final-bill-summary-row.is-total strong {
+      color: #5a1122;
+      font-size: 1.5rem;
+    }
+
+    @media (max-width: 640px) {
+      .final-bill-section .section-shell {
+        padding: 14px;
+      }
+
+      .final-bill-section .section-heading {
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .final-bill-section .section-heading p:not(.section-eyebrow) {
+        display: none;
+      }
+
+      .final-bill-section .guest-bill-link {
+        width: auto;
+        justify-content: center;
+      }
+
+      .final-bill-receipt .final-bill-identity {
+        display: flex;
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .final-bill-line {
+        min-height: 58px;
+        padding: 11px 13px;
+      }
+
+      .final-bill-summary-row {
+        padding-inline: 13px;
+      }
+    }
   </style>
 </head>
 <body class="menu-page">
@@ -2559,35 +2831,31 @@
           </div>
           <a class="guest-bill-link" id="guestBillLink" href="../cashier.html" hidden>Payment code / QR</a>
         </div>
-        <div class="final-bill-identity">
-          <span id="finalBillTableLabel">Table —</span>
-          <span id="finalBillGuestLabel">This device</span>
-        </div>
-        <div class="final-bill-totals">
-          <article class="final-bill-total-card is-table">
-            <span>Table total</span>
-            <strong id="finalBillTableTotal">$0.00</strong>
-            <small id="finalBillTableMeta">0 sent orders</small>
-          </article>
-          <article class="final-bill-total-card is-device">
-            <span>This device</span>
-            <strong id="finalBillDeviceTotal">$0.00</strong>
-            <small id="finalBillDeviceMeta">0 sent orders</small>
-          </article>
-        </div>
-        <div class="final-bill-breakdown">
-          <div>
-            <span class="final-bill-dot is-mine"></span>
-            <span>This device's orders</span>
-            <strong id="finalBillMineTotal">$0.00</strong>
+        <div class="final-bill-receipt">
+          <div class="final-bill-identity">
+            <span id="finalBillTableLabel">Table —</span>
+            <span id="finalBillGuestLabel">This device</span>
           </div>
-          <div>
-            <span class="final-bill-dot is-other"></span>
-            <span>Other devices in this party</span>
-            <strong id="finalBillOtherTotal">$0.00</strong>
+          <div class="final-bill-order-list" id="finalBillOrderList" aria-live="polite"></div>
+          <div class="final-bill-summary">
+            <div class="final-bill-summary-row">
+              <span id="finalBillDeviceMeta">This device</span>
+              <strong id="finalBillDeviceTotal">$0.00</strong>
+            </div>
+            <div class="final-bill-summary-row">
+              <span id="finalBillTableMeta">0 items</span>
+              <strong id="finalBillSubtotal">$0.00</strong>
+            </div>
+            <div class="final-bill-summary-row">
+              <span>Tax</span>
+              <strong id="finalBillTax">$0.00</strong>
+            </div>
+            <div class="final-bill-summary-row is-total">
+              <span>Table total</span>
+              <strong id="finalBillTableTotal">$0.00</strong>
+            </div>
           </div>
         </div>
-        <div class="final-bill-order-list" id="finalBillOrderList" aria-live="polite"></div>
       </div>
     </section>
   </div>
@@ -3662,22 +3930,40 @@
       const deviceTotalEl = document.getElementById("finalBillDeviceTotal");
       const tableMetaEl = document.getElementById("finalBillTableMeta");
       const deviceMetaEl = document.getElementById("finalBillDeviceMeta");
-      const mineTotalEl = document.getElementById("finalBillMineTotal");
-      const otherTotalEl = document.getElementById("finalBillOtherTotal");
+      const subtotalEl = document.getElementById("finalBillSubtotal");
+      const taxEl = document.getElementById("finalBillTax");
       const tableLabelEl = document.getElementById("finalBillTableLabel");
       const guestLabelEl = document.getElementById("finalBillGuestLabel");
       const menuTableContextEl = document.getElementById("menuTableContext");
       const orderListEl = document.getElementById("finalBillOrderList");
-      if (!tableTotalEl || !deviceTotalEl || !tableMetaEl || !deviceMetaEl || !mineTotalEl || !otherTotalEl || !tableLabelEl || !guestLabelEl || !orderListEl) return;
+      if (!tableTotalEl || !deviceTotalEl || !tableMetaEl || !deviceMetaEl || !subtotalEl || !taxEl || !tableLabelEl || !guestLabelEl || !orderListEl) return;
 
       const tableCode = currentQrSession?.table_code || document.getElementById("tableCode")?.value || "—";
       const partyOrders = getPartyOrderRequests();
       const deviceOrders = partyOrders.filter(isCurrentDeviceOrder);
-      const otherOrders = partyOrders.filter((request) => !isCurrentDeviceOrder(request));
       const tableSummary = summarizeOrderRequests(partyOrders);
       const deviceSummary = summarizeOrderRequests(deviceOrders);
-      const otherSummary = summarizeOrderRequests(otherOrders);
       const partyTables = [...new Set(partyOrders.map((request) => request.table_code).filter(Boolean))];
+      const billLines = partyOrders.flatMap((request) => {
+        const isMine = isCurrentDeviceOrder(request);
+        const items = Array.isArray(request.items) ? request.items : [];
+        if (!items.length) {
+          return [{
+            name: `Order #${request.id || "—"}`,
+            quantity: Math.max(1, Number(request.item_count || 1)),
+            lineTotal: Number(request.subtotal || request.total || 0),
+            isMine,
+            tableCode: request.table_code || tableCode
+          }];
+        }
+        return items.map((item) => ({
+          name: item.nameEn || item.nameKo || "Menu item",
+          quantity: Math.max(0, Number(item.quantity || 0)),
+          lineTotal: Number(item.lineTotal ?? (Number(item.unitPrice || 0) * Number(item.quantity || 0))),
+          isMine,
+          tableCode: request.table_code || tableCode
+        }));
+      });
 
       tableLabelEl.textContent = currentGuest?.party_id
         ? `Party #${currentGuest.party_id} · ${partyTables.join(" + ") || `Table ${tableCode}`}`
@@ -3688,34 +3974,25 @@
       if (menuTableContextEl) menuTableContextEl.textContent = `Table ${tableCode}`;
       tableTotalEl.textContent = formatCurrency(tableSummary.total);
       deviceTotalEl.textContent = formatCurrency(deviceSummary.total);
-      mineTotalEl.textContent = formatCurrency(deviceSummary.total);
-      otherTotalEl.textContent = formatCurrency(otherSummary.total);
-      tableMetaEl.textContent = `${partyOrders.length} sent order${partyOrders.length === 1 ? "" : "s"}${partyTables.length ? ` · ${partyTables.length} table${partyTables.length === 1 ? "" : "s"}` : ""}`;
-      deviceMetaEl.textContent = `${deviceOrders.length} from this device`;
+      subtotalEl.textContent = formatCurrency(tableSummary.subtotal);
+      taxEl.textContent = formatCurrency(tableSummary.tax);
+      tableMetaEl.textContent = `${tableSummary.itemCount} item${tableSummary.itemCount === 1 ? "" : "s"}${partyTables.length ? ` · ${partyTables.length} table${partyTables.length === 1 ? "" : "s"}` : ""}`;
+      deviceMetaEl.textContent = `This device · ${deviceOrders.length} order${deviceOrders.length === 1 ? "" : "s"}`;
 
-      if (!partyOrders.length) {
+      if (!billLines.length) {
         orderListEl.innerHTML = `<div class="final-bill-empty">No sent orders in this party yet. New items will appear after you send them.</div>`;
         return;
       }
 
-      orderListEl.innerHTML = partyOrders.map((request) => {
-        const isMine = isCurrentDeviceOrder(request);
-        const meta = getOrderStatusMeta(request.status);
+      orderListEl.innerHTML = billLines.map((item) => {
         return `
-          <article class="final-bill-order-card ${isMine ? "is-mine" : ""}">
-            <div class="final-bill-order-head">
-              <div>
-                <span class="final-bill-source">${isMine ? "This device" : `Other device · Table ${escapeHtml(request.table_code || "—")}`}</span>
-                <strong>Order #${escapeHtml(request.id || "—")}</strong>
-              </div>
-              <time>${escapeHtml(formatGuestRequestTime(request.created_at))}</time>
+          <div class="final-bill-line ${item.isMine ? "is-mine" : ""}">
+            <div class="final-bill-line-copy">
+              <strong>${escapeHtml(item.quantity)}× ${escapeHtml(item.name)}</strong>
+              <small>${item.isMine ? '<span class="final-bill-mine-tag">Mine</span>' : ""}Table ${escapeHtml(item.tableCode || "—")}</small>
             </div>
-            <div class="final-bill-order-items">${escapeHtml(getOrderItemSummary(request))}</div>
-            <div class="final-bill-order-meta">
-              <span>${escapeHtml(meta.label)}</span>
-              <strong>${escapeHtml(formatCurrency(request.total))}</strong>
-            </div>
-          </article>
+            <strong class="final-bill-line-price">${escapeHtml(formatCurrency(item.lineTotal))}</strong>
+          </div>
         `;
       }).join("");
     }
@@ -4573,35 +4850,16 @@
       if (!page || !stickyShell) return;
       let isCollapsed = page.classList.contains("is-scrolled");
       let frameId = 0;
-      let isTransitioning = false;
 
       const applyStickyState = (shouldCollapse) => {
         isCollapsed = shouldCollapse;
-        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        const commitState = () => {
-          page.classList.toggle("is-scrolled", isCollapsed);
-        };
-
-        if (reduceMotion || typeof document.startViewTransition !== "function") {
-          commitState();
-          return;
-        }
-
-        isTransitioning = true;
-        const transition = document.startViewTransition(commitState);
-        transition.finished.finally(() => {
-          requestAnimationFrame(() => {
-            isTransitioning = false;
-            syncStickyState();
-          });
-        });
+        page.classList.toggle("is-scrolled", isCollapsed);
       };
 
       const readStickyState = () => {
         frameId = 0;
-        if (isTransitioning) return;
         const scrollY = window.scrollY;
-        const shouldCollapse = isCollapsed ? scrollY > 28 : scrollY > 96;
+        const shouldCollapse = isCollapsed ? scrollY > 36 : scrollY > 112;
         if (shouldCollapse === isCollapsed) return;
         applyStickyState(shouldCollapse);
       };

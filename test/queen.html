@@ -1728,17 +1728,18 @@
 
     .guest-lookup-total {
       display: flex;
-      align-items: flex-end;
+      align-items: center;
       justify-content: space-between;
       gap: 12px;
-      padding: 14px;
+      padding: 11px 13px;
+      border: 1px solid rgba(113, 88, 60, 0.13);
       border-radius: 14px;
-      background: #f1e6d8;
+      background: rgba(255, 255, 255, 0.8);
     }
 
     .guest-lookup-total strong {
       color: #5f2731;
-      font-size: 1.7rem;
+      font-size: 1.1rem;
     }
 
     .guest-lookup-orders {
@@ -3657,18 +3658,23 @@
 
     .table-current-order-summary {
       display: grid;
-      gap: 12px;
+      gap: 0;
+      overflow: hidden;
+      border: 1px solid rgba(113, 88, 60, 0.13);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.92);
     }
 
     .table-current-order-total {
       display: flex;
-      align-items: flex-end;
+      align-items: center;
       justify-content: space-between;
       gap: 14px;
-      padding: 16px;
-      border-radius: 18px;
-      background: linear-gradient(145deg, #5a1122, #8a3045);
-      color: #fffaf3;
+      min-height: 58px;
+      padding: 12px 14px;
+      border-top: 1px solid rgba(90, 17, 34, 0.16);
+      background: rgba(90, 17, 34, 0.055);
+      color: #3f2b22;
     }
 
     .table-current-order-total span,
@@ -3678,20 +3684,19 @@
     }
 
     .table-current-order-total span {
-      margin-bottom: 5px;
-      font-size: 0.72rem;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
+      margin-bottom: 2px;
+      font-size: 0.78rem;
     }
 
     .table-current-order-total strong {
-      font-size: 1.8rem;
-      letter-spacing: -0.05em;
+      color: #5f2731;
+      font-size: 1.35rem;
+      letter-spacing: -0.035em;
     }
 
     .table-current-order-total small {
-      max-width: 150px;
-      color: rgba(255, 250, 243, 0.68);
+      max-width: 180px;
+      color: #806e60;
       font-size: 0.7rem;
       line-height: 1.4;
       text-align: right;
@@ -3699,20 +3704,17 @@
 
     .table-current-order-items {
       display: grid;
-      gap: 1px;
-      overflow: hidden;
-      border: 1px solid rgba(113, 88, 60, 0.13);
-      border-radius: 16px;
-      background: rgba(113, 88, 60, 0.1);
+      gap: 0;
     }
 
     .table-current-order-item {
       display: grid;
       grid-template-columns: 38px minmax(0, 1fr) auto;
-      align-items: baseline;
+      align-items: center;
       gap: 9px;
       padding: 12px 13px;
-      background: rgba(255, 255, 255, 0.92);
+      border-bottom: 1px solid rgba(113, 88, 60, 0.11);
+      background: transparent;
       color: #403127;
       font-size: 0.82rem;
     }
@@ -3721,7 +3723,8 @@
       color: #6a2635;
     }
 
-    .table-current-order-item span {
+    .table-current-order-item > span,
+    .table-current-order-item-copy span {
       min-width: 0;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -3729,10 +3732,51 @@
       font-weight: 800;
     }
 
-    .table-current-order-item small {
+    .table-current-order-item > small,
+    .table-current-order-item > b {
       color: #5f2731;
       font-size: 0.78rem;
       font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .table-current-order-item-copy {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .table-current-order-item-copy small {
+      color: #8a7769;
+      font-size: 0.65rem;
+      font-weight: 750;
+    }
+
+    .table-current-order-breakdown {
+      display: grid;
+      gap: 0;
+      padding: 4px 14px;
+      border-top: 1px solid rgba(113, 88, 60, 0.12);
+      background: rgba(113, 88, 60, 0.035);
+    }
+
+    .table-current-order-breakdown div {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-height: 34px;
+      color: #806e60;
+      font-size: 0.7rem;
+      font-weight: 800;
+    }
+
+    .table-current-order-breakdown div + div {
+      border-top: 1px solid rgba(113, 88, 60, 0.08);
+    }
+
+    .table-current-order-breakdown strong {
+      color: #49342b;
     }
 
     .empty-state {
@@ -4453,6 +4497,92 @@
       }
 
       .metric-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    }
+
+    /* Queen is operated primarily on a landscape tablet. */
+    @media (min-width: 900px) and (orientation: landscape) {
+      .shell {
+        width: min(calc(100% - 24px), 1280px);
+        padding-top: 10px;
+      }
+
+      .topbar {
+        margin-bottom: 10px;
+      }
+
+      .logo-link {
+        width: 52px;
+        height: 52px;
+      }
+
+      .logo-link img {
+        width: 34px;
+        height: 34px;
+      }
+
+      .brand-copy p {
+        margin-bottom: 2px;
+        font-size: 0.7rem;
+      }
+
+      .brand-copy h1 {
+        font-size: 1.85rem;
+      }
+
+      .purpose-hero {
+        gap: 7px;
+        padding: 15px 18px;
+        border-radius: 22px;
+      }
+
+      .purpose-hero h2 {
+        font-size: 2.25rem;
+      }
+
+      .purpose-hero p:not(.purpose-kicker) {
+        font-size: 0.84rem;
+      }
+
+      .app-view.placeholder-view[data-view="tables"].is-active {
+        grid-template-columns: minmax(0, 1.7fr) minmax(300px, 0.78fr);
+        align-items: start;
+        gap: 12px;
+      }
+
+      .app-view[data-view="tables"] > .purpose-hero {
+        grid-column: 1 / -1;
+        grid-template-columns: auto auto minmax(0, 1fr);
+        align-items: center;
+        gap: 16px;
+      }
+
+      .app-view[data-view="tables"] > .purpose-hero h2,
+      .app-view[data-view="tables"] > .purpose-hero p {
+        margin: 0;
+      }
+
+      .app-view[data-view="tables"] > .purpose-panel:nth-of-type(2) {
+        grid-column: 1;
+        grid-row: 2 / span 2;
+      }
+
+      .app-view[data-view="tables"] > .purpose-panel:nth-of-type(3) {
+        grid-column: 2;
+        grid-row: 2;
+      }
+
+      .app-view[data-view="tables"] > .qr-session-control-panel {
+        grid-column: 2;
+        grid-row: 3;
+      }
+
+      .bottom-nav {
+        padding: 8px;
+      }
+
+      .nav-tab {
+        min-height: 58px;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -6110,57 +6240,106 @@
         .sort((left, right) => new Date(left.created_at) - new Date(right.created_at));
     }
 
-    function renderCurrentTableOrderSummary(requests) {
+    function buildSimpleBillData(requests) {
       const orders = requests.filter((request) => (
         request.kind === "order"
         && request.status !== "canceled"
       ));
       const itemMap = new Map();
+      let subtotal = 0;
+      let tax = 0;
+      let total = 0;
 
       orders.forEach((request) => {
-        request.items.forEach((item) => {
+        const requestTotal = Number(request.total || 0);
+        const requestSubtotal = Number(request.subtotal || 0);
+        const requestTax = Number(request.tax || 0);
+        const fallbackSubtotal = requestSubtotal
+          || (requestTax ? requestTotal - requestTax : Number((requestTotal / 1.13).toFixed(2)));
+        subtotal += fallbackSubtotal;
+        tax += requestTax || Number((requestTotal - fallbackSubtotal).toFixed(2));
+        total += requestTotal;
+
+        const requestItems = Array.isArray(request.items) ? request.items : [];
+        requestItems.forEach((item) => {
           const quantity = Math.max(0, Number(item.quantity || 0));
           const name = item.nameEn || item.nameKo || "Menu item";
+          const tableCode = request.table_code || "";
           const lineTotal = Number(item.lineTotal ?? (Number(item.unitPrice || 0) * quantity));
-          const current = itemMap.get(name) || { name, quantity: 0, total: 0 };
+          const key = `${String(name).toLowerCase()}::${String(tableCode).toLowerCase()}`;
+          const current = itemMap.get(key) || { name, tableCode, quantity: 0, total: 0 };
           current.quantity += quantity;
           current.total += lineTotal;
-          itemMap.set(name, current);
+          itemMap.set(key, current);
         });
       });
 
-      const itemRows = [...itemMap.values()];
-      const fallbackRows = itemRows.length
-        ? itemRows
-        : orders.map((request) => ({
-            name: `Order #${request.id}`,
-            quantity: Math.max(1, Number(request.item_count || 1)),
-            total: Number(request.total || 0)
-          }));
-      const total = orders.reduce((sum, request) => sum + Number(request.total || 0), 0);
+      const rows = [...itemMap.values()];
+      return {
+        orders,
+        rows: rows.length
+          ? rows
+          : orders.map((request) => ({
+              name: `Order #${request.id}`,
+              tableCode: request.table_code || "",
+              quantity: Math.max(1, Number(request.item_count || 1)),
+              total: Number(request.total || 0)
+            })),
+        subtotal: Number(subtotal.toFixed(2)),
+        tax: Number(tax.toFixed(2)),
+        total: Number(total.toFixed(2))
+      };
+    }
+
+    function renderSimpleBill(requests, {
+      ariaLabel = "Bill items",
+      emptyMessage = "No orders in the current session yet.",
+      showTable = false,
+      totalOverride = null
+    } = {}) {
+      const bill = buildSimpleBillData(requests);
+      const total = totalOverride !== null && Number.isFinite(Number(totalOverride))
+        ? Number(totalOverride)
+        : bill.total;
 
       return `
-        <section class="table-current-order-summary" aria-label="Current table order summary">
-          <div class="table-current-order-total">
-            <div>
-              <span>Current table total</span>
-              <strong>${escapeHtml(formatRequestMoney(total))}</strong>
-            </div>
-            <small>${orders.length} order${orders.length === 1 ? "" : "s"} in this session</small>
-          </div>
-          ${fallbackRows.length ? `
+        <div class="table-current-order-summary" role="region" aria-label="${escapeHtml(ariaLabel)}">
+          ${bill.rows.length ? `
             <div class="table-current-order-items">
-              ${fallbackRows.map((item) => `
+              ${bill.rows.map((item) => `
                 <div class="table-current-order-item">
                   <strong>${escapeHtml(item.quantity)}×</strong>
-                  <span>${escapeHtml(item.name)}</span>
-                  <small>${escapeHtml(formatRequestMoney(item.total))}</small>
+                  <div class="table-current-order-item-copy">
+                    <span>${escapeHtml(item.name)}</span>
+                    ${showTable && item.tableCode ? `<small>Table ${escapeHtml(item.tableCode)}</small>` : ""}
+                  </div>
+                  <b>${escapeHtml(formatRequestMoney(item.total))}</b>
                 </div>
               `).join("")}
             </div>
-          ` : '<p class="table-option-empty">No orders in the current session yet.</p>'}
-        </section>
+          ` : `<p class="table-option-empty">${escapeHtml(emptyMessage)}</p>`}
+          ${bill.rows.length ? `
+            <div class="table-current-order-breakdown">
+              <div><span>Subtotal</span><strong>${escapeHtml(formatRequestMoney(bill.subtotal))}</strong></div>
+              <div><span>Tax</span><strong>${escapeHtml(formatRequestMoney(bill.tax))}</strong></div>
+            </div>
+          ` : ""}
+          <div class="table-current-order-total">
+            <div>
+              <span>Total</span>
+              <strong>${escapeHtml(formatRequestMoney(total))}</strong>
+            </div>
+            <small>${bill.orders.length} order${bill.orders.length === 1 ? "" : "s"}</small>
+          </div>
+        </div>
       `;
+    }
+
+    function renderCurrentTableOrderSummary(requests) {
+      return renderSimpleBill(requests, {
+        ariaLabel: "Current table bill",
+        emptyMessage: "No orders in the current session yet."
+      });
     }
 
     function renderTableOrderGuestSplits(history, partyId, { activeParty = null } = {}) {
@@ -6729,22 +6908,21 @@
         return;
       }
       const orders = Array.isArray(bill.orders) ? bill.orders : [];
+      const normalizedOrders = orders.map((order) => normalizeDiningRequest(order));
       const tables = Array.isArray(bill.tables) ? bill.tables : [];
       const status = String(guest.status || "ACTIVE").toUpperCase();
       meta.textContent = `Guest ${guest.display_code} · Party #${bill.party_id} · ${tables.map((table) => table.table_code).join(" + ") || "No tables"}`;
       result.innerHTML = `
         <div class="guest-lookup-total">
-          <div><span>Guest ${escapeHtml(guest.display_code)}</span><br /><small>${escapeHtml(status)}</small></div>
-          <strong>${escapeHtml(formatRequestMoney(bill.total))}</strong>
+          <span>Guest ${escapeHtml(guest.display_code)} · ${escapeHtml(status)}</span>
+          <strong>${normalizedOrders.length} order${normalizedOrders.length === 1 ? "" : "s"}</strong>
         </div>
-        <div class="guest-lookup-orders">
-          ${orders.length
-            ? orders.map((order) => {
-                const normalizedOrder = normalizeDiningRequest(order);
-                return renderPartyOrderDetail(normalizedOrder);
-              }).join("")
-            : '<div class="table-option-empty">No orders on this bill.</div>'}
-        </div>
+        ${renderSimpleBill(normalizedOrders, {
+          ariaLabel: `Guest ${guest.display_code} bill`,
+          emptyMessage: "No orders on this bill.",
+          showTable: true,
+          totalOverride: bill.total
+        })}
         ${status === "ACTIVE" ? `
           <button class="party-pay-btn" type="button" data-mark-guest-paid="${escapeHtml(guest.display_code)}">Mark Guest paid</button>
         ` : ""}
