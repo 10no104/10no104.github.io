@@ -677,6 +677,183 @@
       letter-spacing: -0.03em;
     }
 
+    .order-history-panel {
+      display: grid;
+      gap: 14px;
+    }
+
+    .order-history-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .order-history-copy h3,
+    .order-history-copy p {
+      margin: 0;
+    }
+
+    .order-history-copy p {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .order-history-filters {
+      display: grid;
+      grid-template-columns: minmax(150px, 0.9fr) minmax(150px, 1fr);
+      gap: 9px;
+      width: min(430px, 100%);
+    }
+
+    .order-history-field {
+      display: grid;
+      gap: 5px;
+      color: #765f50;
+      font-size: 0.68rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .order-history-field input,
+    .order-history-field select {
+      width: 100%;
+      min-height: 42px;
+      padding: 0 12px;
+      border: 1px solid rgba(113, 88, 60, 0.18);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.92);
+      color: #3f2b22;
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 850;
+      text-transform: none;
+    }
+
+    .order-history-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      min-height: 42px;
+      padding: 9px 12px;
+      border: 1px solid rgba(113, 88, 60, 0.12);
+      border-radius: 13px;
+      background: rgba(113, 88, 60, 0.055);
+      color: #756254;
+      font-size: 0.76rem;
+      font-weight: 800;
+    }
+
+    .order-history-summary strong {
+      color: #5f2731;
+      font-size: 1rem;
+    }
+
+    .order-history-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .order-history-row {
+      display: grid;
+      grid-template-columns: 94px minmax(0, 1fr) auto;
+      gap: 13px;
+      align-items: center;
+      min-height: 72px;
+      padding: 11px 13px;
+      border: 1px solid rgba(113, 88, 60, 0.13);
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.88);
+    }
+
+    .order-history-row.is-canceled {
+      opacity: 0.62;
+    }
+
+    .order-history-location,
+    .order-history-items {
+      min-width: 0;
+    }
+
+    .order-history-location {
+      display: grid;
+      gap: 4px;
+    }
+
+    .order-history-location strong {
+      color: #5f2731;
+      font-size: 0.9rem;
+    }
+
+    .order-history-location time,
+    .order-history-status {
+      color: #897568;
+      font-size: 0.68rem;
+      font-weight: 800;
+    }
+
+    .order-history-items {
+      overflow: hidden;
+      color: #433129;
+      font-size: 0.82rem;
+      font-weight: 800;
+      line-height: 1.45;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .order-history-price {
+      display: grid;
+      justify-items: end;
+      gap: 4px;
+      color: #3f2b22;
+      font-size: 0.98rem;
+      white-space: nowrap;
+    }
+
+    .order-history-price .order-history-status {
+      padding: 4px 7px;
+      border-radius: 999px;
+      background: rgba(37, 99, 61, 0.09);
+      color: #25633d;
+    }
+
+    .order-history-row.is-canceled .order-history-status {
+      background: rgba(113, 88, 60, 0.09);
+      color: #756254;
+    }
+
+    .order-history-empty {
+      padding: 26px 16px;
+      border: 1px dashed rgba(113, 88, 60, 0.2);
+      border-radius: 15px;
+      color: #806e60;
+      font-size: 0.82rem;
+      font-weight: 750;
+      text-align: center;
+    }
+
+    @media (max-width: 720px) {
+      .order-history-head {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .order-history-filters {
+        width: 100%;
+      }
+
+      .order-history-row {
+        grid-template-columns: 78px minmax(0, 1fr) auto;
+        gap: 9px;
+      }
+    }
+
     .table-map-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
@@ -1800,199 +1977,12 @@
       line-height: 1.55;
     }
 
-    .qr-session-control-panel {
-      margin-top: 2px;
-    }
-
-    .qr-session-control-panel > summary {
-      list-style: none;
-    }
-
-    .qr-session-control-panel > summary::-webkit-details-marker {
-      display: none;
-    }
-
-    .qr-session-summary {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      cursor: pointer;
-      user-select: none;
-    }
-
-    .qr-session-summary h3,
-    .qr-session-summary p {
-      margin: 0;
-    }
-
-    .qr-session-summary p {
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 0.8rem;
-      font-weight: 700;
-    }
-
-    .qr-session-summary-side {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex: 0 0 auto;
-    }
-
-    .qr-session-summary-count {
-      padding: 7px 10px;
-      border-radius: 999px;
-      background: rgba(123, 31, 47, 0.09);
-      color: #682c37;
-      font-size: 0.72rem;
-      font-weight: 900;
-    }
-
-    .qr-session-summary-chevron {
-      display: grid;
-      place-items: center;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: #5f2731;
-      color: #fff;
-      font-size: 1rem;
-      transition: transform 180ms ease;
-    }
-
-    .qr-session-control-panel[open] .qr-session-summary-chevron {
-      transform: rotate(180deg);
-    }
-
-    .qr-session-body {
-      padding-top: 18px;
-    }
-
-    .qr-session-toolbar,
-    .qr-station-top,
-    .qr-station-stats,
-    .qr-station-actions,
     .request-toolbar-actions {
       display: flex;
       align-items: center;
       gap: 10px;
     }
 
-    .qr-session-toolbar,
-    .qr-station-top,
-    .qr-station-stats {
-      justify-content: space-between;
-    }
-
-    .qr-session-toolbar {
-      margin-bottom: 8px;
-    }
-
-    .qr-session-toolbar h3,
-    .qr-session-toolbar p {
-      margin: 0;
-    }
-
-    .qr-session-toolbar p {
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 0.8rem;
-      font-weight: 700;
-    }
-
-    .qr-sheet-link {
-      flex: 0 0 auto;
-      display: inline-flex;
-      align-items: center;
-      min-height: 38px;
-      padding: 0 13px;
-      border: 1px solid rgba(123, 31, 47, 0.16);
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.8);
-      color: #612330;
-      font-size: 0.8rem;
-      font-weight: 900;
-    }
-
-    .qr-session-status {
-      min-height: 20px;
-      margin: 0 0 12px;
-      color: #817062;
-      font-size: 0.78rem;
-      font-weight: 700;
-    }
-
-    .qr-session-status.is-error {
-      color: #92394d;
-    }
-
-    .qr-station-grid {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 10px;
-    }
-
-    .qr-station-card {
-      display: grid;
-      gap: 10px;
-      min-width: 0;
-      padding: 13px;
-      border: 1px solid rgba(113, 88, 60, 0.14);
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.76);
-    }
-
-    .qr-station-card.is-active {
-      border-color: rgba(38, 112, 69, 0.32);
-      background: linear-gradient(145deg, rgba(231, 248, 235, 0.96), rgba(255, 255, 255, 0.9));
-      box-shadow: 0 12px 24px rgba(38, 112, 69, 0.09);
-    }
-
-    .qr-station-number {
-      color: #321f17;
-      font-size: 1.25rem;
-      font-weight: 900;
-      letter-spacing: -0.04em;
-    }
-
-    .qr-station-state {
-      padding: 5px 8px;
-      border-radius: 999px;
-      background: #eee4d8;
-      color: #796657;
-      font-size: 0.64rem;
-      font-weight: 900;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-    }
-
-    .qr-station-card.is-active .qr-station-state {
-      background: #d8eddd;
-      color: #25633d;
-    }
-
-    .qr-station-meta {
-      min-height: 34px;
-      color: #817062;
-      font-size: 0.72rem;
-      font-weight: 700;
-      line-height: 1.45;
-    }
-
-    .qr-station-stats {
-      color: #6e5c4e;
-      font-size: 0.7rem;
-      font-weight: 800;
-    }
-
-    .qr-station-actions {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      margin-top: auto;
-    }
-
-    .qr-station-actions:empty,
     .floor-table-actions:empty,
     .table-map-detail-actions:empty {
       display: none;
@@ -4275,10 +4265,6 @@
         grid-template-columns: 1fr;
       }
 
-      .qr-station-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
       .request-overview {
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
@@ -4593,7 +4579,7 @@
         grid-row: 2;
       }
 
-      .app-view[data-view="tables"] > .qr-session-control-panel {
+      .app-view[data-view="tables"] > .order-history-panel {
         grid-column: 1 / -1;
         grid-row: 3;
       }
@@ -4757,28 +4743,30 @@
         </div>
       </section>
 
-      <details class="purpose-panel qr-session-control-panel">
-        <summary class="qr-session-summary">
-          <div>
-            <h3>QR Session Details</h3>
-            <p>Current Party QR assignments only.</p>
+      <section class="purpose-panel order-history-panel" aria-labelledby="orderHistoryTitle">
+        <div class="order-history-head">
+          <div class="order-history-copy">
+            <h3 id="orderHistoryTitle">Past Orders</h3>
+            <p>Served and canceled orders, kept separate from the live table session.</p>
           </div>
-          <div class="qr-session-summary-side">
-            <span class="qr-session-summary-count" id="qrSessionToggleLabel">0 assigned</span>
-            <span class="qr-session-summary-chevron" aria-hidden="true">⌄</span>
+          <div class="order-history-filters">
+            <label class="order-history-field" for="orderHistoryDate">
+              Date
+              <input id="orderHistoryDate" type="date" />
+            </label>
+            <label class="order-history-field" for="orderHistoryTable">
+              Table
+              <select id="orderHistoryTable">
+                <option value="">All tables</option>
+              </select>
+            </label>
           </div>
-        </summary>
-        <div class="qr-session-body">
-          <div class="qr-session-toolbar">
-            <div>
-              <p>Each Party uses one QR. Every selected table shares that Party and bill.</p>
-            </div>
-            <a class="qr-sheet-link" href="./qr.html">QR Cards 1–10</a>
-          </div>
-          <p class="qr-session-status" id="qrSessionStatus">Loading QR sessions…</p>
-          <div class="qr-station-grid" id="qrStationGrid" aria-live="polite"></div>
         </div>
-      </details>
+        <div class="order-history-summary" id="orderHistorySummary" aria-live="polite">
+          <span>Loading order history…</span>
+        </div>
+        <div class="order-history-list" id="orderHistoryList" aria-live="polite"></div>
+      </section>
     </section>
 
     <section class="app-view placeholder-view is-active" data-view="online">
@@ -4868,7 +4856,7 @@
           <path d="M9 8a3 3 0 0 1 6 0"></path>
           <path d="M9 13h6"></path>
         </svg>
-        <span>주문 · 현황</span>
+        <span>주문</span>
         <b class="nav-count" id="requestNavCount" hidden>0</b>
       </button>
       <button class="nav-tab" type="button" data-queen-tab="tables" aria-pressed="false">
@@ -4878,7 +4866,7 @@
           <path d="M10 4v16"></path>
           <path d="M15 14h2"></path>
         </svg>
-        <span>테이블 · QR</span>
+        <span>테이블</span>
       </button>
       <button class="nav-tab" type="button" data-queen-tab="reservation" aria-pressed="false">
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -5086,6 +5074,15 @@
     let orderAlarmAudioContext = null;
     let orderAlarmIntervalHandle = null;
 
+    function getDeviceDateValue(value = new Date()) {
+      const date = value instanceof Date ? value : new Date(value);
+      if (Number.isNaN(date.getTime())) return "";
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
     const state = {
       reservations: [],
       selectedDate: "",
@@ -5132,6 +5129,8 @@
       requestsLoadedAt: null,
       requestLoadError: false,
       requestActionError: "",
+      orderHistoryDate: getDeviceDateValue(),
+      orderHistoryTableCode: "",
       qrSessions: [],
       qrSessionLoadError: false,
       qrSessionActionError: "",
@@ -5223,6 +5222,7 @@
       preparing: "Preparing",
       ready: "Preparing",
       completed: "Served",
+      served: "Served",
       canceled: "Canceled"
     };
 
@@ -5515,6 +5515,94 @@
         hour: "numeric",
         minute: "2-digit"
       }).format(date);
+    }
+
+    function getPastOrderHistoryRecords() {
+      return state.diningRequests
+        .filter((request) => (
+          request.kind === "order"
+          && ["completed", "served", "canceled"].includes(request.status)
+          && getDeviceDateValue(request.created_at) === state.orderHistoryDate
+          && (!state.orderHistoryTableCode || request.table_code.toLowerCase() === state.orderHistoryTableCode.toLowerCase())
+        ))
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    }
+
+    function getOrderHistoryTableCodes() {
+      return Array.from(new Map(
+        [
+          ...state.tableOptions,
+          ...state.partySnapshot.tables.map((table) => table.table_code),
+          ...state.diningRequests.map((request) => request.table_code)
+        ]
+          .map((tableCode) => String(tableCode || "").trim())
+          .filter(Boolean)
+          .map((tableCode) => [tableCode.toLowerCase(), tableCode])
+      ).values()).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
+    }
+
+    function summarizeOrderHistoryItems(request) {
+      const items = Array.isArray(request.items) ? request.items : [];
+      if (!items.length) {
+        const itemCount = Math.max(0, Number(request.item_count || 0));
+        return `${itemCount} item${itemCount === 1 ? "" : "s"}`;
+      }
+      return items.map((item) => {
+        const quantity = Math.max(1, Number(item.quantity || 1));
+        const name = item.nameEn || item.nameKo || "Menu item";
+        return `${quantity}× ${name}`;
+      }).join(" · ");
+    }
+
+    function renderPastOrderHistory() {
+      const dateInput = document.getElementById("orderHistoryDate");
+      const tableSelect = document.getElementById("orderHistoryTable");
+      const summary = document.getElementById("orderHistorySummary");
+      const list = document.getElementById("orderHistoryList");
+      if (!dateInput || !tableSelect || !summary || !list) return;
+
+      if (!state.orderHistoryDate) state.orderHistoryDate = getDeviceDateValue();
+      dateInput.value = state.orderHistoryDate;
+
+      const tableCodes = getOrderHistoryTableCodes();
+      tableSelect.innerHTML = [
+        '<option value="">All tables</option>',
+        ...tableCodes.map((tableCode) => (
+          `<option value="${escapeHtml(tableCode)}" ${tableCode.toLowerCase() === state.orderHistoryTableCode.toLowerCase() ? "selected" : ""}>Table ${escapeHtml(tableCode)}</option>`
+        ))
+      ].join("");
+
+      const records = getPastOrderHistoryRecords();
+      const billedTotal = records
+        .filter((request) => request.status !== "canceled")
+        .reduce((sum, request) => sum + Number(request.total || 0), 0);
+      summary.innerHTML = `
+        <span>${records.length} past order${records.length === 1 ? "" : "s"}${state.orderHistoryTableCode ? ` · Table ${escapeHtml(state.orderHistoryTableCode)}` : ""}</span>
+        <strong>${escapeHtml(formatRequestMoney(billedTotal))}</strong>
+      `;
+
+      if (!records.length) {
+        list.innerHTML = '<div class="order-history-empty">No served or canceled orders for this date and table.</div>';
+        return;
+      }
+
+      list.innerHTML = records.map((request) => {
+        const isCanceled = request.status === "canceled";
+        const statusLabel = REQUEST_STATUS_LABELS[request.status] || request.status;
+        return `
+          <article class="order-history-row ${isCanceled ? "is-canceled" : ""}">
+            <div class="order-history-location">
+              <strong>Table ${escapeHtml(request.table_code || "-")}</strong>
+              <time datetime="${escapeHtml(request.created_at || "")}">${escapeHtml(formatRequestClock(request.created_at))}</time>
+            </div>
+            <div class="order-history-items" title="${escapeHtml(summarizeOrderHistoryItems(request))}">${escapeHtml(summarizeOrderHistoryItems(request))}</div>
+            <div class="order-history-price">
+              <strong>${escapeHtml(formatRequestMoney(request.total))}</strong>
+              <span class="order-history-status">${escapeHtml(statusLabel)}</span>
+            </div>
+          </article>
+        `;
+      }).join("");
     }
 
     function formatRequestAge(value) {
@@ -5832,116 +5920,6 @@
       confirmButton.textContent = state.partySetupSaving
         ? "Assigning…"
         : "Next · Choose one QR";
-    }
-
-    function renderQrStations() {
-      const grid = document.getElementById("qrStationGrid");
-      const status = document.getElementById("qrSessionStatus");
-      const toggleLabel = document.getElementById("qrSessionToggleLabel");
-      if (!grid || !status) return;
-
-      const permanentMode = state.partyQrPoolAvailable === true;
-      const activeCount = permanentMode
-        ? Array.from({ length: DINING_QR_COUNT }, (_, index) => index + 1)
-            .filter((qrNumber) => getActiveDiningPartyQr(qrNumber)).length
-        : state.qrSessions.filter((session) => session.status === "active" && session.table_code).length;
-      if (toggleLabel) {
-        toggleLabel.textContent = `${activeCount} ${permanentMode ? "active" : "assigned"}`;
-      }
-
-      if (state.qrSessionActionError) {
-        status.textContent = state.qrSessionActionError;
-        status.className = "qr-session-status is-error";
-      } else if (!permanentMode && state.qrSessionLoadError) {
-        status.textContent = "QR table assignments are unavailable. Run tools/sql/dining-qr-table-assignment.sql in Supabase.";
-        status.className = "qr-session-status is-error";
-      } else if (permanentMode) {
-        status.textContent = `${activeCount} of ${DINING_QR_COUNT} QR codes active · QR codes return to the pool when a Party closes.`;
-        status.className = "qr-session-status";
-      } else {
-        status.textContent = `${activeCount} of ${DINING_QR_COUNT} QR codes assigned · Session history is retained after checkout.`;
-        status.className = "qr-session-status";
-      }
-
-      grid.innerHTML = Array.from({ length: DINING_QR_COUNT }, (_, index) => index + 1).map((qrNumber) => {
-        if (permanentMode) {
-          const partyQr = getActiveDiningPartyQr(qrNumber);
-          const tableRecord = partyQr
-            ? state.partySnapshot.tables.find((table) => table.id === partyQr.table_id) || null
-            : null;
-          const activeParty = partyQr ? getDiningParty(partyQr.party_id) : null;
-          const currentOrders = activeParty
-            ? state.diningRequests.filter((request) => (
-                request.party_id === activeParty.id
-                && request.kind === "order"
-                && request.status !== "canceled"
-              ))
-            : [];
-          const currentTotal = currentOrders.reduce((sum, request) => sum + Number(request.total || 0), 0);
-          const stateLabel = activeParty ? "Active" : "Available";
-          const meta = activeParty
-            ? `Table ${escapeHtml(tableRecord?.table_code || partyQr.table_code)}<br>Party #${activeParty.id}`
-            : "QR pool<br>Select tables first";
-          return `
-            <article class="qr-station-card ${activeParty ? "is-active" : ""}">
-              <div class="qr-station-top">
-                <strong class="qr-station-number">QR ${String(qrNumber).padStart(2, "0")}</strong>
-                <span class="qr-station-state">${stateLabel}</span>
-              </div>
-              <div class="qr-station-meta">${meta}</div>
-              <div class="qr-station-stats">
-                ${activeParty
-                  ? `<span>${currentOrders.length} current order${currentOrders.length === 1 ? "" : "s"}</span><span>${escapeHtml(formatRequestMoney(currentTotal))}</span>`
-                  : "<span>Ready to assign</span>"}
-              </div>
-              <div class="qr-station-actions">
-                ${activeParty ? `
-                  <button class="qr-station-btn reset" type="button" data-close-party="${activeParty.id}">Review &amp; Checkout</button>
-                ` : ""}
-              </div>
-            </article>
-          `;
-        }
-
-        const activeSession = getActiveQrSession(qrNumber);
-        const currentOrders = activeSession
-          ? state.diningRequests.filter((request) => (
-              request.qr_session_id === activeSession.id
-              && request.kind === "order"
-              && request.status !== "canceled"
-            ))
-          : [];
-        const currentTotal = currentOrders.reduce((sum, request) => sum + Number(request.total || 0), 0);
-        const isUpdating = state.qrSessionUpdatingNumbers.has(qrNumber);
-        const meta = activeSession
-          ? `Table ${escapeHtml(activeSession.table_code)}<br>Started ${formatRequestClock(activeSession.started_at)}`
-          : "Available<br>Select tables first";
-        return `
-          <article class="qr-station-card ${activeSession ? "is-active" : ""}">
-            <div class="qr-station-top">
-              <strong class="qr-station-number">QR ${String(qrNumber).padStart(2, "0")}</strong>
-              <span class="qr-station-state">${activeSession ? "Assigned" : "Inactive"}</span>
-            </div>
-            <div class="qr-station-meta">${meta}</div>
-            <div class="qr-station-stats">
-              ${activeSession
-                ? `<span>${currentOrders.length} current order${currentOrders.length === 1 ? "" : "s"}</span><span>${escapeHtml(formatRequestMoney(currentTotal))}</span>`
-                : "<span>Ready to assign</span>"}
-            </div>
-            <div class="qr-station-actions">
-              ${activeSession ? `
-                <button
-                  class="qr-station-btn reset"
-                  type="button"
-                  data-end-qr-session="${qrNumber}"
-                  data-table-code="${escapeHtml(activeSession.table_code)}"
-                  ${isUpdating || state.qrSessionLoadError ? "disabled" : ""}
-                >${isUpdating ? "Working…" : "End session"}</button>
-              ` : ""}
-            </div>
-          </article>
-        `;
-      }).join("");
     }
 
     function getDiningTableMapZone(tableCode) {
@@ -7265,17 +7243,6 @@
       return activeRequests.slice().sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
     }
 
-    function showRequestHistory({ qrNumber = null, tableCode = null } = {}) {
-      state.selectedRequestQrNumber = Number.isInteger(qrNumber) ? qrNumber : null;
-      state.selectedRequestTableCode = tableCode ? String(tableCode).trim() : null;
-      state.requestFilter = "active";
-      document.querySelector('[data-queen-tab="online"]')?.click();
-      renderDiningRequests();
-      window.setTimeout(() => {
-        document.getElementById("requestQueue")?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 80);
-    }
-
     function getNextRequestAction(request) {
       if (["completed", "canceled"].includes(request.status)) {
         return { status: "new", label: "Reopen" };
@@ -7458,9 +7425,9 @@
         clearQrFilterButton.hidden = !state.selectedRequestQrNumber && !state.selectedRequestTableCode;
       }
       syncUnconfirmedRequestAlert();
-      renderQrStations();
       renderPartyDashboard();
       renderTableMap();
+      renderPastOrderHistory();
       if (document.getElementById("tableOrderHistoryModal")?.classList.contains("is-open")) {
         renderTableOrderHistoryModal();
       }
@@ -9203,28 +9170,14 @@
       renderDiningRequests();
     });
 
-    document.getElementById("qrStationGrid").addEventListener("click", (event) => {
-      const historyButton = event.target.closest("[data-qr-history]");
-      if (historyButton) {
-        showRequestHistory({ qrNumber: Number(historyButton.dataset.qrHistory) });
-        return;
-      }
+    document.getElementById("orderHistoryDate").addEventListener("change", (event) => {
+      state.orderHistoryDate = event.currentTarget.value || getDeviceDateValue();
+      renderPastOrderHistory();
+    });
 
-      const closePartyButton = event.target.closest("[data-close-party]");
-      if (closePartyButton) {
-        const partyId = Number(closePartyButton.dataset.closeParty);
-        openPartyCheckout(partyId);
-        return;
-      }
-
-      const endButton = event.target.closest("[data-end-qr-session]");
-      if (!endButton) return;
-      const qrNumber = Number(endButton.dataset.endQrSession);
-      const tableCode = endButton.dataset.tableCode || "-";
-      const shouldEnd = window.confirm(
-        `End the Table ${tableCode} session? QR ${String(qrNumber).padStart(2, "0")} will become inactive and any open requests will be canceled.`
-      );
-      if (shouldEnd) endQrSession(qrNumber);
+    document.getElementById("orderHistoryTable").addEventListener("change", (event) => {
+      state.orderHistoryTableCode = String(event.currentTarget.value || "").trim();
+      renderPastOrderHistory();
     });
 
     document.getElementById("tableMapTabs").addEventListener("click", (event) => {
