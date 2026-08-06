@@ -927,6 +927,42 @@
       font-weight: 800;
     }
 
+    .order-history-session-breakdown {
+      display: grid;
+      padding: 6px 14px 9px;
+      border-top: 1px solid rgba(113, 88, 60, 0.1);
+      background: rgba(113, 88, 60, 0.035);
+    }
+
+    .order-history-session-breakdown div {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-height: 30px;
+      color: #806e60;
+      font-size: 0.7rem;
+      font-weight: 800;
+    }
+
+    .order-history-session-breakdown div + div {
+      border-top: 1px solid rgba(113, 88, 60, 0.07);
+    }
+
+    .order-history-session-breakdown strong {
+      color: #49342b;
+    }
+
+    .order-history-session-breakdown .is-total {
+      color: #4a2f26;
+      font-size: 0.78rem;
+    }
+
+    .order-history-session-breakdown .is-total strong {
+      color: #5f2731;
+      font-size: 0.9rem;
+    }
+
     .order-history-empty {
       padding: 26px 16px;
       border: 1px dashed rgba(113, 88, 60, 0.2);
@@ -2550,7 +2586,7 @@
     .request-card {
       position: relative;
       display: grid;
-      gap: 12px;
+      gap: 10px;
       overflow: hidden;
       padding: 18px 16px 16px;
       border: 1px solid rgba(113, 88, 60, 0.14);
@@ -2567,14 +2603,6 @@
       height: 4px;
       background: #8c2940;
       content: "";
-    }
-
-    .request-card:nth-child(3n + 2)::before {
-      background: #d0a62f;
-    }
-
-    .request-card:nth-child(3n)::before {
-      background: #66b9ad;
     }
 
     .request-card.is-new {
@@ -2620,31 +2648,38 @@
       justify-content: space-between;
     }
 
+    .request-card-top {
+      align-items: flex-start;
+    }
+
     .request-card-meta {
       flex-wrap: wrap;
     }
 
     .request-table-code {
       color: #281a13;
-      font-size: 1.35rem;
+      font-size: 1.58rem;
       font-weight: 900;
       letter-spacing: -0.04em;
+      line-height: 1;
     }
 
     .request-age {
       color: #887365;
-      font-size: 0.8rem;
+      font-size: 0.7rem;
       font-weight: 800;
+      line-height: 1.35;
+      text-align: right;
     }
 
     .request-kind-badge,
     .request-status-badge {
       display: inline-flex;
       align-items: center;
-      min-height: 28px;
-      padding: 0 10px;
+      min-height: 23px;
+      padding: 0 8px;
       border-radius: 999px;
-      font-size: 0.72rem;
+      font-size: 0.62rem;
       font-weight: 900;
       letter-spacing: 0.04em;
       text-transform: uppercase;
@@ -2663,12 +2698,12 @@
     .request-device-badge {
       display: inline-flex;
       align-items: center;
-      min-height: 28px;
-      padding: 0 10px;
+      min-height: 23px;
+      padding: 0 8px;
       border-radius: 999px;
       background: rgba(212, 175, 55, 0.14);
       color: #765812;
-      font-size: 0.72rem;
+      font-size: 0.62rem;
       font-weight: 900;
       letter-spacing: 0.04em;
       text-transform: uppercase;
@@ -2676,8 +2711,8 @@
 
     .request-items {
       display: grid;
-      gap: 7px;
-      padding: 12px;
+      gap: 5px;
+      padding: 10px;
       border-radius: 16px;
       background: rgba(246, 239, 230, 0.78);
       color: #36261c;
@@ -2685,14 +2720,20 @@
 
     .request-item-row {
       display: grid;
-      grid-template-columns: 34px minmax(0, 1fr) auto;
-      gap: 8px;
-      align-items: baseline;
-      font-size: 0.88rem;
+      grid-template-columns: 31px minmax(0, 1fr) auto;
+      gap: 9px;
+      align-items: center;
+      min-height: 48px;
+      padding: 5px 8px 5px 10px;
+      border-inline-start: 4px solid var(--menu-type-accent, rgba(123, 31, 47, 0.16));
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.54);
+      font-size: 0.9rem;
     }
 
     .request-item-row strong {
       color: #692737;
+      font-size: 0.92rem;
     }
 
     .request-item-row span {
@@ -2704,22 +2745,30 @@
 
     .request-item-row-copy {
       display: grid;
-      gap: 3px;
+      gap: 4px;
       min-width: 0;
+    }
+
+    .request-item-row-copy > span {
+      color: #281a13;
+      font-size: 1.08rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
     }
 
     .request-item-row-copy .request-item-customizations {
       overflow: visible;
-      color: #7b4d35;
-      font-size: 0.68rem;
-      font-weight: 800;
-      line-height: 1.35;
+      color: #7b3d2f;
+      font-size: 0.72rem;
+      font-weight: 850;
+      line-height: 1.4;
       white-space: normal;
     }
 
     .request-item-row small {
-      color: #806d5e;
-      font-weight: 700;
+      color: #9a887a;
+      font-size: 0.68rem;
+      font-weight: 750;
     }
 
     .request-service-copy {
@@ -2732,15 +2781,32 @@
     }
 
     .request-note {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 8px;
       margin: 0;
-      color: #69584b;
-      font-size: 0.84rem;
+      padding: 9px 11px;
+      border-radius: 12px;
+      background: rgba(212, 175, 55, 0.13);
+      color: #5e4938;
+      font-size: 0.78rem;
+      font-weight: 800;
       line-height: 1.5;
     }
 
+    .request-note strong {
+      color: #7b1f2f;
+    }
+
     .request-total-row {
-      color: #39271d;
+      color: #897568;
+      font-size: 0.7rem;
       font-weight: 800;
+    }
+
+    .request-total-row strong {
+      color: #6f5b4d;
+      font-size: 0.82rem;
     }
 
     .request-card-actions {
@@ -5666,11 +5732,12 @@
             const quantity = Math.max(1, Number(item.quantity || 1));
             const name = item.nameEn || item.nameKo || "Menu item";
             const customizations = formatOrderItemCustomizations(item.customizations);
+            const menuType = String(item.menuType || item.category || "unassigned").trim().toLowerCase();
             const unitPrice = Number(item.unitPrice || 0);
             const rawLineTotal = Number(item.lineTotal);
             const lineTotal = Number.isFinite(rawLineTotal) ? rawLineTotal : unitPrice * quantity;
-            const key = `${name}\u0000${customizations}\u0000${unitPrice}`;
-            const saved = lines.get(key) || { name, customizations, quantity: 0, total: 0 };
+            const key = `${name}\u0000${customizations}\u0000${menuType}\u0000${unitPrice}`;
+            const saved = lines.get(key) || { name, customizations, menuType, quantity: 0, total: 0 };
             saved.quantity += quantity;
             saved.total += lineTotal;
             lines.set(key, saved);
@@ -5681,6 +5748,7 @@
         lines.set("__legacy__", {
           name: "Recorded menu items",
           customizations: "",
+          menuType: "unassigned",
           quantity: fallbackQuantity,
           total: fallbackTotal
         });
@@ -5749,6 +5817,8 @@
             items,
             itemCount: items.reduce((sum, item) => sum + Number(item.quantity || 0), 0),
             canceledCount: group.requests.length - billedRequests.length,
+            subtotal: billedRequests.reduce((sum, request) => sum + Number(request.subtotal || 0), 0),
+            tax: billedRequests.reduce((sum, request) => sum + Number(request.tax || 0), 0),
             total: billedRequests.reduce((sum, request) => sum + Number(request.total || 0), 0)
           };
         })
@@ -5797,6 +5867,11 @@
       const summary = document.getElementById("orderHistorySummary");
       const list = document.getElementById("orderHistoryList");
       if (!dateInput || !tableSelect || !summary || !list) return;
+      const expandedSessionKeys = new Set(
+        [...list.querySelectorAll(".order-history-session[open][data-session-key]")]
+          .map((element) => element.dataset.sessionKey)
+          .filter(Boolean)
+      );
 
       if (!state.orderHistoryDate) state.orderHistoryDate = getDeviceDateValue();
       dateInput.value = state.orderHistoryDate;
@@ -5826,7 +5901,7 @@
         const tableCodes = session.tableCodes.length ? session.tableCodes.join(" + ") : "Unknown";
         const itemsMarkup = session.items.length
           ? session.items.map((item) => `
-              <div class="order-history-session-item">
+              <div class="order-history-session-item" data-menu-type="${escapeHtml(item.menuType || "unassigned")}">
                 <strong>${escapeHtml(item.quantity)}×</strong>
                 <div class="order-history-session-item-copy">
                   <span>${escapeHtml(item.name)}</span>
@@ -5837,7 +5912,11 @@
             `).join("")
           : '<div class="order-history-session-item"><span></span><div class="order-history-session-item-copy"><span>No billed items</span></div><b>$0.00</b></div>';
         return `
-          <details class="order-history-session">
+          <details
+            class="order-history-session"
+            data-session-key="${escapeHtml(session.key)}"
+            ${expandedSessionKeys.has(session.key) ? "open" : ""}
+          >
             <summary class="order-history-session-head">
               <div class="order-history-session-title">
                 <strong>${tableLabel} ${escapeHtml(tableCodes)}</strong>
@@ -5862,6 +5941,11 @@
             </summary>
             <div class="order-history-session-items">
               ${itemsMarkup}
+            </div>
+            <div class="order-history-session-breakdown" aria-label="Session bill breakdown">
+              <div><span>Subtotal</span><strong>${escapeHtml(formatRequestMoney(session.subtotal))}</strong></div>
+              <div><span>Tax</span><strong>${escapeHtml(formatRequestMoney(session.tax))}</strong></div>
+              <div class="is-total"><span>Total</span><strong>${escapeHtml(formatRequestMoney(session.total))}</strong></div>
             </div>
             ${session.canceledCount ? `<div class="order-history-session-note">${session.canceledCount} canceled order${session.canceledCount === 1 ? "" : "s"} excluded from this total.</div>` : ""}
           </details>
@@ -7555,8 +7639,9 @@
               const name = item.nameEn || item.nameKo || "Menu item";
               const lineTotal = Number(item.lineTotal ?? (Number(item.unitPrice || 0) * quantity));
               const customizations = formatOrderItemCustomizations(item.customizations);
+              const menuType = String(item.menuType || item.category || "unassigned").trim().toLowerCase();
               return `
-                <div class="request-item-row">
+                <div class="request-item-row" data-menu-type="${escapeHtml(menuType)}">
                   <strong>${escapeHtml(quantity)}×</strong>
                   <div class="request-item-row-copy">
                     <span>${escapeHtml(name)}</span>
@@ -7577,18 +7662,16 @@
       return `
         <article class="request-card is-${escapeHtml(request.kind)} is-${escapeHtml(request.status)}">
           <div class="request-card-top">
-            <div>
-              <div class="request-card-meta">
-                <span class="request-kind-badge">${request.kind === "order" ? `Order #${escapeHtml(request.id)}` : escapeHtml(requestTypeLabel)}</span>
-                <span class="request-status-badge">${escapeHtml(statusLabel)}</span>
-                ${guestLabel ? `<span class="request-device-badge">${escapeHtml(guestLabel)}</span>` : ""}
-              </div>
-              <div class="request-table-code">${escapeHtml(locationLabel)}</div>
-            </div>
+            <div class="request-table-code">${escapeHtml(locationLabel)}</div>
             <div class="request-age">${escapeHtml(formatRequestClock(request.created_at))}<br />${escapeHtml(formatRequestAge(request.created_at))}</div>
           </div>
+          <div class="request-card-meta">
+            <span class="request-status-badge">${escapeHtml(statusLabel)}</span>
+            <span class="request-kind-badge">${request.kind === "order" ? `Order #${escapeHtml(request.id)}` : escapeHtml(requestTypeLabel)}</span>
+            ${guestLabel ? `<span class="request-device-badge">${escapeHtml(guestLabel)}</span>` : ""}
+          </div>
           ${itemsMarkup}
-          ${request.note ? `<p class="request-note"><strong>Note:</strong> ${escapeHtml(request.note)}</p>` : ""}
+          ${request.note ? `<p class="request-note"><strong>Request</strong><span>${escapeHtml(request.note)}</span></p>` : ""}
           <div class="request-card-actions">
             <button
               class="request-action-btn"
