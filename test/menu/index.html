@@ -214,6 +214,10 @@
       box-shadow: 0 20px 36px rgba(45, 30, 17, 0.08);
     }
 
+    .menu-card-icons {
+      display: none;
+    }
+
     .menu-page .menu-image {
       background: rgba(44, 33, 22, 0.08);
       box-shadow: 0 16px 28px rgba(39, 22, 11, 0.14);
@@ -1964,45 +1968,6 @@
       padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
     }
 
-    .menu-sticky-shell,
-    .menu-page.is-scrolled .menu-sticky-shell {
-      position: sticky;
-      top: 0;
-      left: auto;
-      right: auto;
-      z-index: 60;
-      view-transition-name: menu-sticky-navigation;
-      transition: padding 0.32s cubic-bezier(0.22, 1, 0.36, 1),
-        background 0.32s ease,
-        box-shadow 0.32s ease;
-    }
-
-    .menu-sticky-spacer {
-      display: none;
-      height: 0;
-    }
-
-    .menu-sticky-inner,
-    .menu-home-link,
-    .menu-home-logo {
-      transition-duration: 0.32s;
-      transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    .menu-sticky-inner {
-      transition-property: gap, padding, border-radius, background, box-shadow, transform;
-    }
-
-    ::view-transition-group(menu-sticky-navigation) {
-      animation-duration: 0.34s;
-      animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    ::view-transition-old(menu-sticky-navigation),
-    ::view-transition-new(menu-sticky-navigation) {
-      mix-blend-mode: normal;
-    }
-
     .page-sections {
       width: 100%;
       margin: 0;
@@ -2304,96 +2269,6 @@
     }
 
     @media (max-width: 640px) {
-      .menu-sticky-spacer {
-        display: block;
-        height: 0;
-      }
-
-      .menu-page.is-scrolled:not(.is-detail-view) .menu-sticky-spacer {
-        height: var(--menu-sticky-expanded-height, 0px);
-      }
-
-      .menu-page.is-scrolled:not(.is-detail-view) .menu-sticky-shell {
-        position: fixed;
-        inset: 0 0 auto;
-      }
-
-      .menu-page:not(.is-scrolled) .menu-sticky-shell .tabs,
-      .menu-page:not(.is-scrolled) .menu-sticky-shell .subtabs {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 10px;
-        overflow: visible;
-        padding-bottom: 0;
-      }
-
-      .menu-page:not(.is-scrolled) .menu-sticky-shell .tab {
-        flex: 0 1 auto;
-        min-width: 0;
-        padding: 11px 18px;
-        font-size: 1rem;
-      }
-
-      .menu-page.is-scrolled .menu-sticky-shell .tabs,
-      .menu-page.is-scrolled .menu-sticky-shell .subtabs {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        overflow-y: hidden;
-        scroll-behavior: smooth;
-        scrollbar-width: none;
-      }
-
-      .menu-page.is-scrolled .menu-sticky-shell .tabs::-webkit-scrollbar,
-      .menu-page.is-scrolled .menu-sticky-shell .subtabs::-webkit-scrollbar {
-        display: none;
-      }
-
-      .menu-sticky-shell .tabs,
-      .menu-sticky-shell .subtabs,
-      .menu-sticky-shell .tab,
-      .menu-sticky-shell .subtab {
-        transition: gap 0.34s cubic-bezier(0.22, 1, 0.36, 1),
-          padding 0.34s cubic-bezier(0.22, 1, 0.36, 1),
-          font-size 0.34s cubic-bezier(0.22, 1, 0.36, 1),
-          opacity 0.22s ease,
-          transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
-      }
-
-      .menu-page.is-scrolled .menu-sticky-inner {
-        display: grid;
-        gap: 6px;
-        padding: 8px 10px;
-      }
-
-      .menu-page.is-scrolled .menu-homebar {
-        justify-content: center;
-        width: 100%;
-      }
-
-      .menu-page.is-scrolled .menu-home-link {
-        width: 40px;
-        height: 40px;
-        margin: 0;
-        border-radius: 999px;
-      }
-
-      .menu-page.is-scrolled .menu-home-logo {
-        width: 26px;
-        height: 26px;
-      }
-
-      .menu-page.is-scrolled .menu-sticky-shell .tabs {
-        width: 100%;
-        gap: 8px;
-      }
-
-      .menu-page.is-scrolled .menu-sticky-shell .tab {
-        flex: 0 0 auto;
-        min-width: max-content;
-        padding: 9px 16px;
-        font-size: 0.9rem;
-      }
-
       .menu-section .section-shell {
         width: min(calc(100% - 20px), 420px);
         margin-bottom: 40px;
@@ -2467,131 +2342,8 @@
       }
     }
 
-    /* Phone layout: keep the full category navigator at the top, then condense it into one calm row. */
+    /* Compact phone cards keep key dietary and ingredient cues visible. */
     @media (max-width: 640px) {
-      .menu-sticky-shell,
-      .menu-page.is-scrolled .menu-sticky-shell {
-        padding: 10px 0 8px;
-        background: linear-gradient(180deg, rgba(247, 242, 234, 0.97), rgba(247, 242, 234, 0.9));
-        box-shadow: none;
-      }
-
-      .menu-sticky-inner,
-      .menu-page.is-scrolled .menu-sticky-inner {
-        width: calc(100% - 16px);
-        overflow: hidden;
-        transition: max-height 0.28s cubic-bezier(0.22, 1, 0.36, 1),
-          padding 0.28s cubic-bezier(0.22, 1, 0.36, 1),
-          gap 0.28s cubic-bezier(0.22, 1, 0.36, 1),
-          border-radius 0.28s ease,
-          box-shadow 0.28s ease;
-      }
-
-      .menu-sticky-inner {
-        max-height: 500px;
-      }
-
-      .menu-page.is-scrolled .menu-sticky-shell {
-        padding: 6px 0;
-        background: rgba(247, 242, 234, 0.92);
-        -webkit-backdrop-filter: blur(14px);
-        backdrop-filter: blur(14px);
-        box-shadow: 0 8px 24px rgba(35, 23, 16, 0.08);
-        animation: menu-compact-in 0.18s ease-out both;
-      }
-
-      .menu-page.is-scrolled .menu-sticky-inner {
-        display: grid;
-        grid-template-columns: 38px minmax(0, 1fr);
-        align-items: center;
-        max-height: 54px;
-        gap: 6px;
-        padding: 6px;
-        border-radius: 16px;
-        box-shadow: 0 8px 22px rgba(42, 28, 18, 0.1);
-        transition: none;
-      }
-
-      .menu-page.is-scrolled .menu-sticky-inner:has(.subtabs-wrap:not(.hidden)) {
-        max-height: 98px;
-      }
-
-      .menu-page.is-scrolled .menu-homebar {
-        grid-column: 1;
-        grid-row: 1;
-        width: 38px;
-        justify-content: center;
-      }
-
-      .menu-page.is-scrolled .menu-home-link {
-        width: 36px;
-        height: 36px;
-        margin: 0;
-        border-radius: 12px;
-        box-shadow: none;
-      }
-
-      .menu-page.is-scrolled .menu-home-logo {
-        width: 23px;
-        height: 23px;
-      }
-
-      .menu-page.is-scrolled .menu-sticky-shell .tabs {
-        grid-column: 2;
-        grid-row: 1;
-        width: 100%;
-        min-width: 0;
-        flex-wrap: nowrap !important;
-        justify-content: flex-start;
-        gap: 6px;
-        overflow-x: auto;
-        overflow-y: hidden;
-        padding: 0;
-        scroll-padding-inline: 4px;
-        scrollbar-width: none;
-      }
-
-      .menu-page.is-scrolled .menu-sticky-shell .tabs::-webkit-scrollbar {
-        display: none;
-      }
-
-      .menu-page.is-scrolled .menu-sticky-shell .tab {
-        flex: 0 0 auto;
-        min-width: max-content;
-        min-height: 36px;
-        padding: 8px 12px;
-        font-size: 0.78rem;
-        line-height: 1;
-      }
-
-      .menu-page.is-scrolled .menu-sticky-shell .subtabs-wrap:not(.hidden) {
-        grid-column: 1 / -1;
-        grid-row: 2;
-        width: 100%;
-        min-width: 0;
-      }
-
-      .menu-page.is-scrolled .menu-sticky-shell .subtabs-context {
-        display: none;
-      }
-
-      .menu-page.is-scrolled .menu-sticky-shell .subtabs {
-        width: 100%;
-        flex-wrap: nowrap !important;
-        justify-content: flex-start;
-        gap: 6px;
-        overflow-x: auto;
-        padding: 0;
-        scrollbar-width: none;
-      }
-
-      .menu-page.is-scrolled .menu-sticky-shell .subtab {
-        flex: 0 0 auto;
-        min-height: 32px;
-        padding: 7px 11px;
-        font-size: 0.72rem;
-      }
-
       .menu-page .menu-grid {
         gap: 10px;
       }
@@ -2633,6 +2385,33 @@
         line-height: 1.25;
       }
 
+      .menu-page .menu-card-icons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        min-height: 24px;
+        margin-top: 7px;
+      }
+
+      .menu-page .menu-card-icon {
+        display: inline-grid;
+        width: 24px;
+        height: 24px;
+        place-items: center;
+        border: 1px solid rgba(90, 17, 34, 0.1);
+        border-radius: 8px;
+        background: rgba(90, 17, 34, 0.07);
+        font-size: 0.82rem;
+        line-height: 1;
+      }
+
+      .menu-page .menu-card-icon.green { background: rgba(38, 112, 70, 0.11); }
+      .menu-page .menu-card-icon.yellow { background: rgba(212, 175, 55, 0.16); }
+      .menu-page .menu-card-icon.blue { background: rgba(48, 112, 166, 0.11); }
+      .menu-page .menu-card-icon.orange { background: rgba(196, 105, 31, 0.12); }
+      .menu-page .menu-card-icon.brown { background: rgba(111, 70, 43, 0.12); }
+      .menu-page .menu-card-icon.purple { background: rgba(109, 67, 126, 0.11); }
+
       .menu-page .menu-desc,
       .menu-page .menu-meta {
         display: none;
@@ -2663,23 +2442,6 @@
         padding: 0 12px;
         font-size: 0.74rem;
         box-shadow: none;
-      }
-    }
-
-    @keyframes menu-compact-in {
-      from {
-        opacity: 0.72;
-        transform: translateY(-7px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .menu-page.is-scrolled .menu-sticky-shell {
-        animation: none;
       }
     }
 
@@ -4995,6 +4757,18 @@
             .map((tag) => `<span class="menu-tag ${escapeHtml(tag.color)}">${escapeHtml(tag.label)}</span>`)
             .join("");
           const tagsSection = tagsHtml ? `<div class="menu-meta">${tagsHtml}</div>` : "";
+          const compactTags = displayTags
+            .filter((tag, index, tags) => tags.findIndex((candidate) => candidate.label === tag.label) === index)
+            .slice(0, 4);
+          const compactTagsSection = compactTags.length
+            ? `<div class="menu-card-icons" aria-label="Menu traits">${compactTags.map((tag) => {
+                const label = String(tag.label || "").trim();
+                const firstToken = label.split(/\s+/)[0] || "";
+                const fallbackIcons = { red: "🌶️", green: "🌱", yellow: "⭐", blue: "🐟", orange: "🐔", brown: "🐮", purple: "🐷" };
+                const icon = /[^a-z0-9]/i.test(firstToken) ? firstToken : (fallbackIcons[tag.color] || "•");
+                return `<span class="menu-card-icon ${escapeHtml(tag.color)}" title="${escapeHtml(label)}" aria-label="${escapeHtml(label)}">${escapeHtml(icon)}</span>`;
+              }).join("")}</div>`
+            : "";
 
           return `
             <article class="menu-card">
@@ -5002,6 +4776,7 @@
               <div class="menu-content">
                 <p class="menu-title name-ko">${escapeHtml(item.nameKo)}</p>
                 <p class="menu-title menu-title-alt name-en">${escapeHtml(item.nameEn)}</p>
+                ${compactTagsSection}
                 <p class="menu-desc desc">${escapeHtml(item.description)}</p>
                 ${tagsSection}
               </div>
@@ -5229,27 +5004,70 @@
       const stickyShell = document.querySelector(".menu-sticky-shell");
       const stickySpacer = document.getElementById("menuStickySpacer");
       if (!page || !stickyShell || !stickySpacer) return;
-      let isCollapsed = page.classList.contains("is-scrolled");
+      const mobileQuery = window.matchMedia("(max-width: 640px)");
+      let isSticky = page.classList.contains("is-scrolled");
       let frameId = 0;
+      let expandedHeaderHeight = Math.ceil(stickyShell.getBoundingClientRect().height);
+      let spacerHeight = "";
+      let lastScrollY = null;
 
-      const measureExpandedHeader = () => {
-        if (isCollapsed || window.innerWidth > 640) return;
-        const height = Math.ceil(stickyShell.getBoundingClientRect().height);
-        page.style.setProperty("--menu-sticky-expanded-height", `${height}px`);
-      };
+      const syncHeaderHeight = () => {
+        const currentHeight = Math.ceil(stickyShell.getBoundingClientRect().height);
+        if (isSticky) {
+          expandedHeaderHeight = Math.max(expandedHeaderHeight, currentHeight);
+        } else {
+          expandedHeaderHeight = currentHeight;
+        }
 
-      const applyStickyState = (shouldCollapse) => {
-        if (shouldCollapse && !isCollapsed) measureExpandedHeader();
-        isCollapsed = shouldCollapse;
-        page.classList.toggle("is-scrolled", isCollapsed);
+        const nextSpacerHeight = isSticky ? `${expandedHeaderHeight}px` : "0px";
+        if (nextSpacerHeight !== spacerHeight) {
+          spacerHeight = nextSpacerHeight;
+          stickySpacer.style.height = nextSpacerHeight;
+        }
       };
 
       const readStickyState = () => {
         frameId = 0;
-        const scrollY = window.scrollY;
-        const shouldCollapse = isCollapsed ? scrollY > 36 : scrollY > 112;
-        if (shouldCollapse !== isCollapsed) applyStickyState(shouldCollapse);
-        else measureExpandedHeader();
+        const currentScrollY = window.scrollY;
+        const isFirstSync = lastScrollY === null;
+        const scrollingDown = isFirstSync ? currentScrollY > 0 : currentScrollY > lastScrollY;
+        const scrollingUp = !isFirstSync && currentScrollY < lastScrollY;
+        const enterThreshold = mobileQuery.matches ? 12 : 16;
+        const exitThreshold = mobileQuery.matches
+          ? Math.max(120, Math.min(expandedHeaderHeight - 96, window.innerHeight * 0.48))
+          : 0;
+        let shouldStick = isSticky;
+
+        if (isSticky) {
+          shouldStick = currentScrollY > 0;
+          if (mobileQuery.matches && scrollingUp && currentScrollY <= exitThreshold) {
+            shouldStick = false;
+          }
+        } else {
+          shouldStick = currentScrollY > enterThreshold && (!mobileQuery.matches || scrollingDown || isFirstSync);
+        }
+
+        if (shouldStick !== isSticky) {
+          if (shouldStick) {
+            expandedHeaderHeight = Math.ceil(stickyShell.getBoundingClientRect().height);
+          } else {
+            page.classList.add("is-sticky-resetting");
+          }
+          isSticky = shouldStick;
+          page.classList.toggle("is-scrolled", isSticky);
+          syncHeaderHeight();
+          requestAnimationFrame(() => {
+            syncHeaderHeight();
+            if (!isSticky) {
+              page.classList.remove("is-sticky-resetting");
+            }
+          });
+          lastScrollY = currentScrollY;
+          return;
+        }
+
+        syncHeaderHeight();
+        lastScrollY = currentScrollY;
       };
 
       const syncStickyState = () => {
@@ -5257,10 +5075,19 @@
         frameId = requestAnimationFrame(readStickyState);
       };
 
-      syncStickyHeaderMetrics = syncStickyState;
+      const syncStickyLayout = () => {
+        syncHeaderHeight();
+        syncStickyState();
+      };
+
+      syncStickyHeaderMetrics = syncStickyLayout;
+      syncHeaderHeight();
       syncStickyState();
       window.addEventListener("scroll", syncStickyState, { passive: true });
-      window.addEventListener("resize", syncStickyState);
+      window.addEventListener("resize", syncStickyLayout);
+      if (typeof mobileQuery.addEventListener === "function") {
+        mobileQuery.addEventListener("change", syncStickyLayout);
+      }
     }
 
     async function bootstrap() {
