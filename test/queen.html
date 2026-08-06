@@ -639,6 +639,18 @@
       color: #fff8f0;
     }
 
+    .purpose-hero.is-title-only {
+      display: flex;
+      align-items: center;
+      min-height: 64px;
+      padding: 13px 18px;
+    }
+
+    .purpose-hero.is-title-only h2 {
+      font-size: clamp(1.55rem, 3vw, 2.15rem);
+      line-height: 1;
+    }
+
     .purpose-kicker {
       margin: 0;
       color: #e9bf69;
@@ -2756,13 +2768,56 @@
       letter-spacing: -0.02em;
     }
 
-    .request-item-row-copy .request-item-customizations {
-      overflow: visible;
-      color: #7b3d2f;
+    .order-customization-list {
+      display: grid;
+      gap: 4px;
+      margin-top: 2px;
+    }
+
+    .order-customization-line {
+      display: grid;
+      grid-template-columns: 60px minmax(0, 1fr);
+      gap: 7px;
+      align-items: start;
+      min-width: 0;
+      padding: 5px 8px;
+      border-radius: 8px;
       font-size: 0.72rem;
       font-weight: 850;
-      line-height: 1.4;
+      line-height: 1.35;
       white-space: normal;
+    }
+
+    .order-customization-line strong {
+      font-size: 0.64rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .order-customization-line span {
+      overflow: visible;
+      text-overflow: initial;
+      white-space: normal;
+    }
+
+    .order-customization-line.is-added {
+      border: 1px solid rgba(38, 112, 70, 0.16);
+      background: rgba(38, 112, 70, 0.09);
+      color: #245f40;
+    }
+
+    .order-customization-line.is-added strong {
+      color: #1c5638;
+    }
+
+    .order-customization-line.is-removed {
+      border: 1px solid rgba(145, 43, 62, 0.16);
+      background: rgba(145, 43, 62, 0.085);
+      color: #7d293a;
+    }
+
+    .order-customization-line.is-removed strong {
+      color: #8e2037;
     }
 
     .request-item-row small {
@@ -3658,6 +3713,116 @@
       grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.35fr);
     }
 
+    #partyEditModal .table-modal {
+      width: min(680px, 100%);
+    }
+
+    #tableOrderHistoryModal .table-modal {
+      width: min(700px, 100%);
+    }
+
+    #partyEditModal .table-modal-actions {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.25fr);
+    }
+
+    .party-edit-fields {
+      display: grid;
+      gap: 14px;
+    }
+
+    .party-edit-headcount {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 116px;
+      align-items: center;
+      gap: 14px;
+      padding: 13px 14px;
+      border: 1px solid rgba(113, 88, 60, 0.13);
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.78);
+    }
+
+    .party-edit-headcount label {
+      display: grid;
+      gap: 3px;
+      color: #49362b;
+      font-size: 0.86rem;
+      font-weight: 900;
+    }
+
+    .party-edit-headcount label small {
+      color: #897568;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .party-edit-headcount input {
+      width: 100%;
+      min-height: 48px;
+      border: 1px solid rgba(95, 39, 49, 0.2);
+      border-radius: 12px;
+      background: #fffdf9;
+      color: #38231f;
+      font: inherit;
+      font-size: 1.08rem;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .party-edit-table-section {
+      display: grid;
+      gap: 9px;
+    }
+
+    .party-edit-table-section > strong {
+      color: #463329;
+      font-size: 0.86rem;
+    }
+
+    .party-edit-table-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      max-height: 250px;
+      overflow-y: auto;
+      padding: 2px;
+    }
+
+    .party-edit-table-btn {
+      min-height: 48px;
+      border: 1px solid rgba(113, 88, 60, 0.16);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #4d392e;
+      font: inherit;
+      font-size: 0.88rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .party-edit-table-btn.is-selected {
+      border-color: transparent;
+      background: #6f2633;
+      color: #fffaf4;
+      box-shadow: 0 7px 14px rgba(111, 38, 51, 0.18);
+    }
+
+    .party-edit-table-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.38;
+    }
+
+    .party-edit-feedback {
+      min-height: 20px;
+      margin: 0;
+      color: #7f6c5e;
+      font-size: 0.76rem;
+      font-weight: 750;
+    }
+
+    .party-edit-feedback.is-error {
+      color: #922f46;
+    }
+
     .table-modal .pill-btn {
       min-height: 46px;
       border-color: rgba(113, 88, 60, 0.14);
@@ -3828,13 +3993,18 @@
       font-weight: 800;
     }
 
+    .table-order-history-items > div {
+      display: grid;
+      gap: 4px;
+    }
+
     .table-order-history-total {
       color: #5f2731;
       font-size: 0.82rem;
     }
 
     .table-order-history-actions {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
     }
 
     .table-order-history-actions .is-danger {
@@ -3917,6 +4087,12 @@
       text-overflow: ellipsis;
       white-space: nowrap;
       font-weight: 800;
+    }
+
+    .table-current-order-item-copy .order-customization-line span {
+      overflow: visible;
+      text-overflow: initial;
+      white-space: normal;
     }
 
     .table-current-order-item > small,
@@ -4718,6 +4894,11 @@
         border-radius: 22px;
       }
 
+      .purpose-hero.is-title-only {
+        min-height: 56px;
+        padding: 11px 17px;
+      }
+
       .purpose-hero h2 {
         font-size: 2.25rem;
       }
@@ -4732,11 +4913,15 @@
         gap: 12px;
       }
 
-      .app-view[data-view="tables"] > .purpose-hero {
+      .app-view[data-view="tables"] > .purpose-hero:not(.is-title-only) {
         grid-column: 1 / -1;
         grid-template-columns: auto auto minmax(0, 1fr);
         align-items: center;
         gap: 16px;
+      }
+
+      .app-view[data-view="tables"] > .purpose-hero.is-title-only {
+        grid-column: 1 / -1;
       }
 
       .app-view[data-view="tables"] > .purpose-hero h2,
@@ -4867,10 +5052,8 @@
     </section>
 
     <section class="app-view placeholder-view" data-view="tables">
-      <section class="purpose-hero">
-        <p class="purpose-kicker">Downtown floor</p>
+      <section class="purpose-hero is-title-only">
         <h2>Table Status</h2>
-        <p>Select every table for the group, assign one reusable QR to the Party, then close the Party after checkout.</p>
       </section>
 
       <section class="purpose-panel">
@@ -4940,24 +5123,8 @@
     </section>
 
     <section class="app-view placeholder-view is-active" data-view="online">
-      <section class="purpose-hero">
-        <p class="purpose-kicker">Live table service</p>
+      <section class="purpose-hero is-title-only">
         <h2>Live Orders</h2>
-        <p>New orders move straight to Preparing when confirmed. Mark them Served when they leave the kitchen.</p>
-        <div class="request-overview" aria-label="Active request summary">
-          <div class="request-metric">
-            <span>New</span>
-            <strong id="metricOpenRequests">0</strong>
-          </div>
-          <div class="request-metric">
-            <span>Preparing</span>
-            <strong id="metricOpenOrders">0</strong>
-          </div>
-          <div class="request-metric">
-            <span>Calls</span>
-            <strong id="metricOpenCalls">0</strong>
-          </div>
-        </div>
       </section>
 
       <section class="purpose-panel">
@@ -5171,7 +5338,39 @@
       <div class="table-modal-actions table-order-history-actions">
         <button class="pill-btn" id="dismissTableOrderHistory" type="button">Close</button>
         <button class="pill-btn" id="toggleTableOrderHistoryDetails" type="button">View details</button>
+        <button class="pill-btn" id="editActiveParty" type="button" hidden>Edit Party</button>
         <button class="pill-btn is-danger" id="endTableSessionFromHistory" type="button" hidden>End Party Session</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-backdrop" id="partyEditModal" aria-hidden="true">
+    <div class="table-modal" role="dialog" aria-modal="true" aria-labelledby="partyEditTitle">
+      <div class="table-modal-top">
+        <div>
+          <h3 id="partyEditTitle">Edit active Party</h3>
+          <p id="partyEditMeta">Update the headcount or tables without ending the session.</p>
+        </div>
+        <button class="modal-close" id="closePartyEditModal" type="button">×</button>
+      </div>
+      <div class="party-edit-fields">
+        <div class="party-edit-headcount">
+          <label for="partyEditGuestCount">
+            Party headcount
+            <small>Change the expected number of guests.</small>
+          </label>
+          <input id="partyEditGuestCount" type="number" min="1" max="100" inputmode="numeric" />
+        </div>
+        <section class="party-edit-table-section" aria-labelledby="partyEditTableLabel">
+          <strong id="partyEditTableLabel">Tables in this Party</strong>
+          <div class="party-edit-table-grid" id="partyEditTableGrid"></div>
+        </section>
+        <div class="table-selection-summary" id="partyEditSummary">No tables selected</div>
+        <p class="party-edit-feedback" id="partyEditFeedback">Select every table that should remain in this Party.</p>
+      </div>
+      <div class="table-modal-actions">
+        <button class="pill-btn" id="cancelPartyEdit" type="button">Cancel</button>
+        <button class="pill-btn primary" id="savePartyEdit" type="button">Save changes</button>
       </div>
     </div>
   </div>
@@ -5318,6 +5517,11 @@
       tableOrderHistoryCheckoutComplete: false,
       tableOrderHistoryDetailMode: false,
       tableSessionEnding: false,
+      partyEditPartyId: null,
+      partyEditTableCodes: new Set(),
+      partyEditGuestCount: 1,
+      partyEditSaving: false,
+      partyEditError: "",
       orderAlarmUnlocked: false,
       orderAlarmUnsupported: false,
       dismissedFullscreenRequestIds: new Set(),
@@ -5671,11 +5875,55 @@
       }).format(Number(value || 0));
     }
 
+    function stripOrderEmoji(value = "") {
+      return String(value || "")
+        .replace(/\p{Extended_Pictographic}/gu, "")
+        .replace(/[\uFE0F\u200D]/g, "")
+        .replace(/\s{2,}/g, " ")
+        .trim();
+    }
+
+    function getOrderCustomizationKind(option = {}) {
+      const searchableText = [
+        option.groupId,
+        option.groupLabel,
+        option.optionId,
+        option.label
+      ].map((value) => String(value || "").toLowerCase()).join(" ");
+      return /remove|without|exclude|omit|no[-\s]|빼|제외|삭제/.test(searchableText)
+        ? "removed"
+        : "added";
+    }
+
     function formatOrderItemCustomizations(customizations = []) {
       return (Array.isArray(customizations) ? customizations : [])
-        .map((option) => `${option.groupLabel || "Option"}: ${option.label || ""}`)
-        .filter((label) => !label.endsWith(": "))
+        .map((option) => {
+          const groupLabel = stripOrderEmoji(option.groupLabel || "Option");
+          const optionLabel = stripOrderEmoji(option.label || "");
+          return optionLabel ? `${groupLabel}: ${optionLabel}` : "";
+        })
+        .filter(Boolean)
         .join(" · ");
+    }
+
+    function renderOrderItemCustomizations(customizations = []) {
+      const options = (Array.isArray(customizations) ? customizations : [])
+        .map((option) => ({
+          kind: getOrderCustomizationKind(option),
+          label: stripOrderEmoji(option.label || "")
+        }))
+        .filter((option) => option.label);
+      if (!options.length) return "";
+      return `
+        <div class="order-customization-list" aria-label="Menu customizations">
+          ${options.map((option) => `
+            <div class="order-customization-line is-${option.kind}">
+              <strong>${option.kind === "removed" ? "Remove" : "Add"}</strong>
+              <span>${escapeHtml(option.label)}</span>
+            </div>
+          `).join("")}
+        </div>
+      `;
     }
 
     function formatRequestClock(value) {
@@ -5731,12 +5979,13 @@
           items.forEach((item) => {
             const quantity = Math.max(1, Number(item.quantity || 1));
             const name = item.nameEn || item.nameKo || "Menu item";
-            const customizations = formatOrderItemCustomizations(item.customizations);
+            const customizations = Array.isArray(item.customizations) ? item.customizations : [];
+            const customizationKey = formatOrderItemCustomizations(customizations);
             const menuType = String(item.menuType || item.category || "unassigned").trim().toLowerCase();
             const unitPrice = Number(item.unitPrice || 0);
             const rawLineTotal = Number(item.lineTotal);
             const lineTotal = Number.isFinite(rawLineTotal) ? rawLineTotal : unitPrice * quantity;
-            const key = `${name}\u0000${customizations}\u0000${menuType}\u0000${unitPrice}`;
+            const key = `${name}\u0000${customizationKey}\u0000${menuType}\u0000${unitPrice}`;
             const saved = lines.get(key) || { name, customizations, menuType, quantity: 0, total: 0 };
             saved.quantity += quantity;
             saved.total += lineTotal;
@@ -5747,7 +5996,7 @@
       if (fallbackQuantity || fallbackTotal) {
         lines.set("__legacy__", {
           name: "Recorded menu items",
-          customizations: "",
+          customizations: [],
           menuType: "unassigned",
           quantity: fallbackQuantity,
           total: fallbackTotal
@@ -5905,7 +6154,7 @@
                 <strong>${escapeHtml(item.quantity)}×</strong>
                 <div class="order-history-session-item-copy">
                   <span>${escapeHtml(item.name)}</span>
-                  ${item.customizations ? `<small>${escapeHtml(item.customizations)}</small>` : ""}
+                   ${renderOrderItemCustomizations(item.customizations)}
                 </div>
                 <b>${escapeHtml(formatRequestMoney(item.total))}</b>
               </div>
@@ -6595,8 +6844,12 @@
         ? request.items.map((item) => {
           const quantity = Number(item.quantity || 0);
           const name = item.nameEn || item.nameKo || "Menu item";
-          const customizations = formatOrderItemCustomizations(item.customizations);
-          return `<span>${escapeHtml(quantity)}× ${escapeHtml(name)}${customizations ? ` · ${escapeHtml(customizations)}` : ""}</span>`;
+          return `
+            <div>
+              <span>${escapeHtml(quantity)}× ${escapeHtml(name)}</span>
+              ${renderOrderItemCustomizations(item.customizations)}
+            </div>
+          `;
           }).join("") || "<span>No item details included.</span>"
         : `<span>${escapeHtml(requestTypeLabel)}</span>`;
       return `
@@ -6711,7 +6964,7 @@
                   <strong>${escapeHtml(item.quantity)}×</strong>
                   <div class="table-current-order-item-copy">
                     <span>${escapeHtml(item.name)}</span>
-                    ${item.customizations?.length ? `<small>${escapeHtml(formatOrderItemCustomizations(item.customizations))}</small>` : ""}
+                    ${renderOrderItemCustomizations(item.customizations)}
                     ${showTable && item.tableCode ? `<small>Table ${escapeHtml(item.tableCode)}</small>` : ""}
                   </div>
                   <b>${escapeHtml(formatRequestMoney(item.total))}</b>
@@ -6817,8 +7070,9 @@
       const list = document.getElementById("tableOrderHistoryList");
       const scope = document.getElementById("tableOrderHistoryScope");
       const detailButton = document.getElementById("toggleTableOrderHistoryDetails");
+      const editButton = document.getElementById("editActiveParty");
       const endButton = document.getElementById("endTableSessionFromHistory");
-      if (!tableCode || !title || !meta || !list || !scope || !detailButton || !endButton) return;
+      if (!tableCode || !title || !meta || !list || !scope || !detailButton || !editButton || !endButton) return;
 
       const tableRecord = getDiningTableRecord(tableCode);
       const activeParty = tableRecord?.current_party_id ? getDiningParty(tableRecord.current_party_id) : null;
@@ -6874,6 +7128,9 @@
       }
       detailButton.hidden = history.length === 0;
       detailButton.textContent = isDetailMode ? "Current order" : "View details";
+      editButton.hidden = !activeParty;
+      editButton.disabled = state.partyEditSaving;
+      editButton.textContent = state.partyEditSaving ? "Saving…" : "Edit Party";
       endButton.hidden = state.tableOrderHistoryCheckoutComplete || (!activeParty && !activeSession);
       endButton.disabled = state.tableSessionEnding;
       endButton.textContent = state.tableSessionEnding
@@ -6913,6 +7170,161 @@
         .map((partyTable) => partyTable.table_code)
         .find(Boolean);
       if (firstTable) openTableOrderHistoryModal(firstTable);
+    }
+
+    function getKnownDiningTableCodes() {
+      const layoutTableCodes = [...state.tableLayouts.values()].flatMap((layout) => (
+        (Array.isArray(layout?.items) ? layout.items : [])
+          .filter((item) => item.type === "table")
+          .map((item) => item.tableCode)
+      ));
+      return Array.from(new Map(
+        [
+          ...state.tableOptions,
+          ...state.partySnapshot.tables.map((table) => table.table_code),
+          ...layoutTableCodes
+        ]
+          .map((tableCode) => String(tableCode || "").trim())
+          .filter(Boolean)
+          .map((tableCode) => [tableCode.toLowerCase(), tableCode])
+      ).values()).sort((left, right) => left.localeCompare(right, undefined, {
+        numeric: true,
+        sensitivity: "base"
+      }));
+    }
+
+    function renderPartyEditModal() {
+      const party = getDiningParty(state.partyEditPartyId);
+      const title = document.getElementById("partyEditTitle");
+      const meta = document.getElementById("partyEditMeta");
+      const input = document.getElementById("partyEditGuestCount");
+      const grid = document.getElementById("partyEditTableGrid");
+      const summary = document.getElementById("partyEditSummary");
+      const feedback = document.getElementById("partyEditFeedback");
+      const saveButton = document.getElementById("savePartyEdit");
+      if (!party || !title || !meta || !input || !grid || !summary || !feedback || !saveButton) return;
+
+      const selectedCodes = [...state.partyEditTableCodes].sort((left, right) => (
+        left.localeCompare(right, undefined, { numeric: true, sensitivity: "base" })
+      ));
+      const validGuestCount = Number.isInteger(state.partyEditGuestCount)
+        && state.partyEditGuestCount >= 1
+        && state.partyEditGuestCount <= 100;
+      const tableCodes = getKnownDiningTableCodes();
+      title.textContent = `Edit Party #${party.id}`;
+      meta.textContent = `${formatDiningQrList(getDiningPartyQrs(party.id))} stays active while you update this Party.`;
+      if (document.activeElement !== input) {
+        input.value = validGuestCount ? String(state.partyEditGuestCount) : "";
+      }
+      input.disabled = state.partyEditSaving;
+      grid.innerHTML = tableCodes.map((tableCode) => {
+        const tableRecord = getDiningTableRecord(tableCode);
+        const occupiedByOtherParty = Boolean(
+          tableRecord?.current_party_id
+          && tableRecord.current_party_id !== party.id
+        );
+        const selected = state.partyEditTableCodes.has(tableCode);
+        return `
+          <button
+            class="party-edit-table-btn ${selected ? "is-selected" : ""}"
+            type="button"
+            data-party-edit-table="${escapeHtml(tableCode)}"
+            aria-pressed="${selected ? "true" : "false"}"
+            ${occupiedByOtherParty || state.partyEditSaving ? "disabled" : ""}
+            title="${occupiedByOtherParty ? `Used by Party #${tableRecord.current_party_id}` : selected ? "Remove from this Party" : "Add to this Party"}"
+          >${escapeHtml(tableCode)}</button>
+        `;
+      }).join("");
+      summary.textContent = selectedCodes.length
+        ? `Tables ${selectedCodes.join(" + ")} · ${validGuestCount ? `${state.partyEditGuestCount} guest${state.partyEditGuestCount === 1 ? "" : "s"}` : "Invalid headcount"}`
+        : "Keep at least one table in the Party";
+      feedback.textContent = state.partyEditError || "Selected tables stay together under the same active QR session.";
+      feedback.classList.toggle("is-error", Boolean(state.partyEditError));
+      saveButton.disabled = state.partyEditSaving || !selectedCodes.length || !validGuestCount;
+      saveButton.textContent = state.partyEditSaving ? "Saving…" : "Save changes";
+    }
+
+    function openPartyEditModal(partyId) {
+      const party = getDiningParty(partyId);
+      if (!party || party.status !== "ACTIVE") return;
+      state.partyEditPartyId = party.id;
+      state.partyEditTableCodes = new Set(
+        getDiningPartyTables(party.id, { activeOnly: true })
+          .map((partyTable) => partyTable.table_code)
+          .filter(Boolean)
+      );
+      state.partyEditGuestCount = Math.max(1, Number(party.expected_guest_count) || 1);
+      state.partyEditError = "";
+      renderPartyEditModal();
+      const modal = document.getElementById("partyEditModal");
+      modal?.classList.add("is-open");
+      modal?.setAttribute("aria-hidden", "false");
+      window.setTimeout(() => document.getElementById("partyEditGuestCount")?.focus(), 0);
+    }
+
+    function closePartyEditModal() {
+      if (state.partyEditSaving) return;
+      state.partyEditPartyId = null;
+      state.partyEditTableCodes = new Set();
+      state.partyEditGuestCount = 1;
+      state.partyEditError = "";
+      const modal = document.getElementById("partyEditModal");
+      modal?.classList.remove("is-open");
+      modal?.setAttribute("aria-hidden", "true");
+    }
+
+    async function savePartyEdit() {
+      const partyId = Number(state.partyEditPartyId);
+      const tableCodes = [...state.partyEditTableCodes];
+      const expectedGuestCount = Number(state.partyEditGuestCount);
+      if (
+        !Number.isFinite(partyId)
+        || !tableCodes.length
+        || !Number.isInteger(expectedGuestCount)
+        || expectedGuestCount < 1
+        || expectedGuestCount > 100
+        || state.partyEditSaving
+      ) return;
+
+      state.partyEditSaving = true;
+      state.partyEditError = "";
+      renderPartyEditModal();
+      let succeeded = false;
+      try {
+        await callQueenDiningRpc("update_dining_party_setup", {
+          p_branch: ADMIN_SHEET_CONFIG.branchLabel.toLowerCase(),
+          p_party_id: partyId,
+          p_table_codes: tableCodes,
+          p_expected_guest_count: expectedGuestCount
+        });
+        await refreshPartyOperationData();
+        const activeTableCodes = getDiningPartyTables(partyId, { activeOnly: true })
+          .map((partyTable) => partyTable.table_code)
+          .filter(Boolean);
+        if (
+          state.tableOrderHistoryTableCode
+          && !activeTableCodes.some((tableCode) => (
+            tableCode.toLowerCase() === state.tableOrderHistoryTableCode.toLowerCase()
+          ))
+        ) {
+          state.tableOrderHistoryTableCode = activeTableCodes[0] || null;
+        }
+        succeeded = true;
+      } catch (error) {
+        console.error("Party edit failed", error);
+        state.partyEditError = /update_dining_party_setup|PGRST202|schema cache|function.*not found/i.test(String(error?.message || ""))
+          ? "Install test/dining-party-edit.sql in Supabase, then try again."
+          : "The Party could not be updated. Check whether another Party is using one of these tables.";
+      } finally {
+        state.partyEditSaving = false;
+      }
+
+      if (succeeded) {
+        closePartyEditModal();
+        renderDiningRequests();
+      } else {
+        renderPartyEditModal();
+      }
     }
 
     function closeTableOrderHistoryModal() {
@@ -7638,14 +8050,13 @@
               const quantity = Number(item.quantity || 0);
               const name = item.nameEn || item.nameKo || "Menu item";
               const lineTotal = Number(item.lineTotal ?? (Number(item.unitPrice || 0) * quantity));
-              const customizations = formatOrderItemCustomizations(item.customizations);
               const menuType = String(item.menuType || item.category || "unassigned").trim().toLowerCase();
               return `
                 <div class="request-item-row" data-menu-type="${escapeHtml(menuType)}">
                   <strong>${escapeHtml(quantity)}×</strong>
                   <div class="request-item-row-copy">
                     <span>${escapeHtml(name)}</span>
-                    ${customizations ? `<small class="request-item-customizations">${escapeHtml(customizations)}</small>` : ""}
+                    ${renderOrderItemCustomizations(item.customizations)}
                   </div>
                   <small>${escapeHtml(formatRequestMoney(lineTotal))}</small>
                 </div>
@@ -7756,9 +8167,12 @@
       const newOrders = activeRequests.filter((request) => request.kind === "order" && request.status === "new").length;
       const preparingOrders = activeRequests.filter((request) => request.kind === "order" && request.status !== "new").length;
       const openCalls = activeRequests.filter((request) => request.kind === "service").length;
-      document.getElementById("metricOpenRequests").textContent = String(newOrders);
-      document.getElementById("metricOpenOrders").textContent = String(preparingOrders);
-      document.getElementById("metricOpenCalls").textContent = String(openCalls);
+      const openRequestMetric = document.getElementById("metricOpenRequests");
+      const openOrderMetric = document.getElementById("metricOpenOrders");
+      const openCallMetric = document.getElementById("metricOpenCalls");
+      if (openRequestMetric) openRequestMetric.textContent = String(newOrders);
+      if (openOrderMetric) openOrderMetric.textContent = String(preparingOrders);
+      if (openCallMetric) openCallMetric.textContent = String(openCalls);
       navCount.textContent = String(activeRequests.length);
       navCount.hidden = activeRequests.length === 0;
       if (queueTitle) {
@@ -7777,6 +8191,9 @@
       renderPastOrderHistory();
       if (document.getElementById("tableOrderHistoryModal")?.classList.contains("is-open")) {
         renderTableOrderHistoryModal();
+      }
+      if (document.getElementById("partyEditModal")?.classList.contains("is-open")) {
+        renderPartyEditModal();
       }
 
       document.querySelectorAll("[data-request-filter]").forEach((button) => {
@@ -9745,6 +10162,10 @@
 
     document.getElementById("closeTableOrderHistoryModal").addEventListener("click", closeTableOrderHistoryModal);
     document.getElementById("dismissTableOrderHistory").addEventListener("click", closeTableOrderHistoryModal);
+    document.getElementById("editActiveParty").addEventListener("click", () => {
+      const tableRecord = getDiningTableRecord(state.tableOrderHistoryTableCode);
+      if (tableRecord?.current_party_id) openPartyEditModal(tableRecord.current_party_id);
+    });
     document.getElementById("endTableSessionFromHistory").addEventListener("click", endSelectedTableSession);
     document.getElementById("toggleTableOrderHistoryDetails").addEventListener("click", () => {
       state.tableOrderHistoryDetailMode = !state.tableOrderHistoryDetailMode;
@@ -9766,6 +10187,31 @@
     });
     document.getElementById("tableOrderHistoryModal").addEventListener("click", (event) => {
       if (event.target === event.currentTarget) closeTableOrderHistoryModal();
+    });
+
+    document.getElementById("partyEditTableGrid").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-party-edit-table]");
+      if (!button || button.disabled || state.partyEditSaving) return;
+      const tableCode = button.dataset.partyEditTable;
+      if (state.partyEditTableCodes.has(tableCode)) {
+        state.partyEditTableCodes.delete(tableCode);
+      } else {
+        state.partyEditTableCodes.add(tableCode);
+      }
+      state.partyEditError = "";
+      renderPartyEditModal();
+    });
+    document.getElementById("partyEditGuestCount").addEventListener("input", (event) => {
+      const value = Number.parseInt(event.currentTarget.value, 10);
+      state.partyEditGuestCount = Number.isInteger(value) ? value : 0;
+      state.partyEditError = "";
+      renderPartyEditModal();
+    });
+    document.getElementById("savePartyEdit").addEventListener("click", savePartyEdit);
+    document.getElementById("closePartyEditModal").addEventListener("click", closePartyEditModal);
+    document.getElementById("cancelPartyEdit").addEventListener("click", closePartyEditModal);
+    document.getElementById("partyEditModal").addEventListener("click", (event) => {
+      if (event.target === event.currentTarget) closePartyEditModal();
     });
 
     document.getElementById("refreshRequestsBtn").addEventListener("click", () => {
@@ -9855,7 +10301,9 @@
 
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
-        if (document.getElementById("tableOrderHistoryModal")?.classList.contains("is-open")) {
+        if (document.getElementById("partyEditModal")?.classList.contains("is-open")) {
+          closePartyEditModal();
+        } else if (document.getElementById("tableOrderHistoryModal")?.classList.contains("is-open")) {
           closeTableOrderHistoryModal();
         } else if (document.getElementById("guestLookupModal")?.classList.contains("is-open")) {
           closeGuestLookupModal();
