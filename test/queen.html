@@ -7313,7 +7313,7 @@
       } catch (error) {
         console.error("Party edit failed", error);
         state.partyEditError = /update_dining_party_setup|PGRST202|schema cache|function.*not found/i.test(String(error?.message || ""))
-          ? "Install test/dining-party-edit.sql in Supabase, then try again."
+          ? "Install test/dining-complete-setup.sql in Supabase, then try again."
           : "The Party could not be updated. Check whether another Party is using one of these tables.";
       } finally {
         state.partyEditSaving = false;
