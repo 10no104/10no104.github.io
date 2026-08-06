@@ -2608,6 +2608,21 @@
       white-space: nowrap;
     }
 
+    .request-item-row-copy {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .request-item-row-copy .request-item-customizations {
+      overflow: visible;
+      color: #7b4d35;
+      font-size: 0.68rem;
+      font-weight: 800;
+      line-height: 1.35;
+      white-space: normal;
+    }
+
     .request-item-row small {
       color: #806d5e;
       font-weight: 700;
@@ -5486,6 +5501,13 @@
       }).format(Number(value || 0));
     }
 
+    function formatOrderItemCustomizations(customizations = []) {
+      return (Array.isArray(customizations) ? customizations : [])
+        .map((option) => `${option.groupLabel || "Option"}: ${option.label || ""}`)
+        .filter((label) => !label.endsWith(": "))
+        .join(" · ");
+    }
+
     function formatRequestClock(value) {
       const date = new Date(value);
       if (Number.isNaN(date.getTime())) return "Time unavailable";
@@ -5595,9 +5617,10 @@
 
     function renderPartyOrderDetail(order) {
       const itemSummary = order.kind === "order"
-        ? order.items.map((item) => (
-            `${Number(item.quantity || 0)}× ${item.nameEn || item.nameKo || "Menu item"}`
-          )).join(" · ")
+        ? order.items.map((item) => {
+            const customizations = formatOrderItemCustomizations(item.customizations);
+            return `${Number(item.quantity || 0)}× ${item.nameEn || item.nameKo || "Menu item"}${customizations ? ` (${customizations})` : ""}`;
+          }).join(" · ")
         : REQUEST_TYPE_LABELS[order.request_type] || "Service request";
       const events = state.partySnapshot.orderEvents.filter(
         (event) => event.request_id === order.id
@@ -6244,9 +6267,10 @@
       );
       const itemsMarkup = request.kind === "order"
         ? request.items.map((item) => {
-            const quantity = Number(item.quantity || 0);
-            const name = item.nameEn || item.nameKo || "Menu item";
-            return `<span>${escapeHtml(quantity)}× ${escapeHtml(name)}</span>`;
+          const quantity = Number(item.quantity || 0);
+          const name = item.nameEn || item.nameKo || "Menu item";
+          const customizations = formatOrderItemCustomizations(item.customizations);
+          return `<span>${escapeHtml(quantity)}× ${escapeHtml(name)}${customizations ? ` · ${escapeHtml(customizations)}` : ""}</span>`;
           }).join("") || "<span>No item details included.</span>"
         : `<span>${escapeHtml(requestTypeLabel)}</span>`;
       return `
@@ -6314,8 +6338,10 @@
           const name = item.nameEn || item.nameKo || "Menu item";
           const tableCode = request.table_code || "";
           const lineTotal = Number(item.lineTotal ?? (Number(item.unitPrice || 0) * quantity));
-          const key = `${String(name).toLowerCase()}::${String(tableCode).toLowerCase()}`;
-          const current = itemMap.get(key) || { name, tableCode, quantity: 0, total: 0 };
+          const customizations = Array.isArray(item.customizations) ? item.customizations : [];
+          const customizationKey = formatOrderItemCustomizations(customizations).toLowerCase();
+          const key = `${String(item.cartKey || name).toLowerCase()}::${customizationKey}::${String(tableCode).toLowerCase()}`;
+          const current = itemMap.get(key) || { name, tableCode, customizations, quantity: 0, total: 0 };
           current.quantity += quantity;
           current.total += lineTotal;
           itemMap.set(key, current);
@@ -6359,6 +6385,7 @@
                   <strong>${escapeHtml(item.quantity)}×</strong>
                   <div class="table-current-order-item-copy">
                     <span>${escapeHtml(item.name)}</span>
+                    ${item.customizations?.length ? `<small>${escapeHtml(formatOrderItemCustomizations(item.customizations))}</small>` : ""}
                     ${showTable && item.tableCode ? `<small>Table ${escapeHtml(item.tableCode)}</small>` : ""}
                   </div>
                   <b>${escapeHtml(formatRequestMoney(item.total))}</b>
@@ -7296,10 +7323,14 @@
               const quantity = Number(item.quantity || 0);
               const name = item.nameEn || item.nameKo || "Menu item";
               const lineTotal = Number(item.lineTotal ?? (Number(item.unitPrice || 0) * quantity));
+              const customizations = formatOrderItemCustomizations(item.customizations);
               return `
                 <div class="request-item-row">
                   <strong>${escapeHtml(quantity)}×</strong>
-                  <span>${escapeHtml(name)}</span>
+                  <div class="request-item-row-copy">
+                    <span>${escapeHtml(name)}</span>
+                    ${customizations ? `<small class="request-item-customizations">${escapeHtml(customizations)}</small>` : ""}
+                  </div>
                   <small>${escapeHtml(formatRequestMoney(lineTotal))}</small>
                 </div>
               `;
