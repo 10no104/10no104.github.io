@@ -1964,6 +1964,34 @@
       padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
     }
 
+    .menu-sticky-shell,
+    .menu-page.is-scrolled .menu-sticky-shell {
+      position: sticky;
+      top: 0;
+      left: auto;
+      right: auto;
+      z-index: 60;
+      transition: padding 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+        background 0.32s ease,
+        box-shadow 0.32s ease;
+    }
+
+    .menu-sticky-spacer {
+      display: none;
+      height: 0 !important;
+    }
+
+    .menu-sticky-inner,
+    .menu-home-link,
+    .menu-home-logo {
+      transition-duration: 0.32s;
+      transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .menu-sticky-inner {
+      transition-property: gap, padding, border-radius, background, box-shadow;
+    }
+
     .page-sections {
       width: 100%;
       margin: 0;
@@ -2019,6 +2047,104 @@
     .status-section .guest-session-panel {
       margin-bottom: 14px;
       box-shadow: none;
+    }
+
+    .order-inline-card {
+      display: grid;
+      gap: 14px;
+      margin-bottom: 14px;
+      padding: 16px;
+      border: 1px solid rgba(125, 98, 63, 0.14);
+      border-radius: 20px;
+      background: linear-gradient(145deg, rgba(255, 248, 239, 0.98), rgba(250, 240, 228, 0.92));
+    }
+
+    .order-inline-card .order-list {
+      gap: 9px;
+    }
+
+    .order-inline-card .order-item {
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.78);
+    }
+
+    .order-inline-card .review-order-combined {
+      margin-top: 0;
+    }
+
+    .order-inline-card .review-order-combined > div {
+      display: grid;
+      gap: 3px;
+    }
+
+    .order-inline-card form {
+      display: grid;
+      gap: 8px;
+    }
+
+    .order-server-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 22px;
+      padding: 14px 16px;
+      border: 1px solid rgba(90, 17, 34, 0.13);
+      border-radius: 18px;
+      background: rgba(90, 17, 34, 0.06);
+    }
+
+    .order-server-card > div {
+      display: grid;
+      gap: 3px;
+    }
+
+    .order-server-card strong {
+      color: #3b2418;
+      font-size: 0.92rem;
+    }
+
+    .order-server-card span {
+      color: #7a695d;
+      font-size: 0.74rem;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .status-section .server-call-btn {
+      position: static;
+      display: inline-flex;
+      flex: 0 0 auto;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      opacity: 1;
+      transform: none;
+      pointer-events: auto;
+    }
+
+    .guest-order-card.is-served-compact {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      opacity: 0.76;
+    }
+
+    .guest-order-card.is-served-compact .guest-order-card-top {
+      grid-column: 1 / -1;
+    }
+
+    .guest-order-card.is-served-compact .guest-order-items {
+      overflow: hidden;
+      min-width: 0;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .guest-order-card.is-served-compact .guest-order-card-meta {
+      justify-content: flex-end;
+      white-space: nowrap;
     }
 
     .order-section-cart {
@@ -2155,12 +2281,50 @@
       height: 0 !important;
     }
 
-    body.menu-page.is-detail-view .to-top,
-    body.menu-page.is-detail-view .server-call-btn {
+    body.menu-page.is-detail-view .to-top {
       display: none !important;
     }
 
     @media (max-width: 640px) {
+      .menu-sticky-shell .tabs,
+      .menu-sticky-shell .subtabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+
+      .menu-sticky-shell .tabs::-webkit-scrollbar,
+      .menu-sticky-shell .subtabs::-webkit-scrollbar {
+        display: none;
+      }
+
+      .menu-page.is-scrolled .menu-sticky-inner {
+        display: grid;
+        gap: 6px;
+        padding: 8px 10px;
+      }
+
+      .menu-page.is-scrolled .menu-homebar {
+        justify-content: center;
+        width: 100%;
+      }
+
+      .menu-page.is-scrolled .menu-home-link {
+        width: 40px;
+        height: 40px;
+        margin: 0;
+        border-radius: 999px;
+      }
+
+      .menu-page.is-scrolled .menu-home-logo {
+        width: 26px;
+        height: 26px;
+      }
+
+      .menu-page.is-scrolled .menu-sticky-shell .tabs {
+        width: 100%;
+      }
+
       .menu-section .section-shell {
         width: min(calc(100% - 20px), 420px);
         margin-bottom: 40px;
@@ -2179,8 +2343,26 @@
         align-items: flex-start;
       }
 
+      .final-bill-section .section-heading {
+        flex-direction: column;
+      }
+
+      .final-bill-section .guest-bill-link {
+        width: 100%;
+        justify-content: center;
+      }
+
       .order-section-cart {
         padding: 13px 14px;
+      }
+
+      .order-server-card {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .status-section .server-call-btn {
+        width: 100%;
       }
 
       .guest-order-status-line,
@@ -2254,9 +2436,9 @@
       <div class="section-shell">
         <div class="section-heading">
           <div>
-            <p class="section-eyebrow">LIVE STATUS</p>
-            <h2 id="statusSectionTitle">Order &amp; status</h2>
-            <p>Add or review this device's order, then follow the restaurant's progress.</p>
+            <p class="section-eyebrow">YOUR ORDER</p>
+            <h2 id="statusSectionTitle">Order</h2>
+            <p>Review new items, send them, and follow every order from this device.</p>
           </div>
           <span class="section-context" id="statusSummary">Waiting for orders</span>
         </div>
@@ -2272,17 +2454,46 @@
           </div>
           <p class="guest-session-message" id="guestSessionMessage">Please wait while this QR is verified.</p>
         </section>
-        <button class="order-section-cart" id="openOrderDrawerButton" type="button">
-          <span>
-            <small>THIS DEVICE</small>
-            <strong id="orderSectionCartSummary">No new items</strong>
-          </span>
-          <span class="order-section-cart-action">Review &amp; send</span>
-        </button>
+
+        <section class="order-inline-card" aria-labelledby="newOrderHeading">
+          <div class="review-order-section-head">
+            <div>
+              <strong id="newOrderHeading">New items</strong>
+              <span>Only these items will be sent now</span>
+            </div>
+            <strong class="review-order-section-total" id="newOrderTotal">$0.00</strong>
+          </div>
+          <div class="order-list" id="orderListMobile"></div>
+          <div class="order-summary" id="orderSummaryMobile"></div>
+          <div class="review-order-combined">
+            <div>
+              <span>This device after sending</span>
+              <strong id="combinedOrderItemCount">0 items</strong>
+            </div>
+            <strong id="combinedOrderTotal">$0.00</strong>
+          </div>
+          <form id="orderForm">
+            <input id="storeSelect" name="store" type="hidden" value="downtown" />
+            <input id="tableCode" name="tableCode" type="hidden" value="A12" />
+            <input id="guestCount" name="guestCount" type="hidden" value="2" />
+            <input id="orderNote" name="orderNote" type="hidden" value="" />
+            <button class="drawer-submit-btn" id="orderSubmitBtn" type="button">Send new items</button>
+            <p class="order-status" id="orderStatus" aria-live="polite"></p>
+          </form>
+        </section>
+
+        <section class="order-server-card">
+          <div>
+            <strong>Need something?</strong>
+            <span>Request water, napkins, or a server from this table.</span>
+          </div>
+          <button class="server-call-btn" id="serverCallBtn" type="button" aria-label="Call server">Call server</button>
+        </section>
+
         <div class="guest-order-history-head">
           <div>
-            <h3>Your recent orders</h3>
-            <span>Only orders from this device are shown here.</span>
+            <h3>All orders</h3>
+            <span>Active orders stay detailed. Served orders are shown in a compact row.</span>
           </div>
           <span id="statusLastUpdated">—</span>
         </div>
@@ -2295,8 +2506,8 @@
         <div class="section-heading">
           <div>
             <p class="section-eyebrow">FINAL BILL</p>
-            <h2 id="finalBillSectionTitle">Final Bill</h2>
-            <p>See the total across all assigned tables and this device's share.</p>
+            <h2 id="finalBillSectionTitle">Bill</h2>
+            <p>See every order on this table bill. Orders from this device are highlighted.</p>
           </div>
           <a class="guest-bill-link" id="guestBillLink" href="../cashier.html" hidden>Payment code / QR</a>
         </div>
@@ -2340,7 +2551,7 @@
         <path d="M4 12h16"></path>
         <path d="M4 18h10"></path>
       </svg>
-      <span>메뉴</span>
+      <span>Menu</span>
     </button>
     <button class="bottom-nav-item" type="button" data-section-target="statusSection">
       <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -2349,7 +2560,7 @@
         <path d="M9 8a3 3 0 0 1 6 0"></path>
         <path d="M9 13h6"></path>
       </svg>
-      <span>주문 · 현황</span>
+      <span>Order</span>
       <b class="bottom-nav-badge" id="bottomOrderBadge" hidden>0</b>
     </button>
     <button class="bottom-nav-item" type="button" data-section-target="finalBillSection">
@@ -2359,65 +2570,11 @@
         <path d="M9 12h6"></path>
         <path d="M9 16h3"></path>
       </svg>
-      <span>Final Bill</span>
+      <span>Bill</span>
     </button>
   </nav>
 
-  <div class="cart-drawer-backdrop" id="cartDrawerBackdrop" hidden>
-    <div class="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cartDrawerHeading">
-      <div class="cart-drawer-grab" aria-hidden="true"></div>
-      <div class="cart-drawer-header">
-        <div class="order-card-header">
-          <p class="order-eyebrow">Current Bill</p>
-          <h3 id="cartDrawerHeading">Review Order</h3>
-        </div>
-        <button class="cart-drawer-close" id="cartDrawerCloseBtn" type="button" aria-label="Close order drawer">×</button>
-      </div>
-      <div class="cart-drawer-body">
-        <section class="order-card" aria-label="Order summary">
-          <section class="review-order-section is-sent" aria-labelledby="sentOrderHeading">
-            <div class="review-order-section-head">
-              <div>
-                <strong id="sentOrderHeading">Ordered so far</strong>
-                <span>Items already sent to the restaurant</span>
-              </div>
-              <strong class="review-order-section-total" id="sentOrderTotal">$0.00</strong>
-            </div>
-            <div class="sent-order-list" id="sentOrderListMobile"></div>
-            <div class="order-summary" id="sentOrderSummaryMobile"></div>
-          </section>
-          <section class="review-order-section is-new" aria-labelledby="newOrderHeading">
-            <div class="review-order-section-head">
-              <div>
-                <strong id="newOrderHeading">New items</strong>
-                <span>Only these items will be sent now</span>
-              </div>
-              <strong class="review-order-section-total" id="newOrderTotal">$0.00</strong>
-            </div>
-            <div class="order-list" id="orderListMobile"></div>
-            <div class="order-summary" id="orderSummaryMobile"></div>
-          </section>
-          <div class="review-order-combined">
-            <div>
-              <span>Bill total after sending</span>
-              <strong id="combinedOrderItemCount">0 items</strong>
-            </div>
-            <strong id="combinedOrderTotal">$0.00</strong>
-          </div>
-          <form id="orderForm">
-            <input id="storeSelect" name="store" type="hidden" value="downtown" />
-            <input id="tableCode" name="tableCode" type="hidden" value="A12" />
-            <input id="guestCount" name="guestCount" type="hidden" value="2" />
-            <input id="orderNote" name="orderNote" type="hidden" value="" />
-            <button class="drawer-submit-btn" id="drawerSubmitBtn" type="button">Send new items</button>
-            <p class="order-status" id="orderStatus" aria-live="polite"></p>
-          </form>
-        </section>
-      </div>
-    </div>
-  </div>
   <button class="to-top" id="toTopBtn" type="button" aria-label="Back to top">↑ Top</button>
-  <button class="server-call-btn" id="serverCallBtn" type="button" aria-label="Call server">Call server</button>
   <div class="server-modal-backdrop" id="serverModalBackdrop" hidden>
     <div class="server-modal" role="dialog" aria-modal="true" aria-labelledby="serverModalHeading">
       <div class="server-modal-copy">
@@ -2525,7 +2682,6 @@
     let selectedSubcategory = "All";
     let selectedDietaryTags = new Set();
     let syncStickyHeaderMetrics = () => {};
-    let isCartDrawerOpen = false;
     let isServerModalOpen = false;
     let selectedServerRequestType = "water";
     let menuImageObserver = null;
@@ -3380,10 +3536,15 @@
       const updatedEl = document.getElementById("statusLastUpdated");
       if (!historyEl || !summaryEl || !updatedEl) return;
 
-      const requests = getSentOrderRequests()
+      const requests = guestSessionRequests
+        .filter((request) => request.kind === "order")
         .slice()
-        .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-      const latest = requests[0];
+        .sort((a, b) => {
+          const servedDifference = Number(a.status === "completed") - Number(b.status === "completed");
+          return servedDifference || new Date(b.created_at || 0) - new Date(a.created_at || 0);
+        });
+      const latest = requests.find((request) => !["completed", "canceled"].includes(request.status))
+        || requests.slice().sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))[0];
       const latestMeta = latest ? getOrderStatusMeta(latest.status) : null;
       summaryEl.textContent = latest
         ? `${latestMeta.label} · Order #${latest.id || "—"}`
@@ -3393,12 +3554,26 @@
         : "—";
 
       if (!requests.length) {
-        historyEl.innerHTML = `<div class="guest-order-history-empty">No orders from this device yet. Your sent orders will appear here.</div>`;
+        historyEl.innerHTML = `<div class="guest-order-history-empty">No orders from this device yet.</div>`;
         return;
       }
 
       historyEl.innerHTML = requests.map((request) => {
         const meta = getOrderStatusMeta(request.status);
+        if (request.status === "completed") {
+          return `
+            <article class="guest-order-card is-finished is-served-compact">
+              <div class="guest-order-card-top">
+                <strong>Order #${escapeHtml(request.id || "—")} · Served</strong>
+                <time>${escapeHtml(formatGuestRequestTime(request.created_at))}</time>
+              </div>
+              <div class="guest-order-items">${escapeHtml(getOrderItemSummary(request))}</div>
+              <div class="guest-order-card-meta">
+                <strong>${escapeHtml(formatCurrency(request.total))}</strong>
+              </div>
+            </article>
+          `;
+        }
         const steps = ["Sent", "Confirmed", "Preparing", "Served"]
           .map((label, index) => {
             const classes = [
@@ -3490,7 +3665,7 @@
           <article class="final-bill-order-card ${isMine ? "is-mine" : ""}">
             <div class="final-bill-order-head">
               <div>
-                <span class="final-bill-source">${isMine ? "This device" : `Table ${escapeHtml(request.table_code || "—")}`}</span>
+                <span class="final-bill-source">${isMine ? "This device" : `Other device · Table ${escapeHtml(request.table_code || "—")}`}</span>
                 <strong>Order #${escapeHtml(request.id || "—")}</strong>
               </div>
               <time>${escapeHtml(formatGuestRequestTime(request.created_at))}</time>
@@ -3561,9 +3736,9 @@
       document.querySelectorAll(".menu-add-btn, #serverCallBtn, #serverModalConfirmBtn").forEach((button) => {
         button.disabled = !canOrder || isDiningRequestSubmitting;
       });
-      const drawerSubmitButton = document.getElementById("drawerSubmitBtn");
-      if (drawerSubmitButton) {
-        drawerSubmitButton.disabled = !canOrder || isDiningRequestSubmitting || !cartItems.length;
+      const orderSubmitButton = document.getElementById("orderSubmitBtn");
+      if (orderSubmitButton) {
+        orderSubmitButton.disabled = !canOrder || isDiningRequestSubmitting || !cartItems.length;
       }
       renderGuestOrderHistory();
     }
@@ -3920,34 +4095,6 @@
       return rows[0] || null;
     }
 
-    function openCartDrawer() {
-      const backdrop = document.getElementById("cartDrawerBackdrop");
-      const drawer = backdrop?.querySelector(".cart-drawer");
-      if (!backdrop) return;
-      backdrop.hidden = false;
-      backdrop.classList.add("is-open");
-      if (drawer) {
-        drawer.classList.remove("is-dragging");
-        drawer.style.transform = "";
-      }
-      document.body.style.overflow = "hidden";
-      isCartDrawerOpen = true;
-    }
-
-    function closeCartDrawer() {
-      const backdrop = document.getElementById("cartDrawerBackdrop");
-      const drawer = backdrop?.querySelector(".cart-drawer");
-      if (!backdrop) return;
-      if (drawer) {
-        drawer.classList.remove("is-dragging");
-        drawer.style.transform = "";
-      }
-      backdrop.classList.remove("is-open");
-      backdrop.hidden = true;
-      document.body.style.overflow = "";
-      isCartDrawerOpen = false;
-    }
-
     function openServerModal() {
       const backdrop = document.getElementById("serverModalBackdrop");
       if (!backdrop) return;
@@ -3962,7 +4109,7 @@
       if (!backdrop) return;
       backdrop.classList.remove("is-open");
       backdrop.hidden = true;
-      document.body.style.overflow = isCartDrawerOpen ? "hidden" : "";
+      document.body.style.overflow = "";
       isServerModalOpen = false;
     }
 
@@ -3990,23 +4137,15 @@
     function renderOrderSummary() {
       const mobileOrderListEl = document.getElementById("orderListMobile");
       const mobileOrderSummaryEl = document.getElementById("orderSummaryMobile");
-      const sentOrderListEl = document.getElementById("sentOrderListMobile");
-      const sentOrderSummaryEl = document.getElementById("sentOrderSummaryMobile");
-      const sentOrderTotalEl = document.getElementById("sentOrderTotal");
       const newOrderTotalEl = document.getElementById("newOrderTotal");
       const combinedOrderTotalEl = document.getElementById("combinedOrderTotal");
       const combinedOrderItemCountEl = document.getElementById("combinedOrderItemCount");
-      const submitButton = document.getElementById("drawerSubmitBtn");
+      const submitButton = document.getElementById("orderSubmitBtn");
       const orderBadgeEl = document.getElementById("bottomOrderBadge");
-      const sectionCartSummaryEl = document.getElementById("orderSectionCartSummary");
-      const sectionCartActionEl = document.querySelector(".order-section-cart-action");
 
       if (
         !mobileOrderListEl
         || !mobileOrderSummaryEl
-        || !sentOrderListEl
-        || !sentOrderSummaryEl
-        || !sentOrderTotalEl
         || !newOrderTotalEl
         || !combinedOrderTotalEl
         || !combinedOrderItemCountEl
@@ -4026,25 +4165,6 @@
         <div class="order-summary-row order-summary-grand-total"><span>${totalLabel}</span><strong>${formatCurrency(total)}</strong></div>
       `;
       const sentOrder = getSentOrderSummary();
-      const sentItemsMarkup = sentOrder.items.length
-        ? sentOrder.items.map((item) => `
-            <div class="sent-order-row">
-              <strong>${escapeHtml(item.quantity)}×</strong>
-              <span>${escapeHtml(item.nameEn || item.nameKo || "Menu item")}</span>
-              <small>${escapeHtml(formatCurrency(item.lineTotal))}</small>
-            </div>
-          `).join("")
-        : '<div class="order-empty">No items have been sent yet.</div>';
-      sentOrderListEl.innerHTML = sentItemsMarkup;
-      sentOrderSummaryEl.innerHTML = summaryMarkup(
-        sentOrder.itemCount,
-        sentOrder.subtotal,
-        sentOrder.tax,
-        sentOrder.total,
-        "Ordered total"
-      );
-      sentOrderTotalEl.textContent = formatCurrency(sentOrder.total);
-
       const newItemsMarkup = cartItems.length
         ? cartItems
         .map((item) => `
@@ -4095,17 +4215,6 @@
         orderBadgeEl.textContent = String(badgeCount);
         orderBadgeEl.hidden = !badgeCount;
       }
-      if (sectionCartSummaryEl) {
-        const latestRequest = sentOrder.requests[0];
-        sectionCartSummaryEl.textContent = itemCount
-          ? `${itemCount} new item${itemCount === 1 ? "" : "s"} · ${formatCurrency(total)}`
-          : latestRequest
-            ? `Order #${latestRequest.id} · ${getOrderStatusMeta(latestRequest.status).label}`
-            : "No new items";
-      }
-      if (sectionCartActionEl) {
-        sectionCartActionEl.textContent = itemCount ? "Review & send" : "View order";
-      }
     }
 
     function setupOrderForm() {
@@ -4123,7 +4232,7 @@
         }
 
         if (isDiningRequestSubmitting) return;
-        const submitButton = document.getElementById("drawerSubmitBtn");
+        const submitButton = document.getElementById("orderSubmitBtn");
         const formValues = Object.fromEntries(new FormData(form).entries());
         isDiningRequestSubmitting = true;
         if (submitButton) submitButton.disabled = true;
@@ -4138,7 +4247,6 @@
           statusEl.textContent = `Order${requestNumber} sent.`;
           statusEl.className = "order-status is-success";
           showRequestToast(`Order${requestNumber} sent.`);
-          closeCartDrawer();
           refreshQrSession();
         } catch (error) {
           console.error("Order submission failed", error);
@@ -4149,83 +4257,6 @@
         } finally {
           isDiningRequestSubmitting = false;
           syncQrSessionUi();
-        }
-      });
-    }
-
-    function setupCartDrawer() {
-      const inlineBtn = document.getElementById("openOrderDrawerButton");
-      const closeBtn = document.getElementById("cartDrawerCloseBtn");
-      const backdrop = document.getElementById("cartDrawerBackdrop");
-      const drawer = backdrop?.querySelector(".cart-drawer");
-      if (!closeBtn || !backdrop || !inlineBtn || !drawer) return;
-
-      let touchStartY = 0;
-      let currentDragY = 0;
-      let isGestureActive = false;
-
-      const resetDrawerDrag = () => {
-        currentDragY = 0;
-        isGestureActive = false;
-        drawer.classList.remove("is-dragging");
-        drawer.style.transform = "";
-      };
-
-      inlineBtn.addEventListener("click", () => {
-        openCartDrawer();
-      });
-
-      closeBtn.addEventListener("click", closeCartDrawer);
-
-      backdrop.addEventListener("click", (event) => {
-        if (event.target === backdrop) {
-          closeCartDrawer();
-        }
-      });
-
-      drawer.addEventListener("touchstart", (event) => {
-        if (!isCartDrawerOpen) return;
-        if (drawer.scrollTop > 0) return;
-        touchStartY = event.touches[0]?.clientY || 0;
-        currentDragY = 0;
-        isGestureActive = true;
-      }, { passive: true });
-
-      drawer.addEventListener("touchmove", (event) => {
-        if (!isGestureActive) return;
-        const nextY = event.touches[0]?.clientY || 0;
-        const deltaY = Math.max(0, nextY - touchStartY);
-
-        if (deltaY <= 0) return;
-        if (drawer.scrollTop > 0) {
-          resetDrawerDrag();
-          return;
-        }
-
-        currentDragY = deltaY;
-        drawer.classList.add("is-dragging");
-        drawer.style.transform = `translateY(${Math.min(deltaY * 0.95, 240)}px)`;
-
-        if (event.cancelable) {
-          event.preventDefault();
-        }
-      }, { passive: false });
-
-      drawer.addEventListener("touchend", () => {
-        if (!isGestureActive) return;
-        if (currentDragY > 110) {
-          closeCartDrawer();
-          return;
-        }
-
-        resetDrawerDrag();
-      });
-
-      drawer.addEventListener("touchcancel", resetDrawerDrag);
-
-      document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape" && isCartDrawerOpen) {
-          closeCartDrawer();
         }
       });
     }
@@ -4369,13 +4400,12 @@
       const modalCancelBtn = document.getElementById("serverModalCancelBtn");
       const modalConfirmBtn = document.getElementById("serverModalConfirmBtn");
       const requestGrid = document.getElementById("serverRequestGrid");
-      const drawerSubmitBtn = document.getElementById("drawerSubmitBtn");
-      if (!toTopBtn || !serverCallBtn || !form || !statusEl || !modalBackdrop || !modalMessage || !modalCancelBtn || !modalConfirmBtn || !requestGrid || !drawerSubmitBtn) return;
+      const orderSubmitBtn = document.getElementById("orderSubmitBtn");
+      if (!toTopBtn || !serverCallBtn || !form || !statusEl || !modalBackdrop || !modalMessage || !modalCancelBtn || !modalConfirmBtn || !requestGrid || !orderSubmitBtn) return;
 
       window.addEventListener("scroll", () => {
         const shouldShow = window.scrollY > 380;
         toTopBtn.classList.toggle("show", shouldShow);
-        serverCallBtn.classList.toggle("show", shouldShow);
       }, { passive: true });
 
       toTopBtn.addEventListener("click", () => {
@@ -4392,7 +4422,7 @@
         form.requestSubmit();
       };
 
-      drawerSubmitBtn.addEventListener("click", () => {
+      orderSubmitBtn.addEventListener("click", () => {
         submitOrderFromShortcut();
       });
 
@@ -4500,72 +4530,17 @@
     function setupStickyHeaderState() {
       const page = document.body;
       const stickyShell = document.querySelector(".menu-sticky-shell");
-      const stickySpacer = document.getElementById("menuStickySpacer");
-      if (!page || !stickyShell || !stickySpacer) return;
-      const mobileQuery = window.matchMedia("(max-width: 640px)");
-      let isSticky = page.classList.contains("is-scrolled");
+      if (!page || !stickyShell) return;
+      let isCollapsed = page.classList.contains("is-scrolled");
       let frameId = 0;
-      let expandedHeaderHeight = Math.ceil(stickyShell.getBoundingClientRect().height);
-      let spacerHeight = "";
-      let lastScrollY = null;
-
-      const syncHeaderHeight = () => {
-        const currentHeight = Math.ceil(stickyShell.getBoundingClientRect().height);
-        if (isSticky) {
-          expandedHeaderHeight = Math.max(expandedHeaderHeight, currentHeight);
-        } else {
-          expandedHeaderHeight = currentHeight;
-        }
-
-        const nextSpacerHeight = isSticky ? `${expandedHeaderHeight}px` : "0px";
-        if (nextSpacerHeight !== spacerHeight) {
-          spacerHeight = nextSpacerHeight;
-          stickySpacer.style.height = nextSpacerHeight;
-        }
-      };
 
       const readStickyState = () => {
         frameId = 0;
-        const currentScrollY = window.scrollY;
-        const isFirstSync = lastScrollY === null;
-        const scrollingDown = isFirstSync ? currentScrollY > 0 : currentScrollY > lastScrollY;
-        const scrollingUp = !isFirstSync && currentScrollY < lastScrollY;
-        const enterThreshold = mobileQuery.matches ? 12 : 16;
-        const exitThreshold = mobileQuery.matches
-          ? Math.max(120, Math.min(expandedHeaderHeight - 96, window.innerHeight * 0.48))
-          : 0;
-        let shouldStick = isSticky;
-
-        if (isSticky) {
-          shouldStick = currentScrollY > 0;
-          if (mobileQuery.matches && scrollingUp && currentScrollY <= exitThreshold) {
-            shouldStick = false;
-          }
-        } else {
-          shouldStick = currentScrollY > enterThreshold && (!mobileQuery.matches || scrollingDown || isFirstSync);
-        }
-
-        if (shouldStick !== isSticky) {
-          if (shouldStick) {
-            expandedHeaderHeight = Math.ceil(stickyShell.getBoundingClientRect().height);
-          } else {
-            page.classList.add("is-sticky-resetting");
-          }
-          isSticky = shouldStick;
-          page.classList.toggle("is-scrolled", isSticky);
-          syncHeaderHeight();
-          requestAnimationFrame(() => {
-            syncHeaderHeight();
-            if (!isSticky) {
-              page.classList.remove("is-sticky-resetting");
-            }
-          });
-          lastScrollY = currentScrollY;
-          return;
-        }
-
-        syncHeaderHeight();
-        lastScrollY = currentScrollY;
+        const scrollY = window.scrollY;
+        const shouldCollapse = isCollapsed ? scrollY > 28 : scrollY > 96;
+        if (shouldCollapse === isCollapsed) return;
+        isCollapsed = shouldCollapse;
+        page.classList.toggle("is-scrolled", isCollapsed);
       };
 
       const syncStickyState = () => {
@@ -4573,19 +4548,10 @@
         frameId = requestAnimationFrame(readStickyState);
       };
 
-      const syncStickyLayout = () => {
-        syncHeaderHeight();
-        syncStickyState();
-      };
-
-      syncStickyHeaderMetrics = syncStickyLayout;
-      syncHeaderHeight();
+      syncStickyHeaderMetrics = syncStickyState;
       syncStickyState();
       window.addEventListener("scroll", syncStickyState, { passive: true });
-      window.addEventListener("resize", syncStickyLayout);
-      if (typeof mobileQuery.addEventListener === "function") {
-        mobileQuery.addEventListener("change", syncStickyLayout);
-      }
+      window.addEventListener("resize", syncStickyState);
     }
 
     async function bootstrap() {
@@ -4599,7 +4565,6 @@
       setupToTopButton();
       setupSectionNavigation();
       setupOrderForm();
-      setupCartDrawer();
 
       const qrSessionPromise = refreshQrSession();
       try {
