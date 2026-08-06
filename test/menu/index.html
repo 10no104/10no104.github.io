@@ -1971,6 +1971,7 @@
       left: auto;
       right: auto;
       z-index: 60;
+      view-transition-name: menu-sticky-navigation;
       transition: padding 0.32s cubic-bezier(0.22, 1, 0.36, 1),
         background 0.32s ease,
         box-shadow 0.32s ease;
@@ -1989,7 +1990,17 @@
     }
 
     .menu-sticky-inner {
-      transition-property: gap, padding, border-radius, background, box-shadow;
+      transition-property: gap, padding, border-radius, background, box-shadow, transform;
+    }
+
+    ::view-transition-group(menu-sticky-navigation) {
+      animation-duration: 0.34s;
+      animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    ::view-transition-old(menu-sticky-navigation),
+    ::view-transition-new(menu-sticky-navigation) {
+      mix-blend-mode: normal;
     }
 
     .page-sections {
@@ -2286,16 +2297,45 @@
     }
 
     @media (max-width: 640px) {
-      .menu-sticky-shell .tabs,
-      .menu-sticky-shell .subtabs {
+      .menu-page:not(.is-scrolled) .menu-sticky-shell .tabs,
+      .menu-page:not(.is-scrolled) .menu-sticky-shell .subtabs {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        overflow: visible;
+        padding-bottom: 0;
+      }
+
+      .menu-page:not(.is-scrolled) .menu-sticky-shell .tab {
+        flex: 0 1 auto;
+        min-width: 0;
+        padding: 11px 18px;
+        font-size: 1rem;
+      }
+
+      .menu-page.is-scrolled .menu-sticky-shell .tabs,
+      .menu-page.is-scrolled .menu-sticky-shell .subtabs {
         flex-wrap: nowrap;
         overflow-x: auto;
+        overflow-y: hidden;
+        scroll-behavior: smooth;
         scrollbar-width: none;
       }
 
-      .menu-sticky-shell .tabs::-webkit-scrollbar,
-      .menu-sticky-shell .subtabs::-webkit-scrollbar {
+      .menu-page.is-scrolled .menu-sticky-shell .tabs::-webkit-scrollbar,
+      .menu-page.is-scrolled .menu-sticky-shell .subtabs::-webkit-scrollbar {
         display: none;
+      }
+
+      .menu-sticky-shell .tabs,
+      .menu-sticky-shell .subtabs,
+      .menu-sticky-shell .tab,
+      .menu-sticky-shell .subtab {
+        transition: gap 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+          padding 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+          font-size 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.22s ease,
+          transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
       }
 
       .menu-page.is-scrolled .menu-sticky-inner {
@@ -2323,6 +2363,14 @@
 
       .menu-page.is-scrolled .menu-sticky-shell .tabs {
         width: 100%;
+        gap: 8px;
+      }
+
+      .menu-page.is-scrolled .menu-sticky-shell .tab {
+        flex: 0 0 auto;
+        min-width: max-content;
+        padding: 9px 16px;
+        font-size: 0.9rem;
       }
 
       .menu-section .section-shell {
@@ -4525,14 +4573,37 @@
       if (!page || !stickyShell) return;
       let isCollapsed = page.classList.contains("is-scrolled");
       let frameId = 0;
+      let isTransitioning = false;
+
+      const applyStickyState = (shouldCollapse) => {
+        isCollapsed = shouldCollapse;
+        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const commitState = () => {
+          page.classList.toggle("is-scrolled", isCollapsed);
+        };
+
+        if (reduceMotion || typeof document.startViewTransition !== "function") {
+          commitState();
+          return;
+        }
+
+        isTransitioning = true;
+        const transition = document.startViewTransition(commitState);
+        transition.finished.finally(() => {
+          requestAnimationFrame(() => {
+            isTransitioning = false;
+            syncStickyState();
+          });
+        });
+      };
 
       const readStickyState = () => {
         frameId = 0;
+        if (isTransitioning) return;
         const scrollY = window.scrollY;
         const shouldCollapse = isCollapsed ? scrollY > 28 : scrollY > 96;
         if (shouldCollapse === isCollapsed) return;
-        isCollapsed = shouldCollapse;
-        page.classList.toggle("is-scrolled", isCollapsed);
+        applyStickyState(shouldCollapse);
       };
 
       const syncStickyState = () => {
