@@ -1238,7 +1238,7 @@
 
     .guest-order-progress {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 6px;
     }
 
@@ -3493,28 +3493,20 @@
         return {
           label: "Served",
           detail: "This order has been served.",
-          step: 3,
+          step: 2,
           tone: "finished"
         };
       }
-      if (normalized === "preparing" || normalized === "ready") {
+      if (["acknowledged", "preparing", "ready"].includes(normalized)) {
         return {
-          label: normalized === "ready" ? "Ready" : "Preparing",
+          label: "Preparing",
           detail: "The restaurant confirmed this order and is preparing it.",
-          step: 2,
-          tone: "confirmed"
-        };
-      }
-      if (normalized === "acknowledged") {
-        return {
-          label: "Server confirmed",
-          detail: "The restaurant has confirmed this order.",
           step: 1,
           tone: "confirmed"
         };
       }
       return {
-        label: "Waiting for server",
+        label: "Sent",
         detail: "Sent successfully. Waiting for the restaurant to confirm it.",
         step: 0,
         tone: "waiting"
@@ -3574,7 +3566,7 @@
             </article>
           `;
         }
-        const steps = ["Sent", "Confirmed", "Preparing", "Served"]
+        const steps = ["Sent", "Preparing", "Served"]
           .map((label, index) => {
             const classes = [
               index < meta.step ? "is-done" : "",
