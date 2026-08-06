@@ -3387,6 +3387,11 @@
       font-size: 0.92rem;
     }
 
+    .table-modal-top p.is-error {
+      color: #9b3048;
+      font-weight: 800;
+    }
+
     .table-selection-summary {
       margin-bottom: 16px;
       padding: 12px 14px;
@@ -3459,6 +3464,10 @@
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
+    }
+
+    #qrAssignmentModal .table-modal-actions {
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.35fr);
     }
 
     .table-modal .pill-btn {
@@ -3637,13 +3646,93 @@
     }
 
     .table-order-history-actions {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .table-order-history-actions .is-danger {
       border-color: transparent;
       background: #7b1f2f;
       color: #fff;
+    }
+
+    .table-current-order-summary {
+      display: grid;
+      gap: 12px;
+    }
+
+    .table-current-order-total {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 16px;
+      border-radius: 18px;
+      background: linear-gradient(145deg, #5a1122, #8a3045);
+      color: #fffaf3;
+    }
+
+    .table-current-order-total span,
+    .table-current-order-total small {
+      display: block;
+      font-weight: 800;
+    }
+
+    .table-current-order-total span {
+      margin-bottom: 5px;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .table-current-order-total strong {
+      font-size: 1.8rem;
+      letter-spacing: -0.05em;
+    }
+
+    .table-current-order-total small {
+      max-width: 150px;
+      color: rgba(255, 250, 243, 0.68);
+      font-size: 0.7rem;
+      line-height: 1.4;
+      text-align: right;
+    }
+
+    .table-current-order-items {
+      display: grid;
+      gap: 1px;
+      overflow: hidden;
+      border: 1px solid rgba(113, 88, 60, 0.13);
+      border-radius: 16px;
+      background: rgba(113, 88, 60, 0.1);
+    }
+
+    .table-current-order-item {
+      display: grid;
+      grid-template-columns: 38px minmax(0, 1fr) auto;
+      align-items: baseline;
+      gap: 9px;
+      padding: 12px 13px;
+      background: rgba(255, 255, 255, 0.92);
+      color: #403127;
+      font-size: 0.82rem;
+    }
+
+    .table-current-order-item strong {
+      color: #6a2635;
+    }
+
+    .table-current-order-item span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 800;
+    }
+
+    .table-current-order-item small {
+      color: #5f2731;
+      font-size: 0.78rem;
+      font-weight: 900;
     }
 
     .empty-state {
@@ -4133,6 +4222,10 @@
 
       .request-card {
         padding: 14px;
+      }
+
+      .table-order-history-actions {
+        grid-template-columns: 1fr;
       }
 
       .request-item-row {
@@ -4778,6 +4871,7 @@
       <div class="table-order-guest-splits" id="tableOrderGuestSplits"></div>
       <div class="table-modal-actions table-order-history-actions">
         <button class="pill-btn" id="dismissTableOrderHistory" type="button">Close</button>
+        <button class="pill-btn" id="toggleTableOrderHistoryDetails" type="button">View details</button>
         <button class="pill-btn is-danger" id="endTableSessionFromHistory" type="button" hidden>End Party Session</button>
       </div>
     </div>
@@ -4912,6 +5006,7 @@
       tableOrderHistoryPartyTableCodes: [],
       tableOrderHistoryPartyGuests: [],
       tableOrderHistoryCheckoutComplete: false,
+      tableOrderHistoryDetailMode: false,
       tableSessionEnding: false,
       orderAlarmUnlocked: false,
       orderAlarmUnsupported: false,
@@ -5153,7 +5248,12 @@
 
     function getDiningPartyQrs(partyId) {
       const numericId = Number(partyId);
-      return state.partySnapshot.partyQrs.filter((partyQr) => partyQr.party_id === numericId);
+      const party = getDiningParty(numericId);
+      if (!party || party.status !== "ACTIVE") return [];
+      return state.partySnapshot.partyQrs.filter((partyQr) => (
+        partyQr.party_id === numericId
+        && !partyQr.released_at
+      ));
     }
 
     function getDiningTableQrs(tableOrCode) {
@@ -5165,15 +5265,23 @@
         : String(tableOrCode || "").trim().toLowerCase();
       return state.partySnapshot.partyQrs
         .filter((partyQr) => (
-          (Number.isFinite(tableId) && tableId > 0 && partyQr.table_id === tableId)
-          || (!tableId && partyQr.table_code.toLowerCase() === normalizedCode)
+          !partyQr.released_at
+          && getDiningParty(partyQr.party_id)?.status === "ACTIVE"
+          && (
+            (Number.isFinite(tableId) && tableId > 0 && partyQr.table_id === tableId)
+            || (!tableId && partyQr.table_code.toLowerCase() === normalizedCode)
+          )
         ))
         .sort((left, right) => left.qr_number - right.qr_number);
     }
 
     function getActiveDiningPartyQr(qrNumber) {
       return state.partySnapshot.partyQrs.find(
-        (partyQr) => partyQr.qr_number === Number(qrNumber)
+        (partyQr) => (
+          partyQr.qr_number === Number(qrNumber)
+          && !partyQr.released_at
+          && getDiningParty(partyQr.party_id)?.status === "ACTIVE"
+        )
       ) || null;
     }
 
@@ -5529,7 +5637,8 @@
 
       const permanentMode = state.partyQrPoolAvailable === true;
       const activeCount = permanentMode
-        ? state.partySnapshot.partyQrs.length
+        ? Array.from({ length: DINING_QR_COUNT }, (_, index) => index + 1)
+            .filter((qrNumber) => getActiveDiningPartyQr(qrNumber)).length
         : state.qrSessions.filter((session) => session.status === "active" && session.table_code).length;
       if (toggleLabel) {
         toggleLabel.textContent = `${activeCount} ${permanentMode ? "active" : "assigned"}`;
@@ -5556,13 +5665,14 @@
             ? state.partySnapshot.tables.find((table) => table.id === partyQr.table_id) || null
             : null;
           const activeParty = partyQr ? getDiningParty(partyQr.party_id) : null;
-          const history = state.diningRequests.filter((request) => request.qr_number === qrNumber);
-          const activeRequests = activeParty
-            ? history.filter((request) => (
+          const currentOrders = activeParty
+            ? state.diningRequests.filter((request) => (
                 request.party_id === activeParty.id
-                && !["completed", "canceled"].includes(request.status)
+                && request.kind === "order"
+                && request.status !== "canceled"
               ))
             : [];
+          const currentTotal = currentOrders.reduce((sum, request) => sum + Number(request.total || 0), 0);
           const stateLabel = activeParty ? "Active" : "Available";
           const meta = activeParty
             ? `Table ${escapeHtml(tableRecord?.table_code || partyQr.table_code)}<br>Party #${activeParty.id}`
@@ -5574,7 +5684,11 @@
                 <span class="qr-station-state">${stateLabel}</span>
               </div>
               <div class="qr-station-meta">${meta}</div>
-              <div class="qr-station-stats"><span>${history.length} records</span><span>${activeRequests.length} open</span></div>
+              <div class="qr-station-stats">
+                ${activeParty
+                  ? `<span>${currentOrders.length} current order${currentOrders.length === 1 ? "" : "s"}</span><span>${escapeHtml(formatRequestMoney(currentTotal))}</span>`
+                  : "<span>Ready to assign</span>"}
+              </div>
               <div class="qr-station-actions">
                 ${activeParty ? `
                   <button class="qr-station-btn reset" type="button" data-close-party="${activeParty.id}">Review &amp; Checkout</button>
@@ -5586,17 +5700,18 @@
         }
 
         const activeSession = getActiveQrSession(qrNumber);
-        const history = state.diningRequests.filter((request) => request.qr_number === qrNumber);
-        const activeRequests = activeSession
-          ? history.filter((request) => request.qr_session_id === activeSession.id && !["completed", "canceled"].includes(request.status))
+        const currentOrders = activeSession
+          ? state.diningRequests.filter((request) => (
+              request.qr_session_id === activeSession.id
+              && request.kind === "order"
+              && request.status !== "canceled"
+            ))
           : [];
-        const latestSession = state.qrSessions.find((session) => session.qr_number === qrNumber) || null;
+        const currentTotal = currentOrders.reduce((sum, request) => sum + Number(request.total || 0), 0);
         const isUpdating = state.qrSessionUpdatingNumbers.has(qrNumber);
         const meta = activeSession
           ? `Table ${escapeHtml(activeSession.table_code)}<br>Started ${formatRequestClock(activeSession.started_at)}`
-          : latestSession
-            ? `Last used at Table ${escapeHtml(latestSession.table_code || "-")}<br>Assign from the table map`
-            : "No visits yet<br>Assign from the table map";
+          : "Available<br>Select tables first";
         return `
           <article class="qr-station-card ${activeSession ? "is-active" : ""}">
             <div class="qr-station-top">
@@ -5604,7 +5719,11 @@
               <span class="qr-station-state">${activeSession ? "Assigned" : "Inactive"}</span>
             </div>
             <div class="qr-station-meta">${meta}</div>
-            <div class="qr-station-stats"><span>${history.length} records</span><span>${activeRequests.length} open</span></div>
+            <div class="qr-station-stats">
+              ${activeSession
+                ? `<span>${currentOrders.length} current order${currentOrders.length === 1 ? "" : "s"}</span><span>${escapeHtml(formatRequestMoney(currentTotal))}</span>`
+                : "<span>Ready to assign</span>"}
+            </div>
             <div class="qr-station-actions">
               ${activeSession ? `
                 <button
@@ -5977,6 +6096,73 @@
       `;
     }
 
+    function getCurrentTableSessionRequests(tableCode, activeParty, activeSession) {
+      const normalizedTableCode = String(tableCode || "").trim().toLowerCase();
+      if (!normalizedTableCode || (!activeParty && !activeSession)) return [];
+      return state.diningRequests
+        .filter((request) => (
+          request.table_code.toLowerCase() === normalizedTableCode
+          && (
+            (activeParty && request.party_id === activeParty.id)
+            || (activeSession && request.qr_session_id === activeSession.id)
+          )
+        ))
+        .sort((left, right) => new Date(left.created_at) - new Date(right.created_at));
+    }
+
+    function renderCurrentTableOrderSummary(requests) {
+      const orders = requests.filter((request) => (
+        request.kind === "order"
+        && request.status !== "canceled"
+      ));
+      const itemMap = new Map();
+
+      orders.forEach((request) => {
+        request.items.forEach((item) => {
+          const quantity = Math.max(0, Number(item.quantity || 0));
+          const name = item.nameEn || item.nameKo || "Menu item";
+          const lineTotal = Number(item.lineTotal ?? (Number(item.unitPrice || 0) * quantity));
+          const current = itemMap.get(name) || { name, quantity: 0, total: 0 };
+          current.quantity += quantity;
+          current.total += lineTotal;
+          itemMap.set(name, current);
+        });
+      });
+
+      const itemRows = [...itemMap.values()];
+      const fallbackRows = itemRows.length
+        ? itemRows
+        : orders.map((request) => ({
+            name: `Order #${request.id}`,
+            quantity: Math.max(1, Number(request.item_count || 1)),
+            total: Number(request.total || 0)
+          }));
+      const total = orders.reduce((sum, request) => sum + Number(request.total || 0), 0);
+
+      return `
+        <section class="table-current-order-summary" aria-label="Current table order summary">
+          <div class="table-current-order-total">
+            <div>
+              <span>Current table total</span>
+              <strong>${escapeHtml(formatRequestMoney(total))}</strong>
+            </div>
+            <small>${orders.length} order${orders.length === 1 ? "" : "s"} in this session</small>
+          </div>
+          ${fallbackRows.length ? `
+            <div class="table-current-order-items">
+              ${fallbackRows.map((item) => `
+                <div class="table-current-order-item">
+                  <strong>${escapeHtml(item.quantity)}×</strong>
+                  <span>${escapeHtml(item.name)}</span>
+                  <small>${escapeHtml(formatRequestMoney(item.total))}</small>
+                </div>
+              `).join("")}
+            </div>
+          ` : '<p class="table-option-empty">No orders in the current session yet.</p>'}
+        </section>
+      `;
+    }
+
     function renderTableOrderGuestSplits(history, partyId, { activeParty = null } = {}) {
       const container = document.getElementById("tableOrderGuestSplits");
       if (!container || !partyId) {
@@ -6050,8 +6236,9 @@
       const meta = document.getElementById("tableOrderHistoryMeta");
       const list = document.getElementById("tableOrderHistoryList");
       const scope = document.getElementById("tableOrderHistoryScope");
+      const detailButton = document.getElementById("toggleTableOrderHistoryDetails");
       const endButton = document.getElementById("endTableSessionFromHistory");
-      if (!tableCode || !title || !meta || !list || !scope || !endButton) return;
+      if (!tableCode || !title || !meta || !list || !scope || !detailButton || !endButton) return;
 
       const tableRecord = getDiningTableRecord(tableCode);
       const activeParty = tableRecord?.current_party_id ? getDiningParty(tableRecord.current_party_id) : null;
@@ -6065,6 +6252,7 @@
       if (!canUsePartyScope) state.tableOrderHistoryScope = "table";
       const partyQrs = activeParty ? getDiningPartyQrs(activeParty.id) : [];
       const activeSession = state.partyQrPoolAvailable ? null : getActiveTableSession(tableCode);
+      const currentRequests = getCurrentTableSessionRequests(tableCode, activeParty, activeSession);
       const history = (state.tableOrderHistoryScope === "party" && partyId
         ? state.diningRequests.filter((request) => request.party_id === partyId)
         : getTableRequestHistory(tableCode))
@@ -6079,33 +6267,44 @@
             ? `QR ${String(activeSession.qr_number).padStart(2, "0")} · Active session`
             : "No active session";
 
-      scope.hidden = !canUsePartyScope;
+      const isDetailMode = state.tableOrderHistoryDetailMode;
+      scope.hidden = !isDetailMode || !canUsePartyScope;
       scope.querySelectorAll("[data-table-history-scope]").forEach((button) => {
         button.classList.toggle("is-active", button.dataset.tableHistoryScope === state.tableOrderHistoryScope);
       });
-      title.textContent = state.tableOrderHistoryScope === "party" && partyId
-        ? `Party #${partyId} Orders`
-        : `Table ${tableCode} Orders`;
-      meta.textContent = `${sessionLabel} · ${history.length} record${history.length === 1 ? "" : "s"}${capacity.isOver ? ` · HEADCOUNT WARNING ${capacity.activeCount}/${capacity.expected}` : ""}`;
-      list.innerHTML = history.length
-        ? history.map((request) => renderTableOrderHistoryEntry(request, {
-            activePartyId: activeParty?.id || null,
-            activeSessionId: activeSession?.id || null
-          })).join("")
-        : '<p class="table-option-empty">No orders or service calls in this view yet.</p>';
-      renderTableOrderGuestSplits(history, partyId, { activeParty });
+      title.textContent = isDetailMode
+        ? state.tableOrderHistoryScope === "party" && partyId
+          ? `Party #${partyId} Details`
+          : `Table ${tableCode} Details`
+        : `Table ${tableCode} Current Order`;
+      meta.textContent = state.partyActionError || `${sessionLabel}${capacity.isOver ? ` · HEADCOUNT WARNING ${capacity.activeCount}/${capacity.expected}` : ""}`;
+      meta.classList.toggle("is-error", Boolean(state.partyActionError));
+
+      if (isDetailMode) {
+        list.innerHTML = history.length
+          ? history.map((request) => renderTableOrderHistoryEntry(request, {
+              activePartyId: activeParty?.id || null,
+              activeSessionId: activeSession?.id || null
+            })).join("")
+          : '<p class="table-option-empty">No order history in this view yet.</p>';
+        renderTableOrderGuestSplits(history, partyId, { activeParty });
+      } else {
+        list.innerHTML = renderCurrentTableOrderSummary(currentRequests);
+        document.getElementById("tableOrderGuestSplits").innerHTML = "";
+      }
+      detailButton.hidden = history.length === 0;
+      detailButton.textContent = isDetailMode ? "Current order" : "View details";
       endButton.hidden = state.tableOrderHistoryCheckoutComplete || (!activeParty && !activeSession);
       endButton.disabled = state.tableSessionEnding;
       endButton.textContent = state.tableSessionEnding
-        ? "Completing payment…"
-        : activeParty
-          ? "Complete Payment & End Party"
-          : "End QR Session";
+        ? "Ending…"
+        : "End session";
     }
 
-    function openTableOrderHistoryModal(tableCode) {
+    function openTableOrderHistoryModal(tableCode, { detailMode = false } = {}) {
       const normalizedTableCode = String(tableCode || "").trim();
       if (!normalizedTableCode) return;
+      state.partyActionError = "";
       const tableRecord = getDiningTableRecord(normalizedTableCode);
       const activeParty = tableRecord?.current_party_id ? getDiningParty(tableRecord.current_party_id) : null;
       const partyTableCodes = activeParty
@@ -6120,6 +6319,7 @@
         ? getDiningPartyGuests(activeParty.id).map((guest) => ({ ...guest }))
         : [];
       state.tableOrderHistoryCheckoutComplete = false;
+      state.tableOrderHistoryDetailMode = detailMode;
       state.tableOrderHistoryScope = partyTableCodes.length > 1 ? "party" : "table";
       renderTableOrderHistoryModal();
       const modal = document.getElementById("tableOrderHistoryModal");
@@ -6143,6 +6343,7 @@
       state.tableOrderHistoryPartyTableCodes = [];
       state.tableOrderHistoryPartyGuests = [];
       state.tableOrderHistoryCheckoutComplete = false;
+      state.tableOrderHistoryDetailMode = false;
       const modal = document.getElementById("tableOrderHistoryModal");
       modal?.classList.remove("is-open");
       modal?.setAttribute("aria-hidden", "true");
@@ -6203,7 +6404,9 @@
         : "Choose QR";
       confirmButton.textContent = state.partySetupSaving
         ? "Assigning…"
-        : `Start Party · ${selectedQrLabel}`;
+        : selectedQrNumbers.length
+          ? `Start Party · ${selectedQrLabel}`
+          : "Choose a QR";
     }
 
     function openQrAssignmentModal() {
@@ -6429,11 +6632,21 @@
       state.partyActionError = "";
       let succeeded = false;
       try {
-        await callQueenDiningRpc("close_dining_party", {
+        const basePayload = {
           p_branch: ADMIN_SHEET_CONFIG.branchLabel.toLowerCase(),
-          p_party_id: numericPartyId,
-          p_reason: "table-checkout"
-        });
+          p_party_id: numericPartyId
+        };
+        try {
+          await callQueenDiningRpc("close_dining_party", {
+            ...basePayload,
+            p_reason: "table-checkout"
+          });
+        } catch (error) {
+          if (!/p_reason|PGRST202|schema cache|function.*not found/i.test(String(error?.message || ""))) {
+            throw error;
+          }
+          await callQueenDiningRpc("close_dining_party", basePayload);
+        }
         await refreshPartyOperationData();
         state.selectedMapTableCode = null;
         succeeded = true;
@@ -6448,6 +6661,7 @@
     async function endSelectedTableSession() {
       const tableCode = state.tableOrderHistoryTableCode;
       if (!tableCode || state.tableSessionEnding) return;
+      state.partyActionError = "";
       const tableRecord = getDiningTableRecord(tableCode);
       const activeParty = tableRecord?.current_party_id ? getDiningParty(tableRecord.current_party_id) : null;
       const partyQrs = activeParty
@@ -6461,12 +6675,8 @@
             .map((partyTable) => partyTable.table_code)
             .filter(Boolean)
         : [tableCode];
-      if (activeParty && partyTableCodes.length > 1) {
-        state.tableOrderHistoryScope = "party";
-        renderTableOrderHistoryModal();
-      }
       const shouldEnd = window.confirm(activeParty
-        ? `Complete payment and end Party #${activeParty.id} for ${partyTableCodes.join(" + ")}? All active Guest bills will be marked PAID, open requests will be completed, and ${partyQrs.length || "its"} QR code${partyQrs.length === 1 ? "" : "s"} will return to the available pool.`
+        ? `End the current session for ${partyTableCodes.join(" + ")}? Party #${activeParty.id} will close and ${partyQrs.length || "its"} QR code${partyQrs.length === 1 ? "" : "s"} will return to the available pool.`
         : `End the Table ${tableCode} session? QR ${String(activeSession.qr_number).padStart(2, "0")} will become inactive.`);
       if (!shouldEnd) return;
 
@@ -6476,14 +6686,7 @@
         ? await closeDiningParty(activeParty.id)
         : await endQrSession(activeSession.qr_number);
       state.tableSessionEnding = false;
-      if (succeeded && activeParty) {
-        state.tableOrderHistoryCheckoutComplete = true;
-        state.tableOrderHistoryPartyGuests = state.tableOrderHistoryPartyGuests.map((guest) => ({
-          ...guest,
-          status: guest.status === "ACTIVE" ? "PAID" : guest.status
-        }));
-        renderTableOrderHistoryModal();
-      } else if (succeeded) {
+      if (succeeded) {
         closeTableOrderHistoryModal();
       } else {
         renderTableOrderHistoryModal();
@@ -8844,7 +9047,7 @@
       }
       const historyButton = event.target.closest("[data-table-history]");
       if (historyButton) {
-        openTableOrderHistoryModal(historyButton.dataset.tableHistory);
+        openTableOrderHistoryModal(historyButton.dataset.tableHistory, { detailMode: true });
         return;
       }
 
@@ -8971,6 +9174,10 @@
     document.getElementById("closeTableOrderHistoryModal").addEventListener("click", closeTableOrderHistoryModal);
     document.getElementById("dismissTableOrderHistory").addEventListener("click", closeTableOrderHistoryModal);
     document.getElementById("endTableSessionFromHistory").addEventListener("click", endSelectedTableSession);
+    document.getElementById("toggleTableOrderHistoryDetails").addEventListener("click", () => {
+      state.tableOrderHistoryDetailMode = !state.tableOrderHistoryDetailMode;
+      renderTableOrderHistoryModal();
+    });
     document.getElementById("tableOrderHistoryScope").addEventListener("click", (event) => {
       const button = event.target.closest("[data-table-history-scope]");
       if (!button) return;
