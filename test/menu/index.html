@@ -1979,7 +1979,7 @@
 
     .menu-sticky-spacer {
       display: none;
-      height: 0 !important;
+      height: 0;
     }
 
     .menu-sticky-inner,
@@ -2056,8 +2056,15 @@
     }
 
     .status-section .guest-session-panel {
-      margin-bottom: 14px;
+      gap: 8px;
+      margin: 18px 0 0;
+      padding: 12px;
+      border-radius: 18px;
       box-shadow: none;
+    }
+
+    .status-section .guest-session-panel:not(.is-inactive):not(.is-conflict) .guest-session-message {
+      display: none;
     }
 
     .order-inline-card {
@@ -2297,6 +2304,20 @@
     }
 
     @media (max-width: 640px) {
+      .menu-sticky-spacer {
+        display: block;
+        height: 0;
+      }
+
+      .menu-page.is-scrolled:not(.is-detail-view) .menu-sticky-spacer {
+        height: var(--menu-sticky-expanded-height, 0px);
+      }
+
+      .menu-page.is-scrolled:not(.is-detail-view) .menu-sticky-shell {
+        position: fixed;
+        inset: 0 0 auto;
+      }
+
       .menu-page:not(.is-scrolled) .menu-sticky-shell .tabs,
       .menu-page:not(.is-scrolled) .menu-sticky-shell .subtabs {
         flex-wrap: wrap;
@@ -2476,6 +2497,7 @@
         -webkit-backdrop-filter: blur(14px);
         backdrop-filter: blur(14px);
         box-shadow: 0 8px 24px rgba(35, 23, 16, 0.08);
+        animation: menu-compact-in 0.18s ease-out both;
       }
 
       .menu-page.is-scrolled .menu-sticky-inner {
@@ -2487,6 +2509,7 @@
         padding: 6px;
         border-radius: 16px;
         box-shadow: 0 8px 22px rgba(42, 28, 18, 0.1);
+        transition: none;
       }
 
       .menu-page.is-scrolled .menu-sticky-inner:has(.subtabs-wrap:not(.hidden)) {
@@ -2568,6 +2591,229 @@
         padding: 7px 11px;
         font-size: 0.72rem;
       }
+
+      .menu-page .menu-grid {
+        gap: 10px;
+      }
+
+      .menu-page .menu-card {
+        grid-template-columns: 86px minmax(0, 1fr);
+        grid-template-rows: auto auto;
+        gap: 7px 12px;
+        min-height: 108px;
+        padding: 10px;
+        border-radius: 18px;
+        box-shadow: 0 10px 24px rgba(45, 30, 17, 0.07);
+      }
+
+      .menu-page .menu-image {
+        grid-column: 1;
+        grid-row: 1 / 3;
+        width: 86px;
+        height: 86px;
+        border-radius: 14px;
+        box-shadow: none;
+      }
+
+      .menu-page .menu-content {
+        grid-column: 2;
+        grid-row: 1;
+        align-self: end;
+      }
+
+      .menu-page .menu-title.name-ko {
+        font-size: 1.04rem;
+        line-height: 1.2;
+      }
+
+      .menu-page .menu-title-alt.name-en {
+        margin: 3px 0 0;
+        color: #78675b;
+        font-size: 0.76rem;
+        line-height: 1.25;
+      }
+
+      .menu-page .menu-desc,
+      .menu-page .menu-meta {
+        display: none;
+      }
+
+      .menu-page .menu-price-box {
+        grid-column: 2;
+        grid-row: 2;
+        align-self: start;
+        justify-content: space-between;
+        gap: 8px;
+        min-width: 0;
+      }
+
+      .menu-page .menu-price {
+        padding: 0;
+        font-size: 1.08rem;
+        line-height: 36px;
+      }
+
+      .menu-page .menu-card-actions {
+        margin: 0;
+        transform: none;
+      }
+
+      .menu-page .menu-add-btn {
+        min-height: 36px;
+        padding: 0 12px;
+        font-size: 0.74rem;
+        box-shadow: none;
+      }
+    }
+
+    @keyframes menu-compact-in {
+      from {
+        opacity: 0.72;
+        transform: translateY(-7px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .menu-page.is-scrolled .menu-sticky-shell {
+        animation: none;
+      }
+    }
+
+    .menu-detail-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 180;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      padding-top: 24px;
+      background: rgba(32, 20, 14, 0.58);
+      -webkit-backdrop-filter: blur(5px);
+      backdrop-filter: blur(5px);
+    }
+
+    .menu-detail-backdrop.is-open {
+      display: flex;
+    }
+
+    .menu-detail-sheet {
+      position: relative;
+      width: min(100%, 520px);
+      max-height: calc(100dvh - 24px);
+      overflow-y: auto;
+      padding: 14px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+      border: 1px solid rgba(125, 98, 63, 0.18);
+      border-bottom: 0;
+      border-radius: 28px 28px 0 0;
+      background:
+        linear-gradient(180deg, rgba(255, 253, 249, 0.99), rgba(249, 241, 231, 0.99)),
+        url("../../../assets/pattern.webp") center / 420px auto;
+      box-shadow: 0 -18px 52px rgba(31, 19, 12, 0.24);
+    }
+
+    .menu-detail-close {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: grid;
+      width: 38px;
+      height: 38px;
+      margin: 0 0 8px auto;
+      place-items: center;
+      border: 1px solid rgba(90, 17, 34, 0.14);
+      border-radius: 999px;
+      background: rgba(255, 253, 249, 0.94);
+      color: #5a1122;
+      font: inherit;
+      font-size: 1.25rem;
+      cursor: pointer;
+    }
+
+    .menu-detail-image {
+      display: block;
+      width: 100%;
+      height: min(34vh, 230px);
+      object-fit: cover;
+      border-radius: 20px;
+      background: rgba(44, 33, 22, 0.08);
+    }
+
+    .menu-detail-copy {
+      display: grid;
+      gap: 7px;
+      padding: 16px 2px 12px;
+    }
+
+    .menu-detail-copy h3 {
+      margin: 0;
+      color: #2f2119;
+      font-size: 1.5rem;
+      letter-spacing: -0.045em;
+      line-height: 1.15;
+    }
+
+    .menu-detail-name-en,
+    .menu-detail-description {
+      margin: 0;
+      color: #78675b;
+      line-height: 1.5;
+    }
+
+    .menu-detail-name-en {
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+
+    .menu-detail-description {
+      font-size: 0.85rem;
+      font-weight: 650;
+    }
+
+    .menu-detail-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 4px;
+    }
+
+    .menu-detail-footer {
+      position: sticky;
+      bottom: -1px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin: 4px -2px -2px;
+      padding: 12px 2px 2px;
+      background: linear-gradient(180deg, rgba(249, 241, 231, 0), rgba(249, 241, 231, 0.98) 28%);
+    }
+
+    .menu-detail-price {
+      color: #3b2418;
+      font-size: 1.4rem;
+      font-weight: 950;
+    }
+
+    .menu-detail-add {
+      min-height: 48px;
+      padding: 0 22px;
+      border: 0;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #5a1122, #a77816);
+      color: #fffaf3;
+      font: inherit;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 12px 22px rgba(90, 17, 34, 0.18);
+    }
+
+    .menu-detail-add:disabled {
+      cursor: not-allowed;
+      opacity: 0.58;
     }
 
     .final-bill-receipt {
@@ -2682,6 +2928,19 @@
       font-size: 1.5rem;
     }
 
+    .final-bill-summary-row.is-device {
+      min-height: 56px;
+      border-top: 2px solid rgba(38, 112, 70, 0.24) !important;
+      background: rgba(38, 112, 70, 0.09);
+      color: #245e3e;
+      font-size: 0.86rem;
+    }
+
+    .final-bill-summary-row.is-device strong {
+      color: #1f6a40;
+      font-size: 1.2rem;
+    }
+
     @media (max-width: 640px) {
       .final-bill-section .section-shell {
         padding: 14px;
@@ -2762,19 +3021,6 @@
           </div>
           <span class="section-context" id="statusSummary">Waiting for orders</span>
         </div>
-        <section class="guest-session-panel is-inactive" id="guestSessionPanel" aria-live="polite">
-          <div class="guest-session-head">
-            <div class="guest-session-title">
-              <div class="guest-qr-number" id="guestQrNumber">--</div>
-              <div><span>Dining session</span><strong id="guestSessionTitle">Checking QR status…</strong></div>
-            </div>
-            <div class="guest-session-actions">
-              <button class="guest-session-refresh" id="guestOrdersRefresh" type="button">Refresh</button>
-            </div>
-          </div>
-          <p class="guest-session-message" id="guestSessionMessage">Please wait while this QR is verified.</p>
-        </section>
-
         <section class="order-inline-card" aria-labelledby="newOrderHeading">
           <div class="review-order-section-head">
             <div>
@@ -2803,6 +3049,18 @@
           <span id="statusLastUpdated">—</span>
         </div>
         <div class="guest-order-history-list" id="guestOrderHistory" aria-live="polite"></div>
+        <section class="guest-session-panel is-inactive" id="guestSessionPanel" aria-live="polite">
+          <div class="guest-session-head">
+            <div class="guest-session-title">
+              <div class="guest-qr-number" id="guestQrNumber">--</div>
+              <div><span>Dining session</span><strong id="guestSessionTitle">Checking QR status…</strong></div>
+            </div>
+            <div class="guest-session-actions">
+              <button class="guest-session-refresh" id="guestOrdersRefresh" type="button">Refresh</button>
+            </div>
+          </div>
+          <p class="guest-session-message" id="guestSessionMessage">Please wait while this QR is verified.</p>
+        </section>
       </div>
     </section>
 
@@ -2824,10 +3082,6 @@
           <div class="final-bill-order-list" id="finalBillOrderList" aria-live="polite"></div>
           <div class="final-bill-summary">
             <div class="final-bill-summary-row">
-              <span id="finalBillDeviceMeta">This device</span>
-              <strong id="finalBillDeviceTotal">$0.00</strong>
-            </div>
-            <div class="final-bill-summary-row">
               <span id="finalBillTableMeta">0 items</span>
               <strong id="finalBillSubtotal">$0.00</strong>
             </div>
@@ -2838,6 +3092,10 @@
             <div class="final-bill-summary-row is-total">
               <span>Table total</span>
               <strong id="finalBillTableTotal">$0.00</strong>
+            </div>
+            <div class="final-bill-summary-row is-device">
+              <span id="finalBillDeviceMeta">Your total</span>
+              <strong id="finalBillDeviceTotal">$0.00</strong>
             </div>
           </div>
         </div>
@@ -2876,6 +3134,22 @@
   </nav>
 
   <button class="to-top" id="toTopBtn" type="button" aria-label="Back to top">↑ Top</button>
+  <div class="menu-detail-backdrop" id="menuDetailBackdrop" hidden>
+    <section class="menu-detail-sheet" role="dialog" aria-modal="true" aria-labelledby="menuDetailNameKo">
+      <button class="menu-detail-close" id="menuDetailClose" type="button" aria-label="Close menu details">×</button>
+      <img class="menu-detail-image" id="menuDetailImage" alt="" />
+      <div class="menu-detail-copy">
+        <h3 id="menuDetailNameKo">Menu item</h3>
+        <p class="menu-detail-name-en" id="menuDetailNameEn"></p>
+        <p class="menu-detail-description" id="menuDetailDescription"></p>
+        <div class="menu-detail-tags" id="menuDetailTags"></div>
+      </div>
+      <div class="menu-detail-footer">
+        <strong class="menu-detail-price" id="menuDetailPrice">$0.00</strong>
+        <button class="menu-detail-add" id="menuDetailAdd" type="button">Add to order</button>
+      </div>
+    </section>
+  </div>
   <div class="server-modal-backdrop" id="serverModalBackdrop" hidden>
     <div class="server-modal" role="dialog" aria-modal="true" aria-labelledby="serverModalHeading">
       <div class="server-modal-copy">
@@ -2988,6 +3262,7 @@
     let selectedServerRequestType = "water";
     let menuImageObserver = null;
     let requestToastHandle = null;
+    let selectedMenuDetailId = null;
     let isDiningRequestSubmitting = false;
     let currentQrNumber = null;
     let currentQrSession = null;
@@ -4025,7 +4300,7 @@
       subtotalEl.textContent = formatCurrency(tableSummary.subtotal);
       taxEl.textContent = formatCurrency(tableSummary.tax);
       tableMetaEl.textContent = `${tableSummary.itemCount} item${tableSummary.itemCount === 1 ? "" : "s"}${partyTables.length ? ` · ${partyTables.length} table${partyTables.length === 1 ? "" : "s"}` : ""}`;
-      deviceMetaEl.textContent = `This device · ${deviceOrders.length} order${deviceOrders.length === 1 ? "" : "s"}`;
+      deviceMetaEl.textContent = `Your total · ${deviceOrders.length} order${deviceOrders.length === 1 ? "" : "s"}`;
 
       if (!billLines.length) {
         orderListEl.innerHTML = `<div class="final-bill-empty">No sent orders in this party yet. New items will appear after you send them.</div>`;
@@ -4098,9 +4373,14 @@
         billLink.href = `../cashier.html?store=${encodeURIComponent(getDiningBranch())}`;
       }
 
-      document.querySelectorAll(".menu-add-btn, #serverCallBtn, #serverModalConfirmBtn").forEach((button) => {
+      document.querySelectorAll("#serverCallBtn, #serverModalConfirmBtn").forEach((button) => {
         button.disabled = !canOrder || isDiningRequestSubmitting;
       });
+      const detailAddButton = document.getElementById("menuDetailAdd");
+      if (detailAddButton) {
+        detailAddButton.disabled = !canOrder || isDiningRequestSubmitting;
+        detailAddButton.textContent = canOrder ? "Add to order" : "QR not active";
+      }
       const orderSubmitButton = document.getElementById("orderSubmitBtn");
       if (orderSubmitButton) {
         orderSubmitButton.disabled = !canOrder || isDiningRequestSubmitting || !cartItems.length;
@@ -4728,7 +5008,7 @@
               <div class="menu-price-box">
                 <div class="menu-price price">${escapeHtml(formatPrice(item.price))}</div>
                 <div class="menu-card-actions">
-                  <button class="menu-add-btn" data-menu-id="${escapeHtml(getMenuId(item))}" type="button" ${currentQrSession ? "" : "disabled"}>Add to order</button>
+                  <button class="menu-add-btn" data-menu-id="${escapeHtml(getMenuId(item))}" type="button">View &amp; add</button>
                 </div>
               </div>
             </article>
@@ -4739,11 +5019,72 @@
       menuListEl.querySelectorAll(".menu-add-btn").forEach((button) => {
         button.addEventListener("click", () => {
           const menuId = button.getAttribute("data-menu-id") || "";
-          addToCart(menuId);
+          openMenuDetail(menuId);
         });
       });
       initLazyMenuImages(menuListEl);
       syncQrSessionUi();
+    }
+
+    function openMenuDetail(menuId) {
+      const item = allMenus.find((candidate) => getMenuId(candidate) === menuId);
+      const backdrop = document.getElementById("menuDetailBackdrop");
+      if (!item || !backdrop) return;
+
+      selectedMenuDetailId = menuId;
+      const image = document.getElementById("menuDetailImage");
+      const nameKo = document.getElementById("menuDetailNameKo");
+      const nameEn = document.getElementById("menuDetailNameEn");
+      const description = document.getElementById("menuDetailDescription");
+      const tags = document.getElementById("menuDetailTags");
+      const price = document.getElementById("menuDetailPrice");
+      const addButton = document.getElementById("menuDetailAdd");
+      const displayTags = [...item.tags.filter((tag) => tag.key !== "vegan"), ...getIngredientBadges(item)];
+
+      image.src = item.imageUrl || MENU_IMAGE_PLACEHOLDER;
+      image.alt = item.nameEn || item.nameKo || "Menu item";
+      nameKo.textContent = item.nameKo || item.nameEn || "Menu item";
+      nameEn.textContent = item.nameEn || "";
+      description.textContent = item.description || "Ask your server if you need ingredient details.";
+      tags.innerHTML = displayTags
+        .map((tag) => `<span class="menu-tag ${escapeHtml(tag.color)}">${escapeHtml(tag.label)}</span>`)
+        .join("");
+      price.textContent = formatPrice(item.price);
+      addButton.disabled = !currentQrSession;
+      addButton.textContent = currentQrSession ? "Add to order" : "QR not active";
+      backdrop.hidden = false;
+      backdrop.classList.add("is-open");
+      document.body.style.overflow = "hidden";
+      window.setTimeout(() => document.getElementById("menuDetailClose")?.focus(), 0);
+    }
+
+    function closeMenuDetail() {
+      const backdrop = document.getElementById("menuDetailBackdrop");
+      if (!backdrop) return;
+      backdrop.classList.remove("is-open");
+      backdrop.hidden = true;
+      selectedMenuDetailId = null;
+      document.body.style.overflow = isServerModalOpen ? "hidden" : "";
+    }
+
+    function setupMenuDetail() {
+      const backdrop = document.getElementById("menuDetailBackdrop");
+      const closeButton = document.getElementById("menuDetailClose");
+      const addButton = document.getElementById("menuDetailAdd");
+      if (!backdrop || !closeButton || !addButton) return;
+
+      closeButton.addEventListener("click", closeMenuDetail);
+      backdrop.addEventListener("click", (event) => {
+        if (event.target === backdrop) closeMenuDetail();
+      });
+      addButton.addEventListener("click", () => {
+        if (!selectedMenuDetailId) return;
+        addToCart(selectedMenuDetailId);
+        closeMenuDetail();
+      });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !backdrop.hidden) closeMenuDetail();
+      });
     }
 
     function setupToTopButton() {
@@ -4886,11 +5227,19 @@
     function setupStickyHeaderState() {
       const page = document.body;
       const stickyShell = document.querySelector(".menu-sticky-shell");
-      if (!page || !stickyShell) return;
+      const stickySpacer = document.getElementById("menuStickySpacer");
+      if (!page || !stickyShell || !stickySpacer) return;
       let isCollapsed = page.classList.contains("is-scrolled");
       let frameId = 0;
 
+      const measureExpandedHeader = () => {
+        if (isCollapsed || window.innerWidth > 640) return;
+        const height = Math.ceil(stickyShell.getBoundingClientRect().height);
+        page.style.setProperty("--menu-sticky-expanded-height", `${height}px`);
+      };
+
       const applyStickyState = (shouldCollapse) => {
+        if (shouldCollapse && !isCollapsed) measureExpandedHeader();
         isCollapsed = shouldCollapse;
         page.classList.toggle("is-scrolled", isCollapsed);
       };
@@ -4899,8 +5248,8 @@
         frameId = 0;
         const scrollY = window.scrollY;
         const shouldCollapse = isCollapsed ? scrollY > 36 : scrollY > 112;
-        if (shouldCollapse === isCollapsed) return;
-        applyStickyState(shouldCollapse);
+        if (shouldCollapse !== isCollapsed) applyStickyState(shouldCollapse);
+        else measureExpandedHeader();
       };
 
       const syncStickyState = () => {
@@ -4923,6 +5272,7 @@
       renderOrderSummary();
       setupStickyHeaderState();
       setupToTopButton();
+      setupMenuDetail();
       setupSectionNavigation();
       setupOrderForm();
 
