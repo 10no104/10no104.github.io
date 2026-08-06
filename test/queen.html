@@ -759,73 +759,136 @@
       gap: 8px;
     }
 
-    .order-history-row {
-      display: grid;
-      grid-template-columns: 94px minmax(0, 1fr) auto;
-      gap: 13px;
-      align-items: center;
-      min-height: 72px;
-      padding: 11px 13px;
+    .order-history-session {
+      overflow: hidden;
       border: 1px solid rgba(113, 88, 60, 0.13);
-      border-radius: 15px;
+      border-radius: 17px;
       background: rgba(255, 255, 255, 0.88);
     }
 
-    .order-history-row.is-canceled {
-      opacity: 0.62;
+    .order-history-session-head {
+      display: grid;
+      grid-template-columns: minmax(150px, 0.7fr) minmax(250px, 1.2fr) auto;
+      gap: 18px;
+      align-items: center;
+      min-height: 74px;
+      padding: 12px 14px;
+      background: rgba(113, 88, 60, 0.045);
     }
 
-    .order-history-location,
-    .order-history-items {
+    .order-history-session-title,
+    .order-history-session-times {
       min-width: 0;
     }
 
-    .order-history-location {
+    .order-history-session-title,
+    .order-history-session-total {
       display: grid;
       gap: 4px;
     }
 
-    .order-history-location strong {
+    .order-history-session-title strong {
       color: #5f2731;
-      font-size: 0.9rem;
+      font-size: 0.96rem;
     }
 
-    .order-history-location time,
-    .order-history-status {
+    .order-history-session-title small,
+    .order-history-session-total small {
       color: #897568;
       font-size: 0.68rem;
       font-weight: 800;
     }
 
-    .order-history-items {
-      overflow: hidden;
+    .order-history-session-times {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .order-history-session-times span {
+      display: grid;
+      gap: 2px;
+    }
+
+    .order-history-session-times small {
+      color: #907b6c;
+      font-size: 0.6rem;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .order-history-session-times strong {
+      color: #3f2b22;
+      font-size: 0.78rem;
+      white-space: nowrap;
+    }
+
+    .order-history-session-times i {
+      color: #b29f90;
+      font-size: 0.8rem;
+      font-style: normal;
+    }
+
+    .order-history-session-total {
+      justify-items: end;
+      min-width: 90px;
+    }
+
+    .order-history-session-total strong {
+      color: #5f2731;
+      font-size: 1.08rem;
+      white-space: nowrap;
+    }
+
+    .order-history-session-items {
+      display: grid;
+      padding: 3px 14px;
+      border-top: 1px solid rgba(113, 88, 60, 0.1);
+    }
+
+    .order-history-session-item {
+      display: grid;
+      grid-template-columns: 38px minmax(0, 1fr) auto;
+      gap: 9px;
+      align-items: center;
+      min-height: 42px;
       color: #433129;
-      font-size: 0.82rem;
+      font-size: 0.78rem;
+    }
+
+    .order-history-session-item + .order-history-session-item {
+      border-top: 1px solid rgba(113, 88, 60, 0.09);
+    }
+
+    .order-history-session-item > strong,
+    .order-history-session-item > b {
+      color: #652433;
+      font-size: 0.76rem;
+      white-space: nowrap;
+    }
+
+    .order-history-session-item-copy {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
       font-weight: 800;
-      line-height: 1.45;
+    }
+
+    .order-history-session-item-copy small {
+      overflow: hidden;
+      color: #8a7769;
+      font-size: 0.64rem;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
 
-    .order-history-price {
-      display: grid;
-      justify-items: end;
-      gap: 4px;
-      color: #3f2b22;
-      font-size: 0.98rem;
-      white-space: nowrap;
-    }
-
-    .order-history-price .order-history-status {
-      padding: 4px 7px;
-      border-radius: 999px;
-      background: rgba(37, 99, 61, 0.09);
-      color: #25633d;
-    }
-
-    .order-history-row.is-canceled .order-history-status {
-      background: rgba(113, 88, 60, 0.09);
-      color: #756254;
+    .order-history-session-note {
+      padding: 8px 14px 10px;
+      border-top: 1px solid rgba(113, 88, 60, 0.08);
+      color: #8a7769;
+      font-size: 0.66rem;
+      font-weight: 800;
     }
 
     .order-history-empty {
@@ -848,9 +911,14 @@
         width: 100%;
       }
 
-      .order-history-row {
-        grid-template-columns: 78px minmax(0, 1fr) auto;
-        gap: 9px;
+      .order-history-session-head {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+      }
+
+      .order-history-session-times {
+        grid-column: 1 / -1;
+        grid-row: 2;
       }
     }
 
@@ -4747,7 +4815,7 @@
         <div class="order-history-head">
           <div class="order-history-copy">
             <h3 id="orderHistoryTitle">Past Orders</h3>
-            <p>Served and canceled orders, kept separate from the live table session.</p>
+            <p>Closed table sessions with every bill item combined.</p>
           </div>
           <div class="order-history-filters">
             <label class="order-history-field" for="orderHistoryDate">
@@ -5517,15 +5585,148 @@
       }).format(date);
     }
 
-    function getPastOrderHistoryRecords() {
-      return state.diningRequests
-        .filter((request) => (
-          request.kind === "order"
-          && ["completed", "served", "canceled"].includes(request.status)
-          && getDeviceDateValue(request.created_at) === state.orderHistoryDate
-          && (!state.orderHistoryTableCode || request.table_code.toLowerCase() === state.orderHistoryTableCode.toLowerCase())
-        ))
-        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    function findOrderHistoryQrSession(request) {
+      const directSessionId = Number(request.qr_session_id) || null;
+      if (directSessionId) {
+        const directSession = state.qrSessions.find((session) => session.id === directSessionId);
+        if (directSession) return directSession;
+      }
+
+      const requestTime = new Date(request.created_at || 0).getTime();
+      if (!Number.isFinite(requestTime)) return null;
+      const tableCode = String(request.table_code || "").trim().toLowerCase();
+      const qrNumber = Number(request.qr_number) || null;
+      return state.qrSessions
+        .filter((session) => {
+          const startedAt = new Date(session.started_at || 0).getTime();
+          const endedAt = session.ended_at ? new Date(session.ended_at).getTime() : Number.POSITIVE_INFINITY;
+          const sameAssignment = (qrNumber && session.qr_number === qrNumber)
+            || (tableCode && session.table_code.toLowerCase() === tableCode);
+          return sameAssignment
+            && Number.isFinite(startedAt)
+            && requestTime >= startedAt
+            && requestTime <= endedAt;
+        })
+        .sort((left, right) => new Date(right.started_at) - new Date(left.started_at))[0] || null;
+    }
+
+    function getOrderHistorySessionItems(requests) {
+      const lines = new Map();
+      let fallbackQuantity = 0;
+      let fallbackTotal = 0;
+
+      requests
+        .filter((request) => request.status !== "canceled")
+        .sort((left, right) => new Date(left.created_at) - new Date(right.created_at))
+        .forEach((request) => {
+          const items = Array.isArray(request.items) ? request.items : [];
+          if (!items.length) {
+            fallbackQuantity += Math.max(0, Number(request.item_count || 0));
+            fallbackTotal += Number(request.total || 0);
+            return;
+          }
+
+          items.forEach((item) => {
+            const quantity = Math.max(1, Number(item.quantity || 1));
+            const name = item.nameEn || item.nameKo || "Menu item";
+            const customizations = formatOrderItemCustomizations(item.customizations);
+            const unitPrice = Number(item.unitPrice || 0);
+            const rawLineTotal = Number(item.lineTotal);
+            const lineTotal = Number.isFinite(rawLineTotal) ? rawLineTotal : unitPrice * quantity;
+            const key = `${name}\u0000${customizations}\u0000${unitPrice}`;
+            const saved = lines.get(key) || { name, customizations, quantity: 0, total: 0 };
+            saved.quantity += quantity;
+            saved.total += lineTotal;
+            lines.set(key, saved);
+          });
+        });
+
+      if (fallbackQuantity || fallbackTotal) {
+        lines.set("__legacy__", {
+          name: "Recorded menu items",
+          customizations: "",
+          quantity: fallbackQuantity,
+          total: fallbackTotal
+        });
+      }
+      return [...lines.values()];
+    }
+
+    function getPastOrderHistorySessions() {
+      const groupedSessions = new Map();
+
+      state.diningRequests.forEach((request) => {
+        if (request.kind !== "order") return;
+        const qrSession = findOrderHistoryQrSession(request);
+        const partyId = Number(request.party_id) || null;
+        const isLegacyPastOrder = ["completed", "served", "canceled"].includes(request.status);
+        if (!qrSession && !partyId && !isLegacyPastOrder) return;
+
+        const fallbackDate = getDeviceDateValue(request.created_at);
+        const fallbackTable = String(request.table_code || "unknown").trim().toLowerCase();
+        const key = partyId
+          ? `party:${partyId}`
+          : qrSession
+            ? `qr-session:${qrSession.id}`
+            : `legacy:${fallbackTable}:${fallbackDate}`;
+        const group = groupedSessions.get(key) || {
+          key,
+          partyId,
+          requests: [],
+          qrSessions: new Map(),
+          tableCodes: new Map()
+        };
+        group.requests.push(request);
+        if (qrSession) group.qrSessions.set(qrSession.id, qrSession);
+        if (request.table_code) group.tableCodes.set(request.table_code.toLowerCase(), request.table_code);
+        if (qrSession?.table_code) group.tableCodes.set(qrSession.table_code.toLowerCase(), qrSession.table_code);
+        groupedSessions.set(key, group);
+      });
+
+      return [...groupedSessions.values()]
+        .map((group) => {
+          const qrSessions = [...group.qrSessions.values()];
+          const requestTimes = group.requests
+            .map((request) => new Date(request.created_at || 0).getTime())
+            .filter(Number.isFinite);
+          const sessionStartTimes = qrSessions
+            .map((session) => new Date(session.started_at || 0).getTime())
+            .filter(Number.isFinite);
+          const sessionEndTimes = qrSessions
+            .map((session) => new Date(session.ended_at || 0).getTime())
+            .filter((value) => Number.isFinite(value) && value > 0);
+          const activeParty = group.partyId ? getDiningParty(group.partyId) : null;
+          const isActive = activeParty?.status === "ACTIVE"
+            || qrSessions.some((session) => session.status === "active");
+          const openedAt = sessionStartTimes.length ? new Date(Math.min(...sessionStartTimes)).toISOString() : null;
+          const closedAt = sessionEndTimes.length ? new Date(Math.max(...sessionEndTimes)).toISOString() : null;
+          const firstOrderAt = requestTimes.length ? new Date(Math.min(...requestTimes)).toISOString() : null;
+          const billedRequests = group.requests.filter((request) => request.status !== "canceled");
+          const items = getOrderHistorySessionItems(group.requests);
+          return {
+            ...group,
+            tableCodes: [...group.tableCodes.values()].sort((a, b) => a.localeCompare(b, undefined, { numeric: true })),
+            openedAt,
+            closedAt,
+            firstOrderAt,
+            isActive,
+            items,
+            itemCount: items.reduce((sum, item) => sum + Number(item.quantity || 0), 0),
+            canceledCount: group.requests.length - billedRequests.length,
+            total: billedRequests.reduce((sum, request) => sum + Number(request.total || 0), 0)
+          };
+        })
+        .filter((session) => {
+          const historyDate = getDeviceDateValue(session.openedAt || session.firstOrderAt);
+          const normalizedTable = state.orderHistoryTableCode.toLowerCase();
+          const matchesTable = !normalizedTable
+            || session.tableCodes.some((tableCode) => tableCode.toLowerCase() === normalizedTable);
+          return !session.isActive && historyDate === state.orderHistoryDate && matchesTable;
+        })
+        .sort((left, right) => (
+          new Date(right.openedAt || right.firstOrderAt || 0)
+          - new Date(left.openedAt || left.firstOrderAt || 0)
+        ));
     }
 
     function getOrderHistoryTableCodes() {
@@ -5541,17 +5742,17 @@
       ).values()).sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }));
     }
 
-    function summarizeOrderHistoryItems(request) {
-      const items = Array.isArray(request.items) ? request.items : [];
-      if (!items.length) {
-        const itemCount = Math.max(0, Number(request.item_count || 0));
-        return `${itemCount} item${itemCount === 1 ? "" : "s"}`;
-      }
-      return items.map((item) => {
-        const quantity = Math.max(1, Number(item.quantity || 1));
-        const name = item.nameEn || item.nameKo || "Menu item";
-        return `${quantity}× ${name}`;
-      }).join(" · ");
+    function formatOrderHistorySessionTime(value, openedAt = null) {
+      if (!value) return "Unavailable";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "Unavailable";
+      const clock = formatRequestClock(value);
+      if (!openedAt || getDeviceDateValue(openedAt) === getDeviceDateValue(value)) return clock;
+      const dateLabel = new Intl.DateTimeFormat("en-CA", {
+        month: "short",
+        day: "numeric"
+      }).format(date);
+      return `${dateLabel} · ${clock}`;
     }
 
     function renderPastOrderHistory() {
@@ -5572,34 +5773,60 @@
         ))
       ].join("");
 
-      const records = getPastOrderHistoryRecords();
-      const billedTotal = records
-        .filter((request) => request.status !== "canceled")
-        .reduce((sum, request) => sum + Number(request.total || 0), 0);
+      const sessions = getPastOrderHistorySessions();
+      const billedTotal = sessions.reduce((sum, session) => sum + session.total, 0);
       summary.innerHTML = `
-        <span>${records.length} past order${records.length === 1 ? "" : "s"}${state.orderHistoryTableCode ? ` · Table ${escapeHtml(state.orderHistoryTableCode)}` : ""}</span>
+        <span>${sessions.length} table session${sessions.length === 1 ? "" : "s"}${state.orderHistoryTableCode ? ` · Table ${escapeHtml(state.orderHistoryTableCode)}` : ""}</span>
         <strong>${escapeHtml(formatRequestMoney(billedTotal))}</strong>
       `;
 
-      if (!records.length) {
-        list.innerHTML = '<div class="order-history-empty">No served or canceled orders for this date and table.</div>';
+      if (!sessions.length) {
+        list.innerHTML = '<div class="order-history-empty">No closed table sessions for this date and table.</div>';
         return;
       }
 
-      list.innerHTML = records.map((request) => {
-        const isCanceled = request.status === "canceled";
-        const statusLabel = REQUEST_STATUS_LABELS[request.status] || request.status;
+      list.innerHTML = sessions.map((session) => {
+        const tableLabel = session.tableCodes.length > 1 ? "Tables" : "Table";
+        const tableCodes = session.tableCodes.length ? session.tableCodes.join(" + ") : "Unknown";
+        const itemsMarkup = session.items.length
+          ? session.items.map((item) => `
+              <div class="order-history-session-item">
+                <strong>${escapeHtml(item.quantity)}×</strong>
+                <div class="order-history-session-item-copy">
+                  <span>${escapeHtml(item.name)}</span>
+                  ${item.customizations ? `<small>${escapeHtml(item.customizations)}</small>` : ""}
+                </div>
+                <b>${escapeHtml(formatRequestMoney(item.total))}</b>
+              </div>
+            `).join("")
+          : '<div class="order-history-session-item"><span></span><div class="order-history-session-item-copy"><span>No billed items</span></div><b>$0.00</b></div>';
         return `
-          <article class="order-history-row ${isCanceled ? "is-canceled" : ""}">
-            <div class="order-history-location">
-              <strong>Table ${escapeHtml(request.table_code || "-")}</strong>
-              <time datetime="${escapeHtml(request.created_at || "")}">${escapeHtml(formatRequestClock(request.created_at))}</time>
+          <article class="order-history-session">
+            <header class="order-history-session-head">
+              <div class="order-history-session-title">
+                <strong>${tableLabel} ${escapeHtml(tableCodes)}</strong>
+                <small>Closed session</small>
+              </div>
+              <div class="order-history-session-times">
+                <span>
+                  <small>Open</small>
+                  <strong>${escapeHtml(formatOrderHistorySessionTime(session.openedAt))}</strong>
+                </span>
+                <i aria-hidden="true">→</i>
+                <span>
+                  <small>Closed</small>
+                  <strong>${escapeHtml(formatOrderHistorySessionTime(session.closedAt, session.openedAt))}</strong>
+                </span>
+              </div>
+              <div class="order-history-session-total">
+                <small>${session.itemCount} item${session.itemCount === 1 ? "" : "s"}</small>
+                <strong>${escapeHtml(formatRequestMoney(session.total))}</strong>
+              </div>
+            </header>
+            <div class="order-history-session-items">
+              ${itemsMarkup}
             </div>
-            <div class="order-history-items" title="${escapeHtml(summarizeOrderHistoryItems(request))}">${escapeHtml(summarizeOrderHistoryItems(request))}</div>
-            <div class="order-history-price">
-              <strong>${escapeHtml(formatRequestMoney(request.total))}</strong>
-              <span class="order-history-status">${escapeHtml(statusLabel)}</span>
-            </div>
+            ${session.canceledCount ? `<div class="order-history-session-note">${session.canceledCount} canceled order${session.canceledCount === 1 ? "" : "s"} excluded from this total.</div>` : ""}
           </article>
         `;
       }).join("");
