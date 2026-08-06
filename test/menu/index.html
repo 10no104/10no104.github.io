@@ -2785,13 +2785,6 @@
           </div>
           <div class="order-list" id="orderListMobile"></div>
           <div class="order-summary" id="orderSummaryMobile"></div>
-          <div class="review-order-combined">
-            <div>
-              <span>This device after sending</span>
-              <strong id="combinedOrderItemCount">0 items</strong>
-            </div>
-            <strong id="combinedOrderTotal">$0.00</strong>
-          </div>
           <form id="orderForm">
             <input id="storeSelect" name="store" type="hidden" value="downtown" />
             <input id="tableCode" name="tableCode" type="hidden" value="A12" />
@@ -2800,14 +2793,6 @@
             <button class="drawer-submit-btn" id="orderSubmitBtn" type="button">Send new items</button>
             <p class="order-status" id="orderStatus" aria-live="polite"></p>
           </form>
-        </section>
-
-        <section class="order-server-card">
-          <div>
-            <strong>Need something?</strong>
-            <span>Request water, napkins, or a server from this table.</span>
-          </div>
-          <button class="server-call-btn" id="serverCallBtn" type="button" aria-label="Call server">Call server</button>
         </section>
 
         <div class="guest-order-history-head">
@@ -2929,6 +2914,7 @@
     const DINING_REQUESTS_TABLE = "dining_requests";
     const DINING_QR_SESSIONS_TABLE = "dining_qr_sessions";
     const DINING_GUEST_STORAGE_PREFIX = "ehwa_dining_guest";
+    const DINING_DEVICE_STORAGE_KEY = "ehwa_dining_device_id";
     const QR_SESSION_REFRESH_MS = 5000;
     const SHEET_CONFIG = {
       sheetId: "1xa9OZbctYnlbaAL8lKIgmefM5hvSw0Plk01lxp5G2fc",
@@ -3014,6 +3000,7 @@
     let diningPartyArchitectureAvailable = null;
     let guestPartyConflict = null;
     let lastNotificationId = 0;
+    let guestResolvePromise = null;
 
     function escapeHtml(text = "") {
       return String(text ?? "")
@@ -3606,14 +3593,59 @@
       return `${DINING_GUEST_STORAGE_PREFIX}:${branch}`;
     }
 
+    function getGuestCookieName(branch = getDiningBranch()) {
+      return `${DINING_GUEST_STORAGE_PREFIX}_${String(branch || MENU_BRANCH).replace(/[^a-z0-9_-]/gi, "_")}`;
+    }
+
+    function readCookieValue(name) {
+      const prefix = `${name}=`;
+      const item = String(document.cookie || "")
+        .split(";")
+        .map((part) => part.trim())
+        .find((part) => part.startsWith(prefix));
+      return item ? decodeURIComponent(item.slice(prefix.length)) : "";
+    }
+
+    function writeCookieValue(name, value, maxAgeSeconds) {
+      try {
+        document.cookie = `${name}=${encodeURIComponent(value)}; Path=/; Max-Age=${maxAgeSeconds}; SameSite=Lax`;
+      } catch {
+        // Local storage remains the primary persistence layer.
+      }
+    }
+
+    function getDiningDeviceId() {
+      let deviceId = "";
+      try {
+        deviceId = String(window.localStorage.getItem(DINING_DEVICE_STORAGE_KEY) || "");
+      } catch {
+        deviceId = "";
+      }
+      if (!deviceId) deviceId = readCookieValue(DINING_DEVICE_STORAGE_KEY);
+      if (!/^[a-z0-9-]{16,80}$/i.test(deviceId)) {
+        deviceId = globalThis.crypto?.randomUUID
+          ? globalThis.crypto.randomUUID()
+          : `device-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 14)}`;
+      }
+      try {
+        window.localStorage.setItem(DINING_DEVICE_STORAGE_KEY, deviceId);
+      } catch {
+        // Cookie fallback below keeps the device stable.
+      }
+      writeCookieValue(DINING_DEVICE_STORAGE_KEY, deviceId, 60 * 60 * 24 * 365);
+      return deviceId;
+    }
+
     function readStoredGuestId() {
       try {
         const value = JSON.parse(window.localStorage.getItem(getGuestStorageKey()) || "null");
         const guestId = String(value?.guest_id || "");
-        return /^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(guestId) ? guestId : null;
+        if (/^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(guestId)) return guestId;
       } catch {
-        return null;
+        // Cookie fallback below handles unavailable or corrupt local storage.
       }
+      const cookieGuestId = readCookieValue(getGuestCookieName());
+      return /^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(cookieGuestId) ? cookieGuestId : null;
     }
 
     function storeResolvedGuest(guest) {
@@ -3628,6 +3660,7 @@
       } catch {
         // Ordering still works when browser storage is unavailable.
       }
+      writeCookieValue(getGuestCookieName(), guest.guest_id, 60 * 60 * 12);
     }
 
     function getGuestDeviceInfo() {
@@ -3635,6 +3668,7 @@
         ? `${window.screen.width || 0}x${window.screen.height || 0}`
         : "";
       return {
+        deviceId: getDiningDeviceId(),
         userAgent: String(navigator.userAgent || "").slice(0, 500),
         platform: String(navigator.platform || "").slice(0, 100),
         language: String(navigator.language || "").slice(0, 40),
@@ -3750,16 +3784,30 @@
 
     async function resolveDiningGuest() {
       if (!currentQrNumber) return null;
-      const resolved = await callDiningRpc("resolve_dining_guest", {
-        p_branch: getDiningBranch(),
-        p_qr_number: currentQrNumber,
-        p_guest_id: readStoredGuestId(),
-        p_device_info: getGuestDeviceInfo(),
-        p_current_page: `${window.location.pathname}${window.location.search}`.slice(0, 300)
-      });
-      diningPartyArchitectureAvailable = true;
-      applyResolvedDiningGuest(resolved);
-      return resolved;
+      if (guestResolvePromise) return guestResolvePromise;
+
+      const resolveOnce = async () => {
+        const resolved = await callDiningRpc("resolve_dining_guest", {
+          p_branch: getDiningBranch(),
+          p_qr_number: currentQrNumber,
+          p_guest_id: readStoredGuestId(),
+          p_device_info: getGuestDeviceInfo(),
+          p_current_page: `${window.location.pathname}${window.location.search}`.slice(0, 300)
+        });
+        diningPartyArchitectureAvailable = true;
+        applyResolvedDiningGuest(resolved);
+        return resolved;
+      };
+
+      const lockName = `ehwa-dining-guest:${getDiningBranch()}`;
+      guestResolvePromise = globalThis.navigator?.locks?.request
+        ? navigator.locks.request(lockName, resolveOnce)
+        : resolveOnce();
+      try {
+        return await guestResolvePromise;
+      } finally {
+        guestResolvePromise = null;
+      }
     }
 
     async function fetchGuestNotifications() {
@@ -4455,8 +4503,6 @@
       const mobileOrderListEl = document.getElementById("orderListMobile");
       const mobileOrderSummaryEl = document.getElementById("orderSummaryMobile");
       const newOrderTotalEl = document.getElementById("newOrderTotal");
-      const combinedOrderTotalEl = document.getElementById("combinedOrderTotal");
-      const combinedOrderItemCountEl = document.getElementById("combinedOrderItemCount");
       const submitButton = document.getElementById("orderSubmitBtn");
       const orderBadgeEl = document.getElementById("bottomOrderBadge");
 
@@ -4464,8 +4510,6 @@
         !mobileOrderListEl
         || !mobileOrderSummaryEl
         || !newOrderTotalEl
-        || !combinedOrderTotalEl
-        || !combinedOrderItemCountEl
       ) {
         return;
       }
@@ -4512,14 +4556,9 @@
       const subtotal = getCartSubtotal();
       const tax = getCartTax();
       const total = getCartTotal();
-      const combinedItemCount = sentOrder.itemCount + itemCount;
-      const combinedTotal = Number((sentOrder.total + total).toFixed(2));
-
       mobileOrderListEl.innerHTML = newItemsMarkup;
       mobileOrderSummaryEl.innerHTML = summaryMarkup(itemCount, subtotal, tax, total);
       newOrderTotalEl.textContent = formatCurrency(total);
-      combinedOrderItemCountEl.textContent = `${combinedItemCount} item${combinedItemCount === 1 ? "" : "s"}`;
-      combinedOrderTotalEl.textContent = formatCurrency(combinedTotal);
       if (cartItems.length) bindOrderListInteractions(mobileOrderListEl);
       if (submitButton) {
         submitButton.disabled = !cartItems.length || !currentQrSession || isDiningRequestSubmitting;
@@ -4718,7 +4757,7 @@
       const modalConfirmBtn = document.getElementById("serverModalConfirmBtn");
       const requestGrid = document.getElementById("serverRequestGrid");
       const orderSubmitBtn = document.getElementById("orderSubmitBtn");
-      if (!toTopBtn || !serverCallBtn || !form || !statusEl || !modalBackdrop || !modalMessage || !modalCancelBtn || !modalConfirmBtn || !requestGrid || !orderSubmitBtn) return;
+      if (!toTopBtn || !form || !statusEl || !modalBackdrop || !modalMessage || !modalCancelBtn || !modalConfirmBtn || !requestGrid || !orderSubmitBtn) return;
 
       window.addEventListener("scroll", () => {
         const shouldShow = window.scrollY > 380;
@@ -4780,7 +4819,7 @@
         });
       });
 
-      serverCallBtn.addEventListener("click", () => {
+      serverCallBtn?.addEventListener("click", () => {
         modalMessage.textContent = "Request type";
 
         openServerModal();

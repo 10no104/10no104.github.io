@@ -1992,6 +1992,12 @@
       margin-top: auto;
     }
 
+    .qr-station-actions:empty,
+    .floor-table-actions:empty,
+    .table-map-detail-actions:empty {
+      display: none;
+    }
+
     .qr-station-btn {
       min-height: 34px;
       padding: 0 8px;
@@ -2197,6 +2203,12 @@
       border: 1px solid rgba(113, 88, 60, 0.13);
       border-radius: 16px;
       background: #f3ece3;
+    }
+
+    .cashier-code-bar,
+    .request-toolbar,
+    .request-filter-row {
+      display: none !important;
     }
 
     .cashier-code-copy {
@@ -4544,7 +4556,7 @@
       }
 
       .app-view.placeholder-view[data-view="tables"].is-active {
-        grid-template-columns: minmax(0, 1.7fr) minmax(300px, 0.78fr);
+        grid-template-columns: minmax(0, 1fr);
         align-items: start;
         gap: 12px;
       }
@@ -4562,17 +4574,12 @@
       }
 
       .app-view[data-view="tables"] > .purpose-panel:nth-of-type(2) {
-        grid-column: 1;
-        grid-row: 2 / span 2;
-      }
-
-      .app-view[data-view="tables"] > .purpose-panel:nth-of-type(3) {
-        grid-column: 2;
+        grid-column: 1 / -1;
         grid-row: 2;
       }
 
       .app-view[data-view="tables"] > .qr-session-control-panel {
-        grid-column: 2;
+        grid-column: 1 / -1;
         grid-row: 3;
       }
 
@@ -4735,22 +4742,11 @@
         </div>
       </section>
 
-      <section class="purpose-panel">
-        <div class="party-panel-head">
-          <div>
-            <h3>Active Parties</h3>
-            <p>Review tables, Guest device bills, and checkout from one place.</p>
-          </div>
-        </div>
-        <p class="party-status" id="partyStatus">Loading active Parties…</p>
-        <div class="party-list" id="partyList" aria-live="polite"></div>
-      </section>
-
       <details class="purpose-panel qr-session-control-panel">
         <summary class="qr-session-summary">
           <div>
             <h3>QR Session Details</h3>
-            <p>Active Party QR assignments and retained session history.</p>
+            <p>Current Party QR assignments only.</p>
           </div>
           <div class="qr-session-summary-side">
             <span class="qr-session-summary-count" id="qrSessionToggleLabel">0 assigned</span>
@@ -5427,6 +5423,25 @@
       return state.partySnapshot.guests.filter((guest) => guest.party_id === numericId);
     }
 
+    function getDiningGuestDeviceKey(guest) {
+      const deviceInfo = guest?.device_info && typeof guest.device_info === "object"
+        ? guest.device_info
+        : {};
+      const explicitDeviceId = String(deviceInfo.deviceId || deviceInfo.device_id || "").trim();
+      if (explicitDeviceId) return `device:${explicitDeviceId}`;
+
+      const legacyFingerprint = [
+        deviceInfo.userAgent,
+        deviceInfo.platform,
+        deviceInfo.screen,
+        deviceInfo.timezone,
+        deviceInfo.language
+      ].map((value) => String(value || "").trim().toLowerCase()).join("|");
+      return legacyFingerprint.replaceAll("|", "")
+        ? `legacy:${legacyFingerprint}`
+        : `guest:${guest?.id || "unknown"}`;
+    }
+
     function getDiningPartyCapacity(partyOrId) {
       const party = typeof partyOrId === "object"
         ? partyOrId
@@ -5438,10 +5453,19 @@
             && (!guest.expires_at || new Date(guest.expires_at).getTime() > Date.now())
           ))
         : [];
+      const activeDevices = new Map();
+      activeGuests.forEach((guest) => {
+        const key = getDiningGuestDeviceKey(guest);
+        const saved = activeDevices.get(key);
+        if (!saved || new Date(guest.last_seen_at || 0) > new Date(saved.last_seen_at || 0)) {
+          activeDevices.set(key, guest);
+        }
+      });
+      const activeCount = activeDevices.size;
       return {
         expected,
-        activeCount: activeGuests.length,
-        isOver: activeGuests.length > expected
+        activeCount,
+        isOver: activeCount > expected
       };
     }
 
@@ -5498,9 +5522,37 @@
       )) || null;
     }
 
+    function isRequestInCurrentDiningSession(request) {
+      const partyId = Number(request?.party_id) || null;
+      if (partyId) {
+        const party = getDiningParty(partyId);
+        if (party) return party.status === "ACTIVE";
+        if (state.partyArchitectureAvailable === true) return false;
+      }
+
+      const qrSessionId = Number(request?.qr_session_id) || null;
+      if (qrSessionId) {
+        return state.qrSessions.some((session) => (
+          session.id === qrSessionId
+          && session.status === "active"
+        ));
+      }
+
+      const activeSession = getActiveTableSession(request?.table_code);
+      if (!activeSession) return false;
+      const requestTime = new Date(request?.created_at || 0).getTime();
+      const sessionStart = new Date(activeSession.started_at || 0).getTime();
+      return Number.isFinite(requestTime)
+        && Number.isFinite(sessionStart)
+        && requestTime >= sessionStart;
+    }
+
     function getTableRequestHistory(tableCode) {
       const normalizedTable = String(tableCode || "").trim().toLowerCase();
-      return state.diningRequests.filter((request) => request.table_code.toLowerCase() === normalizedTable);
+      return state.diningRequests.filter((request) => (
+        request.table_code.toLowerCase() === normalizedTable
+        && isRequestInCurrentDiningSession(request)
+      ));
     }
 
     function formatPartyDiagnosticTime(value) {
@@ -5823,7 +5875,6 @@
                 ${activeParty ? `
                   <button class="qr-station-btn reset" type="button" data-close-party="${activeParty.id}">Review &amp; Checkout</button>
                 ` : ""}
-                <button class="qr-station-btn ${activeParty ? "" : "is-wide"}" type="button" data-qr-history="${qrNumber}">History</button>
               </div>
             </article>
           `;
@@ -5864,7 +5915,6 @@
                   ${isUpdating || state.qrSessionLoadError ? "disabled" : ""}
                 >${isUpdating ? "Working…" : "End session"}</button>
               ` : ""}
-              <button class="qr-station-btn ${activeSession ? "" : "is-wide"}" type="button" data-qr-history="${qrNumber}">History</button>
             </div>
           </article>
         `;
@@ -5935,7 +5985,7 @@
             ? `<strong>Party #${activeParty.id} · ${escapeHtml(formatDiningQrList(partyQrs))}</strong><br>${activeRequests.length} open request${activeRequests.length === 1 ? "" : "s"}`
           : activeSession
           ? `<strong>QR ${String(activeSession.qr_number).padStart(2, "0")}</strong><br>${activeRequests.length} open request${activeRequests.length === 1 ? "" : "s"} · since ${formatRequestClock(activeSession.started_at)}`
-          : `${history.length} historical request${history.length === 1 ? "" : "s"}<br>Empty · Tap to select this table first.`;
+          : "Empty · Tap to start a new Party.";
         return `
           <article
             class="floor-table-card ${stateClasses}"
@@ -5963,7 +6013,6 @@
                   ${isUpdating ? "disabled" : ""}
                 >${isUpdating ? "Working…" : "End session"}</button>
               ` : ""}
-              <button class="qr-station-btn" type="button" data-table-history="${escapeHtml(tableCode)}">History</button>
             </div>
           </article>
         `;
@@ -6009,7 +6058,7 @@
           ? `Party #${activeParty.id} · ${formatDiningQrList(partyQrs)} · ${activeRequests.length} open request${activeRequests.length === 1 ? "" : "s"}`
         : activeSession
         ? `QR ${String(activeSession.qr_number).padStart(2, "0")} · ${activeRequests.length} open request${activeRequests.length === 1 ? "" : "s"} · since ${formatRequestClock(activeSession.started_at)}`
-        : `Empty · ${history.length} historical request${history.length === 1 ? "" : "s"}`;
+        : "Empty · Ready for a new Party";
 
       return `
         <div class="table-map-detail">
@@ -6034,7 +6083,6 @@
                 ${isUpdating ? "disabled" : ""}
               >${isUpdating ? "Working…" : "End session"}</button>
             ` : ""}
-            <button class="qr-station-btn" type="button" data-table-history="${escapeHtml(tableCode)}">History</button>
           </div>
         </div>
       `;
@@ -6954,7 +7002,10 @@
     }
 
     function getUnconfirmedDiningRequests() {
-      return state.diningRequests.filter((request) => request.status === "new");
+      return state.diningRequests.filter((request) => (
+        request.status === "new"
+        && isRequestInCurrentDiningSession(request)
+      ));
     }
 
     function getUnconfirmedNewReservations() {
@@ -7147,19 +7198,28 @@
     }
 
     function getActiveDiningRequests() {
-      return state.diningRequests.filter((request) => !["completed", "canceled"].includes(request.status));
+      return state.diningRequests.filter((request) => (
+        !["completed", "canceled"].includes(request.status)
+        && isRequestInCurrentDiningSession(request)
+      ));
     }
 
     function getFilteredDiningRequests() {
       if (state.selectedRequestQrNumber) {
         return state.diningRequests
-          .filter((request) => request.qr_number === state.selectedRequestQrNumber)
+          .filter((request) => (
+            request.qr_number === state.selectedRequestQrNumber
+            && isRequestInCurrentDiningSession(request)
+          ))
           .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
       }
       if (state.selectedRequestTableCode) {
         const normalizedTable = state.selectedRequestTableCode.toLowerCase();
         return state.diningRequests
-          .filter((request) => request.table_code.toLowerCase() === normalizedTable)
+          .filter((request) => (
+            request.table_code.toLowerCase() === normalizedTable
+            && isRequestInCurrentDiningSession(request)
+          ))
           .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
       }
       const activeRequests = getActiveDiningRequests();
@@ -7170,7 +7230,10 @@
         return activeRequests.filter((request) => request.kind === "service");
       }
       if (state.requestFilter === "completed") {
-        return state.diningRequests.filter((request) => ["completed", "canceled"].includes(request.status));
+        return state.diningRequests.filter((request) => (
+          ["completed", "canceled"].includes(request.status)
+          && isRequestInCurrentDiningSession(request)
+        ));
       }
       return activeRequests.slice().sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
     }
