@@ -2789,6 +2789,13 @@
       gap: 1px;
     }
 
+    .menu-detail-slide-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
     .menu-detail-slide-heading strong {
       color: #2f2119;
       font-size: 1.05rem;
@@ -2800,6 +2807,15 @@
       color: #806e60;
       font-size: 0.7rem;
       font-weight: 850;
+    }
+
+    .menu-detail-slide-price {
+      flex: 0 0 auto;
+      color: #5a1122;
+      font-size: 1rem;
+      font-weight: 950;
+      letter-spacing: -0.025em;
+      line-height: 1.2;
     }
 
     .menu-detail-slide-description {
@@ -2829,6 +2845,14 @@
     }
 
     .menu-detail-sheet:has(.menu-detail-gallery.is-menu-set) > .menu-detail-copy {
+      display: none;
+    }
+
+    .menu-detail-sheet:has(.menu-detail-gallery.is-menu-set) > .menu-detail-footer {
+      justify-content: flex-end;
+    }
+
+    .menu-detail-sheet:has(.menu-detail-gallery.is-menu-set) > .menu-detail-footer > .menu-detail-price {
       display: none;
     }
 
@@ -6390,9 +6414,12 @@
           </span>
           ${isMenuSet ? `
             <span class="menu-detail-slide-body">
-              <span class="menu-detail-slide-heading">
-                <strong>${escapeHtml(variant.nameKo)}</strong>
-                ${variant.nameEn ? `<small>${escapeHtml(variant.nameEn)}</small>` : ""}
+              <span class="menu-detail-slide-top">
+                <span class="menu-detail-slide-heading">
+                  <strong>${escapeHtml(variant.nameKo)}</strong>
+                  ${variant.nameEn ? `<small>${escapeHtml(variant.nameEn)}</small>` : ""}
+                </span>
+                <strong class="menu-detail-slide-price">${escapeHtml(formatCurrency(slidePrice))}</strong>
               </span>
               <span class="menu-detail-slide-description">${escapeHtml(variant.description)}</span>
               ${cardTags ? `<span class="menu-detail-slide-tags">${cardTags}</span>` : ""}
