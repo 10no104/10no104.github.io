@@ -1073,9 +1073,9 @@
     .table-map-overview {
       display: grid;
       grid-template-columns: minmax(0, 1.38fr) minmax(250px, 0.92fr);
-      grid-template-rows: repeat(2, minmax(210px, 1fr));
+      grid-template-rows: repeat(2, minmax(145px, 1fr));
       gap: 12px;
-      min-height: clamp(510px, 60vh, 660px);
+      min-height: clamp(340px, 48vh, 560px);
     }
 
     .table-map-zone-preview {
@@ -1386,7 +1386,8 @@
       line-height: 1.45;
     }
 
-    .table-map-editor-link {
+    .table-map-editor-link,
+    .table-map-mode-badge {
       display: inline-flex;
       flex: 0 0 auto;
       align-items: center;
@@ -5460,7 +5461,7 @@
             <h3>Table Map</h3>
             <p>See every active table at once, then tap an area to zoom in and select tables.</p>
           </div>
-          <a class="table-map-editor-link" href="./table.html">Edit map</a>
+          <span class="table-map-mode-badge">Tablet preview</span>
         </div>
         <div class="table-map-legend" aria-label="Table state colors">
           <span><i></i>Empty</span>
@@ -7009,11 +7010,21 @@
     }
 
     function getAllDiningTableCodes() {
+      const registeredTableCodes = state.partySnapshot.tables
+        .map((table) => table.table_code)
+        .filter(Boolean);
+      const preferredTableCodes = TABLE_MAP_ZONE_ORDER.flatMap((zone) => (
+        TABLE_MAP_ZONE_META[zone]?.preferredTableCodes || []
+      ));
+      const sourceTableCodes = registeredTableCodes.length
+        ? registeredTableCodes
+        : preferredTableCodes.filter((tableCode) => (
+            state.tableOptions.some((option) => (
+              String(option || "").trim().toLowerCase() === tableCode.toLowerCase()
+            ))
+          ));
       return Array.from(new Map(
-        [
-          ...state.tableOptions,
-          ...state.partySnapshot.tables.map((table) => table.table_code)
-        ]
+        sourceTableCodes
           .map((tableCode) => String(tableCode || "").trim())
           .filter(Boolean)
           .map((tableCode) => [tableCode.toLowerCase(), tableCode])
@@ -7357,29 +7368,98 @@
       `;
     }
 
+    function getTableMapPreviewStatus(tableCode) {
+      const tableRecord = getDiningTableRecord(tableCode);
+      const activeParty = tableRecord?.current_party_id ? getDiningParty(tableRecord.current_party_id) : null;
+      const activeSession = state.partyQrPoolAvailable ? null : getActiveTableSession(tableCode);
+      return {
+        activeParty,
+        activeSession,
+        occupied: Boolean(activeParty || activeSession || tableRecord?.current_party_id)
+      };
+    }
+
+    function renderTemporaryTableMapOverview(layouts) {
+      const zoneMarkup = TABLE_MAP_ZONE_ORDER.map((zone) => {
+        const meta = TABLE_MAP_ZONE_META[zone];
+        const layout = layouts.get(zone);
+        const tableItems = layout.items.filter((item) => item.type === "table" && item.tableCode);
+        const obstacleItems = layout.items.filter((item) => item.type === "obstacle");
+        const activeCount = tableItems.filter((item) => getTableMapPreviewStatus(item.tableCode).occupied).length;
+        const obstacleMarkup = obstacleItems.map((item) => {
+          const x = Math.min(item.x, 100 - item.w);
+          const y = Math.min(item.y, 100 - item.h);
+          return `<span class="table-map-mini-obstacle" style="left:${x}%;top:${y}%;width:${item.w}%;height:${item.h}%" aria-hidden="true"></span>`;
+        }).join("");
+        const tableMarkup = tableItems.map((item) => {
+          const x = Math.min(item.x, 100 - item.w);
+          const y = Math.min(item.y, 100 - item.h);
+          const occupied = getTableMapPreviewStatus(item.tableCode).occupied;
+          return `
+            <span
+              class="table-map-mini-table is-${escapeHtml(item.shape)} ${occupied ? "is-assigned" : "is-empty"}"
+              style="left:${x}%;top:${y}%;width:${item.w}%;height:${item.h}%"
+              aria-hidden="true"
+            >${escapeHtml(item.tableCode)}</span>
+          `;
+        }).join("");
+        return `
+          <button
+            class="table-map-zone-preview"
+            type="button"
+            data-map-preview-zone="${escapeHtml(zone)}"
+            data-zone="${escapeHtml(zone)}"
+            aria-label="Open ${escapeHtml(meta.label)} map, ${activeCount} active of ${tableItems.length} tables"
+          >
+            <span class="table-map-zone-preview-head">
+              <span class="table-map-zone-preview-copy">
+                <strong>${escapeHtml(meta.label)}</strong>
+                <small>${escapeHtml(meta.description)} · Tap to zoom</small>
+              </span>
+              <span class="table-map-zone-preview-stats">
+                <strong>${activeCount} active</strong>
+                <span>${tableItems.length} tables</span>
+              </span>
+            </span>
+            <span class="table-map-mini-canvas" aria-hidden="true">
+              ${obstacleMarkup}
+              ${tableMarkup}
+            </span>
+          </button>
+        `;
+      }).join("");
+      return `<div class="table-map-overview">${zoneMarkup}</div>`;
+    }
+
+    function renderTemporaryFocusedTableMap(zone, layout) {
+      const meta = TABLE_MAP_ZONE_META[zone];
+      const tableItems = layout.items.filter((item) => item.type === "table" && item.tableCode);
+      const activeCount = tableItems.filter((item) => getTableMapPreviewStatus(item.tableCode).occupied).length;
+      return `
+        <section class="table-map-zone-focus" data-zone="${escapeHtml(zone)}">
+          <div class="table-map-focus-head">
+            <div class="table-map-focus-copy">
+              <strong>${escapeHtml(meta.label)} · Expanded</strong>
+              <small>Tap an empty table to select it, or tap an active table to review.</small>
+            </div>
+            <span class="table-map-focus-badge">${activeCount} active · ${tableItems.length} tables</span>
+          </div>
+          ${renderSavedTableMap(layout)}
+        </section>
+      `;
+    }
+
     function renderTableMap() {
       const grid = document.getElementById("tableMapGrid");
       if (!grid) return;
       renderPartySetupBar();
 
-      const allTableOptions = Array.from(new Map(
-        [
-          ...state.tableOptions,
-          ...state.partySnapshot.tables.map((table) => table.table_code)
-        ]
-          .map((tableCode) => String(tableCode || "").trim())
-          .filter(Boolean)
-          .map((tableCode) => [tableCode.toLowerCase(), tableCode])
-      ).values());
-
-      const zoneCounts = { first: 0, second: 0, patio: 0 };
-      Object.keys(zoneCounts).forEach((zone) => {
-        const layout = getDiningTableMapLayout(zone);
-        const savedTableCount = layout?.items.filter((item) => item.type === "table" && item.tableCode).length || 0;
-        zoneCounts[zone] = layout
-          ? savedTableCount
-          : allTableOptions.filter((tableCode) => getDiningTableMapZone(tableCode) === zone).length;
-      });
+      const layouts = getTemporaryTableMapLayouts();
+      const zoneCounts = Object.fromEntries(TABLE_MAP_ZONE_ORDER.map((zone) => [
+        zone,
+        layouts.get(zone).items.filter((item) => item.type === "table" && item.tableCode).length
+      ]));
+      zoneCounts.overview = Object.values(zoneCounts).reduce((sum, count) => sum + count, 0);
       document.querySelectorAll("[data-table-map-count]").forEach((count) => {
         count.textContent = String(zoneCounts[count.dataset.tableMapCount] || 0);
       });
@@ -7389,19 +7469,23 @@
         button.setAttribute("aria-pressed", isActive ? "true" : "false");
       });
 
-      const layout = getDiningTableMapLayout();
-      if (layout?.items.length) {
-        grid.innerHTML = renderSavedTableMap(layout);
+      if (state.activeTableMapZone === "overview") {
+        state.selectedMapTableCode = null;
+        grid.classList.add("is-overview");
+        grid.classList.remove("is-zone-view");
+        grid.removeAttribute("data-zone");
+        grid.innerHTML = renderTemporaryTableMapOverview(layouts);
         return;
       }
 
-      const tableOptions = allTableOptions.filter(
-        (tableCode) => getDiningTableMapZone(tableCode) === state.activeTableMapZone
-      );
-      const setupMessage = state.tableLayoutLoadError
-        ? '<p class="table-map-layout-note is-error">Saved table maps are unavailable. Run tools/sql/dining-table-layout-schema.sql in Supabase. The table list remains usable below.</p>'
-        : '<p class="table-map-layout-note">No saved visual map for this floor yet. Use Edit map to place tables. The table list remains usable below.</p>';
-      grid.innerHTML = setupMessage + renderFallbackTableCards(tableOptions);
+      const zone = TABLE_MAP_ZONE_ORDER.includes(state.activeTableMapZone)
+        ? state.activeTableMapZone
+        : "first";
+      state.activeTableMapZone = zone;
+      grid.classList.remove("is-overview");
+      grid.classList.add("is-zone-view");
+      grid.dataset.zone = zone;
+      grid.innerHTML = renderTemporaryFocusedTableMap(zone, layouts.get(zone));
     }
 
     function renderTableOrderHistoryEntry(request, { activePartyId = null, activeSessionId = null } = {}) {
@@ -10738,7 +10822,9 @@
     document.getElementById("tableMapTabs").addEventListener("click", (event) => {
       const button = event.target.closest("[data-table-map-zone]");
       if (!button) return;
-      state.activeTableMapZone = button.dataset.tableMapZone || "first";
+      const nextZone = button.dataset.tableMapZone || "overview";
+      if (!["overview", ...TABLE_MAP_ZONE_ORDER].includes(nextZone)) return;
+      state.activeTableMapZone = nextZone;
       state.selectedMapTableCode = null;
       renderTableMap();
     });
@@ -10823,6 +10909,16 @@
         event.preventDefault();
         event.stopPropagation();
         suppressTableMapClick = false;
+        return;
+      }
+      const previewZoneButton = event.target.closest("[data-map-preview-zone]");
+      if (previewZoneButton) {
+        const nextZone = previewZoneButton.dataset.mapPreviewZone;
+        if (TABLE_MAP_ZONE_ORDER.includes(nextZone)) {
+          state.activeTableMapZone = nextZone;
+          state.selectedMapTableCode = null;
+          renderTableMap();
+        }
         return;
       }
       const historyButton = event.target.closest("[data-table-history]");
