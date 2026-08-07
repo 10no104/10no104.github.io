@@ -2660,23 +2660,28 @@
     .menu-detail-visual {
       position: relative;
       overflow: hidden;
-      margin-inline: -4px;
-      border-radius: 20px;
-      background: transparent;
+      margin-inline: -16px;
+      border-radius: 24px;
+      background: #fff;
     }
 
     .menu-detail-gallery {
       display: flex;
       align-items: flex-start;
-      gap: 10px;
+      gap: 12px;
       width: 100%;
       height: auto;
-      padding-inline: 6%;
+      padding-inline: 5%;
       overflow-x: auto;
       overscroll-behavior-x: contain;
-      scroll-padding-inline: 6%;
+      scroll-padding-inline: 5%;
       scroll-snap-type: x mandatory;
       scrollbar-width: none;
+    }
+
+    .menu-detail-gallery.is-single {
+      padding-inline: 0;
+      overflow: hidden;
     }
 
     .menu-detail-gallery::-webkit-scrollbar,
@@ -2686,26 +2691,36 @@
 
     .menu-detail-slide {
       position: relative;
-      flex: 0 0 88%;
-      aspect-ratio: 4 / 3;
+      flex: 0 0 90%;
+      aspect-ratio: 1 / 1;
       padding: 0;
       overflow: hidden;
-      border: 2px solid transparent;
-      border-radius: 18px;
-      background: #eee6da;
-      box-shadow: 0 10px 24px rgba(44, 27, 16, 0.12);
-      opacity: 0.68;
+      border: 2px solid rgba(125, 98, 63, 0.12);
+      border-radius: 22px;
+      background: #fff;
+      box-shadow: 0 12px 28px rgba(44, 27, 16, 0.1);
       scroll-snap-align: center;
-      transform: scale(0.965);
-      transition: opacity 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+      scroll-snap-stop: always;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
       cursor: pointer;
     }
 
-    .menu-detail-slide.is-static,
+    .menu-detail-gallery.is-single .menu-detail-slide {
+      flex-basis: 100%;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+      cursor: default;
+    }
+
+    .menu-detail-slide.is-current,
     .menu-detail-slide:has(input:checked) {
       border-color: rgba(212, 175, 55, 0.76);
-      opacity: 1;
-      transform: scale(1);
+      box-shadow: 0 14px 30px rgba(90, 17, 34, 0.14);
+    }
+
+    .menu-detail-gallery.is-single .menu-detail-slide.is-current {
+      box-shadow: none;
     }
 
     .menu-detail-slide-input {
@@ -2721,7 +2736,8 @@
     .menu-detail-slide img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
+      object-position: center;
     }
 
     .menu-detail-slide:focus-visible {
@@ -2737,16 +2753,24 @@
     .menu-detail-slide::after {
       content: "";
       position: absolute;
-      inset: 42% 0 0;
-      background: linear-gradient(180deg, transparent, rgba(31, 19, 12, 0.62));
+      inset: auto 10px 10px;
+      height: 58px;
+      border-radius: 14px;
+      background: rgba(39, 24, 16, 0.72);
       pointer-events: none;
+      -webkit-backdrop-filter: blur(7px);
+      backdrop-filter: blur(7px);
+    }
+
+    .menu-detail-gallery.is-single .menu-detail-slide::after {
+      display: none;
     }
 
     .menu-detail-slide-label {
       position: absolute;
-      left: 16px;
-      right: 16px;
-      bottom: 14px;
+      left: 22px;
+      right: 22px;
+      bottom: 20px;
       z-index: 1;
       display: flex;
       align-items: flex-end;
@@ -2755,6 +2779,10 @@
       color: #fff;
       text-align: left;
       text-shadow: 0 2px 8px rgba(0, 0, 0, 0.32);
+    }
+
+    .menu-detail-gallery.is-single .menu-detail-slide-label {
+      display: none;
     }
 
     .menu-detail-slide-copy {
@@ -3331,6 +3359,11 @@
         height: 40px;
       }
 
+      .menu-detail-visual {
+        margin-inline: -12px;
+        border-radius: 20px;
+      }
+
       .menu-detail-gallery {
         height: auto;
         padding-inline: 5%;
@@ -3339,7 +3372,8 @@
 
       .menu-detail-slide {
         flex-basis: 90%;
-        aspect-ratio: 4 / 3;
+        aspect-ratio: 1 / 1;
+        border-radius: 20px;
       }
 
       .menu-detail-gallery-nav {
@@ -3850,6 +3884,7 @@
     let requestToastHandle = null;
     let selectedMenuDetailId = null;
     let selectedMenuGalleryIndex = 0;
+    let menuDetailGallerySettleHandle = null;
     let isDiningRequestSubmitting = false;
     let currentQrNumber = null;
     let currentQrSession = null;
@@ -6282,6 +6317,7 @@
 
       selectedMenuGalleryIndex = 0;
       gallery.scrollLeft = 0;
+      gallery.classList.toggle("is-single", slides.length === 1);
       gallery.innerHTML = slides.map((image, index) => {
         const slidePrice = image.variantPrice != null
           ? Number(image.variantPrice)
@@ -6343,6 +6379,9 @@
       if (!gallery || !status || !prev || !next || !slideCount) return;
 
       selectedMenuGalleryIndex = Math.max(0, Math.min(selectedMenuGalleryIndex, slideCount - 1));
+      [...gallery.children].forEach((slide, index) => {
+        slide.classList.toggle("is-current", index === selectedMenuGalleryIndex);
+      });
       status.innerHTML = `<b>${selectedMenuGalleryIndex + 1}</b><span>/ ${slideCount}</span>`;
       prev.disabled = selectedMenuGalleryIndex === 0;
       next.disabled = selectedMenuGalleryIndex === slideCount - 1;
@@ -6396,6 +6435,23 @@
       selectMenuDetailFlavor(slide.dataset.flavorOptionId, slide.dataset.flavorGroupId || "");
     }
 
+    function settleMenuDetailGallery() {
+      const gallery = document.getElementById("menuDetailGallery");
+      if (!gallery?.clientWidth) return;
+      if (menuDetailGallerySettleHandle) {
+        window.clearTimeout(menuDetailGallerySettleHandle);
+        menuDetailGallerySettleHandle = null;
+      }
+      selectedMenuGalleryIndex = getCenteredMenuDetailGalleryIndex(gallery);
+      syncMenuDetailGalleryStatus();
+      selectMenuDetailFlavorFromCurrentSlide();
+    }
+
+    function queueMenuDetailGallerySettle() {
+      if (menuDetailGallerySettleHandle) window.clearTimeout(menuDetailGallerySettleHandle);
+      menuDetailGallerySettleHandle = window.setTimeout(settleMenuDetailGallery, 140);
+    }
+
     function openMenuDetail(menuId) {
       const item = allMenus.find((candidate) => getMenuId(candidate) === menuId);
       const backdrop = document.getElementById("menuDetailBackdrop");
@@ -6419,6 +6475,10 @@
       backdrop.classList.remove("is-open");
       backdrop.hidden = true;
       selectedMenuDetailId = null;
+      if (menuDetailGallerySettleHandle) {
+        window.clearTimeout(menuDetailGallerySettleHandle);
+        menuDetailGallerySettleHandle = null;
+      }
       document.body.style.overflow = isServerModalOpen ? "hidden" : "";
     }
 
@@ -6614,13 +6674,9 @@
         scrollMenuDetailGallery(selectedMenuGalleryIndex, { absolute: true });
       });
       gallery.addEventListener("scroll", () => {
-        if (!gallery.clientWidth) return;
-        const nextIndex = getCenteredMenuDetailGalleryIndex(gallery);
-        if (nextIndex === selectedMenuGalleryIndex) return;
-        selectedMenuGalleryIndex = nextIndex;
-        syncMenuDetailGalleryStatus();
-        selectMenuDetailFlavorFromCurrentSlide();
+        queueMenuDetailGallerySettle();
       }, { passive: true });
+      gallery.addEventListener("scrollend", settleMenuDetailGallery);
       gallery.addEventListener("keydown", (event) => {
         if (event.key === "ArrowLeft") {
           event.preventDefault();
