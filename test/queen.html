@@ -1071,20 +1071,21 @@
     }
 
     .table-map-overview {
-      display: grid;
-      grid-template-columns: minmax(0, 1.38fr) minmax(250px, 0.92fr);
-      grid-template-rows: repeat(2, minmax(145px, 1fr));
-      gap: 12px;
-      min-height: clamp(340px, 48vh, 560px);
+      display: block;
+      height: clamp(380px, 42vw, 510px);
+      min-height: 0;
+      overflow: auto;
+      border: 1px solid rgba(80, 54, 37, 0.16);
+      border-radius: 20px;
+      background: #e9ddce;
     }
 
     .table-map-zone-preview {
-      position: relative;
-      display: grid;
-      grid-template-rows: auto minmax(0, 1fr);
-      gap: 10px;
+      position: absolute;
+      display: block;
       min-width: 0;
-      padding: 14px;
+      min-height: 0;
+      padding: 0;
       overflow: hidden;
       border: 2px solid transparent;
       border-radius: 20px;
@@ -1127,7 +1128,7 @@
     }
 
     .table-map-zone-preview[data-zone="first"] {
-      grid-row: 1 / 3;
+      grid-row: auto;
     }
 
     .table-map-zone-preview-head,
@@ -1236,6 +1237,142 @@
       pointer-events: none;
     }
 
+    .store-map-plan {
+      position: relative;
+      width: 100%;
+      min-width: 760px;
+      height: 100%;
+      overflow: hidden;
+      border-radius: 18px;
+      background-color: #f3eadc;
+      background-image:
+        linear-gradient(rgba(80, 54, 37, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(80, 54, 37, 0.045) 1px, transparent 1px);
+      background-size: 5% 8%;
+      box-shadow: inset 0 0 38px rgba(72, 46, 29, 0.06);
+    }
+
+    .store-map-zone-heading {
+      position: absolute;
+      top: 9px;
+      left: 11px;
+      right: 11px;
+      z-index: 30;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .store-map-zone-heading-copy {
+      display: grid;
+      gap: 1px;
+      min-width: 0;
+    }
+
+    .store-map-zone-heading strong {
+      color: #402a20;
+      font-size: clamp(0.72rem, 1.3vw, 0.94rem);
+      letter-spacing: -0.03em;
+    }
+
+    .store-map-zone-heading small,
+    .store-map-zone-heading em {
+      color: #776458;
+      font-size: clamp(0.48rem, 0.75vw, 0.62rem);
+      font-style: normal;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .store-map-zone-heading em {
+      color: #5f2731;
+    }
+
+    .store-map-preview-table {
+      pointer-events: none;
+      cursor: inherit;
+    }
+
+    .store-map-preview-table .queen-map-table-label {
+      font-size: clamp(0.48rem, 0.86vw, 0.72rem);
+    }
+
+    .store-map-preview-table .queen-map-table-state {
+      top: -7px;
+      right: -6px;
+      min-width: 22px;
+      min-height: 18px;
+      padding: 0 4px;
+      border-width: 1px;
+      font-size: 0.44rem;
+    }
+
+    .store-map-preview-table .queen-map-open-count {
+      right: -5px;
+      bottom: -6px;
+      min-width: 19px;
+      height: 19px;
+      border-width: 1px;
+      font-size: 0.46rem;
+    }
+
+    .store-map-passage {
+      position: absolute;
+      z-index: 10;
+      display: grid;
+      place-items: center;
+      padding: 3px;
+      border: 2px dashed rgba(91, 71, 57, 0.46);
+      border-radius: 8px;
+      background: rgba(255, 252, 244, 0.92);
+      color: #5d473a;
+      font-size: clamp(0.46rem, 0.72vw, 0.61rem);
+      font-weight: 950;
+      line-height: 1.15;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .store-map-passage.is-stairs {
+      left: 62%;
+      top: 18%;
+      width: 8%;
+      height: 16%;
+      background:
+        repeating-linear-gradient(0deg, rgba(132, 119, 108, 0.26) 0 5px, rgba(255, 252, 244, 0.9) 5px 8px),
+        #fffaf2;
+    }
+
+    .store-map-passage.is-patio {
+      left: 62%;
+      top: 68%;
+      width: 8%;
+      height: 13%;
+      border-color: rgba(49, 122, 76, 0.48);
+      background: rgba(235, 248, 238, 0.94);
+      color: #286142;
+    }
+
+    .store-map-entrance {
+      position: absolute;
+      left: 20%;
+      bottom: 0.8%;
+      z-index: 25;
+      min-width: 96px;
+      padding: 4px 12px;
+      border: 2px dashed rgba(51, 115, 85, 0.58);
+      border-bottom: 0;
+      border-radius: 10px 10px 0 0;
+      background: rgba(255, 255, 255, 0.78);
+      color: #2e654c;
+      font-size: 0.58rem;
+      font-weight: 950;
+      text-align: center;
+      pointer-events: none;
+    }
+
     .table-map-zone-focus {
       padding: 14px;
       border: 2px solid transparent;
@@ -1269,15 +1406,13 @@
       }
 
       .table-map-overview {
-        grid-template-columns: 1fr;
-        grid-template-rows: none;
-        min-height: 0;
+        height: 430px;
       }
 
       .table-map-zone-preview,
       .table-map-zone-preview[data-zone="first"] {
         grid-row: auto;
-        min-height: 230px;
+        min-height: 0;
       }
     }
 
@@ -5880,6 +6015,11 @@
         preferredTableCodes: ["A8", "A9", "A10"]
       }
     };
+    const TABLE_MAP_STORE_ZONE_BOUNDS = {
+      first: { x: 2.2, y: 3.5, w: 59.5, h: 93 },
+      second: { x: 70.2, y: 3.5, w: 27.6, h: 42 },
+      patio: { x: 70.2, y: 54.5, w: 27.6, h: 42 }
+    };
 
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3Iiujn95evZuFiyLNrJUo-_H6rKngdxt0EeBFVw/exec";
     const RESERVATION_REFRESH_MS = 5000;
@@ -7065,7 +7205,7 @@
       const totalWidth = tableWidth * columns + horizontalGap * (columns - 1);
       const totalHeight = tableHeight * rows + verticalGap * (rows - 1);
       const startX = (100 - totalWidth) / 2;
-      const startY = Math.max(10, (78 - totalHeight) / 2);
+      const startY = Math.max(23, (84 - totalHeight) / 2);
       const tableItems = tableCodes.map((tableCode, index) => {
         const column = index % columns;
         const row = Math.floor(index / columns);
@@ -7382,6 +7522,7 @@
     function renderTemporaryTableMapOverview(layouts) {
       const zoneMarkup = TABLE_MAP_ZONE_ORDER.map((zone) => {
         const meta = TABLE_MAP_ZONE_META[zone];
+        const bounds = TABLE_MAP_STORE_ZONE_BOUNDS[zone];
         const layout = layouts.get(zone);
         const tableItems = layout.items.filter((item) => item.type === "table" && item.tableCode);
         const obstacleItems = layout.items.filter((item) => item.type === "obstacle");
@@ -7389,46 +7530,97 @@
         const obstacleMarkup = obstacleItems.map((item) => {
           const x = Math.min(item.x, 100 - item.w);
           const y = Math.min(item.y, 100 - item.h);
-          return `<span class="table-map-mini-obstacle" style="left:${x}%;top:${y}%;width:${item.w}%;height:${item.h}%" aria-hidden="true"></span>`;
+          const style = `left:${x}%;top:${y}%;width:${item.w}%;height:${item.h}%;transform:rotate(${item.rotation}deg)`;
+          return `
+            <span
+              class="queen-map-item queen-map-obstacle"
+              data-kind="${escapeHtml(item.obstacleKind)}"
+              style="${style}"
+              aria-hidden="true"
+            >
+              <span class="queen-map-obstacle-label">${escapeHtml(item.label)}</span>
+            </span>
+          `;
         }).join("");
         const tableMarkup = tableItems.map((item) => {
           const x = Math.min(item.x, 100 - item.w);
           const y = Math.min(item.y, 100 - item.h);
-          const occupied = getTableMapPreviewStatus(item.tableCode).occupied;
+          const { activeParty, activeSession, occupied } = getTableMapPreviewStatus(item.tableCode);
+          const tableRecord = getDiningTableRecord(item.tableCode);
+          const partyQrs = getDiningTableQrs(tableRecord || item.tableCode);
+          const activeRequests = activeParty
+            ? getTableRequestHistory(item.tableCode).filter((request) => (
+              request.party_id === activeParty.id
+              && !["completed", "canceled"].includes(request.status)
+            ))
+            : activeSession
+              ? getTableRequestHistory(item.tableCode).filter((request) => (
+                request.qr_session_id === activeSession.id
+                && !["completed", "canceled"].includes(request.status)
+              ))
+              : [];
+          const partyToneClass = activeParty ? getDiningPartyToneClass(activeParty.id) : "";
+          const mappedQr = partyQrs[0]?.qr_number || activeSession?.qr_number || null;
+          const stateLabel = partyQrs.length > 1
+            ? `${partyQrs.length} QRs`
+            : mappedQr
+              ? `QR ${String(mappedQr).padStart(2, "0")}`
+              : occupied
+                ? "ACTIVE"
+                : "EMPTY";
+          const stateClasses = [
+            occupied ? "is-assigned" : "is-empty",
+            partyQrs.length ? "is-qr-active" : "",
+            partyToneClass
+          ].filter(Boolean).join(" ");
+          const style = `left:${x}%;top:${y}%;width:${item.w}%;height:${item.h}%;transform:rotate(${item.rotation}deg)`;
           return `
             <span
-              class="table-map-mini-table is-${escapeHtml(item.shape)} ${occupied ? "is-assigned" : "is-empty"}"
-              style="left:${x}%;top:${y}%;width:${item.w}%;height:${item.h}%"
+              class="queen-map-item queen-map-table store-map-preview-table is-${escapeHtml(item.shape)} ${stateClasses}"
+              style="${style}"
               aria-hidden="true"
-            >${escapeHtml(item.tableCode)}</span>
+            >
+              <span class="queen-map-table-label">${escapeHtml(item.label || item.tableCode)}</span>
+              <span class="queen-map-table-state">${escapeHtml(stateLabel)}</span>
+              ${activeRequests.length ? `<span class="queen-map-open-count">${activeRequests.length}</span>` : ""}
+            </span>
           `;
         }).join("");
+        const zoneStyle = `left:${bounds.x}%;top:${bounds.y}%;width:${bounds.w}%;height:${bounds.h}%`;
         return `
           <button
             class="table-map-zone-preview"
             type="button"
             data-map-preview-zone="${escapeHtml(zone)}"
             data-zone="${escapeHtml(zone)}"
+            style="${zoneStyle}"
             aria-label="Open ${escapeHtml(meta.label)} map, ${activeCount} active of ${tableItems.length} tables"
           >
-            <span class="table-map-zone-preview-head">
-              <span class="table-map-zone-preview-copy">
+            <span class="store-map-zone-heading">
+              <span class="store-map-zone-heading-copy">
                 <strong>${escapeHtml(meta.label)}</strong>
-                <small>${escapeHtml(meta.description)} · Tap to zoom</small>
+                <small>${escapeHtml(meta.description)} &middot; Tap to zoom</small>
               </span>
               <span class="table-map-zone-preview-stats">
                 <strong>${activeCount} active</strong>
                 <span>${tableItems.length} tables</span>
               </span>
             </span>
-            <span class="table-map-mini-canvas" aria-hidden="true">
-              ${obstacleMarkup}
-              ${tableMarkup}
-            </span>
+            ${obstacleMarkup}
+            ${tableMarkup}
           </button>
         `;
       }).join("");
-      return `<div class="table-map-overview">${zoneMarkup}</div>`;
+      return `
+        <div class="table-map-overview">
+          <div class="store-map-plan" aria-label="Whole restaurant map">
+            ${zoneMarkup}
+            <span class="store-map-passage is-stairs" aria-hidden="true">2F<br>STAIRS &uarr;</span>
+            <span class="store-map-passage is-patio" aria-hidden="true">PATIO<br>PASSAGE &rarr;</span>
+            <span class="store-map-entrance" aria-hidden="true">MAIN ENTRANCE</span>
+          </div>
+        </div>
+      `;
     }
 
     function renderTemporaryFocusedTableMap(zone, layout) {

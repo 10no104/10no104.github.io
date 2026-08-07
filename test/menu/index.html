@@ -2736,7 +2736,7 @@
     .menu-detail-slide img {
       width: 100%;
       height: 100%;
-      object-fit: contain;
+      object-fit: cover;
       object-position: center;
     }
 
@@ -2830,6 +2830,13 @@
     .menu-detail-gallery-nav:disabled {
       opacity: 0.28;
       cursor: default;
+    }
+
+    .menu-detail-gallery-nav[hidden],
+    .menu-detail-gallery-status[hidden],
+    .menu-detail-visual:has(.menu-detail-gallery.is-single) .menu-detail-gallery-nav,
+    .menu-detail-visual:has(.menu-detail-gallery.is-single) .menu-detail-gallery-status {
+      display: none;
     }
 
     .menu-detail-gallery-prev { left: 10px; }
