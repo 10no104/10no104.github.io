@@ -2671,7 +2671,7 @@
       gap: 12px;
       width: 100%;
       height: auto;
-      padding-inline: 5%;
+      padding: 0 5% 12px;
       overflow-x: auto;
       overscroll-behavior-x: contain;
       scroll-padding-inline: 5%;
@@ -2680,8 +2680,12 @@
     }
 
     .menu-detail-gallery.is-single {
-      padding-inline: 0;
+      padding: 0;
       overflow: hidden;
+    }
+
+    .menu-detail-gallery.is-menu-set {
+      align-items: stretch;
     }
 
     .menu-detail-gallery::-webkit-scrollbar,
@@ -2691,8 +2695,9 @@
 
     .menu-detail-slide {
       position: relative;
+      display: flex;
       flex: 0 0 90%;
-      aspect-ratio: 1 / 1;
+      flex-direction: column;
       padding: 0;
       overflow: hidden;
       border: 2px solid rgba(125, 98, 63, 0.12);
@@ -2707,7 +2712,6 @@
 
     .menu-detail-gallery.is-single .menu-detail-slide {
       flex-basis: 100%;
-      aspect-ratio: auto;
       border: 0;
       border-radius: 0;
       box-shadow: none;
@@ -2734,12 +2738,25 @@
       white-space: nowrap;
     }
 
+    .menu-detail-slide-media {
+      display: block;
+      flex: 0 0 auto;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      background: #eee6da;
+    }
+
     .menu-detail-slide img {
       display: block;
       width: 100%;
       height: 100%;
       object-fit: cover;
       object-position: center;
+    }
+
+    .menu-detail-gallery.is-single .menu-detail-slide-media {
+      aspect-ratio: auto;
     }
 
     .menu-detail-gallery.is-single .menu-detail-slide img {
@@ -2757,60 +2774,62 @@
       outline-offset: 2px;
     }
 
-    .menu-detail-slide::after {
-      content: "";
-      position: absolute;
-      inset: auto 10px 10px;
-      height: 58px;
-      border-radius: 14px;
-      background: rgba(39, 24, 16, 0.72);
-      pointer-events: none;
-      -webkit-backdrop-filter: blur(7px);
-      backdrop-filter: blur(7px);
-    }
-
-    .menu-detail-gallery.is-single .menu-detail-slide::after {
-      display: none;
-    }
-
-    .menu-detail-slide-label {
-      position: absolute;
-      left: 22px;
-      right: 22px;
-      bottom: 20px;
-      z-index: 1;
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 12px;
-      color: #fff;
-      text-align: left;
-      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.32);
-    }
-
-    .menu-detail-gallery.is-single .menu-detail-slide-label {
-      display: none;
-    }
-
-    .menu-detail-slide-copy {
+    .menu-detail-slide-body {
       display: grid;
-      gap: 2px;
-      min-width: 0;
+      flex: 1 1 auto;
+      gap: 5px;
+      padding: 14px 15px 16px;
+      background: #fffdf9;
+      color: #2f2119;
+      text-align: left;
     }
 
-    .menu-detail-slide-label strong {
-      font-size: 0.88rem;
-      line-height: 1.25;
+    .menu-detail-slide-heading {
+      display: grid;
+      gap: 1px;
     }
 
-    .menu-detail-slide-label small {
-      color: rgba(255, 255, 255, 0.84);
-      font-size: 0.72rem;
-      font-weight: 900;
+    .menu-detail-slide-heading strong {
+      color: #2f2119;
+      font-size: 1.05rem;
+      letter-spacing: -0.035em;
+      line-height: 1.2;
     }
 
-    .menu-detail-slide-emoji {
-      font-size: 1.2rem;
+    .menu-detail-slide-heading small {
+      color: #806e60;
+      font-size: 0.7rem;
+      font-weight: 850;
+    }
+
+    .menu-detail-slide-description {
+      color: #746257;
+      font-size: 0.74rem;
+      font-weight: 650;
+      line-height: 1.45;
+    }
+
+    .menu-detail-slide-tags {
+      display: flex;
+      gap: 5px;
+      margin-top: 3px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .menu-detail-slide-tags::-webkit-scrollbar {
+      display: none;
+    }
+
+    .menu-detail-slide-tags .menu-tag {
+      flex: 0 0 auto;
+      padding: 5px 8px;
+      font-size: 0.6rem;
+      box-shadow: none;
+    }
+
+    .menu-detail-sheet:has(.menu-detail-gallery.is-menu-set) > .menu-detail-copy {
+      display: none;
     }
 
     .menu-detail-gallery-nav {
@@ -3386,8 +3405,11 @@
 
       .menu-detail-slide {
         flex-basis: 90%;
-        aspect-ratio: 1 / 1;
         border-radius: 20px;
+      }
+
+      .menu-detail-slide-body {
+        padding: 13px 14px 15px;
       }
 
       .menu-detail-gallery-nav {
@@ -6331,13 +6353,19 @@
 
       selectedMenuGalleryIndex = 0;
       gallery.scrollLeft = 0;
+      const isMenuSet = slides.length > 1 && slides.every((image) => Boolean(image.groupId && image.optionId));
       gallery.classList.toggle("is-single", slides.length === 1);
+      gallery.classList.toggle("is-menu-set", isMenuSet);
       gallery.innerHTML = slides.map((image, index) => {
         const slidePrice = image.variantPrice != null
           ? Number(image.variantPrice)
           : Number((parsePriceNumber(item.price) + Number(image.priceDelta || 0)).toFixed(2));
         const hasFlavorChoice = Boolean(image.groupId && image.optionId);
         const slideTag = hasFlavorChoice ? "label" : "div";
+        const variant = getMenuDetailVariant(item, image.optionId || "");
+        const cardTags = variant.displayTags
+          .map((tag) => `<span class="menu-tag ${escapeHtml(tag.color || "gray")}">${escapeHtml(tag.label)}</span>`)
+          .join("");
         return `
         <${slideTag}
           class="menu-detail-slide${hasFlavorChoice ? " is-selectable" : " is-static"}"
@@ -6345,7 +6373,7 @@
           ${image.groupId ? `data-flavor-group-id="${escapeHtml(image.groupId)}"` : ""}
           ${image.optionId ? `data-flavor-option-id="${escapeHtml(image.optionId)}"` : ""}
           ${hasFlavorChoice ? "" : "tabindex=\"0\""}
-          aria-label="${escapeHtml(image.label || `Photo ${index + 1}`)}${image.optionId ? " — view this menu" : ""}"
+          aria-label="${escapeHtml(image.label || `Photo ${index + 1}`)} · ${escapeHtml(formatCurrency(slidePrice))}${image.optionId ? " — view this menu" : ""}"
         >
           ${hasFlavorChoice ? `
             <input
@@ -6357,14 +6385,19 @@
               ${image.optionId === defaultFlavorOptionId ? "checked" : ""}
             />
           ` : ""}
-          <img src="${escapeHtml(image.imageUrl || MENU_IMAGE_PLACEHOLDER)}" alt="${escapeHtml(image.imageAlt || image.label || item.nameEn || item.nameKo)}" />
-          <span class="menu-detail-slide-label">
-            <span class="menu-detail-slide-copy">
-              <strong>${escapeHtml(image.label || item.nameEn || item.nameKo || "Menu item")}</strong>
-              <small>${escapeHtml(formatCurrency(slidePrice))}</small>
-            </span>
-            ${image.emoji ? `<span class="menu-detail-slide-emoji" aria-hidden="true">${escapeHtml(image.emoji)}</span>` : ""}
+          <span class="menu-detail-slide-media">
+            <img src="${escapeHtml(image.imageUrl || MENU_IMAGE_PLACEHOLDER)}" alt="${escapeHtml(image.imageAlt || image.label || item.nameEn || item.nameKo)}" />
           </span>
+          ${isMenuSet ? `
+            <span class="menu-detail-slide-body">
+              <span class="menu-detail-slide-heading">
+                <strong>${escapeHtml(variant.nameKo)}</strong>
+                ${variant.nameEn ? `<small>${escapeHtml(variant.nameEn)}</small>` : ""}
+              </span>
+              <span class="menu-detail-slide-description">${escapeHtml(variant.description)}</span>
+              ${cardTags ? `<span class="menu-detail-slide-tags">${cardTags}</span>` : ""}
+            </span>
+          ` : ""}
         </${slideTag}>
       `;}).join("");
       syncMenuDetailGalleryStatus();

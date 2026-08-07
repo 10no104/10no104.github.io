@@ -1072,9 +1072,10 @@
 
     .table-map-overview {
       display: block;
-      height: clamp(380px, 42vw, 510px);
+      width: 100%;
+      height: clamp(360px, 52vw, 510px);
       min-height: 0;
-      overflow: auto;
+      overflow: hidden;
       border: 1px solid rgba(80, 54, 37, 0.16);
       border-radius: 20px;
       background: #e9ddce;
@@ -1240,7 +1241,7 @@
     .store-map-plan {
       position: relative;
       width: 100%;
-      min-width: 760px;
+      min-width: 0;
       height: 100%;
       overflow: hidden;
       border-radius: 18px;
@@ -1380,7 +1381,42 @@
     }
 
     .table-map-focus-head {
+      flex-wrap: wrap;
       margin-bottom: 12px;
+    }
+
+    .table-map-back-button {
+      display: inline-flex;
+      flex: 0 0 auto;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 42px;
+      padding: 0 15px;
+      border: 0;
+      border-radius: 13px;
+      background: #5f2731;
+      color: #fffaf2;
+      font: inherit;
+      font-size: 0.76rem;
+      font-weight: 950;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(95, 39, 49, 0.18);
+    }
+
+    .table-map-back-button:hover,
+    .table-map-back-button:focus-visible {
+      background: #7b1f2f;
+      transform: translateY(-1px);
+    }
+
+    .table-map-back-button:focus-visible {
+      outline: 3px solid rgba(212, 175, 55, 0.68);
+      outline-offset: 2px;
+    }
+
+    .table-map-focus-head .table-map-focus-copy {
+      flex: 1 1 220px;
     }
 
     .table-map-focus-badge {
@@ -1400,19 +1436,82 @@
       background: rgba(255, 255, 255, 0.45);
     }
 
+    @media (max-width: 900px) {
+      .table-map-overview {
+        height: clamp(340px, 58vw, 430px);
+      }
+
+      .store-map-zone-heading {
+        top: 6px;
+        left: 7px;
+        right: 7px;
+        gap: 3px;
+      }
+
+      .store-map-zone-heading-copy small {
+        display: none;
+      }
+
+      .store-map-zone-heading strong {
+        font-size: clamp(0.58rem, 1.65vw, 0.78rem);
+      }
+
+      .table-map-zone-preview-stats {
+        gap: 0;
+      }
+
+      .table-map-zone-preview-stats strong {
+        font-size: clamp(0.5rem, 1.25vw, 0.68rem);
+      }
+
+      .table-map-zone-preview-stats span {
+        font-size: clamp(0.4rem, 1vw, 0.53rem);
+      }
+
+      .store-map-preview-table .queen-map-table-state {
+        top: -5px;
+        right: -4px;
+        min-width: 18px;
+        min-height: 15px;
+        padding: 0 2px;
+        font-size: 0.36rem;
+      }
+
+      .store-map-passage {
+        padding: 1px;
+        border-width: 1px;
+        font-size: clamp(0.36rem, 1vw, 0.5rem);
+      }
+
+      .store-map-entrance {
+        min-width: 70px;
+        padding: 3px 7px;
+        font-size: 0.46rem;
+      }
+    }
+
     @media (max-width: 720px) {
       .table-map-tabs {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       .table-map-overview {
-        height: 430px;
+        height: clamp(320px, 64vw, 390px);
       }
 
       .table-map-zone-preview,
       .table-map-zone-preview[data-zone="first"] {
         grid-row: auto;
         min-height: 0;
+      }
+
+      .table-map-focus-head {
+        align-items: stretch;
+      }
+
+      .table-map-back-button {
+        flex: 1 1 100%;
+        width: 100%;
       }
     }
 
@@ -1544,7 +1643,7 @@
     }
 
     .table-map-canvas-scroll {
-      overflow: auto;
+      overflow: hidden;
       padding: 11px;
       border-radius: 18px;
       background:
@@ -1556,7 +1655,7 @@
     .queen-floor-canvas {
       position: relative;
       width: 100%;
-      min-width: 620px;
+      min-width: 0;
       overflow: hidden;
       border: 2px solid rgba(80, 54, 37, 0.2);
       border-radius: 14px;
@@ -7630,6 +7729,12 @@
       return `
         <section class="table-map-zone-focus" data-zone="${escapeHtml(zone)}">
           <div class="table-map-focus-head">
+            <button
+              class="table-map-back-button"
+              type="button"
+              data-map-back-overview
+              aria-label="Return to the whole restaurant map"
+            >&larr; All Areas</button>
             <div class="table-map-focus-copy">
               <strong>${escapeHtml(meta.label)} · Expanded</strong>
               <small>Tap an empty table to select it, or tap an active table to review.</small>
@@ -11101,6 +11206,14 @@
         event.preventDefault();
         event.stopPropagation();
         suppressTableMapClick = false;
+        return;
+      }
+      const backToOverviewButton = event.target.closest("[data-map-back-overview]");
+      if (backToOverviewButton) {
+        state.activeTableMapZone = "overview";
+        state.selectedMapTableCode = null;
+        renderTableMap();
+        document.querySelector('[data-table-map-zone="overview"]')?.focus();
         return;
       }
       const previewZoneButton = event.target.closest("[data-map-preview-zone]");
