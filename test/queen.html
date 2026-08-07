@@ -5416,6 +5416,7 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.107.0"></script>
   <script>
     const ADMIN_SHEET_CONFIG = {
       sheetId: "1xa9OZbctYnlbaAL8lKIgmefM5hvSw0Plk01lxp5G2fc",
@@ -5432,10 +5433,14 @@
     const DINING_REQUESTS_TABLE = "dining_requests";
     const DINING_QR_SESSIONS_TABLE = "dining_qr_sessions";
     const DINING_TABLE_LAYOUTS_TABLE = "dining_table_layouts";
+    const DINING_REALTIME_SIGNAL_TABLE = "dining_realtime_signals";
     const DINING_QR_COUNT = 10;
 
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3Iiujn95evZuFiyLNrJUo-_H6rKngdxt0EeBFVw/exec";
-    const AUTO_REFRESH_MS = 5000;
+    const RESERVATION_REFRESH_MS = 5000;
+    const DINING_REALTIME_DEBOUNCE_MS = 350;
+    const DINING_SIGNAL_FALLBACK_MS = 5000;
+    const DINING_SAFETY_REFRESH_MS = 5 * 60 * 1000;
     const ORDER_ALARM_REPEAT_MS = 2200;
     const DEFAULT_DOCUMENT_TITLE = document.title;
     const AUTO_REMOVE_AFTER_MS = 60 * 60 * 1000;
@@ -5461,7 +5466,20 @@
       knownReservationKeys: new Set(),
       knownReservationSnapshots: new Map(),
       suppressNewAlertUntil: 0,
-      autoRefreshHandle: null,
+      reservationRefreshHandle: null,
+      diningSafetyRefreshHandle: null,
+      diningSignalPollHandle: null,
+      diningRealtimeClient: null,
+      diningRealtimeChannel: null,
+      diningRealtimeStatus: "DISCONNECTED",
+      diningSignalRevision: null,
+      diningSignalCheckInFlight: false,
+      diningSignalLoadError: false,
+      diningRealtimeRefreshTimer: null,
+      diningRefreshInFlight: false,
+      diningRefreshPending: false,
+      diningRefreshPendingManual: false,
+      lastDiningFullRefreshAt: 0,
       autoRemovingReservationIds: new Set(),
       confirmingAlertIds: new Set(),
       feedbackQueue: [],
@@ -8212,7 +8230,7 @@
         syncStatus.textContent = "Could not reach the request queue. Existing items may be out of date.";
         syncStatus.className = "request-sync-status is-error";
       } else if (state.requestsLoadedAt) {
-        syncStatus.textContent = `Auto-refresh every 5 seconds · Updated ${formatRequestClock(state.requestsLoadedAt)}`;
+        syncStatus.textContent = `Realtime updates · 5-second safety check · Updated ${formatRequestClock(state.requestsLoadedAt)}`;
         syncStatus.className = "request-sync-status";
       }
 
@@ -8347,55 +8365,221 @@
     }
 
     async function refreshDiningRequests({ manual = false } = {}) {
+      if (state.diningRefreshInFlight) {
+        state.diningRefreshPending = true;
+        state.diningRefreshPendingManual ||= manual;
+        return;
+      }
+
+      state.diningRefreshInFlight = true;
       const refreshButton = document.getElementById("refreshRequestsBtn");
       if (manual && refreshButton) refreshButton.disabled = true;
-      const [requestResult, qrSessionResult, tableLayoutResult, partyResult] = await Promise.allSettled([
-        fetchDiningRequests(),
-        fetchQrSessions(),
-        fetchDiningTableLayouts(),
-        fetchDiningAdminSnapshot()
-      ]);
+      try {
+        const [requestResult, qrSessionResult, tableLayoutResult, partyResult] = await Promise.allSettled([
+          fetchDiningRequests(),
+          fetchQrSessions(),
+          fetchDiningTableLayouts(),
+          fetchDiningAdminSnapshot()
+        ]);
 
-      if (requestResult.status === "fulfilled") {
-        state.diningRequests = requestResult.value;
-        state.requestsLoadedAt = new Date().toISOString();
-        state.requestLoadError = false;
-        state.requestActionError = "";
-      } else {
-        console.error("Dining request refresh failed", requestResult.reason);
-        state.requestLoadError = true;
+        if (requestResult.status === "fulfilled") {
+          state.diningRequests = requestResult.value;
+          state.requestsLoadedAt = new Date().toISOString();
+          state.requestLoadError = false;
+          state.requestActionError = "";
+        } else {
+          console.error("Dining request refresh failed", requestResult.reason);
+          state.requestLoadError = true;
+        }
+
+        if (qrSessionResult.status === "fulfilled") {
+          state.qrSessions = qrSessionResult.value;
+          state.qrSessionLoadError = false;
+          state.qrSessionActionError = "";
+        } else {
+          console.error("QR session refresh failed", qrSessionResult.reason);
+          state.qrSessionLoadError = true;
+        }
+
+        if (tableLayoutResult.status === "fulfilled") {
+          state.tableLayouts = new Map(tableLayoutResult.value.map((layout) => [layout.zone, layout]));
+          state.tableLayoutLoadError = false;
+        } else {
+          console.error("Table layout refresh failed", tableLayoutResult.reason);
+          state.tableLayoutLoadError = true;
+        }
+
+        if (partyResult.status === "fulfilled") {
+          state.partySnapshot = partyResult.value;
+          state.partyQrPoolAvailable = partyResult.value.qrPoolAvailable;
+          state.partyArchitectureAvailable = true;
+          state.partyLoadError = false;
+        } else {
+          state.partyArchitectureAvailable = false;
+          state.partyQrPoolAvailable = false;
+          state.partyLoadError = true;
+        }
+
+        state.lastDiningFullRefreshAt = Date.now();
+        renderDiningRequests();
+      } finally {
+        state.diningRefreshInFlight = false;
+        if (refreshButton) refreshButton.disabled = false;
+        if (state.diningRefreshPending) {
+          const pendingManual = state.diningRefreshPendingManual;
+          state.diningRefreshPending = false;
+          state.diningRefreshPendingManual = false;
+          window.setTimeout(() => refreshDiningRequests({ manual: pendingManual }), 0);
+        }
+      }
+    }
+
+    function scheduleDiningRealtimeRefresh() {
+      window.clearTimeout(state.diningRealtimeRefreshTimer);
+      state.diningRealtimeRefreshTimer = window.setTimeout(() => {
+        state.diningRealtimeRefreshTimer = null;
+        refreshDiningRequests();
+      }, DINING_REALTIME_DEBOUNCE_MS);
+    }
+
+    async function fetchDiningSignal() {
+      const { url, anonKey } = SUPABASE_CONFIG;
+      if (!url || !anonKey) throw new Error("Missing Supabase configuration");
+      const endpoint = new URL(`${url}/rest/v1/${DINING_REALTIME_SIGNAL_TABLE}`);
+      endpoint.searchParams.set("select", "branch,revision,updated_at");
+      endpoint.searchParams.set("branch", `eq.${ADMIN_SHEET_CONFIG.branchLabel.toLowerCase()}`);
+      endpoint.searchParams.set("limit", "1");
+      const response = await fetch(endpoint.toString(), {
+        headers: {
+          apikey: anonKey,
+          Authorization: `Bearer ${anonKey}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`Dining signal check failed (${response.status}): ${await response.text()}`);
+      }
+      return (await response.json())[0] || null;
+    }
+
+    async function checkDiningSignal() {
+      if (state.diningSignalCheckInFlight) return;
+      state.diningSignalCheckInFlight = true;
+      try {
+        const signal = await fetchDiningSignal();
+        const nextRevision = signal?.revision == null ? null : String(signal.revision);
+        if (
+          state.diningSignalRevision !== null
+          && nextRevision !== null
+          && nextRevision !== state.diningSignalRevision
+        ) {
+          scheduleDiningRealtimeRefresh();
+        }
+        state.diningSignalRevision = nextRevision;
+        state.diningSignalLoadError = false;
+      } catch (error) {
+        if (!state.diningSignalLoadError) {
+          console.error("Dining signal fallback check failed", error);
+        }
+        state.diningSignalLoadError = true;
+      } finally {
+        state.diningSignalCheckInFlight = false;
+      }
+    }
+
+    function stopDiningSignalFallbackPolling() {
+      if (!state.diningSignalPollHandle) return;
+      window.clearInterval(state.diningSignalPollHandle);
+      state.diningSignalPollHandle = null;
+    }
+
+    function startDiningSignalFallbackPolling() {
+      if (state.diningSignalPollHandle) return;
+      checkDiningSignal();
+      state.diningSignalPollHandle = window.setInterval(
+        checkDiningSignal,
+        DINING_SIGNAL_FALLBACK_MS
+      );
+    }
+
+    function handleDiningRealtimeSignal(payload) {
+      const nextRevision = payload?.payload?.revision == null
+        ? null
+        : String(payload.payload.revision);
+      if (nextRevision !== null) state.diningSignalRevision = nextRevision;
+      scheduleDiningRealtimeRefresh();
+    }
+
+    function startDiningRealtime() {
+      startDiningSignalFallbackPolling();
+
+      if (!window.supabase?.createClient) {
+        console.error("Supabase Realtime client did not load; using signal polling fallback.");
+        return;
       }
 
-      if (qrSessionResult.status === "fulfilled") {
-        state.qrSessions = qrSessionResult.value;
-        state.qrSessionLoadError = false;
-        state.qrSessionActionError = "";
-      } else {
-        console.error("QR session refresh failed", qrSessionResult.reason);
-        state.qrSessionLoadError = true;
+      try {
+        const branch = ADMIN_SHEET_CONFIG.branchLabel.toLowerCase();
+        state.diningRealtimeClient = window.supabase.createClient(
+          SUPABASE_CONFIG.url,
+          SUPABASE_CONFIG.anonKey,
+          {
+            auth: {
+              persistSession: false,
+              autoRefreshToken: false,
+              detectSessionInUrl: false
+            }
+          }
+        );
+        state.diningRealtimeChannel = state.diningRealtimeClient
+          .channel(`dining:${branch}`, {
+            config: {
+              broadcast: { self: false },
+              private: false
+            }
+          })
+          .on(
+            "broadcast",
+            { event: "dining_changed" },
+            handleDiningRealtimeSignal
+          )
+          .subscribe((status, error) => {
+            state.diningRealtimeStatus = status;
+            if (status === "SUBSCRIBED") {
+              checkDiningSignal();
+              return;
+            }
+            if (error) console.error("Dining Realtime subscription failed", error);
+            if (["CHANNEL_ERROR", "TIMED_OUT", "CLOSED"].includes(status)) {
+              startDiningSignalFallbackPolling();
+            }
+          });
+      } catch (error) {
+        console.error("Dining Realtime setup failed; using signal polling fallback.", error);
+        startDiningSignalFallbackPolling();
       }
+    }
 
-      if (tableLayoutResult.status === "fulfilled") {
-        state.tableLayouts = new Map(tableLayoutResult.value.map((layout) => [layout.zone, layout]));
-        state.tableLayoutLoadError = false;
-      } else {
-        console.error("Table layout refresh failed", tableLayoutResult.reason);
-        state.tableLayoutLoadError = true;
+    function startDiningSafetyRefresh() {
+      if (state.diningSafetyRefreshHandle) return;
+      state.diningSafetyRefreshHandle = window.setInterval(() => {
+        if (document.hidden) return;
+        if (Date.now() - state.lastDiningFullRefreshAt >= DINING_SAFETY_REFRESH_MS) {
+          refreshDiningRequests();
+        }
+      }, DINING_SAFETY_REFRESH_MS);
+    }
+
+    function stopDiningRealtime() {
+      stopDiningSignalFallbackPolling();
+      window.clearInterval(state.diningSafetyRefreshHandle);
+      window.clearTimeout(state.diningRealtimeRefreshTimer);
+      state.diningSafetyRefreshHandle = null;
+      state.diningRealtimeRefreshTimer = null;
+      if (state.diningRealtimeClient && state.diningRealtimeChannel) {
+        state.diningRealtimeClient.removeChannel(state.diningRealtimeChannel);
       }
-
-      if (partyResult.status === "fulfilled") {
-        state.partySnapshot = partyResult.value;
-        state.partyQrPoolAvailable = partyResult.value.qrPoolAvailable;
-        state.partyArchitectureAvailable = true;
-        state.partyLoadError = false;
-      } else {
-        state.partyArchitectureAvailable = false;
-        state.partyQrPoolAvailable = false;
-        state.partyLoadError = true;
-      }
-
-      if (refreshButton) refreshButton.disabled = false;
-      renderDiningRequests();
+      state.diningRealtimeChannel = null;
+      state.diningRealtimeClient = null;
     }
 
     async function updateDiningRequestStatus(requestId, nextStatus) {
@@ -9723,6 +9907,7 @@
           state.tableLayouts = new Map(tableLayouts.map((layout) => [layout.zone, layout]));
           state.partySnapshot = partySnapshot;
           state.partyQrPoolAvailable = partySnapshot.qrPoolAvailable;
+          state.lastDiningFullRefreshAt = Date.now();
           if (!state.partyLoadError) state.partyArchitectureAvailable = true;
           if (!state.requestLoadError) state.requestsLoadedAt = new Date().toISOString();
           syncReservations(reservations);
@@ -9747,66 +9932,15 @@
     }
 
     async function performAutoRefresh() {
-      const [reservationResult, requestResult, qrSessionResult, tableLayoutResult, partyResult] = await Promise.allSettled([
-        document.hidden ? Promise.resolve(null) : fetchReservations(),
-        fetchDiningRequests(),
-        fetchQrSessions(),
-        fetchDiningTableLayouts(),
-        fetchDiningAdminSnapshot()
-      ]);
-
-      if (reservationResult.status === "fulfilled" && reservationResult.value) {
-        const reservations = reservationResult.value;
+      if (document.hidden) return;
+      try {
+        const reservations = await fetchReservations();
         syncReservations(reservations, { detectNew: true });
         syncPendingFeedbackQueue(reservations);
         autoRemoveExpiredReservations(reservations);
-      } else {
-        console.error("Reservation auto refresh failed", reservationResult.reason);
+      } catch (error) {
+        console.error("Reservation auto refresh failed", error);
       }
-
-      if (requestResult.status === "fulfilled") {
-        state.diningRequests = requestResult.value;
-        state.requestsLoadedAt = new Date().toISOString();
-        state.requestLoadError = false;
-      } else {
-        console.error("Dining request auto refresh failed", requestResult.reason);
-        state.requestLoadError = true;
-      }
-
-      if (qrSessionResult.status === "fulfilled") {
-        state.qrSessions = qrSessionResult.value;
-        state.qrSessionLoadError = false;
-      } else {
-        if (!state.qrSessionLoadError) {
-          console.error("QR session auto refresh failed", qrSessionResult.reason);
-        }
-        state.qrSessionLoadError = true;
-      }
-
-      if (tableLayoutResult.status === "fulfilled") {
-        state.tableLayouts = new Map(tableLayoutResult.value.map((layout) => [layout.zone, layout]));
-        state.tableLayoutLoadError = false;
-      } else {
-        if (!state.tableLayoutLoadError) {
-          console.error("Table layout auto refresh failed", tableLayoutResult.reason);
-        }
-        state.tableLayoutLoadError = true;
-      }
-
-      if (partyResult.status === "fulfilled") {
-        state.partySnapshot = partyResult.value;
-        state.partyQrPoolAvailable = partyResult.value.qrPoolAvailable;
-        state.partyArchitectureAvailable = true;
-        state.partyLoadError = false;
-      } else {
-        if (!state.partyLoadError) {
-          console.error("Party architecture auto refresh failed", partyResult.reason);
-        }
-        state.partyArchitectureAvailable = false;
-        state.partyQrPoolAvailable = false;
-        state.partyLoadError = true;
-      }
-      renderDiningRequests();
     }
 
     document.getElementById("todayHeading").textContent = new Intl.DateTimeFormat("en-CA", {
@@ -10323,12 +10457,26 @@
       }
     });
 
-    state.autoRefreshHandle = window.setInterval(performAutoRefresh, AUTO_REFRESH_MS);
+    state.reservationRefreshHandle = window.setInterval(
+      performAutoRefresh,
+      RESERVATION_REFRESH_MS
+    );
     document.addEventListener("visibilitychange", () => {
-      if (!document.hidden) performAutoRefresh();
+      if (document.hidden) return;
+      performAutoRefresh();
+      checkDiningSignal();
+      if (Date.now() - state.lastDiningFullRefreshAt >= DINING_SAFETY_REFRESH_MS) {
+        refreshDiningRequests();
+      }
+    });
+    window.addEventListener("beforeunload", () => {
+      window.clearInterval(state.reservationRefreshHandle);
+      stopDiningRealtime();
     });
 
     syncUnconfirmedRequestAlert();
+    startDiningRealtime();
+    startDiningSafetyRefresh();
     bootstrapAdmin();
   </script>
   <script>
