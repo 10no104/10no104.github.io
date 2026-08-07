@@ -2637,21 +2637,24 @@
     }
 
     .menu-detail-close {
-      position: sticky;
-      top: 0;
-      z-index: 2;
+      position: absolute;
+      top: 24px;
+      right: 26px;
+      z-index: 5;
       display: grid;
       width: 38px;
       height: 38px;
-      margin: 0 0 8px auto;
+      margin: 0;
       place-items: center;
-      border: 1px solid rgba(90, 17, 34, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.58);
       border-radius: 999px;
-      background: rgba(255, 253, 249, 0.94);
-      color: #5a1122;
+      background: rgba(45, 27, 18, 0.7);
+      color: #fff;
       font: inherit;
       font-size: 1.25rem;
+      box-shadow: 0 8px 18px rgba(35, 20, 11, 0.2);
       cursor: pointer;
+      backdrop-filter: blur(6px);
     }
 
     .menu-detail-visual {
@@ -2723,12 +2726,24 @@
       text-shadow: 0 2px 8px rgba(0, 0, 0, 0.32);
     }
 
+    .menu-detail-slide-copy {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
+
     .menu-detail-slide-label strong {
       font-size: 0.88rem;
       line-height: 1.25;
     }
 
-    .menu-detail-slide-label span {
+    .menu-detail-slide-label small {
+      color: rgba(255, 255, 255, 0.84);
+      font-size: 0.72rem;
+      font-weight: 900;
+    }
+
+    .menu-detail-slide-emoji {
       font-size: 1.2rem;
     }
 
@@ -2790,6 +2805,15 @@
       padding: 16px 2px 12px;
     }
 
+    .menu-detail-variant-kicker {
+      margin: 0 0 2px;
+      color: #9a7520;
+      font-size: 0.64rem;
+      font-weight: 950;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
     .menu-detail-copy h3 {
       margin: 0;
       color: #2f2119;
@@ -2820,6 +2844,41 @@
       flex-wrap: wrap;
       gap: 7px;
       margin-top: 4px;
+    }
+
+    .menu-detail-tags[hidden] {
+      display: none;
+    }
+
+    .menu-detail-ingredients {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 6px 10px;
+      margin-top: 5px;
+      padding: 10px 12px;
+      border: 1px solid rgba(125, 98, 63, 0.12);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.58);
+    }
+
+    .menu-detail-ingredients[hidden] {
+      display: none;
+    }
+
+    .menu-detail-ingredients strong {
+      color: #6f5039;
+      font-size: 0.68rem;
+      font-weight: 950;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .menu-detail-ingredients p {
+      margin: 0;
+      color: #756357;
+      font-size: 0.72rem;
+      font-weight: 720;
+      line-height: 1.45;
     }
 
     .menu-detail-customizations {
@@ -2890,6 +2949,22 @@
       scrollbar-width: none;
     }
 
+    .menu-customization-options.is-flavor-nav {
+      display: flex;
+      gap: 8px;
+      margin: 0 -14px;
+      padding: 2px 14px 7px;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-padding-inline: 14px;
+      scroll-snap-type: x proximity;
+      scrollbar-width: none;
+    }
+
+    .menu-customization-options.is-flavor-nav::-webkit-scrollbar {
+      display: none;
+    }
+
     .menu-customization-option {
       display: flex;
       align-items: center;
@@ -2912,6 +2987,75 @@
     .menu-customization-option:has(input:disabled) {
       cursor: not-allowed;
       opacity: 0.5;
+    }
+
+    .menu-customization-option.is-flavor-nav {
+      position: relative;
+      flex: 0 0 auto;
+      min-height: 50px;
+      max-width: min(78vw, 250px);
+      padding: 7px 12px 7px 9px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 5px 12px rgba(44, 27, 16, 0.06);
+      scroll-snap-align: start;
+    }
+
+    .menu-customization-option.is-flavor-nav:has(input:checked) {
+      border-color: rgba(90, 17, 34, 0.62);
+      background: #5a1122;
+      color: #fff;
+      box-shadow: 0 8px 18px rgba(90, 17, 34, 0.18);
+    }
+
+    .menu-customization-option.is-flavor-nav input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    .menu-flavor-nav-emoji {
+      display: grid;
+      flex: 0 0 auto;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border-radius: 999px;
+      background: rgba(90, 17, 34, 0.08);
+      font-size: 0.95rem;
+    }
+
+    .menu-customization-option.is-flavor-nav:has(input:checked) .menu-flavor-nav-emoji {
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    .menu-customization-option.is-flavor-nav .menu-customization-option-copy {
+      display: flex;
+      align-items: baseline;
+      gap: 7px;
+      overflow: hidden;
+    }
+
+    .menu-customization-option.is-flavor-nav .menu-customization-option-copy strong {
+      overflow: hidden;
+      color: inherit;
+      font-size: 0.74rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .menu-customization-option.is-flavor-nav .menu-customization-option-copy small {
+      flex: 0 0 auto;
+      color: #8a786a;
+      font-size: 0.62rem;
+    }
+
+    .menu-customization-option.is-flavor-nav:has(input:checked) .menu-customization-option-copy small {
+      color: rgba(255, 255, 255, 0.74);
     }
 
     .menu-customization-option.is-visual {
@@ -3089,6 +3233,100 @@
     .menu-detail-add:disabled {
       cursor: not-allowed;
       opacity: 0.58;
+    }
+
+    @media (max-width: 640px) {
+      .menu-detail-backdrop {
+        padding-top: 8px;
+      }
+
+      .menu-detail-sheet {
+        width: 100%;
+        max-height: calc(100dvh - 8px);
+        padding: 10px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+        border-radius: 24px 24px 0 0;
+      }
+
+      .menu-detail-sheet::before {
+        content: "";
+        display: block;
+        width: 42px;
+        height: 4px;
+        margin: 0 auto 7px;
+        border-radius: 999px;
+        background: rgba(90, 17, 34, 0.22);
+      }
+
+      .menu-detail-close {
+        top: 21px;
+        right: 22px;
+        width: 40px;
+        height: 40px;
+      }
+
+      .menu-detail-gallery {
+        height: min(35dvh, 260px);
+      }
+
+      .menu-detail-gallery-nav {
+        width: 38px;
+        height: 38px;
+      }
+
+      .menu-detail-copy {
+        gap: 6px;
+        padding: 13px 2px 9px;
+      }
+
+      .menu-detail-copy h3 {
+        padding-right: 4px;
+        font-size: 1.32rem;
+      }
+
+      .menu-detail-description {
+        font-size: 0.82rem;
+      }
+
+      .menu-detail-ingredients {
+        grid-template-columns: 1fr;
+        gap: 3px;
+        padding: 9px 10px;
+      }
+
+      .menu-detail-customizations {
+        gap: 10px;
+        margin: 0 0 6px;
+        padding: 11px;
+        border-radius: 16px;
+      }
+
+      .menu-customization-heading {
+        display: none;
+      }
+
+      .menu-customization-group-head small {
+        font-size: 0.61rem;
+      }
+
+      .menu-customization-options.is-flavor-nav {
+        margin-inline: -11px;
+        padding-inline: 11px;
+      }
+
+      .menu-customization-option.is-flavor-nav {
+        min-height: 48px;
+        max-width: 82vw;
+      }
+
+      .menu-detail-footer {
+        margin-inline: -2px;
+        padding-top: 10px;
+      }
+
+      .menu-detail-add {
+        min-height: 50px;
+        padding-inline: 20px;
+      }
     }
 
     .final-bill-receipt {
@@ -3418,10 +3656,15 @@
         <button class="menu-detail-gallery-nav menu-detail-gallery-next" id="menuDetailGalleryNext" type="button" aria-label="Next photo">›</button>
         <div class="menu-detail-gallery-status" id="menuDetailGalleryStatus" aria-live="polite"><b>1</b><span>/ 1</span></div>
       </div>
-      <div class="menu-detail-copy">
+      <div class="menu-detail-copy" id="menuDetailCopy" aria-live="polite">
+        <p class="menu-detail-variant-kicker" id="menuDetailVariantKicker">Swipe to explore flavors</p>
         <h3 id="menuDetailNameKo">Menu item</h3>
         <p class="menu-detail-name-en" id="menuDetailNameEn"></p>
         <p class="menu-detail-description" id="menuDetailDescription"></p>
+        <div class="menu-detail-ingredients" id="menuDetailIngredients" hidden>
+          <strong>Ingredients</strong>
+          <p id="menuDetailIngredientText"></p>
+        </div>
         <div class="menu-detail-tags" id="menuDetailTags"></div>
       </div>
       <div class="menu-detail-customizations" id="menuDetailCustomizations" hidden></div>
@@ -3545,6 +3788,7 @@
     let requestToastHandle = null;
     let selectedMenuDetailId = null;
     let selectedMenuGalleryIndex = 0;
+    let menuDetailGalleryScrollHandle = null;
     let isDiningRequestSubmitting = false;
     let currentQrNumber = null;
     let currentQrSession = null;
@@ -3732,6 +3976,15 @@
         const rawOptions = Array.isArray(group?.options) ? group.options : [];
         const options = rawOptions.map((option, optionIndex) => {
           const optionLabel = String(option?.label || option?.name || `Choice ${optionIndex + 1}`).trim();
+          const variantTagsSource = option?.variantTags ?? option?.variant_tags ?? [];
+          const variantTags = Array.isArray(variantTagsSource)
+            ? variantTagsSource.map((tag) => ({
+                key: String(tag?.key || getTagKey(tag?.label || tag || "tag")),
+                label: String(tag?.label || tag || "").trim(),
+                color: String(tag?.color || "gray").trim()
+              })).filter((tag) => tag.label)
+            : parseTags(variantTagsSource || "");
+          const variantPriceSource = option?.variantPrice ?? option?.variant_price;
           return {
             id: slugify(option?.id || optionLabel) || `choice-${optionIndex + 1}`,
             label: optionLabel,
@@ -3743,7 +3996,16 @@
             emoji: String(option?.emoji || "").trim(),
             variantMenuId: option?.variantMenuId ?? option?.variant_menu_id ?? null,
             variantNameKo: String(option?.variantNameKo || option?.variant_name_ko || "").trim(),
-            variantNameEn: String(option?.variantNameEn || option?.variant_name_en || "").trim()
+            variantNameEn: String(option?.variantNameEn || option?.variant_name_en || "").trim(),
+            variantDescription: String(option?.variantDescription || option?.variant_description || "").trim(),
+            variantIngredient: String(option?.variantIngredient || option?.variant_ingredient || "").trim(),
+            variantDietaryTags: parseDietaryTagList(
+              option?.variantDietaryTags ?? option?.variant_dietary_tags ?? ""
+            ),
+            variantTags,
+            variantPrice: variantPriceSource == null || variantPriceSource === ""
+              ? null
+              : parsePriceNumber(variantPriceSource)
           };
         }).filter((option) => option.id && option.label);
         const minimum = Math.max(0, Number(group?.min ?? (group?.required ? 1 : 0)) || 0);
@@ -3845,7 +4107,12 @@
         defaultSelected: index === 0,
         variantMenuId: item?.id ?? getMenuId(item),
         variantNameKo: item?.nameKo || "",
-        variantNameEn: item?.nameEn || ""
+        variantNameEn: item?.nameEn || "",
+        variantDescription: item?.description || "",
+        variantIngredient: item?.ingredient || "",
+        variantDietaryTags: Array.isArray(item?.dietaryTags) ? item.dietaryTags : [],
+        variantTags: Array.isArray(item?.tags) ? item.tags : [],
+        variantPrice: itemPrice
       };
 
       if (familyType === "chicken") {
@@ -3915,6 +4182,15 @@
       const basePrice = Math.min(...variants.map((item) => parsePriceNumber(item.price)));
       const options = variants.map((item, index) => getFlavorFamilyOption(item, familyType, basePrice, index));
       const isChicken = familyType === "chicken";
+      const commonTags = (base.tags || []).filter((tag) => variants.every((item) => (
+        (item.tags || []).some((candidate) => candidate.key === tag.key && candidate.label === tag.label)
+      )));
+      const commonIngredients = variants.every((item) => String(item.ingredient || "") === String(base.ingredient || ""))
+        ? base.ingredient
+        : "";
+      const commonDietaryTags = (base.dietaryTags || []).filter((tag) => variants.every((item) => (
+        (item.dietaryTags || []).some((candidate) => normalizeDietaryTag(candidate) === normalizeDietaryTag(tag))
+      )));
       return {
         ...base,
         nameKo: isChicken ? "순살 치킨" : "소주",
@@ -3924,6 +4200,9 @@
           : "Swipe through classic bottles and fruit flavors, then pick your favorite.",
         price: basePrice,
         imageUrl: options[0]?.imageUrl || base.imageUrl,
+        tags: commonTags,
+        ingredient: commonIngredients,
+        dietaryTags: commonDietaryTags,
         customizations: [
           {
             id: "flavor",
@@ -4446,7 +4725,15 @@
             label: option.label,
             emoji: option.emoji,
             groupId: flavorGroup.id,
-            optionId: option.id
+            optionId: option.id,
+            priceDelta: option.priceDelta,
+            variantPrice: option.variantPrice,
+            variantNameKo: option.variantNameKo,
+            variantNameEn: option.variantNameEn,
+            variantDescription: option.variantDescription,
+            variantIngredient: option.variantIngredient,
+            variantDietaryTags: option.variantDietaryTags,
+            variantTags: option.variantTags
           }))
         : [];
       const extraImages = normalizeMenuImages(item?.galleryImages || []).map((image) => ({
@@ -4579,6 +4866,12 @@
       const selectedVariant = selectedCustomizations.find((option) => option.variantMenuId != null);
       const cartKey = buildCartKey(menuId, selectedCustomizations);
       const optionTotal = selectedCustomizations.reduce((sum, option) => sum + Number(option.priceDelta || 0), 0);
+      const nonVariantOptionTotal = selectedCustomizations
+        .filter((option) => option !== selectedVariant)
+        .reduce((sum, option) => sum + Number(option.priceDelta || 0), 0);
+      const resolvedUnitPrice = selectedVariant?.variantPrice != null
+        ? Number(selectedVariant.variantPrice) + nonVariantOptionTotal
+        : parsePriceNumber(menuItem.price) + optionTotal;
 
       const existing = cartItems.find((item) => item.cartKey === cartKey);
       if (existing) {
@@ -4591,7 +4884,7 @@
           nameKo: menuItem.nameKo,
           nameEn: menuItem.nameEn,
           quantity: 1,
-          unitPrice: Number((parsePriceNumber(menuItem.price) + optionTotal).toFixed(2)),
+          unitPrice: Number(resolvedUnitPrice.toFixed(2)),
           imageUrl: selectedVariant?.imageUrl || menuItem.imageUrl,
           variantMenuId: selectedVariant?.variantMenuId ?? null,
           customizations: selectedCustomizations
@@ -5847,6 +6140,71 @@
       syncQrSessionUi();
     }
 
+    function getMenuDetailVariant(item, optionId = "") {
+      const flavorGroup = getMenuCustomizations(item).find(isFlavorCustomizationGroup);
+      const option = flavorGroup?.options.find((candidate) => candidate.id === optionId)
+        || flavorGroup?.options.find((candidate) => candidate.defaultSelected)
+        || null;
+      const isFamilyVariant = Boolean(item?.flavorFamilyType && option);
+      const ingredient = option
+        ? (isFamilyVariant ? option.variantIngredient : (option.variantIngredient || item.ingredient || ""))
+        : (item.ingredient || "");
+      const dietaryTags = option
+        ? (isFamilyVariant ? option.variantDietaryTags : (option.variantDietaryTags?.length ? option.variantDietaryTags : item.dietaryTags))
+        : item.dietaryTags;
+      const variantTags = option
+        ? (isFamilyVariant ? option.variantTags : (option.variantTags?.length ? option.variantTags : item.tags))
+        : item.tags;
+      const ingredientBadges = getIngredientBadges({ ingredient, dietaryTags, tags: variantTags || [] });
+      const displayTags = [
+        ...(variantTags || []).filter((tag) => tag.key !== "vegan"),
+        ...ingredientBadges
+      ].filter((tag, index, tags) => tags.findIndex((candidate) => candidate.label === tag.label) === index);
+      const price = option?.variantPrice != null
+        ? Number(option.variantPrice)
+        : Number((parsePriceNumber(item.price) + Number(option?.priceDelta || 0)).toFixed(2));
+      const optionIndex = option ? flavorGroup.options.findIndex((candidate) => candidate.id === option.id) : 0;
+
+      return {
+        option,
+        optionIndex,
+        optionCount: flavorGroup?.options.length || 1,
+        nameKo: option?.variantNameKo || item.nameKo || item.nameEn || "Menu item",
+        nameEn: option?.variantNameEn || item.nameEn || "",
+        description: option?.variantDescription || option?.description || item.description || "Ask your server if you need ingredient details.",
+        ingredient,
+        displayTags,
+        price
+      };
+    }
+
+    function renderMenuDetailVariant(item, optionId = "") {
+      const variant = getMenuDetailVariant(item, optionId);
+      const nameKo = document.getElementById("menuDetailNameKo");
+      const nameEn = document.getElementById("menuDetailNameEn");
+      const description = document.getElementById("menuDetailDescription");
+      const ingredients = document.getElementById("menuDetailIngredients");
+      const ingredientText = document.getElementById("menuDetailIngredientText");
+      const tags = document.getElementById("menuDetailTags");
+      const kicker = document.getElementById("menuDetailVariantKicker");
+      if (!nameKo || !nameEn || !description || !ingredients || !ingredientText || !tags || !kicker) return variant;
+
+      nameKo.textContent = variant.nameKo;
+      nameEn.textContent = variant.nameEn;
+      nameEn.hidden = !variant.nameEn;
+      description.textContent = variant.description;
+      ingredientText.textContent = variant.ingredient;
+      ingredients.hidden = !variant.ingredient;
+      kicker.textContent = variant.optionCount > 1
+        ? `${variant.optionIndex + 1} of ${variant.optionCount} · swipe for full flavor details`
+        : "Menu details";
+      tags.innerHTML = variant.displayTags
+        .map((tag) => `<span class="menu-tag ${escapeHtml(tag.color || "gray")}">${escapeHtml(tag.label)}</span>`)
+        .join("");
+      tags.hidden = !variant.displayTags.length;
+      return variant;
+    }
+
     function renderMenuDetailGallery(item) {
       const gallery = document.getElementById("menuDetailGallery");
       if (!gallery) return;
@@ -5862,7 +6220,11 @@
 
       selectedMenuGalleryIndex = 0;
       gallery.scrollLeft = 0;
-      gallery.innerHTML = slides.map((image, index) => `
+      gallery.innerHTML = slides.map((image, index) => {
+        const slidePrice = image.variantPrice != null
+          ? Number(image.variantPrice)
+          : Number((parsePriceNumber(item.price) + Number(image.priceDelta || 0)).toFixed(2));
+        return `
         <button
           class="menu-detail-slide"
           type="button"
@@ -5873,11 +6235,14 @@
         >
           <img src="${escapeHtml(image.imageUrl || MENU_IMAGE_PLACEHOLDER)}" alt="${escapeHtml(image.imageAlt || image.label || item.nameEn || item.nameKo)}" />
           <span class="menu-detail-slide-label">
-            <strong>${escapeHtml(image.label || item.nameEn || item.nameKo || "Menu item")}</strong>
-            ${image.emoji ? `<span aria-hidden="true">${escapeHtml(image.emoji)}</span>` : ""}
+            <span class="menu-detail-slide-copy">
+              <strong>${escapeHtml(image.label || item.nameEn || item.nameKo || "Menu item")}</strong>
+              <small>${escapeHtml(formatCurrency(slidePrice))}</small>
+            </span>
+            ${image.emoji ? `<span class="menu-detail-slide-emoji" aria-hidden="true">${escapeHtml(image.emoji)}</span>` : ""}
           </span>
         </button>
-      `).join("");
+      `;}).join("");
       syncMenuDetailGalleryStatus();
     }
 
@@ -5908,6 +6273,7 @@
       selectedMenuGalleryIndex = Math.max(0, Math.min(nextIndex, slideCount - 1));
       gallery.scrollTo({ left: gallery.clientWidth * selectedMenuGalleryIndex, behavior });
       syncMenuDetailGalleryStatus();
+      selectMenuDetailFlavorFromCurrentSlide();
     }
 
     function focusMenuDetailFlavor(optionId, behavior = "smooth") {
@@ -5918,32 +6284,50 @@
       if (index >= 0) scrollMenuDetailGallery(index, { absolute: true, behavior });
     }
 
+    function selectMenuDetailFlavor(optionId, groupId = "", { centerNav = true } = {}) {
+      if (!optionId) return;
+      const customizations = document.getElementById("menuDetailCustomizations");
+      const inputs = [...(customizations?.querySelectorAll("[data-custom-option]") || [])];
+      const input = inputs.find((candidate) => (
+        candidate.dataset.customOption === optionId
+        && (!groupId || candidate.dataset.customGroup === groupId)
+      ));
+      if (!input || input.disabled) return;
+      input.checked = true;
+      syncMenuDetailSelectionState();
+      if (centerNav) {
+        const label = input.closest("label");
+        const track = label?.parentElement;
+        if (label && track) {
+          track.scrollTo({
+            left: label.offsetLeft - ((track.clientWidth - label.clientWidth) / 2),
+            behavior: "smooth"
+          });
+        }
+      }
+    }
+
+    function selectMenuDetailFlavorFromCurrentSlide() {
+      const gallery = document.getElementById("menuDetailGallery");
+      const slide = gallery?.children[selectedMenuGalleryIndex];
+      if (!slide?.dataset?.flavorOptionId) return;
+      selectMenuDetailFlavor(slide.dataset.flavorOptionId, slide.dataset.flavorGroupId || "");
+    }
+
     function openMenuDetail(menuId) {
       const item = allMenus.find((candidate) => getMenuId(candidate) === menuId);
       const backdrop = document.getElementById("menuDetailBackdrop");
       if (!item || !backdrop) return;
 
       selectedMenuDetailId = menuId;
-      const nameKo = document.getElementById("menuDetailNameKo");
-      const nameEn = document.getElementById("menuDetailNameEn");
-      const description = document.getElementById("menuDetailDescription");
-      const tags = document.getElementById("menuDetailTags");
-      const displayTags = [...item.tags.filter((tag) => tag.key !== "vegan"), ...getIngredientBadges(item)];
-
-      nameKo.textContent = item.nameKo || item.nameEn || "Menu item";
-      nameEn.textContent = item.nameEn || "";
-      description.textContent = item.description || "Ask your server if you need ingredient details.";
-      tags.innerHTML = displayTags
-        .map((tag) => `<span class="menu-tag ${escapeHtml(tag.color)}">${escapeHtml(tag.label)}</span>`)
-        .join("");
       renderMenuDetailCustomizations(item);
       renderMenuDetailGallery(item);
       syncMenuDetailSelectionState();
       const selectedFlavor = document.querySelector("#menuDetailCustomizations [data-custom-option]:checked");
-      focusMenuDetailFlavor(selectedFlavor?.dataset.customOption || "", "auto");
       backdrop.hidden = false;
       backdrop.classList.add("is-open");
       document.body.style.overflow = "hidden";
+      focusMenuDetailFlavor(selectedFlavor?.dataset.customOption || "", "auto");
       window.setTimeout(() => document.getElementById("menuDetailClose")?.focus(), 0);
     }
 
@@ -5953,6 +6337,10 @@
       backdrop.classList.remove("is-open");
       backdrop.hidden = true;
       selectedMenuDetailId = null;
+      if (menuDetailGalleryScrollHandle) {
+        window.clearTimeout(menuDetailGalleryScrollHandle);
+        menuDetailGalleryScrollHandle = null;
+      }
       document.body.style.overflow = isServerModalOpen ? "hidden" : "";
     }
 
@@ -5970,7 +6358,8 @@
       container.innerHTML = `
         <h4 class="menu-customization-heading">Customize</h4>
         ${groups.map((group) => {
-          const isVisual = Boolean(group.visual || group.options.some((option) => option.imageUrl));
+          const isFlavorNav = isFlavorCustomizationGroup(group) && group.options.some((option) => option.imageUrl);
+          const isVisual = !isFlavorNav && Boolean(group.visual || group.options.some((option) => option.imageUrl));
           const hint = group.min > 0
             ? (group.type === "single" ? "Choose one" : `Choose ${group.min}–${group.max}`)
             : (group.type === "single" ? "Optional · choose one" : `Optional · up to ${group.max}`);
@@ -5978,11 +6367,16 @@
             <section class="menu-customization-group" data-customization-group="${escapeHtml(group.id)}">
               <div class="menu-customization-group-head">
                 <strong>${escapeHtml(group.label)}</strong>
-                <small>${escapeHtml(isVisual ? `${hint} · swipe →` : hint)}</small>
+                <small>${escapeHtml(isFlavorNav ? "Swipe photo or tap a flavor" : (isVisual ? `${hint} · swipe →` : hint))}</small>
               </div>
-              <div class="menu-customization-options${isVisual ? " is-visual" : ""}">
-                ${group.options.map((option) => `
-                  <label class="menu-customization-option${isVisual ? " is-visual" : ""}">
+              <div class="menu-customization-options${isFlavorNav ? " is-flavor-nav" : (isVisual ? " is-visual" : "")}">
+                ${group.options.map((option) => {
+                  const optionPrice = option.variantPrice != null
+                    ? Number(option.variantPrice)
+                    : Number((parsePriceNumber(item.price) + Number(option.priceDelta || 0)).toFixed(2));
+                  const shortLabel = String(option.variantNameKo || option.label || "Flavor").split("·")[0].trim();
+                  return `
+                  <label class="menu-customization-option${isFlavorNav ? " is-flavor-nav" : (isVisual ? " is-visual" : "")}">
                     <input
                       type="${group.type === "single" ? "radio" : "checkbox"}"
                       name="menu-custom-${escapeHtml(group.id)}"
@@ -5990,6 +6384,13 @@
                       data-custom-option="${escapeHtml(option.id)}"
                       ${option.defaultSelected ? "checked" : ""}
                     />
+                    ${isFlavorNav ? `
+                      <span class="menu-flavor-nav-emoji" aria-hidden="true">${escapeHtml(option.emoji || "•")}</span>
+                      <span class="menu-customization-option-copy">
+                        <strong>${escapeHtml(shortLabel)}</strong>
+                        <small>${escapeHtml(formatCurrency(optionPrice))}</small>
+                      </span>
+                    ` : `
                     ${isVisual ? `
                       <span class="menu-customization-option-media">
                         <img
@@ -6007,8 +6408,9 @@
                       ${option.description ? `<small>${escapeHtml(option.description)}</small>` : ""}
                       ${option.priceDelta ? `<small>+${escapeHtml(formatCurrency(option.priceDelta))}</small>` : ""}
                     </span>
+                    `}
                   </label>
-                `).join("")}
+                `;}).join("")}
               </div>
             </section>
           `;
@@ -6035,6 +6437,7 @@
           variantMenuId: option.variantMenuId,
           variantNameKo: option.variantNameKo,
           variantNameEn: option.variantNameEn,
+          variantPrice: option.variantPrice,
           imageUrl: option.imageUrl
         }];
       });
@@ -6060,11 +6463,22 @@
       });
 
       const selectedOptions = getSelectedMenuCustomizations();
-      const optionTotal = selectedOptions.reduce((sum, option) => sum + Number(option.priceDelta || 0), 0);
-      const itemTotal = Number((parsePriceNumber(item.price) + optionTotal).toFixed(2));
+      const flavorGroup = groups.find(isFlavorCustomizationGroup);
+      const selectedFlavorInput = inputs.find((input) => (
+        input.checked && input.dataset.customGroup === flavorGroup?.id
+      ));
+      const selectedFlavorOption = flavorGroup?.options.find((option) => option.id === selectedFlavorInput?.dataset.customOption);
+      const nonFlavorOptionTotal = selectedOptions
+        .filter((option) => option.groupId !== flavorGroup?.id)
+        .reduce((sum, option) => sum + Number(option.priceDelta || 0), 0);
+      const flavorPrice = selectedFlavorOption?.variantPrice != null
+        ? Number(selectedFlavorOption.variantPrice)
+        : Number((parsePriceNumber(item.price) + Number(selectedFlavorOption?.priceDelta || 0)).toFixed(2));
+      const itemTotal = Number((flavorPrice + nonFlavorOptionTotal).toFixed(2));
       const canOrder = Boolean(currentQrSession && !qrSessionLoadError && !guestPartyConflict && !isDiningRequestSubmitting);
 
       price.textContent = formatCurrency(itemTotal);
+      renderMenuDetailVariant(item, selectedFlavorOption?.id || "");
       addButton.disabled = !canOrder || missingRequired;
       addButton.textContent = !canOrder
         ? "QR not active"
@@ -6095,18 +6509,16 @@
         if (!gallery.clientWidth) return;
         selectedMenuGalleryIndex = Math.round(gallery.scrollLeft / gallery.clientWidth);
         syncMenuDetailGalleryStatus();
+        if (menuDetailGalleryScrollHandle) window.clearTimeout(menuDetailGalleryScrollHandle);
+        menuDetailGalleryScrollHandle = window.setTimeout(() => {
+          menuDetailGalleryScrollHandle = null;
+          selectMenuDetailFlavorFromCurrentSlide();
+        }, 80);
       }, { passive: true });
       gallery.addEventListener("click", (event) => {
         const slide = event.target.closest("[data-flavor-option-id]");
         if (!slide?.dataset.flavorOptionId) return;
-        const inputs = [...customizations.querySelectorAll("[data-custom-option]")];
-        const input = inputs.find((candidate) => (
-          candidate.dataset.customGroup === slide.dataset.flavorGroupId
-          && candidate.dataset.customOption === slide.dataset.flavorOptionId
-        ));
-        if (!input || input.disabled) return;
-        input.checked = true;
-        input.dispatchEvent(new Event("change", { bubbles: true }));
+        selectMenuDetailFlavor(slide.dataset.flavorOptionId, slide.dataset.flavorGroupId || "");
       });
       gallery.addEventListener("keydown", (event) => {
         if (event.key === "ArrowLeft") {
