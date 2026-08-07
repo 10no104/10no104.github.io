@@ -222,7 +222,7 @@
 
     .floor-tabs {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 8px;
       margin-bottom: 14px;
       padding: 7px;
@@ -495,6 +495,147 @@
         linear-gradient(rgba(80, 54, 37, 0.045) 1px, transparent 1px),
         linear-gradient(90deg, rgba(80, 54, 37, 0.045) 1px, transparent 1px);
       background-size: 10% 10%;
+    }
+
+    .map-canvas.is-overview-map {
+      min-width: 0;
+      aspect-ratio: 16 / 9;
+      background-color: #f1e6d7;
+      background-size: 5% 8%;
+      touch-action: pan-y;
+    }
+
+    .overview-map-zone {
+      position: absolute;
+      display: block;
+      min-width: 0;
+      min-height: 0;
+      padding: 0;
+      overflow: hidden;
+      border: 2px solid transparent;
+      border-radius: 18px;
+      color: var(--ink);
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+      box-shadow: 0 10px 24px rgba(55, 36, 25, 0.09);
+    }
+
+    .overview-map-zone:hover,
+    .overview-map-zone:focus-visible {
+      z-index: 30;
+      transform: translateY(-2px);
+      box-shadow: 0 16px 30px rgba(55, 36, 25, 0.15);
+    }
+
+    .overview-map-zone[data-overview-zone="first"] {
+      border-color: rgba(54, 111, 148, 0.34);
+      background: linear-gradient(145deg, rgba(224, 240, 249, 0.96), rgba(248, 252, 253, 0.9));
+    }
+
+    .overview-map-zone[data-overview-zone="second"] {
+      border-color: rgba(155, 115, 53, 0.34);
+      background: linear-gradient(145deg, rgba(248, 238, 211, 0.96), rgba(255, 252, 244, 0.9));
+    }
+
+    .overview-map-zone[data-overview-zone="patio"] {
+      border-color: rgba(59, 126, 84, 0.34);
+      background: linear-gradient(145deg, rgba(225, 243, 230, 0.96), rgba(249, 253, 249, 0.9));
+    }
+
+    .overview-map-zone-heading {
+      position: absolute;
+      top: 8px;
+      left: 10px;
+      right: 10px;
+      z-index: 25;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .overview-map-zone-heading strong,
+    .overview-map-zone-heading span {
+      display: block;
+    }
+
+    .overview-map-zone-heading strong {
+      color: #402a20;
+      font-size: clamp(0.62rem, 1.25vw, 0.9rem);
+    }
+
+    .overview-map-zone-heading span {
+      color: #7b6759;
+      font-size: clamp(0.42rem, 0.72vw, 0.6rem);
+      font-weight: 850;
+      text-align: right;
+    }
+
+    .overview-map-item {
+      pointer-events: none;
+      cursor: inherit;
+    }
+
+    .overview-map-item .table-label,
+    .overview-map-item .obstacle-label {
+      font-size: clamp(0.4rem, 0.72vw, 0.64rem);
+    }
+
+    .overview-map-passage {
+      position: absolute;
+      z-index: 20;
+      display: grid;
+      place-items: center;
+      padding: 2px;
+      border: 2px dashed rgba(91, 71, 57, 0.46);
+      border-radius: 8px;
+      background: rgba(255, 252, 244, 0.93);
+      color: #5d473a;
+      font-size: clamp(0.38rem, 0.68vw, 0.58rem);
+      font-weight: 950;
+      line-height: 1.15;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .overview-map-passage.is-stairs {
+      left: 62%;
+      top: 18%;
+      width: 8%;
+      height: 16%;
+      background:
+        repeating-linear-gradient(0deg, rgba(132, 119, 108, 0.26) 0 5px, rgba(255, 252, 244, 0.9) 5px 8px),
+        #fffaf2;
+    }
+
+    .overview-map-passage.is-patio {
+      left: 62%;
+      top: 68%;
+      width: 8%;
+      height: 13%;
+      border-color: rgba(49, 122, 76, 0.48);
+      background: rgba(235, 248, 238, 0.94);
+      color: #286142;
+    }
+
+    .overview-map-entrance {
+      position: absolute;
+      left: 20%;
+      bottom: 0;
+      z-index: 24;
+      min-width: 86px;
+      padding: 3px 9px;
+      border: 2px dashed rgba(51, 115, 85, 0.58);
+      border-bottom: 0;
+      border-radius: 9px 9px 0 0;
+      background: rgba(255, 255, 255, 0.8);
+      color: #2e654c;
+      font-size: 0.52rem;
+      font-weight: 950;
+      text-align: center;
+      pointer-events: none;
     }
 
     .map-empty {
@@ -816,6 +957,10 @@
         padding: 13px;
       }
 
+      .floor-tabs {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
       .intro {
         align-items: flex-start;
         flex-direction: column;
@@ -857,6 +1002,16 @@
         min-width: 650px;
       }
 
+      .map-canvas.is-overview-map {
+        min-width: 0;
+      }
+
+      .overview-map-zone-heading {
+        top: 5px;
+        left: 6px;
+        right: 6px;
+      }
+
       .inspector-body {
         display: block;
       }
@@ -882,13 +1037,14 @@
     <section class="intro">
       <div>
         <h1>Build the floor once. Run service from the map.</h1>
-        <p>Place tables and fixed landmarks, save each floor, then use the same layout in Queen to assign QR cards and manage live table sessions.</p>
+        <p>Review the whole restaurant first, then open one area to place tables and fixed landmarks. Queen uses the same combined layout for live table service.</p>
       </div>
       <div class="save-state" id="saveState">Loading map</div>
     </section>
 
     <nav class="floor-tabs" id="floorTabs" aria-label="Floor selection">
-      <button class="floor-tab is-active" type="button" data-zone="first">1st Floor</button>
+      <button class="floor-tab is-active" type="button" data-zone="overview">All Areas</button>
+      <button class="floor-tab" type="button" data-zone="first">1st Floor</button>
       <button class="floor-tab" type="button" data-zone="second">2nd Floor</button>
       <button class="floor-tab" type="button" data-zone="patio">Patio</button>
     </nav>
@@ -968,9 +1124,16 @@
 
     const TABLE_LAYOUTS_TABLE = "dining_table_layouts";
     const FLOOR_LABELS = {
+      overview: "All Areas",
       first: "1st Floor",
       second: "2nd Floor",
       patio: "Patio"
+    };
+    const MAP_ZONE_ORDER = ["first", "second", "patio"];
+    const MAP_ZONE_BOUNDS = {
+      first: { x: 2.2, y: 3.5, w: 59.5, h: 93 },
+      second: { x: 70.2, y: 3.5, w: 27.6, h: 42 },
+      patio: { x: 70.2, y: 54.5, w: 27.6, h: 42 }
     };
     const OBSTACLE_LABELS = {
       wall: "Wall",
@@ -992,7 +1155,7 @@
     };
 
     const state = {
-      zone: "first",
+      zone: "overview",
       mode: "edit",
       snap: true,
       selectedId: null,
@@ -1189,6 +1352,7 @@
     }
 
     function undo() {
+      if (state.zone === "overview") return;
       const layout = currentLayout();
       const previous = layout.undo.pop();
       if (!previous) return;
@@ -1200,6 +1364,7 @@
     }
 
     function redo() {
+      if (state.zone === "overview") return;
       const layout = currentLayout();
       const next = layout.redo.pop();
       if (!next) return;
@@ -1223,7 +1388,7 @@
     }
 
     function addTable(tableCode) {
-      if (state.mode !== "edit") return;
+      if (state.zone === "overview" || state.mode !== "edit") return;
       const normalizedCode = String(tableCode || "").trim().toUpperCase().slice(0, 40);
       if (!normalizedCode) return;
       const existing = currentLayout().items.find(
@@ -1255,7 +1420,7 @@
     }
 
     function addObstacle(kind) {
-      if (state.mode !== "edit" || !OBSTACLE_LABELS[kind]) return;
+      if (state.zone === "overview" || state.mode !== "edit" || !OBSTACLE_LABELS[kind]) return;
       mutateLayout((layout) => {
         const [width, height] = DEFAULT_OBSTACLE_SIZES[kind];
         const position = findOpenPosition(width, height);
@@ -1289,8 +1454,9 @@
     }
 
     function placeAllTables() {
+      if (state.zone === "overview" || state.mode !== "edit") return;
       const unplaced = getUnplacedTableOptions();
-      if (!unplaced.length || state.mode !== "edit") return;
+      if (!unplaced.length) return;
       mutateLayout((layout) => {
         const startIndex = layout.items.length;
         unplaced.forEach((tableCode, tableIndex) => {
@@ -1315,7 +1481,7 @@
     }
 
     function deleteSelected() {
-      if (!state.selectedId || state.mode !== "edit") return;
+      if (state.zone === "overview" || !state.selectedId || state.mode !== "edit") return;
       mutateLayout((layout) => {
         layout.items = layout.items.filter((item) => item.id !== state.selectedId);
         state.selectedId = null;
@@ -1323,6 +1489,7 @@
     }
 
     function duplicateSelected() {
+      if (state.zone === "overview") return;
       const selected = currentLayout().items.find((item) => item.id === state.selectedId);
       if (!selected || state.mode !== "edit") return;
       if (selected.type === "table") {
@@ -1366,12 +1533,24 @@
         button.classList.toggle("is-active", active);
         button.setAttribute("aria-pressed", active ? "true" : "false");
       });
-      document.getElementById("saveButton").textContent = `Save ${FLOOR_LABELS[state.zone]}`;
+      const saveButton = document.getElementById("saveButton");
+      saveButton.hidden = state.zone === "overview";
+      if (state.zone !== "overview") {
+        saveButton.textContent = `Save ${FLOOR_LABELS[state.zone]}`;
+      }
     }
 
     function renderPalette() {
-      const available = getUnplacedTableOptions();
       const list = document.getElementById("availableTables");
+      if (state.zone === "overview") {
+        list.innerHTML = '<p class="available-empty">Tap 1st Floor, 2nd Floor, or Patio on the whole-store map to edit that saved area.</p>';
+        document.getElementById("placeAllTables").disabled = true;
+        document.querySelectorAll("[data-add-table], [data-obstacle], #addCustomTable").forEach((button) => {
+          button.disabled = true;
+        });
+        return;
+      }
+      const available = getUnplacedTableOptions();
       list.innerHTML = available.length
         ? available.map((tableCode) => `
             <button class="available-table" type="button" data-add-table="${escapeHtml(tableCode)}">
@@ -1385,10 +1564,90 @@
       });
     }
 
+    function renderOverviewCanvas() {
+      const canvas = document.getElementById("mapCanvas");
+      let tableCount = 0;
+      let obstacleCount = 0;
+      let savedAreaCount = 0;
+      const zoneMarkup = MAP_ZONE_ORDER.map((zone) => {
+        const layout = state.layouts.get(zone) || defaultLayout(zone);
+        const bounds = MAP_ZONE_BOUNDS[zone];
+        const hasSavedMap = Boolean(layout.revision || layout.items.length);
+        if (hasSavedMap) savedAreaCount += 1;
+        const zoneTableCount = layout.items.filter((item) => item.type === "table").length;
+        const zoneObstacleCount = layout.items.length - zoneTableCount;
+        tableCount += zoneTableCount;
+        obstacleCount += zoneObstacleCount;
+        const itemMarkup = layout.items.map((item) => {
+          const previewHeight = item.h * 0.8;
+          const previewY = Math.min(17 + item.y * 0.8, 100 - previewHeight);
+          const style = [
+            `left:${item.x}%`,
+            `top:${previewY}%`,
+            `width:${item.w}%`,
+            `height:${previewHeight}%`,
+            `transform:rotate(${item.rotation}deg)`
+          ].join(";");
+          if (item.type === "table") {
+            return `
+              <span
+                class="map-item table-item overview-map-item is-${escapeHtml(item.shape)}"
+                style="${style}"
+                aria-hidden="true"
+              >
+                <span class="table-label">${escapeHtml(item.label || item.tableCode)}</span>
+              </span>
+            `;
+          }
+          return `
+            <span
+              class="map-item obstacle-item overview-map-item"
+              data-kind="${escapeHtml(item.obstacleKind)}"
+              style="${style}"
+              aria-hidden="true"
+            >
+              <span class="obstacle-label">${escapeHtml(item.label)}</span>
+            </span>
+          `;
+        }).join("");
+        const zoneStyle = `left:${bounds.x}%;top:${bounds.y}%;width:${bounds.w}%;height:${bounds.h}%`;
+        return `
+          <button
+            class="overview-map-zone"
+            type="button"
+            data-overview-zone="${escapeHtml(zone)}"
+            style="${zoneStyle}"
+            aria-label="Open ${escapeHtml(FLOOR_LABELS[zone])} editor, ${zoneTableCount} tables"
+          >
+            <span class="overview-map-zone-heading">
+              <strong>${escapeHtml(FLOOR_LABELS[zone])}</strong>
+              <span>${hasSavedMap ? `revision ${layout.revision} · ${zoneTableCount} tables` : "not saved yet"}</span>
+            </span>
+            ${itemMarkup}
+          </button>
+        `;
+      }).join("");
+      canvas.style.aspectRatio = "16 / 9";
+      canvas.classList.add("is-overview-map", "is-viewing");
+      canvas.innerHTML = `
+        ${zoneMarkup}
+        <span class="overview-map-passage is-stairs" aria-hidden="true">2F<br>STAIRS &uarr;</span>
+        <span class="overview-map-passage is-patio" aria-hidden="true">PATIO<br>PASSAGE &rarr;</span>
+        <span class="overview-map-entrance" aria-hidden="true">MAIN ENTRANCE</span>
+      `;
+      document.getElementById("mapSummary").textContent =
+        `${savedAreaCount} saved area${savedAreaCount === 1 ? "" : "s"} · ${tableCount} tables · ${obstacleCount} reference points`;
+    }
+
     function renderCanvas() {
+      if (state.zone === "overview") {
+        renderOverviewCanvas();
+        return;
+      }
       const layout = currentLayout();
       const canvas = document.getElementById("mapCanvas");
       canvas.style.aspectRatio = `${layout.width} / ${layout.height}`;
+      canvas.classList.remove("is-overview-map");
       canvas.classList.toggle("is-viewing", state.mode === "view");
       canvas.innerHTML = layout.items.length
         ? layout.items.map((item) => {
@@ -1471,6 +1730,23 @@
 
     function renderInspector() {
       const inspector = document.getElementById("inspector");
+      if (state.zone === "overview") {
+        inspector.innerHTML = `
+          <div>
+            <span class="section-label">Whole-store preview</span>
+            <p class="inspector-placeholder">This screen combines every saved area. Tap a colored area on the map to open its editor.</p>
+          </div>
+          <div>
+            <span class="section-label">How saving works</span>
+            <p class="connection-note ${state.databaseAvailable ? "" : "is-error"}">
+              ${state.databaseAvailable
+                ? "Each area saves separately in Supabase. All Areas and Queen update from those saved maps."
+                : "Map storage is unavailable. Check the Supabase connection before editing."}
+            </p>
+          </div>
+        `;
+        return;
+      }
       const layout = currentLayout();
       const item = layout.items.find((candidate) => candidate.id === state.selectedId);
       if (!item) {
@@ -1546,6 +1822,21 @@
     }
 
     function updateButtons() {
+      const isOverview = state.zone === "overview";
+      if (isOverview) {
+        document.getElementById("undoButton").disabled = true;
+        document.getElementById("redoButton").disabled = true;
+        document.getElementById("saveButton").disabled = true;
+        document.getElementById("reloadButton").disabled = true;
+        document.getElementById("snapButton").disabled = true;
+        document.getElementById("snapButton").classList.remove("is-active");
+        document.getElementById("snapButton").setAttribute("aria-pressed", "false");
+        const modeToggle = document.getElementById("modeToggle");
+        modeToggle.textContent = "Overview";
+        modeToggle.classList.remove("is-active");
+        modeToggle.disabled = true;
+        return;
+      }
       const layout = currentLayout();
       document.getElementById("undoButton").disabled = !layout.undo.length || state.mode !== "edit";
       document.getElementById("redoButton").disabled = !layout.redo.length || state.mode !== "edit";
@@ -1553,11 +1844,13 @@
       document.getElementById("snapButton").classList.toggle("is-active", state.snap);
       document.getElementById("snapButton").setAttribute("aria-pressed", state.snap ? "true" : "false");
       const modeToggle = document.getElementById("modeToggle");
+      modeToggle.disabled = false;
       modeToggle.textContent = state.mode === "edit" ? "Edit mode" : "Preview";
       modeToggle.classList.toggle("is-active", state.mode === "edit");
     }
 
     function renderAll() {
+      document.querySelector(".editor-shell")?.classList.toggle("is-overview", state.zone === "overview");
       renderFloorTabs();
       renderPalette();
       renderCanvas();
@@ -1566,7 +1859,7 @@
     }
 
     async function saveCurrentLayout() {
-      if (state.saving || !state.databaseAvailable) return;
+      if (state.zone === "overview" || state.saving || !state.databaseAvailable) return;
       const layout = currentLayout();
       state.saving = true;
       setSaveState(`Saving ${FLOOR_LABELS[state.zone]}…`);
@@ -1607,6 +1900,7 @@
     }
 
     async function reloadCurrentLayout() {
+      if (state.zone === "overview") return;
       const layout = currentLayout();
       if (layout.dirty && !window.confirm("Discard unsaved changes on this floor?")) return;
       setSaveState(`Reloading ${FLOOR_LABELS[state.zone]}…`);
@@ -1629,6 +1923,11 @@
       if (!FLOOR_LABELS[zone] || zone === state.zone) return;
       state.zone = zone;
       state.selectedId = null;
+      if (zone === "overview") {
+        setSaveState("All saved areas preview", "is-saved");
+        renderAll();
+        return;
+      }
       const layout = currentLayout();
       setSaveState(
         layout.dirty
@@ -1794,13 +2093,10 @@
         if (!state.layouts.has(zone)) state.layouts.set(zone, defaultLayout(zone));
       });
 
-      const layout = currentLayout();
       if (!state.databaseAvailable) {
         setSaveState("Map storage needs SQL setup", "is-error");
-      } else if (layout.revision) {
-        setSaveState(`${FLOOR_LABELS[state.zone]} loaded · revision ${layout.revision}`, "is-saved");
       } else {
-        setSaveState("No saved map yet");
+        setSaveState("All saved areas preview", "is-saved");
       }
       renderAll();
     }
@@ -1850,6 +2146,10 @@
     });
 
     const mapCanvas = document.getElementById("mapCanvas");
+    mapCanvas.addEventListener("click", (event) => {
+      const area = event.target.closest("[data-overview-zone]");
+      if (area && state.zone === "overview") selectZone(area.dataset.overviewZone);
+    });
     mapCanvas.addEventListener("pointerdown", beginPointerInteraction);
     mapCanvas.addEventListener("pointermove", movePointerInteraction);
     mapCanvas.addEventListener("pointerup", endPointerInteraction);
@@ -1864,6 +2164,7 @@
       updateButtons();
     });
     document.getElementById("modeToggle").addEventListener("click", () => {
+      if (state.zone === "overview") return;
       state.mode = state.mode === "edit" ? "view" : "edit";
       state.selectedId = null;
       renderAll();
@@ -1894,7 +2195,7 @@
         ArrowUp: [0, -1],
         ArrowDown: [0, 1]
       };
-      if (!directions[event.key] || !state.selectedId || state.mode !== "edit") return;
+      if (state.zone === "overview" || !directions[event.key] || !state.selectedId || state.mode !== "edit") return;
       event.preventDefault();
       const [deltaX, deltaY] = directions[event.key];
       mutateLayout((layout) => {
