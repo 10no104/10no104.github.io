@@ -1021,7 +1021,7 @@
 
     .table-map-tabs {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 8px;
       margin-bottom: 12px;
     }
@@ -1063,6 +1063,222 @@
 
     .table-map-tab.is-active span {
       background: rgba(255, 255, 255, 0.18);
+    }
+
+    .table-map-grid.is-overview,
+    .table-map-grid.is-zone-view {
+      display: block;
+    }
+
+    .table-map-overview {
+      display: grid;
+      grid-template-columns: minmax(0, 1.38fr) minmax(250px, 0.92fr);
+      grid-template-rows: repeat(2, minmax(210px, 1fr));
+      gap: 12px;
+      min-height: clamp(510px, 60vh, 660px);
+    }
+
+    .table-map-zone-preview {
+      position: relative;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: 10px;
+      min-width: 0;
+      padding: 14px;
+      overflow: hidden;
+      border: 2px solid transparent;
+      border-radius: 20px;
+      color: #3e2c24;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+      box-shadow: 0 12px 28px rgba(55, 36, 25, 0.08);
+      transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+    }
+
+    .table-map-zone-preview:hover,
+    .table-map-zone-preview:focus-visible {
+      z-index: 2;
+      transform: translateY(-2px);
+      box-shadow: 0 18px 34px rgba(55, 36, 25, 0.14);
+    }
+
+    .table-map-zone-preview:focus-visible {
+      outline: 3px solid rgba(212, 175, 55, 0.62);
+      outline-offset: 2px;
+    }
+
+    .table-map-zone-preview[data-zone="first"],
+    .table-map-zone-focus[data-zone="first"] {
+      border-color: rgba(54, 111, 148, 0.3);
+      background: linear-gradient(145deg, rgba(224, 240, 249, 0.94), rgba(248, 252, 253, 0.9));
+    }
+
+    .table-map-zone-preview[data-zone="second"],
+    .table-map-zone-focus[data-zone="second"] {
+      border-color: rgba(155, 115, 53, 0.3);
+      background: linear-gradient(145deg, rgba(248, 238, 211, 0.95), rgba(255, 252, 244, 0.9));
+    }
+
+    .table-map-zone-preview[data-zone="patio"],
+    .table-map-zone-focus[data-zone="patio"] {
+      border-color: rgba(59, 126, 84, 0.3);
+      background: linear-gradient(145deg, rgba(225, 243, 230, 0.95), rgba(249, 253, 249, 0.9));
+    }
+
+    .table-map-zone-preview[data-zone="first"] {
+      grid-row: 1 / 3;
+    }
+
+    .table-map-zone-preview-head,
+    .table-map-focus-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .table-map-zone-preview-copy,
+    .table-map-focus-copy {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .table-map-zone-preview-copy strong,
+    .table-map-focus-copy strong {
+      color: #402a20;
+      font-size: 0.98rem;
+      letter-spacing: -0.03em;
+    }
+
+    .table-map-zone-preview-copy small,
+    .table-map-focus-copy small {
+      color: #7c695c;
+      font-size: 0.67rem;
+      font-weight: 800;
+    }
+
+    .table-map-zone-preview-stats {
+      display: grid;
+      justify-items: end;
+      gap: 3px;
+      flex: 0 0 auto;
+    }
+
+    .table-map-zone-preview-stats strong {
+      color: #5f2731;
+      font-size: 0.8rem;
+    }
+
+    .table-map-zone-preview-stats span {
+      color: #897568;
+      font-size: 0.61rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .table-map-mini-canvas {
+      position: relative;
+      min-height: 0;
+      overflow: hidden;
+      border: 1px solid rgba(80, 54, 37, 0.13);
+      border-radius: 14px;
+      background-color: rgba(255, 255, 255, 0.58);
+      background-image:
+        linear-gradient(rgba(80, 54, 37, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(80, 54, 37, 0.035) 1px, transparent 1px);
+      background-size: 20% 20%;
+    }
+
+    .table-map-mini-table {
+      position: absolute;
+      display: grid;
+      place-items: center;
+      min-width: 30px;
+      min-height: 28px;
+      border: 2px solid rgba(101, 63, 40, 0.74);
+      border-radius: 10px;
+      background: linear-gradient(145deg, #a87958, #815135);
+      color: #fffaf2;
+      font-size: clamp(0.54rem, 1.05vw, 0.72rem);
+      font-weight: 950;
+      line-height: 1;
+      box-shadow: 0 5px 10px rgba(62, 37, 24, 0.14);
+    }
+
+    .table-map-mini-table.is-round {
+      border-radius: 50%;
+    }
+
+    .table-map-mini-table.is-assigned {
+      border-color: #1e5f3d;
+      background: linear-gradient(145deg, #4a9b6f, #286a46);
+      box-shadow: 0 6px 14px rgba(34, 103, 66, 0.25);
+    }
+
+    .table-map-mini-table.is-assigned::after {
+      content: "";
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      width: 10px;
+      height: 10px;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      background: #1e9a59;
+    }
+
+    .table-map-mini-obstacle {
+      position: absolute;
+      border-radius: 5px;
+      background: rgba(83, 102, 97, 0.28);
+      pointer-events: none;
+    }
+
+    .table-map-zone-focus {
+      padding: 14px;
+      border: 2px solid transparent;
+      border-radius: 22px;
+    }
+
+    .table-map-focus-head {
+      margin-bottom: 12px;
+    }
+
+    .table-map-focus-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 0 11px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      color: #5f2731;
+      font-size: 0.68rem;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .table-map-zone-focus .table-map-canvas-scroll {
+      background: rgba(255, 255, 255, 0.45);
+    }
+
+    @media (max-width: 720px) {
+      .table-map-tabs {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .table-map-overview {
+        grid-template-columns: 1fr;
+        grid-template-rows: none;
+        min-height: 0;
+      }
+
+      .table-map-zone-preview,
+      .table-map-zone-preview[data-zone="first"] {
+        grid-row: auto;
+        min-height: 230px;
+      }
     }
 
     .floor-table-card {
@@ -5242,7 +5458,7 @@
         <div class="table-map-title-row">
           <div>
             <h3>Table Map</h3>
-            <p>Tap one or more empty tables before starting a Party. One QR works across all selected tables.</p>
+            <p>See every active table at once, then tap an area to zoom in and select tables.</p>
           </div>
           <a class="table-map-editor-link" href="./table.html">Edit map</a>
         </div>
@@ -5263,7 +5479,10 @@
           </div>
         </div>
         <div class="table-map-tabs" id="tableMapTabs" aria-label="Table map area">
-          <button class="table-map-tab is-active" type="button" data-table-map-zone="first" aria-pressed="true">
+          <button class="table-map-tab is-active" type="button" data-table-map-zone="overview" aria-pressed="true">
+            All Areas <span data-table-map-count="overview">0</span>
+          </button>
+          <button class="table-map-tab" type="button" data-table-map-zone="first" aria-pressed="false">
             1st Floor <span data-table-map-count="first">0</span>
           </button>
           <button class="table-map-tab" type="button" data-table-map-zone="second" aria-pressed="false">
@@ -5639,6 +5858,27 @@
     const DINING_TABLE_LAYOUTS_TABLE = "dining_table_layouts";
     const DINING_REALTIME_SIGNAL_TABLE = "dining_realtime_signals";
     const DINING_QR_COUNT = 10;
+    const TABLE_MAP_ZONE_ORDER = ["first", "second", "patio"];
+    const TABLE_MAP_ZONE_META = {
+      first: {
+        label: "1st Floor",
+        shortLabel: "1F",
+        description: "Main dining room",
+        preferredTableCodes: ["A0", "A1", "A2", "A3", "C1", "C2"]
+      },
+      second: {
+        label: "2nd Floor",
+        shortLabel: "2F",
+        description: "Upper dining room",
+        preferredTableCodes: ["A4", "A5", "A6", "A7"]
+      },
+      patio: {
+        label: "Patio",
+        shortLabel: "PT",
+        description: "Outdoor seating",
+        preferredTableCodes: ["A8", "A9", "A10"]
+      }
+    };
 
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3Iiujn95evZuFiyLNrJUo-_H6rKngdxt0EeBFVw/exec";
     const RESERVATION_REFRESH_MS = 5000;
@@ -5691,7 +5931,7 @@
       feedbackQueue: [],
       feedbackTransitionLocked: false,
       tableOptions: [],
-      activeTableMapZone: "first",
+      activeTableMapZone: "overview",
       tableLayouts: new Map(),
       tableLayoutLoadError: false,
       selectedMapTableCode: null,
@@ -6766,6 +7006,112 @@
 
     function getDiningTableMapLayout(zone = state.activeTableMapZone) {
       return state.tableLayouts.get(zone) || null;
+    }
+
+    function getAllDiningTableCodes() {
+      return Array.from(new Map(
+        [
+          ...state.tableOptions,
+          ...state.partySnapshot.tables.map((table) => table.table_code)
+        ]
+          .map((tableCode) => String(tableCode || "").trim())
+          .filter(Boolean)
+          .map((tableCode) => [tableCode.toLowerCase(), tableCode])
+      ).values()).sort((left, right) => left.localeCompare(right, undefined, {
+        numeric: true,
+        sensitivity: "base"
+      }));
+    }
+
+    function getTemporaryZoneTableCodes(zone, allTableCodes = getAllDiningTableCodes()) {
+      const preferredCodes = TABLE_MAP_ZONE_META[zone]?.preferredTableCodes || [];
+      const allCodesByKey = new Map(
+        allTableCodes.map((tableCode) => [tableCode.toLowerCase(), tableCode])
+      );
+      const reservedKeys = new Set(
+        TABLE_MAP_ZONE_ORDER.flatMap((zoneName) => (
+          TABLE_MAP_ZONE_META[zoneName]?.preferredTableCodes || []
+        )).map((tableCode) => tableCode.toLowerCase())
+      );
+      const preferred = preferredCodes
+        .map((tableCode) => allCodesByKey.get(tableCode.toLowerCase()))
+        .filter(Boolean);
+      const unreserved = allTableCodes.filter((tableCode) => (
+        !reservedKeys.has(tableCode.toLowerCase())
+        && getDiningTableMapZone(tableCode) === zone
+      ));
+      return [...preferred, ...unreserved];
+    }
+
+    function buildTemporaryTableMapLayout(zone, tableCodes) {
+      const tableCount = tableCodes.length;
+      const columns = Math.max(1, Math.min(zone === "patio" ? 3 : zone === "second" ? 2 : 3, tableCount || 1));
+      const rows = Math.max(1, Math.ceil(tableCount / columns));
+      const horizontalGap = 6;
+      const verticalGap = rows > 2 ? 5 : 9;
+      const tableWidth = Math.min(20, (80 - horizontalGap * (columns - 1)) / columns);
+      const tableHeight = Math.min(22, (62 - verticalGap * (rows - 1)) / rows);
+      const totalWidth = tableWidth * columns + horizontalGap * (columns - 1);
+      const totalHeight = tableHeight * rows + verticalGap * (rows - 1);
+      const startX = (100 - totalWidth) / 2;
+      const startY = Math.max(10, (78 - totalHeight) / 2);
+      const tableItems = tableCodes.map((tableCode, index) => {
+        const column = index % columns;
+        const row = Math.floor(index / columns);
+        const normalizedCode = tableCode.toUpperCase();
+        return {
+          id: `temporary-${zone}-${normalizedCode}`,
+          type: "table",
+          tableCode,
+          label: tableCode,
+          obstacleKind: "wall",
+          shape: zone === "patio"
+            ? "round"
+            : normalizedCode.startsWith("C")
+              ? "booth"
+              : index % 3 === 1
+                ? "round"
+                : "rectangle",
+          x: startX + column * (tableWidth + horizontalGap),
+          y: startY + row * (tableHeight + verticalGap),
+          w: tableWidth,
+          h: tableHeight,
+          rotation: 0
+        };
+      });
+      const obstacleItems = zone === "first"
+        ? [
+            { id: "temporary-first-bar", type: "obstacle", tableCode: "", label: "BAR", obstacleKind: "bar", shape: "rectangle", x: 6, y: 86, w: 54, h: 8, rotation: 0 },
+            { id: "temporary-first-stairs", type: "obstacle", tableCode: "", label: "STAIRS", obstacleKind: "stairs", shape: "rectangle", x: 76, y: 84, w: 18, h: 10, rotation: 0 }
+          ]
+        : zone === "second"
+          ? [
+              { id: "temporary-second-service", type: "obstacle", tableCode: "", label: "SERVICE", obstacleKind: "service", shape: "rectangle", x: 7, y: 84, w: 30, h: 9, rotation: 0 },
+              { id: "temporary-second-stairs", type: "obstacle", tableCode: "", label: "STAIRS", obstacleKind: "stairs", shape: "rectangle", x: 72, y: 82, w: 21, h: 11, rotation: 0 }
+            ]
+          : [
+              { id: "temporary-patio-door", type: "obstacle", tableCode: "", label: "DOOR", obstacleKind: "door", shape: "rectangle", x: 7, y: 83, w: 21, h: 10, rotation: 0 },
+              { id: "temporary-patio-planter", type: "obstacle", tableCode: "", label: "PLANTER", obstacleKind: "service", shape: "rectangle", x: 55, y: 86, w: 38, h: 7, rotation: 0 }
+            ];
+      return {
+        zone,
+        canvasWidth: 1000,
+        canvasHeight: 620,
+        items: [...obstacleItems, ...tableItems],
+        revision: 0,
+        updatedAt: ""
+      };
+    }
+
+    function getTemporaryTableMapLayouts() {
+      const allTableCodes = getAllDiningTableCodes();
+      return new Map(TABLE_MAP_ZONE_ORDER.map((zone) => [
+        zone,
+        buildTemporaryTableMapLayout(
+          zone,
+          getTemporaryZoneTableCodes(zone, allTableCodes)
+        )
+      ]));
     }
 
     function formatDiningQrList(partyQrs) {
