@@ -36,6 +36,44 @@ begin
 end;
 $$;
 
+create or replace function public.noble_get_availability_v1(input_ref text)
+returns table (
+  availability_date date,
+  status text,
+  available_start time,
+  available_end time,
+  note text
+)
+language plpgsql
+stable
+security definer
+set search_path = ''
+as $$
+declare
+  employee record;
+begin
+  select *
+    into employee
+  from public.lookup_employee_ref(input_ref)
+  limit 1;
+
+  if employee.staff_key is null then
+    raise exception 'invalid reference code';
+  end if;
+
+  return query
+    select
+      availability.availability_date,
+      availability.status,
+      availability.available_start,
+      availability.available_end,
+      availability.note
+    from schedule.staff_availability as availability
+    where availability.staff_key = employee.staff_key
+    order by availability.availability_date;
+end;
+$$;
+
 create or replace function public.noble_submit_availability_v2(
   input_ref text,
   p_unavailable_dates jsonb default '[]'::jsonb,
@@ -241,6 +279,12 @@ grant execute on function public.noble_submit_access_request_v2(text, text, text
 
 revoke all on function public.noble_submit_availability_v2(text, jsonb, jsonb, jsonb) from public;
 grant execute on function public.noble_submit_availability_v2(text, jsonb, jsonb, jsonb) to anon, authenticated;
+
+revoke all on function public.noble_get_availability_v1(text) from public;
+grant execute on function public.noble_get_availability_v1(text) to anon, authenticated;
+
+comment on function public.noble_get_availability_v1(text) is
+  'Returns only the availability rows belonging to the active employee reference code.';
 
 revoke all on function public.noble_get_latest_schedule(text) from public;
 grant execute on function public.noble_get_latest_schedule(text) to anon, authenticated;

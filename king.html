@@ -73,6 +73,17 @@
       margin-bottom: 14px;
     }
 
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .topbar-actions [hidden],
+    .access-summary [hidden] { display: none !important; }
+
     .brand {
       display: inline-flex;
       align-items: center;
@@ -206,7 +217,7 @@
       z-index: 60;
       width: min(calc(100% - 18px), 680px);
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(var(--king-tab-count, 1), minmax(0, 1fr));
       gap: 6px;
       padding: 7px;
       border: 1px solid rgba(113, 88, 60, 0.14);
@@ -216,6 +227,8 @@
       backdrop-filter: blur(18px);
       transform: translateX(-50%);
     }
+
+    .admin-tab[hidden] { display: none !important; }
 
     .admin-tab {
       min-height: 58px;
@@ -735,6 +748,55 @@
       gap: 16px;
       padding: 18px;
     }
+
+    .access-modal { width: min(100%, 620px); }
+
+    .access-modal-body {
+      display: grid;
+      gap: 16px;
+      padding: 18px;
+    }
+
+    .access-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255, 252, 247, 0.78);
+    }
+
+    .access-summary strong {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .access-auth-section {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(255, 252, 247, 0.72);
+    }
+
+    .access-auth-section[hidden] { display: none !important; }
+
+    .access-auth-section h4,
+    .access-auth-section p { margin: 0; }
+
+    .access-auth-section h4 { font-size: 1rem; }
+
+    .access-auth-section p {
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .access-auth-section .form-actions { margin-top: 2px; }
 
     .form-actions {
       display: flex;
@@ -3007,7 +3069,7 @@
         align-items: flex-start;
       }
 
-      .topbar > .pill-btn {
+      .topbar-actions .pill-btn {
         min-height: 38px;
         padding: 0 11px;
         font-size: 0.78rem;
@@ -3098,7 +3160,10 @@
           <h1>운영 관리</h1>
         </div>
       </div>
-      <a class="pill-btn" href="./modify.html">수정 페이지</a>
+      <div class="topbar-actions">
+        <a class="pill-btn" id="kingModifyLink" href="./modify.html" hidden>수정 페이지</a>
+        <button class="pill-btn" id="kingAccessButton" type="button">권한 로그인</button>
+      </div>
     </header>
 
     <section class="hero">
@@ -3467,6 +3532,53 @@
     </main>
   </div>
 
+  <div class="modal-backdrop" id="kingAccessModal" aria-hidden="true">
+    <div class="modal access-modal" role="dialog" aria-modal="true" aria-labelledby="kingAccessTitle">
+      <div class="modal-head">
+        <h3 id="kingAccessTitle">King 권한 로그인</h3>
+        <button class="icon-btn" id="kingAccessClose" type="button" aria-label="닫기">X</button>
+      </div>
+      <div class="access-modal-body">
+        <div class="access-summary">
+          <strong id="kingAccessSummary">현재는 예약만 볼 수 있습니다.</strong>
+          <button class="pill-btn" id="kingAccessLogoutBtn" type="button" hidden>로그아웃</button>
+        </div>
+
+        <form class="access-auth-section" id="kingRefLoginForm">
+          <h4>REF 코드</h4>
+          <p>예약, 달력, 스케줄을 보고 스케줄을 작성할 수 있습니다.</p>
+          <div class="field">
+            <label for="kingRefInput">REF</label>
+            <input id="kingRefInput" type="password" inputmode="numeric" autocomplete="one-time-code" placeholder="REF 코드 입력" required />
+          </div>
+          <div class="form-actions">
+            <button class="pill-btn primary" type="submit">REF 로그인</button>
+          </div>
+          <div class="status-line" id="kingRefLoginStatus" aria-live="polite"></div>
+        </form>
+
+        <form class="access-auth-section" id="kingAdminLoginForm">
+          <h4>Supabase 관리자</h4>
+          <p>메뉴변경과 직원을 포함한 모든 King 기능을 사용할 수 있습니다.</p>
+          <div class="field-grid">
+            <div class="field">
+              <label for="kingAdminEmail">이메일</label>
+              <input id="kingAdminEmail" type="email" autocomplete="email" placeholder="관리자 이메일" required />
+            </div>
+            <div class="field">
+              <label for="kingAdminPassword">비밀번호</label>
+              <input id="kingAdminPassword" type="password" autocomplete="current-password" placeholder="비밀번호" required />
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="pill-btn primary" type="submit">관리자 로그인</button>
+          </div>
+          <div class="status-line" id="kingAdminLoginStatus" aria-live="polite"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-backdrop" id="menuEditorModal" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="menuEditorTitle">
       <div class="modal-head">
@@ -3632,6 +3744,6 @@
     </div>
   </div>
 
-  <script src="js/king-admin.js?v=20260803-5"></script>
+  <script src="js/king-admin.js?v=20260806-1"></script>
 </body>
 </html>

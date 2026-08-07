@@ -5,6 +5,7 @@
     url: "https://pzhzdjsjfdzbzkhnaxmc.supabase.co",
     anonKey: "sb_publishable_3Ox2JIQXVLwusT-xzIMJ4g_YXTR5q8e"
   };
+  const KING_REF_SESSION_KEY = "ehwa:king:ref-session";
 
   const ADMIN_SHEET_CONFIG = {
     sheetId: "1xa9OZbctYnlbaAL8lKIgmefM5hvSw0Plk01lxp5G2fc",
@@ -84,18 +85,7 @@
   const ASSET_PREFIX = window.location.pathname.includes("/test/") ? "../" : "";
   const FALLBACK_IMAGE = `${ASSET_PREFIX}assets/edited/ehwa.png`;
   const SORT_BASE_STEP = 1000;
-  const FALLBACK_SERVER_REFS = [
-    { staff_key: "우진", name: "우진", branch_scope: "uptown", job_role: "server" },
-    { staff_key: "예림", name: "예림", branch_scope: "downtown", job_role: "server" },
-    { staff_key: "소정", name: "소정", branch_scope: "downtown", job_role: "server" },
-    { staff_key: "영채", name: "영채", branch_scope: "both", job_role: "server" },
-    { staff_key: "은성", name: "은성", branch_scope: "both", job_role: "server" },
-    { staff_key: "주은", name: "주은", branch_scope: "both", job_role: "server" },
-    { staff_key: "제윤", name: "제윤", branch_scope: "both", job_role: "server" },
-    { staff_key: "진아", name: "진아", branch_scope: "uptown", job_role: "server" },
-    { staff_key: "현영", name: "현영", branch_scope: "uptown", job_role: "server" },
-    { staff_key: "서윤", name: "서윤", branch_scope: "downtown", job_role: "server" }
-  ];
+  const FALLBACK_SERVER_REFS = [];
   const SCHEDULE_BRANCHES = [
     { key: "uptown", label: "Uptown", color: "#8f2438", bg: "#fff3ed", border: "#e6b9b0" },
     { key: "downtown", label: "Downtown", color: "#245f51", bg: "#f1fbf5", border: "#b9d8c9" }
@@ -113,6 +103,7 @@
     employees: [],
     employeeShowInactive: false,
     menuSession: null,
+    refSession: null,
     menuItems: [],
     menuSearch: "",
     menuCategory: "all",
@@ -158,6 +149,140 @@
   };
 
   const supabaseClient = window.supabase?.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+  let refSupabaseClient = null;
+  let refSessionExpiryTimer = null;
+
+  function hasAdminAccess() {
+    return Boolean(state.menuSession?.access_token);
+  }
+
+  function hasActiveRefSession() {
+    if (!state.refSession?.token || !state.refSession?.expires_at) return false;
+    return new Date(state.refSession.expires_at).getTime() > Date.now();
+  }
+
+  function hasRefCalendarAccess() {
+    return hasActiveRefSession() && state.refSession.can_view_calendar === true;
+  }
+
+  function hasRefScheduleAccess() {
+    return hasActiveRefSession() && state.refSession.can_manage_schedule === true;
+  }
+
+  function canAccessTab(tabName) {
+    if (tabName === "reservations") return true;
+    if (tabName === "calendar") return hasAdminAccess() || hasRefCalendarAccess();
+    if (tabName === "schedule") return hasAdminAccess() || hasRefScheduleAccess();
+    if (tabName === "menu" || tabName === "staff") return hasAdminAccess();
+    return false;
+  }
+
+  function createRefSupabaseClient(token) {
+    if (!window.supabase?.createClient || !token) return null;
+    return window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+        storageKey: "king-ref-api-client"
+      },
+      global: {
+        headers: { "x-king-ref-session": token }
+      }
+    });
+  }
+
+  function persistRefSession(session) {
+    state.refSession = session;
+    refSupabaseClient = createRefSupabaseClient(session?.token);
+    window.clearTimeout(refSessionExpiryTimer);
+    const expiresIn = Math.max(0, new Date(session?.expires_at).getTime() - Date.now());
+    refSessionExpiryTimer = window.setTimeout(() => {
+      clearRefSessionState();
+      clearUnavailableAccessData();
+      updateAccessNavigation();
+      setActiveTab("reservations");
+    }, Math.min(expiresIn, 2147483647));
+    try {
+      window.sessionStorage.setItem(KING_REF_SESSION_KEY, JSON.stringify(session));
+    } catch (_error) {
+      // The in-memory session still works when browser storage is unavailable.
+    }
+  }
+
+  function clearRefSessionState() {
+    window.clearTimeout(refSessionExpiryTimer);
+    refSessionExpiryTimer = null;
+    state.refSession = null;
+    refSupabaseClient = null;
+    try {
+      window.sessionStorage.removeItem(KING_REF_SESSION_KEY);
+    } catch (_error) {
+      // Ignore unavailable browser storage.
+    }
+  }
+
+  function restoreRefSession() {
+    try {
+      const stored = JSON.parse(window.sessionStorage.getItem(KING_REF_SESSION_KEY) || "null");
+      if (!stored?.token || !stored?.expires_at || new Date(stored.expires_at).getTime() <= Date.now()) {
+        clearRefSessionState();
+        return;
+      }
+      persistRefSession(stored);
+    } catch (_error) {
+      clearRefSessionState();
+    }
+  }
+
+  function getCalendarAccess() {
+    if (hasAdminAccess() && supabaseClient) {
+      return {
+        client: supabaseClient,
+        isAdmin: true,
+        availability: "noble_staff_availability",
+        preferences: "noble_staff_preferences"
+      };
+    }
+    if (hasRefCalendarAccess() && refSupabaseClient) {
+      return {
+        client: refSupabaseClient,
+        isAdmin: false,
+        staff: "king_ref_staff_directory",
+        availability: "king_ref_staff_availability",
+        preferences: "king_ref_staff_preferences"
+      };
+    }
+    return null;
+  }
+
+  function getScheduleAccess() {
+    if (hasAdminAccess() && supabaseClient) {
+      return {
+        client: supabaseClient,
+        isAdmin: true,
+        staff: "employee_refs",
+        availability: "noble_staff_availability",
+        preferences: "noble_staff_preferences",
+        weeks: "noble_schedule_weeks",
+        shifts: "noble_schedule_shifts",
+        events: "king_schedule_calendar_events"
+      };
+    }
+    if (hasRefScheduleAccess() && refSupabaseClient) {
+      return {
+        client: refSupabaseClient,
+        isAdmin: false,
+        staff: "king_ref_staff_directory",
+        availability: "king_ref_staff_availability",
+        preferences: "king_ref_staff_preferences",
+        weeks: "king_ref_schedule_weeks",
+        shifts: "king_ref_schedule_shifts",
+        events: "king_ref_schedule_calendar_events"
+      };
+    }
+    return null;
+  }
 
   function escapeHtml(value = "") {
     return String(value ?? "")
@@ -179,6 +304,19 @@
       "metricReservations",
       "metricDowntown",
       "metricUptown",
+      "kingModifyLink",
+      "kingAccessButton",
+      "kingAccessModal",
+      "kingAccessClose",
+      "kingAccessSummary",
+      "kingAccessLogoutBtn",
+      "kingRefLoginForm",
+      "kingRefInput",
+      "kingRefLoginStatus",
+      "kingAdminLoginForm",
+      "kingAdminEmail",
+      "kingAdminPassword",
+      "kingAdminLoginStatus",
       "reservationDateLabel",
       "reservationDayChips",
       "reservationBranchChips",
@@ -685,11 +823,12 @@
   }
 
   async function fetchStaffCalendarData() {
-    if (!supabaseClient || !state.menuSession) {
+    const access = getCalendarAccess();
+    if (!access) {
       state.calendarDataLoaded = false;
       state.calendarStaff = [];
       state.calendarAvailability = [];
-      setStaffCalendarStatus("관리자 로그인 후 사용할 수 있습니다.", "error");
+      setStaffCalendarStatus("REF 또는 관리자 로그인이 필요합니다.", "error");
       renderStaffCalendar();
       return;
     }
@@ -698,14 +837,18 @@
     setStaffCalendarStatus("직원 달력 데이터를 불러오는 중...");
 
     const [employeeResult, availabilityResult, preferencesResult] = await Promise.all([
-      fetchEmployeeRefRows(),
-      supabaseClient
-        .from("noble_staff_availability")
+      access.isAdmin
+        ? fetchEmployeeRefRows()
+        : access.client
+          .from(access.staff)
+          .select("staff_key,name,job_role,branch_scope,active"),
+      access.client
+        .from(access.availability)
         .select("staff_key,staff_name,branch_scope,availability_date,status,available_start,available_end,note")
         .order("availability_date", { ascending: true }),
-      supabaseClient
-        .from("noble_staff_preferences")
-        .select("*")
+      access.client
+        .from(access.preferences)
+        .select("staff_key,staff_name,branch_scope,fixed_unavailable_weekdays,fixed_preferred_weekdays,work_style,preferred_branch,max_weekly_shifts")
     ]);
 
     if (fetchToken !== state.calendarFetchToken) return;
@@ -1098,6 +1241,182 @@
     refs.menuAuthStatus.className = `status-line${type ? ` is-${type}` : ""}`;
   }
 
+  function setKingRefStatus(message = "", type = "") {
+    refs.kingRefLoginStatus.textContent = message;
+    refs.kingRefLoginStatus.className = `status-line${type ? ` is-${type}` : ""}`;
+  }
+
+  function setKingAdminStatus(message = "", type = "") {
+    refs.kingAdminLoginStatus.textContent = message;
+    refs.kingAdminLoginStatus.className = `status-line${type ? ` is-${type}` : ""}`;
+  }
+
+  function openKingAccessModal() {
+    updateAccessNavigation();
+    refs.kingAccessModal.classList.add("is-open");
+    refs.kingAccessModal.setAttribute("aria-hidden", "false");
+    window.setTimeout(() => {
+      if (!hasAdminAccess() && !hasActiveRefSession()) refs.kingRefInput.focus();
+      else if (!hasAdminAccess()) refs.kingAdminEmail.focus();
+    }, 0);
+  }
+
+  function closeKingAccessModal() {
+    refs.kingAccessModal.classList.remove("is-open");
+    refs.kingAccessModal.setAttribute("aria-hidden", "true");
+  }
+
+  function clearUnavailableAccessData() {
+    if (!hasAdminAccess()) {
+      state.accessRequests = [];
+      state.employees = [];
+      state.menuItems = [];
+      renderEmployees();
+      renderMenu();
+    }
+
+    if (!hasAdminAccess() && !hasRefCalendarAccess()) {
+      state.calendarFetchToken += 1;
+      state.calendarDataLoaded = false;
+      state.calendarStaff = [];
+      state.calendarAvailability = [];
+      state.calendarSelectedStaffKey = "";
+      setStaffCalendarStatus("");
+      renderStaffCalendar();
+    }
+
+    if (!hasAdminAccess() && !hasRefScheduleAccess()) {
+      state.scheduleFetchToken += 1;
+      state.scheduleDataLoaded = false;
+      state.scheduleCalendarEvents = [];
+      state.scheduleWeeks = [];
+      state.scheduleAvailability = [];
+      state.scheduleStaff = [];
+      state.scheduleWeek = null;
+      state.scheduleShifts = [];
+      state.scheduleShiftNotes = new Map();
+      setScheduleStatus("");
+      setScheduleCalendarEventStatus("");
+      renderScheduleBoard({ preserveBoardEdits: false });
+    }
+  }
+
+  function updateAccessNavigation() {
+    const adminAccess = hasAdminAccess();
+    const refAccess = hasActiveRefSession();
+    let visibleTabCount = 0;
+
+    document.querySelectorAll("[data-admin-tab]").forEach((button) => {
+      const allowed = canAccessTab(button.dataset.adminTab || "");
+      button.hidden = !allowed;
+      if (allowed) visibleTabCount += 1;
+    });
+    document.querySelector(".admin-tabs")?.style.setProperty("--king-tab-count", String(Math.max(visibleTabCount, 1)));
+
+    refs.kingModifyLink.hidden = !adminAccess;
+    refs.kingAccessButton.textContent = adminAccess
+      ? "관리자 로그인됨"
+      : refAccess
+        ? "REF 로그인됨"
+        : "권한 로그인";
+    refs.kingAccessButton.classList.toggle("primary", adminAccess || refAccess);
+    refs.kingAccessSummary.textContent = adminAccess
+      ? `관리자 · ${state.menuSession.user?.email || "Supabase 계정"}`
+      : refAccess
+        ? `${state.refSession.label || "King REF"} · 달력/스케줄 사용 가능`
+        : "현재는 예약만 볼 수 있습니다.";
+    refs.kingAccessLogoutBtn.hidden = !adminAccess && !refAccess;
+    refs.kingAccessLogoutBtn.textContent = adminAccess ? "관리자 로그아웃" : "REF 로그아웃";
+    refs.kingRefLoginForm.hidden = adminAccess || refAccess;
+    refs.kingAdminLoginForm.hidden = adminAccess;
+
+    if (!canAccessTab(state.activeTab) && byId("reservationsAdminPanel")) {
+      setActiveTab("reservations");
+    }
+  }
+
+  async function signInKingRef(event) {
+    event.preventDefault();
+    if (!supabaseClient) {
+      setKingRefStatus("Supabase 클라이언트를 불러오지 못했습니다.", "error");
+      return;
+    }
+    const inputRef = refs.kingRefInput.value.trim();
+    if (!inputRef) {
+      setKingRefStatus("REF 코드를 입력하세요.", "error");
+      return;
+    }
+
+    setKingRefStatus("REF 확인 중...");
+    const { data, error } = await supabaseClient.rpc("king_start_ref_session", { input_ref: inputRef });
+    if (error || !data?.token) {
+      setKingRefStatus("REF 코드를 확인해주세요.", "error");
+      return;
+    }
+
+    persistRefSession(data);
+    refs.kingRefInput.value = "";
+    state.calendarDataLoaded = false;
+    state.scheduleDataLoaded = false;
+    updateAccessNavigation();
+    setKingRefStatus("REF 권한으로 로그인했습니다.", "success");
+    closeKingAccessModal();
+    setActiveTab("calendar");
+  }
+
+  async function signInAdminAccount(email, password, setStatus) {
+    if (!supabaseClient) {
+      setStatus("Supabase 클라이언트를 불러오지 못했습니다.", "error");
+      return false;
+    }
+    if (!email || !password) {
+      setStatus("이메일과 비밀번호를 입력하세요.", "error");
+      return false;
+    }
+
+    setStatus("로그인 중...");
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    if (error) {
+      setStatus(error.message, "error");
+      return false;
+    }
+
+    state.menuSession = data.session;
+    updateMenuAuthView();
+    updateAccessNavigation();
+    setStatus("관리자 권한으로 로그인했습니다.", "success");
+    await Promise.all([fetchMenuItems(), fetchScheduleCalendarEvents()]);
+    return true;
+  }
+
+  async function signInKingAdmin(event) {
+    event.preventDefault();
+    const signedIn = await signInAdminAccount(
+      refs.kingAdminEmail.value.trim(),
+      refs.kingAdminPassword.value,
+      setKingAdminStatus
+    );
+    if (!signedIn) return;
+    refs.kingAdminPassword.value = "";
+    closeKingAccessModal();
+  }
+
+  async function signOutRefAccess() {
+    const client = refSupabaseClient;
+    if (client) await client.rpc("king_end_ref_session");
+    clearRefSessionState();
+    clearUnavailableAccessData();
+    updateAccessNavigation();
+    setActiveTab("reservations");
+  }
+
+  async function signOutKingAccess() {
+    if (hasAdminAccess()) await signOutMenuAdmin();
+    else if (hasActiveRefSession()) await signOutRefAccess();
+    updateAccessNavigation();
+    closeKingAccessModal();
+  }
+
   function updateMenuAuthView() {
     const signedIn = Boolean(state.menuSession?.access_token);
     refs.menuAuthCard.hidden = signedIn;
@@ -1117,44 +1436,27 @@
     }
     state.menuSession = data.session;
     updateMenuAuthView();
+    updateAccessNavigation();
     if (state.menuSession && !state.menuItems.length) await fetchMenuItems();
     if (state.menuSession) await fetchScheduleCalendarEvents();
   }
 
   async function signInMenuAdmin() {
-    if (!supabaseClient) {
-      setMenuAuthStatus("Supabase 클라이언트를 불러오지 못했습니다.", "error");
-      return;
-    }
     const email = refs.menuAdminEmail.value.trim();
     const password = refs.menuAdminPassword.value;
-    if (!email || !password) {
-      setMenuAuthStatus("이메일과 비밀번호를 입력하세요.", "error");
-      return;
-    }
-    setMenuAuthStatus("로그인 중...");
-    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-    if (error) {
-      setMenuAuthStatus(error.message, "error");
-      return;
-    }
-    state.menuSession = data.session;
+    const signedIn = await signInAdminAccount(email, password, setMenuAuthStatus);
+    if (!signedIn) return;
     refs.menuAdminPassword.value = "";
-    updateMenuAuthView();
-    setMenuAuthStatus("로그인되었습니다.", "success");
-    await fetchMenuItems();
-    await fetchScheduleCalendarEvents();
   }
 
   async function signOutMenuAdmin() {
     if (!supabaseClient) return;
     await supabaseClient.auth.signOut();
     state.menuSession = null;
-    state.menuItems = [];
-    state.scheduleCalendarEvents = [];
     updateMenuAuthView();
-    renderMenu();
-    renderScheduleBoard();
+    clearUnavailableAccessData();
+    updateAccessNavigation();
+    if (hasRefScheduleAccess()) await fetchScheduleCalendarEvents();
     setMenuStatus("");
   }
 
@@ -1989,17 +2291,19 @@
   }
 
   async function fetchScheduleCalendarEvents() {
-    if (!supabaseClient || !state.menuSession) {
+    const access = getScheduleAccess();
+    if (!access) {
       state.scheduleCalendarEvents = [];
       renderScheduleMonthCalendar();
       return;
     }
 
-    const { data, error } = await supabaseClient
-      .from("king_schedule_calendar_events")
+    let query = access.client
+      .from(access.events)
       .select("id,event_date,title")
-      .order("event_date", { ascending: true })
-      .order("created_at", { ascending: true });
+      .order("event_date", { ascending: true });
+    if (access.isAdmin) query = query.order("created_at", { ascending: true });
+    const { data, error } = await query;
 
     if (error) {
       state.scheduleCalendarEvents = [];
@@ -2021,14 +2325,18 @@
       return;
     }
 
-    if (!supabaseClient || !state.menuSession) {
-      setScheduleCalendarEventStatus("관리자 로그인 후 이벤트를 저장할 수 있습니다.", "error");
+    const access = getScheduleAccess();
+    if (!access) {
+      setScheduleCalendarEventStatus("REF 또는 관리자 로그인이 필요합니다.", "error");
       return;
     }
 
-    const { data, error } = await supabaseClient
-      .from("king_schedule_calendar_events")
-      .insert({ event_date: eventDate, title, created_by: state.menuSession.user?.id || null })
+    const insertRow = access.isAdmin
+      ? { event_date: eventDate, title, created_by: state.menuSession.user?.id || null }
+      : { event_date: eventDate, title };
+    const { data, error } = await access.client
+      .from(access.events)
+      .insert(insertRow)
       .select("id,event_date,title")
       .single();
     if (error || !data) {
@@ -2048,13 +2356,14 @@
   async function deleteScheduleCalendarEvent(id = "") {
     const target = state.scheduleCalendarEvents.find((item) => item.id === id);
     if (!target) return;
-    if (!supabaseClient || !state.menuSession) {
-      setScheduleCalendarEventStatus("관리자 로그인 후 이벤트를 삭제할 수 있습니다.", "error");
+    const access = getScheduleAccess();
+    if (!access) {
+      setScheduleCalendarEventStatus("REF 또는 관리자 로그인이 필요합니다.", "error");
       return;
     }
 
-    const { error } = await supabaseClient
-      .from("king_schedule_calendar_events")
+    const { error } = await access.client
+      .from(access.events)
       .delete()
       .eq("id", id);
     if (error) {
@@ -2150,7 +2459,7 @@
   }
 
   function getStaffCalendarPool() {
-    if (!state.menuSession) return [];
+    if (!hasAdminAccess() && !hasRefCalendarAccess()) return [];
     const source = state.calendarStaff.length
       ? state.calendarStaff
       : (state.scheduleStaff.length ? state.scheduleStaff : FALLBACK_SERVER_REFS.map(normalizeStaffRef).filter(Boolean));
@@ -2906,8 +3215,9 @@
   }
 
   async function fetchScheduleData() {
-    if (!supabaseClient || !state.menuSession) {
-      setScheduleStatus("메뉴변경 탭에서 관리자 로그인 후 사용할 수 있습니다.", "error");
+    const access = getScheduleAccess();
+    if (!access) {
+      setScheduleStatus("REF 또는 관리자 로그인이 필요합니다.", "error");
       renderScheduleBoard();
       return;
     }
@@ -2925,8 +3235,8 @@
     await fetchScheduleCalendarEvents();
     if (fetchToken !== state.scheduleFetchToken) return;
 
-    const availabilityResult = await supabaseClient
-      .from("noble_staff_availability")
+    const availabilityResult = await access.client
+      .from(access.availability)
       .select("staff_key,staff_name,branch_scope,availability_date,status,available_start,available_end,note")
       .gte("availability_date", weekWindowFrom)
       .lte("availability_date", availabilityWindowEnd)
@@ -2938,24 +3248,28 @@
       return;
     }
 
-    const staffResult = await fetchEmployeeRefRows();
+    const staffResult = access.isAdmin
+      ? await fetchEmployeeRefRows()
+      : await access.client
+        .from(access.staff)
+        .select("staff_key,name,job_role,branch_scope,active");
 
     if (fetchToken !== state.scheduleFetchToken) return;
     if (staffResult.error) {
       console.warn("Could not load employee refs", staffResult.error);
     }
 
-    const preferencesResult = await supabaseClient
-      .from("noble_staff_preferences")
-      .select("*");
+    const preferencesResult = await access.client
+      .from(access.preferences)
+      .select("staff_key,staff_name,branch_scope,fixed_unavailable_weekdays,fixed_preferred_weekdays,work_style,preferred_branch,max_weekly_shifts");
 
     if (fetchToken !== state.scheduleFetchToken) return;
     if (preferencesResult.error) {
       console.warn("Could not load staff preferences", preferencesResult.error);
     }
 
-    const weeksResult = await supabaseClient
-      .from("noble_schedule_weeks")
+    const weeksResult = await access.client
+      .from(access.weeks)
       .select("id,week_start,status,note")
       .gte("week_start", weekWindowFrom)
       .lte("week_start", weekWindowTo)
@@ -2963,8 +3277,8 @@
 
     if (fetchToken !== state.scheduleFetchToken) return;
 
-    const weekResult = await supabaseClient
-      .from("noble_schedule_weeks")
+    const weekResult = await access.client
+      .from(access.weeks)
       .select("id,week_start,status,note")
       .eq("week_start", selectedWeekStart)
       .maybeSingle();
@@ -3016,8 +3330,8 @@
     let scheduleShifts = [];
 
     if (weekResult.data?.id) {
-      const shiftsResult = await supabaseClient
-        .from("noble_schedule_shifts")
+      const shiftsResult = await access.client
+        .from(access.shifts)
         .select("id,week_id,shift_date,branch,staff_key,staff_name,job_role,shift_label,start_time,end_time,sort_order,note")
         .eq("week_id", weekResult.data.id)
         .order("branch", { ascending: true })
@@ -3798,17 +4112,17 @@
     setScheduleStatus(`${baseMessage}${fixedSuffix}${suffix}${shortfallSuffix}`, shortfalls.length ? "error" : "success");
   }
 
-  async function ensureScheduleWeek() {
-    const existing = await supabaseClient
-      .from("noble_schedule_weeks")
+  async function ensureScheduleWeek(access) {
+    const existing = await access.client
+      .from(access.weeks)
       .select("id,week_start,status,note")
       .eq("week_start", state.scheduleWeekStart)
       .maybeSingle();
 
     if (existing.error) throw existing.error;
     if (existing.data?.id) {
-      const updated = await supabaseClient
-        .from("noble_schedule_weeks")
+      const updated = await access.client
+        .from(access.weeks)
         .update({ status: "published" })
         .eq("id", existing.data.id)
         .select("id,week_start,status,note")
@@ -3817,8 +4131,8 @@
       return updated.data;
     }
 
-    const inserted = await supabaseClient
-      .from("noble_schedule_weeks")
+    const inserted = await access.client
+      .from(access.weeks)
       .insert({ week_start: state.scheduleWeekStart, status: "published" })
       .select("id,week_start,status,note")
       .single();
@@ -3827,8 +4141,9 @@
   }
 
   async function saveScheduleWeek() {
-    if (!supabaseClient || !state.menuSession) {
-      setScheduleStatus("메뉴변경 탭에서 관리자 로그인 후 사용할 수 있습니다.", "error");
+    const access = getScheduleAccess();
+    if (!access) {
+      setScheduleStatus("REF 또는 관리자 로그인이 필요합니다.", "error");
       return;
     }
 
@@ -3842,17 +4157,17 @@
     setScheduleStatus("스케줄을 저장하는 중...");
 
     try {
-      const week = await ensureScheduleWeek();
-      const deleteResult = await supabaseClient
-        .from("noble_schedule_shifts")
+      const week = await ensureScheduleWeek(access);
+      const deleteResult = await access.client
+        .from(access.shifts)
         .delete()
         .eq("week_id", week.id);
       if (deleteResult.error) throw deleteResult.error;
 
       const rows = collectScheduleRows(week.id);
       if (rows.length) {
-        const insertResult = await supabaseClient
-          .from("noble_schedule_shifts")
+        const insertResult = await access.client
+          .from(access.shifts)
           .insert(rows);
         if (insertResult.error) throw insertResult.error;
       }
@@ -3871,8 +4186,9 @@
   }
 
   async function resetScheduleWeek() {
-    if (!supabaseClient || !state.menuSession) {
-      setScheduleStatus("메뉴변경 탭에서 관리자 로그인 후 사용할 수 있습니다.", "error");
+    const access = getScheduleAccess();
+    if (!access) {
+      setScheduleStatus("REF 또는 관리자 로그인이 필요합니다.", "error");
       return;
     }
 
@@ -3885,14 +4201,14 @@
 
     try {
       if (state.scheduleWeek?.id) {
-        const deleteResult = await supabaseClient
-          .from("noble_schedule_shifts")
+        const deleteResult = await access.client
+          .from(access.shifts)
           .delete()
           .eq("week_id", state.scheduleWeek.id);
         if (deleteResult.error) throw deleteResult.error;
 
-        const updateResult = await supabaseClient
-          .from("noble_schedule_weeks")
+        const updateResult = await access.client
+          .from(access.weeks)
           .update({ status: "draft" })
           .eq("id", state.scheduleWeek.id)
           .select("id,week_start,status,note")
@@ -3919,6 +4235,7 @@
   }
 
   function setActiveTab(tabName) {
+    if (!canAccessTab(tabName)) tabName = "reservations";
     if (state.activeTab === "schedule" && tabName !== "schedule") {
       // Do not let an in-flight background request overwrite an in-progress board.
       state.scheduleFetchToken += 1;
@@ -3946,6 +4263,15 @@
     document.querySelectorAll("[data-admin-tab]").forEach((button) => {
       button.addEventListener("click", () => setActiveTab(button.dataset.adminTab || "reservations"));
     });
+
+    refs.kingAccessButton.addEventListener("click", openKingAccessModal);
+    refs.kingAccessClose.addEventListener("click", closeKingAccessModal);
+    refs.kingAccessModal.addEventListener("click", (event) => {
+      if (event.target === refs.kingAccessModal) closeKingAccessModal();
+    });
+    refs.kingRefLoginForm.addEventListener("submit", (event) => void signInKingRef(event));
+    refs.kingAdminLoginForm.addEventListener("submit", (event) => void signInKingAdmin(event));
+    refs.kingAccessLogoutBtn.addEventListener("click", () => void signOutKingAccess());
 
     refs.reservationDayChips.addEventListener("click", (event) => {
       const button = event.target.closest("[data-reservation-date]");
@@ -4255,6 +4581,9 @@
     });
 
     document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && refs.kingAccessModal.classList.contains("is-open")) {
+        closeKingAccessModal();
+      }
       if (event.key === "Escape" && refs.menuEditorModal.classList.contains("is-open")) {
         closeMenuEditor();
       }
@@ -4266,6 +4595,7 @@
 
   function bootstrap() {
     cacheRefs();
+    restoreRefSession();
     refs.todayHeading.textContent = new Intl.DateTimeFormat("ko-KR", {
       weekday: "long",
       month: "long",
@@ -4277,7 +4607,7 @@
     state.scheduleMonthSelectedDate = formatInputDate(new Date());
     state.scheduleMonthCursor = startOfMonth(toSafeDate(state.scheduleWeekStart) || new Date());
     state.scheduleStaff = FALLBACK_SERVER_REFS.map(normalizeStaffRef).filter(Boolean);
-    state.scheduleUsingFallbackStaff = true;
+    state.scheduleUsingFallbackStaff = false;
     refs.scheduleWeekStart.value = state.scheduleWeekStart;
     refs.scheduleCalendarEventDate.value = formatInputDate(new Date());
     bindEvents();
@@ -4287,23 +4617,19 @@
     renderEmployees();
     renderScheduleBoard();
     updateMenuAuthView();
+    updateAccessNavigation();
     setActiveTab("reservations");
     if (supabaseClient) {
       supabaseClient.auth.onAuthStateChange((_event, session) => {
         state.menuSession = session;
         updateMenuAuthView();
-        if (!session) {
-          state.calendarDataLoaded = false;
-          state.calendarStaff = [];
-          state.calendarAvailability = [];
-          state.calendarSelectedStaffKey = "";
-          setStaffCalendarStatus("로그인 필요", "error");
-          renderStaffCalendar();
-        }
+        clearUnavailableAccessData();
+        updateAccessNavigation();
         if (session) void fetchScheduleCalendarEvents();
         if (session && state.activeTab === "menu" && !state.menuItems.length) void fetchMenuItems();
         if (session && state.activeTab === "staff") void fetchEmployees();
-        if (session && state.activeTab === "calendar" && !state.calendarDataLoaded) void fetchStaffCalendarData();
+        if (canAccessTab("calendar") && state.activeTab === "calendar" && !state.calendarDataLoaded) void fetchStaffCalendarData();
+        if (canAccessTab("schedule") && state.activeTab === "schedule" && !state.scheduleDataLoaded) void fetchScheduleData();
       });
       void refreshMenuSession();
     } else {

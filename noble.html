@@ -2907,6 +2907,52 @@
         }
       }
 
+      function normalizeAvailabilityTime(value = "") {
+        const match = String(value || "").match(/^(\d{2}):(\d{2})/);
+        return match ? `${match[1]}:${match[2]}` : "";
+      }
+
+      function applyDbAvailability(rows = []) {
+        state.unavailableDates = new Set();
+        state.preferredDates = new Set();
+        state.dateDetails = {};
+
+        rows.forEach((row) => {
+          const isoDate = String(row?.availability_date || "").slice(0, 10);
+          const status = String(row?.status || "").toLowerCase();
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(isoDate)) return;
+          if (!["default", "unavailable", "preferred"].includes(status)) return;
+
+          if (status === "unavailable") state.unavailableDates.add(isoDate);
+          if (status === "preferred") state.preferredDates.add(isoDate);
+
+          const startTime = normalizeAvailabilityTime(row.available_start);
+          const endTime = normalizeAvailabilityTime(row.available_end);
+          const note = String(row.note || "");
+          if (startTime || endTime || note) {
+            state.dateDetails[isoDate] = { status, startTime, endTime, note };
+          }
+        });
+
+        state.availabilityDirty = false;
+      }
+
+      async function loadDbAvailability(input = "") {
+        // Keep the last device snapshot as an offline fallback, but use DB data as truth.
+        loadUnavailableDates();
+        const refCode = String(input || "").trim();
+        if (!refCode || !supabaseClient) return;
+
+        try {
+          const { data, error } = await supabaseClient.rpc("noble_get_availability_v1", { input_ref: refCode });
+          if (error) throw error;
+          applyDbAvailability(Array.isArray(data) ? data : []);
+          saveUnavailableDates();
+        } catch (error) {
+          console.warn("DB availability unavailable; using device snapshot", error);
+        }
+      }
+
       function isPeriodSummaryRow(row = []) {
         const day = String(row[0] || "").trim();
         const date = String(row[1] || "").trim();
@@ -3804,6 +3850,10 @@
         } else if (status === "preferred") {
           state.preferredDates.add(isoDate);
         }
+
+        if (state.dateDetails[isoDate]) {
+          state.dateDetails[isoDate].status = status;
+        }
       }
 
       function getNextCalendarDateStatus(isoDate) {
@@ -4235,7 +4285,7 @@
           if (!isWageOnlyAccess(access)) {
             await loadDbSchedule(input, state.scheduleCursor);
             await loadDbSubstituteRequests(input);
-            loadUnavailableDates();
+            await loadDbAvailability(input);
             await loadDbPreferences(input);
           } else {
             state.dbScheduleRows = [];
