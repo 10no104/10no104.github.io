@@ -2995,6 +2995,60 @@
       display: none;
     }
 
+    .menu-detail-customizations.is-tteokbokki {
+      overflow: visible;
+      border: 0;
+      background: transparent;
+    }
+
+    .tteokbokki-add-ons {
+      display: grid;
+      gap: 9px;
+      padding: 11px 11px 9px;
+      overflow: hidden;
+      border: 1px solid rgba(125, 98, 63, 0.14);
+      border-radius: 14px;
+      background: rgba(255, 252, 247, 0.82);
+    }
+
+    .tteokbokki-add-ons-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .tteokbokki-add-ons-head strong {
+      color: #3b2418;
+      font-size: 0.82rem;
+    }
+
+    .tteokbokki-add-ons-head small {
+      color: #8a786a;
+      font-size: 0.64rem;
+      font-weight: 850;
+    }
+
+    .menu-customization-more.is-removal-only {
+      margin-top: 8px;
+      overflow: hidden;
+      border: 1px solid rgba(125, 98, 63, 0.14);
+      border-radius: 14px;
+      background: rgba(255, 252, 247, 0.82);
+    }
+
+    .menu-customization-more.is-removal-only .menu-customization-group-head {
+      display: none;
+    }
+
+    .menu-customization-removal-note {
+      margin: 1px 0 0;
+      color: #806e60;
+      font-size: 0.67rem;
+      font-weight: 750;
+      line-height: 1.4;
+    }
+
     .menu-customization-heading {
       margin: 0;
       color: #3b2418;
@@ -3113,6 +3167,22 @@
       scrollbar-width: none;
     }
 
+    .menu-customization-options.is-inline-scroll {
+      display: flex;
+      gap: 7px;
+      margin: 0 -11px;
+      padding: 1px 11px 7px;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-padding-inline: 11px;
+      scroll-snap-type: x proximity;
+      scrollbar-width: none;
+    }
+
+    .menu-customization-options.is-inline-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
     .menu-customization-options.is-flavor-nav::-webkit-scrollbar {
       display: none;
     }
@@ -3128,6 +3198,21 @@
       background: rgba(255, 255, 255, 0.78);
       color: #4f4036;
       cursor: pointer;
+    }
+
+    .menu-customization-option.is-inline-scroll {
+      flex: 0 0 auto;
+      min-height: 42px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: #fff;
+      scroll-snap-align: start;
+    }
+
+    .menu-customization-option.is-inline-scroll .menu-customization-option-copy {
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
     }
 
     .menu-customization-option:has(input:checked) {
@@ -4806,6 +4891,49 @@
       return /flavou?r|taste|sauce|맛/i.test(`${group?.id || ""} ${group?.label || ""}`);
     }
 
+    function isTteokbokkiMenu(item) {
+      return /떡볶이|tteokbokki/i.test(`${item?.nameKo || ""} ${item?.nameEn || ""}`);
+    }
+
+    function isRemovalCustomizationGroup(group) {
+      return /remove|without|hold|빼|제외/i.test(`${group?.id || ""} ${group?.label || ""}`);
+    }
+
+    function addTteokbokkiOtherRemovalOption(item, groups = []) {
+      if (!isTteokbokkiMenu(item)) return groups;
+      return groups.map((group) => {
+        if (!isRemovalCustomizationGroup(group)) return group;
+        const hasOther = group.options.some((option) => /other|기타/i.test(`${option.id} ${option.label}`));
+        if (hasOther) return group;
+        const options = [
+          ...group.options,
+          {
+            id: "other-removal",
+            label: "Other",
+            priceDelta: 0,
+            defaultSelected: false,
+            description: "Please tell your server directly what you would like removed.",
+            imageUrl: "",
+            imageAlt: "",
+            emoji: "",
+            variantMenuId: null,
+            variantNameKo: "",
+            variantNameEn: "",
+            variantDescription: "",
+            variantIngredient: "",
+            variantDietaryTags: [],
+            variantTags: [],
+            variantPrice: null
+          }
+        ];
+        return {
+          ...group,
+          max: group.type === "multiple" ? options.length : group.max,
+          options
+        };
+      });
+    }
+
     function addFlavorVisuals(group, presetGroup, item) {
       if (!group || !presetGroup) return group;
       return {
@@ -4842,12 +4970,12 @@
       if (automaticFlavorGroup && !hasConfiguredFlavor) {
         enhancedGroups.unshift(automaticFlavorGroup);
       }
-      if (enhancedGroups.length) return enhancedGroups;
+      if (enhancedGroups.length) return addTteokbokkiOtherRemovalOption(item, enhancedGroups);
 
       const menuName = `${item?.nameKo || ""} ${item?.nameEn || ""}`;
       if (!/떡볶이|tteokbokki/i.test(menuName)) return [];
 
-      return normalizeMenuCustomizations([
+      return addTteokbokkiOtherRemovalOption(item, normalizeMenuCustomizations([
         {
           id: "toppings",
           label: "Toppings",
@@ -4869,7 +4997,7 @@
             { id: "sesame-seeds", label: "Sesame seeds" }
           ]
         }
-      ]);
+      ]));
     }
 
     function getMenuGallery(item) {
@@ -6564,6 +6692,8 @@
         isFlavorCustomizationGroup(group) && group.options.some((option) => option.imageUrl)
       ));
       const groups = allGroups.filter((group) => group !== galleryFlavorGroup);
+      const isTteokbokki = isTteokbokkiMenu(item);
+      container.classList.toggle("is-tteokbokki", isTteokbokki);
       if (!groups.length) {
         container.innerHTML = "";
         container.hidden = true;
@@ -6571,34 +6701,36 @@
       }
 
       container.hidden = false;
-      const hasRequiredOptions = groups.some((group) => group.min > 0);
-      container.innerHTML = `
-        <details class="menu-customization-more" ${hasRequiredOptions ? "open" : ""}>
-          <summary>
-            <span>Add-ons &amp; requests</span>
-            <small id="menuCustomizationMoreSummary">${hasRequiredOptions ? "Selection required" : "Optional"}</small>
-          </summary>
-          <div class="menu-customization-more-body">
-        ${groups.map((group) => {
+      const visibleGroups = isTteokbokki
+        ? groups.filter((group) => !isRemovalCustomizationGroup(group))
+        : [];
+      const collapsedGroups = isTteokbokki
+        ? groups.filter(isRemovalCustomizationGroup)
+        : groups;
+
+      const renderGroup = (group, { inline = false, removal = false } = {}) => {
           const isFlavorNav = isFlavorCustomizationGroup(group) && group.options.some((option) => option.imageUrl);
-          const isVisual = !isFlavorNav && Boolean(group.visual || group.options.some((option) => option.imageUrl));
+          const isVisual = !inline && !isFlavorNav && Boolean(group.visual || group.options.some((option) => option.imageUrl));
           const hint = group.min > 0
             ? (group.type === "single" ? "Choose one" : `Choose ${group.min}–${group.max}`)
             : (group.type === "single" ? "Optional · choose one" : `Optional · up to ${group.max}`);
+          const displayLabel = inline
+            ? (/topping/i.test(group.label) ? "Add toppings" : `Add · ${group.label}`)
+            : group.label;
           return `
-            <section class="menu-customization-group" data-customization-group="${escapeHtml(group.id)}">
-              <div class="menu-customization-group-head">
-                <strong>${escapeHtml(group.label)}</strong>
-                <small>${escapeHtml(isFlavorNav ? "Swipe photo or tap a flavor" : (isVisual ? `${hint} · swipe →` : hint))}</small>
+            <section class="menu-customization-group${inline ? " tteokbokki-add-ons" : ""}" data-customization-group="${escapeHtml(group.id)}">
+              <div class="menu-customization-group-head${inline ? " tteokbokki-add-ons-head" : ""}">
+                <strong>${escapeHtml(displayLabel)}</strong>
+                <small>${escapeHtml(inline ? "Optional · swipe →" : (isFlavorNav ? "Swipe photo or tap a flavor" : (isVisual ? `${hint} · swipe →` : hint)))}</small>
               </div>
-              <div class="menu-customization-options${isFlavorNav ? " is-flavor-nav" : (isVisual ? " is-visual" : "")}">
+              <div class="menu-customization-options${inline ? " is-inline-scroll" : (isFlavorNav ? " is-flavor-nav" : (isVisual ? " is-visual" : ""))}">
                 ${group.options.map((option) => {
                   const optionPrice = option.variantPrice != null
                     ? Number(option.variantPrice)
                     : Number((parsePriceNumber(item.price) + Number(option.priceDelta || 0)).toFixed(2));
                   const shortLabel = String(option.variantNameKo || option.label || "Flavor").split("·")[0].trim();
                   return `
-                  <label class="menu-customization-option${isFlavorNav ? " is-flavor-nav" : (isVisual ? " is-visual" : "")}">
+                  <label class="menu-customization-option${inline ? " is-inline-scroll" : (isFlavorNav ? " is-flavor-nav" : (isVisual ? " is-visual" : ""))}">
                     <input
                       type="${group.type === "single" ? "radio" : "checkbox"}"
                       name="menu-custom-${escapeHtml(group.id)}"
@@ -6634,12 +6766,33 @@
                   </label>
                 `;}).join("")}
               </div>
+              ${removal ? `<p class="menu-customization-removal-note">Can’t find it? Choose Other, then tell your server directly what to remove.</p>` : ""}
             </section>
           `;
-        }).join("")}
+      };
+
+      const visibleHtml = visibleGroups.map((group) => renderGroup(group, { inline: true })).join("");
+      const hasRequiredCollapsedOptions = collapsedGroups.some((group) => group.min > 0);
+      const collapsedHtml = collapsedGroups.length ? `
+        <details
+          class="menu-customization-more${isTteokbokki ? " is-removal-only" : ""}"
+          ${isTteokbokki ? "data-summary-scope=\"remove\"" : ""}
+          ${hasRequiredCollapsedOptions ? "open" : ""}
+        >
+          <summary>
+            <span>${isTteokbokki ? "Remove ingredients" : "Add-ons &amp; requests"}</span>
+            <small
+              id="menuCustomizationMoreSummary"
+              data-empty-summary="${escapeHtml(isTteokbokki ? `${collapsedGroups.reduce((sum, group) => sum + group.options.length, 0)} choices · tap to view` : "Optional")}"
+            >${hasRequiredCollapsedOptions ? "Selection required" : (isTteokbokki ? `${collapsedGroups.reduce((sum, group) => sum + group.options.length, 0)} choices · tap to view` : "Optional")}</small>
+          </summary>
+          <div class="menu-customization-more-body">
+            ${collapsedGroups.map((group) => renderGroup(group, { removal: isTteokbokki })).join("")}
           </div>
         </details>
-      `;
+      ` : "";
+
+      container.innerHTML = `${visibleHtml}${collapsedHtml}`;
     }
 
     function getSelectedMenuCustomizations() {
@@ -6706,13 +6859,16 @@
       const addOnInputs = [...document.querySelectorAll("#menuDetailCustomizations [data-custom-option]:checked")];
       const addOnSummary = document.getElementById("menuCustomizationMoreSummary");
       const addOnDetails = document.querySelector("#menuDetailCustomizations .menu-customization-more");
+      const summaryInputs = addOnDetails?.dataset.summaryScope === "remove"
+        ? [...addOnDetails.querySelectorAll("[data-custom-option]:checked")]
+        : addOnInputs;
 
       price.textContent = formatCurrency(itemTotal);
       renderMenuDetailVariant(item, selectedFlavorOption?.id || "");
       if (addOnSummary) {
         addOnSummary.textContent = missingRequiredAddOn
           ? "Selection required"
-          : (addOnInputs.length ? `${addOnInputs.length} selected` : "Optional");
+          : (summaryInputs.length ? `${summaryInputs.length} selected` : (addOnSummary.dataset.emptySummary || "Optional"));
       }
       if (missingRequiredAddOn && addOnDetails) addOnDetails.open = true;
       addButton.disabled = !canOrder || missingRequired;
