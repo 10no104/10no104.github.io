@@ -4615,6 +4615,15 @@
       }
     }
 
+    function clearStoredGuestId(branch = getDiningBranch()) {
+      try {
+        window.localStorage.removeItem(getGuestStorageKey(branch));
+      } catch {
+        // The cookie fallback is cleared below.
+      }
+      writeCookieValue(getGuestCookieName(branch), "", 0);
+    }
+
     function getDiningDeviceId() {
       let deviceId = "";
       try {
@@ -5251,6 +5260,7 @@
             } else if (/not assigned to an active party/i.test(String(error?.message || ""))) {
               diningPartyArchitectureAvailable = true;
               guestPartyConflict = null;
+              clearStoredGuestId();
               currentGuest = null;
               currentQrSession = null;
               guestSessionRequests = [];
@@ -5301,6 +5311,9 @@
         } catch (error) {
           if (!isPartyArchitectureMissing(error)) {
             applyGuestPartyConflict(error);
+            if (/not assigned to an active party/i.test(String(error?.message || ""))) {
+              clearStoredGuestId();
+            }
             currentGuest = null;
             currentQrSession = null;
             guestSessionRequests = [];

@@ -6041,7 +6041,7 @@
       <div class="qr-assignment-headcount">
         <label for="qrAssignmentGuestCount">
           Party headcount
-          <small>Queen warns when active devices exceed this number.</small>
+          <small>Queen warns when total unique devices that joined this Party exceed this number.</small>
         </label>
         <input id="qrAssignmentGuestCount" type="number" min="1" max="100" inputmode="numeric" value="1" />
       </div>
@@ -6204,6 +6204,7 @@
     const DINING_SIGNAL_CONNECTED_POLL_MS = 30000;
     const DINING_SIGNAL_FALLBACK_MS = 5000;
     const DINING_SAFETY_REFRESH_MS = 5 * 60 * 1000;
+    const DINING_GUEST_RECENT_MS = 60 * 1000;
     const ORDER_ALARM_REPEAT_MS = 2200;
     const DEFAULT_DOCUMENT_TITLE = document.title;
     const AUTO_REMOVE_AFTER_MS = 60 * 60 * 1000;
@@ -6621,25 +6622,21 @@
         ? partyOrId
         : getDiningParty(partyOrId);
       const expected = Math.max(1, Number(party?.expected_guest_count) || 1);
-      const activeGuests = party
-        ? getDiningPartyGuests(party.id).filter((guest) => (
-            guest.status === "ACTIVE"
-            && (!guest.expires_at || new Date(guest.expires_at).getTime() > Date.now())
-          ))
-        : [];
-      const activeDevices = new Map();
-      activeGuests.forEach((guest) => {
+      const partyGuests = party ? getDiningPartyGuests(party.id) : [];
+      // Security signal: keep every unique device counted until the Party itself ends.
+      const joinedDevices = new Map();
+      partyGuests.forEach((guest) => {
         const key = getDiningGuestDeviceKey(guest);
-        const saved = activeDevices.get(key);
+        const saved = joinedDevices.get(key);
         if (!saved || new Date(guest.last_seen_at || 0) > new Date(saved.last_seen_at || 0)) {
-          activeDevices.set(key, guest);
+          joinedDevices.set(key, guest);
         }
       });
-      const activeCount = activeDevices.size;
+      const deviceCount = joinedDevices.size;
       return {
         expected,
-        activeCount,
-        isOver: activeCount > expected
+        deviceCount,
+        isOver: deviceCount > expected
       };
     }
 
@@ -7124,7 +7121,7 @@
       const statusClass = guest.status === "PAID" ? "is-paid" : guest.status === "ACTIVE" ? "" : "is-expired";
       const deviceInfo = guest.device_info || {};
       const lastSeenAt = new Date(guest.last_seen_at).getTime();
-      const connectionStatus = Number.isFinite(lastSeenAt) && Date.now() - lastSeenAt <= 20000
+      const connectionStatus = Number.isFinite(lastSeenAt) && Date.now() - lastSeenAt <= DINING_GUEST_RECENT_MS
         ? "Online"
         : "Not currently connected";
       const deviceSummary = [
@@ -7379,7 +7376,7 @@
               <span class="floor-table-state">${partySelected ? "Selected" : partyQrs.length ? "QR Active" : occupied ? "Active" : "Empty"}</span>
             </div>
             <div class="floor-table-session">${sessionCopy}</div>
-            ${capacity.isOver ? `<div class="floor-table-capacity-warning">${capacity.activeCount} devices / ${capacity.expected} guests</div>` : ""}
+            ${capacity.isOver ? `<div class="floor-table-capacity-warning">${capacity.deviceCount} total devices / ${capacity.expected} guests</div>` : ""}
             <div class="floor-table-actions">
               ${activeParty ? `
                 <button
@@ -7448,7 +7445,7 @@
           <div class="table-map-detail-copy">
             <strong>Table ${escapeHtml(tableCode)}</strong>
             <span>${escapeHtml(detail)}</span>
-            ${capacity.isOver ? `<span class="floor-table-capacity-warning">${capacity.activeCount} active devices / ${capacity.expected} guests</span>` : ""}
+            ${capacity.isOver ? `<span class="floor-table-capacity-warning">${capacity.deviceCount} total devices / ${capacity.expected} guests</span>` : ""}
           </div>
           <div class="table-map-detail-actions">
             ${activeParty ? `
@@ -7548,7 +7545,7 @@
             <span class="queen-map-table-label">${escapeHtml(item.label || item.tableCode)}</span>
             <span class="queen-map-table-state">${partySelected ? "SELECTED" : qrStateLabel}</span>
             ${activeRequests.length ? `<span class="queen-map-open-count">${activeRequests.length}</span>` : ""}
-            ${capacity.isOver ? `<span class="queen-map-guest-warning" title="Active devices exceed the Party headcount">${capacity.activeCount}/${capacity.expected}</span>` : ""}
+            ${capacity.isOver ? `<span class="queen-map-guest-warning" title="Total devices that joined this Party exceed its headcount">${capacity.deviceCount}/${capacity.expected}</span>` : ""}
           </button>
         `;
       }).join("");
@@ -8065,7 +8062,7 @@
       const sessionLabel = state.tableOrderHistoryCheckoutComplete && partyId
         ? `Party #${partyId} · Payment complete`
         : activeParty
-          ? `Party #${activeParty.id} · ${formatDiningQrList(partyQrs)} · ${capacity.activeCount}/${capacity.expected} devices`
+          ? `Party #${activeParty.id} · ${formatDiningQrList(partyQrs)} · ${capacity.deviceCount}/${capacity.expected} total devices`
           : activeSession
             ? `QR ${String(activeSession.qr_number).padStart(2, "0")} · Active session`
             : "No active session";
@@ -8080,7 +8077,7 @@
           ? `Party #${partyId} Details`
           : `Table ${tableCode} Details`
         : `Table ${tableCode} Current Order`;
-      meta.textContent = state.partyActionError || `${sessionLabel}${capacity.isOver ? ` · HEADCOUNT WARNING ${capacity.activeCount}/${capacity.expected}` : ""}`;
+      meta.textContent = state.partyActionError || `${sessionLabel}${capacity.isOver ? ` · HEADCOUNT WARNING ${capacity.deviceCount}/${capacity.expected}` : ""}`;
       meta.classList.toggle("is-error", Boolean(state.partyActionError));
 
       if (isDetailMode) {
