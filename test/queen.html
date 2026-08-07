@@ -2447,6 +2447,188 @@
       box-shadow: 0 10px 18px rgba(123, 31, 47, 0.16);
     }
 
+    .served-order-history-panel {
+      overflow: hidden;
+      padding: 0;
+    }
+
+    .served-order-history > summary {
+      list-style: none;
+    }
+
+    .served-order-history > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .served-order-history-toggle {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto 34px;
+      gap: 14px;
+      align-items: center;
+      min-height: 76px;
+      padding: 16px 18px;
+      background: rgba(113, 88, 60, 0.045);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .served-order-history-toggle:hover {
+      background: rgba(123, 31, 47, 0.06);
+    }
+
+    .served-order-history-toggle:focus-visible {
+      outline: 3px solid rgba(212, 175, 55, 0.48);
+      outline-offset: -3px;
+    }
+
+    .served-order-history-copy {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .served-order-history-copy strong {
+      color: #3b2418;
+      font-size: 1.02rem;
+    }
+
+    .served-order-history-copy small,
+    .served-order-history-count {
+      color: #806e60;
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    .served-order-history-count {
+      white-space: nowrap;
+    }
+
+    .served-order-history-chevron {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(95, 39, 49, 0.09);
+      color: #652433;
+      font-size: 0.95rem;
+      font-weight: 900;
+      transition: transform 160ms ease;
+    }
+
+    .served-order-history[open] .served-order-history-chevron {
+      transform: rotate(180deg);
+    }
+
+    .served-order-history-body {
+      display: grid;
+      gap: 12px;
+      padding: 0 18px 18px;
+      border-top: 1px solid rgba(113, 88, 60, 0.1);
+    }
+
+    .served-order-history-toolbar {
+      display: flex;
+      justify-content: flex-end;
+      padding-top: 14px;
+    }
+
+    .served-order-history-toolbar .order-history-field {
+      width: min(220px, 100%);
+    }
+
+    .served-order-history-list {
+      display: grid;
+      gap: 7px;
+    }
+
+    .served-order-history-row {
+      display: grid;
+      grid-template-columns: minmax(104px, 0.55fr) minmax(180px, 1.5fr) auto;
+      gap: 14px;
+      align-items: center;
+      min-height: 58px;
+      padding: 10px 12px;
+      border: 1px solid rgba(113, 88, 60, 0.12);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.84);
+    }
+
+    .served-order-history-location,
+    .served-order-history-meta {
+      display: grid;
+      gap: 2px;
+    }
+
+    .served-order-history-location strong,
+    .served-order-history-meta strong {
+      color: #5f2731;
+      font-size: 0.82rem;
+    }
+
+    .served-order-history-location span,
+    .served-order-history-meta span {
+      color: #8a7769;
+      font-size: 0.66rem;
+      font-weight: 800;
+    }
+
+    .served-order-history-items {
+      overflow: hidden;
+      margin: 0;
+      color: #49372d;
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .served-order-history-meta {
+      justify-items: end;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 620px) {
+      .served-order-history-toggle {
+        grid-template-columns: minmax(0, 1fr) 34px;
+      }
+
+      .served-order-history-count {
+        grid-column: 1;
+        grid-row: 2;
+      }
+
+      .served-order-history-chevron {
+        grid-column: 2;
+        grid-row: 1 / 3;
+      }
+
+      .served-order-history-toolbar {
+        justify-content: stretch;
+      }
+
+      .served-order-history-toolbar .order-history-field {
+        width: 100%;
+      }
+
+      .served-order-history-row {
+        grid-template-columns: minmax(96px, 0.55fr) minmax(0, 1.45fr);
+        gap: 8px 12px;
+      }
+
+      .served-order-history-meta {
+        grid-column: 1 / -1;
+        grid-template-columns: minmax(0, 1fr) auto;
+        justify-items: stretch;
+        text-align: left;
+      }
+
+      .served-order-history-meta strong {
+        text-align: right;
+      }
+    }
+
     .request-sync-status {
       min-height: 20px;
       margin: 0 0 12px;
@@ -5154,6 +5336,28 @@
           <div class="request-empty">Loading orders and service calls…</div>
         </div>
       </section>
+
+      <section class="purpose-panel served-order-history-panel" aria-labelledby="servedOrderHistoryTitle">
+        <details class="served-order-history" id="servedOrderHistory">
+          <summary class="served-order-history-toggle">
+            <span class="served-order-history-copy">
+              <strong id="servedOrderHistoryTitle">Served Orders</strong>
+              <small>Compact review for orders already passed from the board.</small>
+            </span>
+            <span class="served-order-history-count" id="servedOrderHistorySummary">No served orders today</span>
+            <span class="served-order-history-chevron" aria-hidden="true">⌄</span>
+          </summary>
+          <div class="served-order-history-body">
+            <div class="served-order-history-toolbar">
+              <label class="order-history-field" for="servedOrderHistoryDate">
+                Business date
+                <input id="servedOrderHistoryDate" type="date" />
+              </label>
+            </div>
+            <div class="served-order-history-list" id="servedOrderHistoryList" aria-live="polite"></div>
+          </div>
+        </details>
+      </section>
     </section>
 
     <section class="app-view placeholder-view" data-view="notes">
@@ -5520,6 +5724,7 @@
       requestActionError: "",
       orderHistoryDate: getDeviceDateValue(),
       orderHistoryTableCode: "",
+      servedOrderHistoryDate: getDeviceDateValue(),
       qrSessions: [],
       qrSessionLoadError: false,
       qrSessionActionError: "",
@@ -8175,6 +8380,89 @@
       `;
     }
 
+    function getRequestBusinessDate(request) {
+      const party = request.party_id ? getDiningParty(request.party_id) : null;
+      const qrSession = findOrderHistoryQrSession(request);
+      return getDeviceDateValue(
+        party?.created_at
+        || qrSession?.started_at
+        || request.created_at
+      );
+    }
+
+    function getServedOrderHistoryRequests() {
+      return state.diningRequests
+        .filter((request) => (
+          request.kind === "order"
+          && ["completed", "served"].includes(request.status)
+          && getRequestBusinessDate(request) === state.servedOrderHistoryDate
+        ))
+        .sort((left, right) => (
+          new Date(right.updated_at || right.created_at || 0)
+          - new Date(left.updated_at || left.created_at || 0)
+        ));
+    }
+
+    function getCompactServedOrderItems(request) {
+      const items = Array.isArray(request.items) ? request.items : [];
+      if (!items.length) {
+        const itemCount = Math.max(0, Number(request.item_count || 0));
+        return `${itemCount} item${itemCount === 1 ? "" : "s"}`;
+      }
+      const visibleItems = items.slice(0, 3).map((item) => {
+        const quantity = Math.max(1, Number(item.quantity || 1));
+        const name = item.nameEn || item.nameKo || "Menu item";
+        return `${quantity}× ${name}`;
+      });
+      const hiddenItemCount = items.length - visibleItems.length;
+      if (hiddenItemCount > 0) visibleItems.push(`+${hiddenItemCount} more`);
+      return visibleItems.join(" · ");
+    }
+
+    function formatServedOrderHistoryDate(value) {
+      const date = new Date(`${value}T12:00:00`);
+      if (Number.isNaN(date.getTime())) return value;
+      return new Intl.DateTimeFormat("en-US", {
+        month: "short",
+        day: "numeric"
+      }).format(date);
+    }
+
+    function renderServedOrderHistory() {
+      const dateInput = document.getElementById("servedOrderHistoryDate");
+      const summary = document.getElementById("servedOrderHistorySummary");
+      const list = document.getElementById("servedOrderHistoryList");
+      if (!dateInput || !summary || !list) return;
+
+      if (!state.servedOrderHistoryDate) {
+        state.servedOrderHistoryDate = getDeviceDateValue();
+      }
+      dateInput.value = state.servedOrderHistoryDate;
+
+      const requests = getServedOrderHistoryRequests();
+      const dateLabel = formatServedOrderHistoryDate(state.servedOrderHistoryDate);
+      summary.textContent = `${requests.length} served order${requests.length === 1 ? "" : "s"} · ${dateLabel}`;
+
+      if (!requests.length) {
+        list.innerHTML = '<div class="order-history-empty">No served orders for this business date.</div>';
+        return;
+      }
+
+      list.innerHTML = requests.map((request) => `
+        <article class="served-order-history-row">
+          <div class="served-order-history-location">
+            <strong>Table ${escapeHtml(request.table_code || "-")}</strong>
+            <span>Order #${escapeHtml(request.id)}</span>
+          </div>
+          <p class="served-order-history-items" title="${escapeHtml(getCompactServedOrderItems(request))}">${escapeHtml(getCompactServedOrderItems(request))}</p>
+          <div class="served-order-history-meta">
+            <span>${escapeHtml(formatRequestClock(request.created_at))} → ${escapeHtml(formatRequestClock(request.updated_at || request.created_at))}</span>
+            <strong>${escapeHtml(formatRequestMoney(request.total))}</strong>
+          </div>
+        </article>
+      `).join("");
+    }
+
     function renderDiningRequests() {
       const queue = document.getElementById("requestQueue");
       const syncStatus = document.getElementById("requestSyncStatus");
@@ -8209,6 +8497,7 @@
       renderPartyDashboard();
       renderTableMap();
       renderPastOrderHistory();
+      renderServedOrderHistory();
       if (document.getElementById("tableOrderHistoryModal")?.classList.contains("is-open")) {
         renderTableOrderHistoryModal();
       }
@@ -10088,6 +10377,11 @@
     document.getElementById("orderHistoryDate").addEventListener("change", (event) => {
       state.orderHistoryDate = event.currentTarget.value || getDeviceDateValue();
       renderPastOrderHistory();
+    });
+
+    document.getElementById("servedOrderHistoryDate").addEventListener("change", (event) => {
+      state.servedOrderHistoryDate = event.currentTarget.value || getDeviceDateValue();
+      renderServedOrderHistory();
     });
 
     document.getElementById("orderHistoryTable").addEventListener("change", (event) => {
