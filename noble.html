@@ -2929,9 +2929,8 @@
           const startTime = normalizeAvailabilityTime(row.available_start);
           const endTime = normalizeAvailabilityTime(row.available_end);
           const note = String(row.note || "");
-          if (startTime || endTime || note) {
-            state.dateDetails[isoDate] = { status, startTime, endTime, note };
-          }
+          // Every DB row is an explicit per-date override, including "default/available".
+          state.dateDetails[isoDate] = { status, startTime, endTime, note };
         });
 
         state.availabilityDirty = false;
@@ -3827,6 +3826,8 @@
       }
 
       function getCalendarDateStatus(isoDate) {
+        const explicitStatus = state.dateDetails[isoDate]?.status;
+        if (["default", "unavailable", "preferred"].includes(explicitStatus)) return explicitStatus;
         if (state.unavailableDates.has(isoDate)) return "unavailable";
         if (state.preferredDates.has(isoDate)) return "preferred";
         return getFixedCalendarDateStatus(isoDate);
@@ -3842,18 +3843,23 @@
       }
 
       function setCalendarDateStatus(isoDate, status) {
+        const nextStatus = ["default", "unavailable", "preferred"].includes(status) ? status : "default";
         state.unavailableDates.delete(isoDate);
         state.preferredDates.delete(isoDate);
 
-        if (status === "unavailable") {
+        if (nextStatus === "unavailable") {
           state.unavailableDates.add(isoDate);
-        } else if (status === "preferred") {
+        } else if (nextStatus === "preferred") {
           state.preferredDates.add(isoDate);
         }
 
-        if (state.dateDetails[isoDate]) {
-          state.dateDetails[isoDate].status = status;
-        }
+        const currentDetail = state.dateDetails[isoDate] || {};
+        state.dateDetails[isoDate] = {
+          status: nextStatus,
+          startTime: String(currentDetail.startTime || ""),
+          endTime: String(currentDetail.endTime || ""),
+          note: String(currentDetail.note || "")
+        };
       }
 
       function getNextCalendarDateStatus(isoDate) {

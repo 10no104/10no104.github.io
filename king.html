@@ -2193,6 +2193,23 @@
       border-width: 2px;
     }
 
+    .staff-pill.has-note {
+      flex-wrap: wrap;
+      border-radius: 16px;
+    }
+
+    .staff-pill .staff-pill-note {
+      flex: 1 0 100%;
+      color: currentColor;
+      font-size: 0.7rem;
+      font-weight: 800;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+      text-transform: none;
+      white-space: normal;
+      opacity: 0.84;
+    }
+
     .staff-pill.is-day-unavailable:not(.is-selected) {
       --day-state-color: #8d2739;
       border-color: #a3223b;
@@ -2300,13 +2317,13 @@
     }
 
     .availability-person small {
-      overflow: hidden;
-      max-width: 180px;
+      max-width: 260px;
       color: currentColor;
       font-size: 0.66rem;
       font-weight: 750;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+      white-space: normal;
       opacity: 0.76;
     }
 
@@ -3744,6 +3761,6 @@
     </div>
   </div>
 
-  <script src="js/king-admin.js?v=20260806-1"></script>
+  <script src="js/king-admin.js?v=20260806-2"></script>
 </body>
 </html>

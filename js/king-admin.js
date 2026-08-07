@@ -2488,12 +2488,18 @@
     }) || null;
   }
 
+  function getExplicitAvailabilityStatus(availability) {
+    if (!availability) return null;
+    const status = String(availability.status || "default").trim().toLowerCase();
+    return status === "unavailable" || status === "preferred" ? status : "default";
+  }
+
   function getStaffCalendarDateStatus(staff, isoDate = "") {
     const date = toSafeDate(isoDate);
     if (!staff || !date) return "default";
     const availability = getStaffCalendarAvailability(staff, isoDate);
-    if (availability?.status === "unavailable") return "unavailable";
-    if (availability?.status === "preferred") return "preferred";
+    const explicitStatus = getExplicitAvailabilityStatus(availability);
+    if (explicitStatus !== null) return explicitStatus;
     if (staff.fixed_unavailable_weekdays?.includes(date.getDay())) return "unavailable";
     if (staff.fixed_preferred_weekdays?.includes(date.getDay())) return "preferred";
     return "default";
@@ -2539,11 +2545,12 @@
     const isoDate = formatInputDate(date);
     const status = getStaffCalendarDateStatus(staff, isoDate);
     const availability = getStaffCalendarAvailability(staff, isoDate);
+    const note = String(availability?.note || "").trim();
     const details = [
       availability?.available_start || availability?.available_end
         ? `${availability.available_start || "open"} - ${availability.available_end || "close"}`
         : "",
-      availability?.note || ""
+      note ? `메모: ${note}` : ""
     ].filter(Boolean);
     const dateLabel = new Intl.DateTimeFormat("ko-KR", {
       year: "numeric",
@@ -2642,9 +2649,11 @@
         weekday: "short"
       }).format(date);
       const stateLabel = status === "default" ? "" : getStaffCalendarStatusLabel(status);
+      const note = String(availability?.note || "").trim();
+      const accessibleLabel = `${staff.name} ${dateLabel} ${getStaffCalendarStatusLabel(status)}${note ? `, 메모 ${note}` : ""}`;
 
       cells.push(`
-        <button class="${classes}" type="button" data-staff-calendar-date="${isoDate}" aria-label="${escapeHtml(`${staff.name} ${dateLabel} ${getStaffCalendarStatusLabel(status)}`)}" aria-pressed="${state.calendarSelectedDate === isoDate ? "true" : "false"}">
+        <button class="${classes}" type="button" data-staff-calendar-date="${isoDate}" aria-label="${escapeHtml(accessibleLabel)}" title="${escapeHtml(note ? `메모: ${note}` : accessibleLabel)}" aria-pressed="${state.calendarSelectedDate === isoDate ? "true" : "false"}">
           <strong>${day}</strong>
           ${stateLabel ? `<span class="calendar-state-label">${stateLabel}</span>` : ""}
         </button>
@@ -2779,13 +2788,14 @@
     if (!staff || !isoDate) return false;
     const date = toSafeDate(isoDate);
     if (!date) return false;
-    return getAvailabilityForStaff(staff, isoDate)?.status === "unavailable" ||
-      Boolean(staff.fixed_unavailable_weekdays?.includes(date.getDay()));
+    const explicitStatus = getExplicitAvailabilityStatus(getAvailabilityForStaff(staff, isoDate));
+    if (explicitStatus !== null) return explicitStatus === "unavailable";
+    return Boolean(staff.fixed_unavailable_weekdays?.includes(date.getDay()));
   }
 
   function getStaffUnavailableLabel(staff, isoDate) {
     const availability = getAvailabilityForStaff(staff, isoDate);
-    if (availability?.status === "unavailable") return "일반 불가";
+    if (getExplicitAvailabilityStatus(availability) === "unavailable") return "일반 불가";
     return "고정 불가";
   }
 
@@ -2916,26 +2926,28 @@
   }
 
   function renderAvailabilityList(status, target) {
+    const items = [];
     const weekDates = getScheduleWeekDates();
-    const weekStart = weekDates[0] ? startOfDay(weekDates[0]).getTime() : null;
-    const weekEnd = weekDates[6] ? startOfDay(weekDates[6]).getTime() : null;
-    const dateItems = state.scheduleAvailability
-      .filter((item) => {
-        if (item.status !== status) return false;
-        const date = toSafeDate(item.availability_date);
-        if (!date || weekStart === null || weekEnd === null) return false;
-        const time = startOfDay(date).getTime();
-        return time >= weekStart && time <= weekEnd;
+
+    getScheduleStaffPool().forEach((staff) => {
+      weekDates.forEach((date) => {
+        const isoDate = formatInputDate(date);
+        const dayState = getScheduleStaffDateState(staff, isoDate);
+        if (dayState?.type !== status) return;
+        const availability = getAvailabilityForStaff(staff, isoDate);
+        items.push({
+          ...(availability || {}),
+          staff_key: availability?.staff_key || staff.staff_key,
+          staff_name: availability?.staff_name || staff.name,
+          branch_scope: availability?.branch_scope || staff.branch_scope,
+          availability_date: isoDate,
+          status,
+          source: dayState.source
+        });
       });
-    const fixedItems = getFixedPreferenceItems(status);
-    const mergedItems = new Map();
-    [...dateItems, ...fixedItems].forEach((item) => {
-      const key = `${normalizeScheduleStaffKey(item.staff_key || item.staff_name)}|${item.availability_date}`;
-      const existing = mergedItems.get(key);
-      // A one-off entry can add a time or note to the same recurring weekday.
-      mergedItems.set(key, existing ? { ...item, ...existing } : item);
     });
-    const items = Array.from(mergedItems.values())
+
+    items
       .sort((a, b) => String(a.availability_date).localeCompare(String(b.availability_date)) || String(a.staff_name || a.staff_key).localeCompare(String(b.staff_name || b.staff_key)));
 
     if (!items.length) {
@@ -2957,7 +2969,8 @@
         const time = item.available_start || item.available_end
           ? `${item.available_start || "open"} - ${item.available_end || "close"}`
           : "";
-        const detail = [time, item.note].filter(Boolean).join(" · ");
+        const note = String(item.note || "").trim();
+        const detail = [time, note ? `메모: ${note}` : ""].filter(Boolean).join(" · ");
         return `
           <span class="availability-person">
             <strong>${escapeHtml(item.staff_name || item.staff_key || "-")}</strong>
@@ -2978,38 +2991,16 @@
     }).join("");
   }
 
-  function getFixedPreferenceItems(status) {
-    const dates = getScheduleWeekDates();
-    const weekdayField = status === "unavailable" ? "fixed_unavailable_weekdays" : "fixed_preferred_weekdays";
-    const items = [];
-
-    getScheduleStaffPool().forEach((staff) => {
-      const weekdays = normalizeWeekdayList(staff[weekdayField]);
-      if (!weekdays.length) return;
-
-      dates.forEach((date) => {
-        if (!weekdays.includes(date.getDay())) return;
-        items.push({
-          staff_key: staff.staff_key,
-          staff_name: staff.name,
-          branch_scope: staff.branch_scope,
-          availability_date: formatInputDate(date),
-          status
-        });
-      });
-    });
-
-    return items;
-  }
-
   function getScheduleStaffDateState(staff, isoDate) {
     const date = toSafeDate(isoDate);
     if (!staff || !date) return null;
     const availability = getAvailabilityForStaff(staff, isoDate);
-    if (availability?.status === "unavailable") return { type: "unavailable", label: "일반 불가" };
-    if (staff.fixed_unavailable_weekdays?.includes(date.getDay())) return { type: "unavailable", label: "고정 불가" };
-    if (availability?.status === "preferred") return { type: "preferred", label: "일반 선호" };
-    if (staff.fixed_preferred_weekdays?.includes(date.getDay())) return { type: "preferred", label: "고정 선호" };
+    const explicitStatus = getExplicitAvailabilityStatus(availability);
+    if (explicitStatus === "unavailable") return { type: "unavailable", label: "일반 불가", source: "explicit" };
+    if (explicitStatus === "preferred") return { type: "preferred", label: "일반 선호", source: "explicit" };
+    if (explicitStatus === "default") return null;
+    if (staff.fixed_unavailable_weekdays?.includes(date.getDay())) return { type: "unavailable", label: "고정 불가", source: "fixed" };
+    if (staff.fixed_preferred_weekdays?.includes(date.getDay())) return { type: "preferred", label: "고정 선호", source: "fixed" };
     return null;
   }
 
@@ -3054,7 +3045,9 @@
         const isBlocked = Boolean(selectedCell && !dropStatus?.allowed && !isAssigned);
         const isPreferred = Boolean(selectedCell && !isBlocked && dayState?.type === "preferred");
         const isAvailable = Boolean(selectedCell && dropStatus?.allowed && !isPreferred);
-        const stateLabel = isAssigned
+        const availability = selectedCell ? getAvailabilityForStaff(item, selectedCell.isoDate) : null;
+        const dayNote = String(availability?.note || "").trim();
+        const baseStateLabel = isAssigned
           ? "배정됨 · 탭해서 삭제"
           : isBlocked
             ? dropStatus?.label
@@ -3063,6 +3056,7 @@
               : isAvailable
                 ? "가능"
                 : "";
+        const stateLabel = `${baseStateLabel}${dayNote ? `${baseStateLabel ? " · " : ""}메모: ${dayNote}` : ""}`;
         const indicator = isBlocked ? "×" : isAssigned ? "−" : isPreferred ? "★" : isAvailable ? "✓" : "";
         const stateClass = isBlocked
           ? "is-day-unavailable"
@@ -3076,7 +3070,7 @@
         const isSelected = selectedKey === staffId;
         return `
         <button
-          class="staff-pill is-${escapeHtml(normalizeBranchScope(item.branch_scope))} ${isSelected ? "is-selected" : ""} ${selectedCell ? "is-date-context" : ""} ${stateClass}"
+          class="staff-pill is-${escapeHtml(normalizeBranchScope(item.branch_scope))} ${isSelected ? "is-selected" : ""} ${selectedCell ? "is-date-context" : ""} ${dayNote ? "has-note" : ""} ${stateClass}"
           type="button"
           data-schedule-staff="${escapeHtml(item.staff_key || item.name)}"
           aria-pressed="${isSelected ? "true" : "false"}"
@@ -3089,6 +3083,7 @@
               ? (indicator ? `<b class="staff-pill-day-mark" aria-hidden="true">${indicator}</b>` : "")
               : `<small>${escapeHtml(formatBranchLabel(item.branch_scope))}</small><b class="staff-pill-count" aria-hidden="true">${assignedDays}일</b>`}
           </span>
+          ${selectedCell && dayNote ? `<small class="staff-pill-note">메모: ${escapeHtml(dayNote)}</small>` : ""}
         </button>
       `;
       }).join("")}
@@ -3925,8 +3920,7 @@
   function scoreScheduleCandidate(staff, branch, isoDate, context) {
     const staffId = normalizeScheduleStaffKey(staff.staff_key || staff.name);
     const date = toSafeDate(isoDate);
-    const weekday = date ? date.getDay() : null;
-    const availability = getAvailabilityForStaff(staff, isoDate);
+    const dayState = getScheduleStaffDateState(staff, isoDate);
     const currentDays = new Set((context.byStaff.get(staffId) || []).map((item) => item.isoDate));
     let score = Math.random() * 0.2;
 
@@ -3934,8 +3928,7 @@
     else if (currentDays.size === 1) score += 60;
     else score += Math.max(0, 24 - currentDays.size * 4);
 
-    if (availability?.status === "preferred") score += 32;
-    if (staff.fixed_preferred_weekdays?.includes(weekday)) score += 24;
+    if (dayState?.type === "preferred") score += dayState.source === "explicit" ? 32 : 24;
     if (normalizeBranchScope(staff.preferred_branch) === branch) score += 40;
 
     const workStyle = staff.work_style || "";
@@ -3977,21 +3970,21 @@
     const existingKeys = new Set(existingNames.map(normalizeScheduleStaffKey));
     const pool = getScheduleStaffPool();
     const alreadyWorkingThisDate = context.byDate.get(isoDate) || new Set();
-    const date = toSafeDate(isoDate);
-    const weekday = date ? date.getDay() : null;
 
     return seededShuffle(pool)
       .map((staff) => {
         const availability = getAvailabilityForStaff(staff, isoDate);
+        const dayState = getScheduleStaffDateState(staff, isoDate);
         const staffId = normalizeScheduleStaffKey(staff.staff_key || staff.name);
         const currentShiftDays = new Set((context.byStaff.get(staffId) || []).map((item) => item.isoDate)).size;
         const branchPreferenceTier = getScheduleBranchPreferenceTier(staff, branch);
         return {
           ...staff,
           availability,
+          dayState,
           staffId,
           currentShiftDays,
-          isFixedPreferredWeekday: Boolean(weekday !== null && staff.fixed_preferred_weekdays?.includes(weekday)),
+          isFixedPreferredWeekday: dayState?.type === "preferred" && dayState.source === "fixed",
           branchPreferenceTier,
           isPreferredBranchMatch: branchPreferenceTier === 2,
           isNonPreferredBranch: branchPreferenceTier === 0,
@@ -4001,8 +3994,7 @@
       .filter((staff) => branchMatchesStaff(staff, branch))
       .filter((staff) => !existingKeys.has(normalizeScheduleStaffKey(staff.name)) && !existingKeys.has(normalizeScheduleStaffKey(staff.staff_key)))
       .filter((staff) => !alreadyWorkingThisDate.has(staff.staffId))
-      .filter((staff) => staff.availability?.status !== "unavailable")
-      .filter((staff) => !staff.fixed_unavailable_weekdays?.includes(weekday))
+      .filter((staff) => !isStaffUnavailableOnDate(staff, isoDate))
       .filter((staff) => {
         const maxWeeklyShifts = normalizeMaxWeeklyShifts(staff.max_weekly_shifts);
         if (!maxWeeklyShifts) return true;
