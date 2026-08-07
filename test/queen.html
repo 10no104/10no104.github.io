@@ -6429,6 +6429,7 @@
 
     function normalizeDiningTableMapItem(item = {}, index = 0) {
       const type = item.type === "obstacle" ? "obstacle" : "table";
+      const targetZone = TABLE_MAP_ZONE_ORDER.includes(item.targetZone) ? item.targetZone : "";
       return {
         id: String(item.id || `${type}-${index}`).slice(0, 80),
         type,
@@ -6438,10 +6439,11 @@
           ? item.obstacleKind
           : "wall",
         shape: ["rectangle", "round", "booth"].includes(item.shape) ? item.shape : "rectangle",
+        targetZone,
         x: clampTableMapNumber(item.x, 0, 98),
         y: clampTableMapNumber(item.y, 0, 98),
-        w: clampTableMapNumber(item.w || 10, 2, 80),
-        h: clampTableMapNumber(item.h || 9, 2, 80),
+        w: clampTableMapNumber(item.w || 10, 2, targetZone ? 98 : 80),
+        h: clampTableMapNumber(item.h || 9, 2, targetZone ? 98 : 80),
         rotation: clampTableMapNumber(item.rotation, -180, 180)
       };
     }
@@ -6456,7 +6458,7 @@
         }
       }
       return {
-        zone: ["first", "second", "patio"].includes(row.zone) ? row.zone : "first",
+        zone: ["overview", "first", "second", "patio"].includes(row.zone) ? row.zone : "first",
         canvasWidth: clampTableMapNumber(row.canvas_width || 1200, 600, 2400),
         canvasHeight: clampTableMapNumber(row.canvas_height || 800, 400, 1800),
         items: Array.isArray(items) ? items.map(normalizeDiningTableMapItem) : [],
@@ -7580,9 +7582,20 @@
       };
     }
 
+    function getSavedTableMapZoneBounds(zone) {
+      const frame = state.tableLayouts.get("overview")?.items.find((item) => item.targetZone === zone);
+      if (!frame) return TABLE_MAP_STORE_ZONE_BOUNDS[zone];
+      return {
+        x: Math.min(frame.x, 100 - frame.w),
+        y: Math.min(frame.y, 100 - frame.h),
+        w: frame.w,
+        h: frame.h
+      };
+    }
+
     function renderSavedTableMapPreviewZone(zone, layout) {
       const meta = TABLE_MAP_ZONE_META[zone];
-      const bounds = TABLE_MAP_STORE_ZONE_BOUNDS[zone];
+      const bounds = getSavedTableMapZoneBounds(zone);
       const tableItems = layout?.items.filter((item) => item.type === "table" && item.tableCode) || [];
       const obstacleItems = layout?.items.filter((item) => item.type === "obstacle") || [];
       const activeCount = tableItems.filter((item) => getTableMapPreviewStatus(item.tableCode).occupied).length;

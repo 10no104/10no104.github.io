@@ -16,7 +16,7 @@ create table if not exists public.dining_table_layouts (
   constraint dining_table_layouts_branch_check
     check (branch ~ '^[a-z0-9_-]{1,40}$'),
   constraint dining_table_layouts_zone_check
-    check (zone in ('first', 'second', 'patio')),
+    check (zone in ('overview', 'first', 'second', 'patio')),
   constraint dining_table_layouts_canvas_width_check
     check (canvas_width between 600 and 2400),
   constraint dining_table_layouts_canvas_height_check
@@ -26,6 +26,13 @@ create table if not exists public.dining_table_layouts (
   constraint dining_table_layouts_branch_zone_unique
     unique (branch, zone)
 );
+
+-- Keep existing installations in sync when this setup script is rerun.
+alter table public.dining_table_layouts
+  drop constraint if exists dining_table_layouts_zone_check;
+alter table public.dining_table_layouts
+  add constraint dining_table_layouts_zone_check
+  check (zone in ('overview', 'first', 'second', 'patio'));
 
 create or replace function public.set_dining_table_layout_updated_at()
 returns trigger
@@ -70,7 +77,7 @@ begin
   end if;
 
   if normalized_zone is null
-    or normalized_zone not in ('first', 'second', 'patio')
+    or normalized_zone not in ('overview', 'first', 'second', 'patio')
   then
     raise exception 'Invalid map zone';
   end if;
@@ -101,6 +108,22 @@ begin
       or length(coalesce(element.item->>'tableCode', '')) > 40
   ) then
     raise exception 'One or more map items are invalid';
+  end if;
+
+  if normalized_zone = 'overview' and (
+    jsonb_array_length(p_items) <> 3
+    or exists (
+      select 1
+      from jsonb_array_elements(p_items) as element(item)
+      where coalesce(element.item->>'type', '') <> 'obstacle'
+        or coalesce(element.item->>'targetZone', '') not in ('first', 'second', 'patio')
+    )
+    or (
+      select count(distinct element.item->>'targetZone')
+      from jsonb_array_elements(p_items) as element(item)
+    ) <> 3
+  ) then
+    raise exception 'Overview must contain one frame for each map zone';
   end if;
 
   insert into public.dining_table_layouts (
@@ -155,6 +178,26 @@ on public.dining_table_layouts
 for select
 to anon, authenticated
 using (true);
+
+insert into public.dining_table_layouts (
+  branch,
+  zone,
+  canvas_width,
+  canvas_height,
+  items
+)
+values (
+  'downtown',
+  'overview',
+  1600,
+  900,
+  '[
+    {"id":"overview-first","type":"obstacle","tableCode":"","label":"1st Floor","obstacleKind":"service","shape":"rectangle","targetZone":"first","x":2.2,"y":3.5,"w":59.5,"h":93,"rotation":0},
+    {"id":"overview-second","type":"obstacle","tableCode":"","label":"2nd Floor","obstacleKind":"service","shape":"rectangle","targetZone":"second","x":70.2,"y":3.5,"w":27.6,"h":42,"rotation":0},
+    {"id":"overview-patio","type":"obstacle","tableCode":"","label":"Patio","obstacleKind":"service","shape":"rectangle","targetZone":"patio","x":70.2,"y":54.5,"w":27.6,"h":42,"rotation":0}
+  ]'::jsonb
+)
+on conflict (branch, zone) do nothing;
 
 comment on table public.dining_table_layouts is
   'Saved floor maps for table placement and fixed reference obstacles.';
