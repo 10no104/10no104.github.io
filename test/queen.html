@@ -1065,20 +1065,85 @@
       background: rgba(255, 255, 255, 0.18);
     }
 
+    .table-map-tab:disabled {
+      opacity: 0.42;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
     .table-map-grid.is-overview,
     .table-map-grid.is-zone-view {
       display: block;
     }
 
     .table-map-overview {
+      position: relative;
       display: block;
       width: 100%;
-      height: clamp(360px, 52vw, 510px);
+      height: auto;
       min-height: 0;
       overflow: hidden;
       border: 1px solid rgba(80, 54, 37, 0.16);
       border-radius: 20px;
       background: #e9ddce;
+    }
+
+    .saved-map-overview-shell {
+      display: grid;
+      gap: 10px;
+    }
+
+    .saved-map-overview-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0 4px;
+    }
+
+    .saved-map-overview-head strong {
+      color: #402a20;
+      font-size: 0.9rem;
+    }
+
+    .saved-map-overview-head span {
+      color: #7c695c;
+      font-size: 0.68rem;
+      font-weight: 850;
+      text-align: right;
+    }
+
+    .saved-store-map-preview {
+      position: relative;
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-width: 0;
+      padding: 0;
+      overflow: hidden;
+      border: 0;
+      border-radius: 18px;
+      background-color: #f3eadc;
+      background-image:
+        linear-gradient(rgba(80, 54, 37, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(80, 54, 37, 0.045) 1px, transparent 1px);
+      background-size: 10% 10%;
+      color: inherit;
+      font: inherit;
+      cursor: zoom-in;
+      box-shadow: inset 0 0 38px rgba(72, 46, 29, 0.06);
+    }
+
+    .saved-store-map-preview:hover,
+    .saved-store-map-preview:focus-visible {
+      box-shadow:
+        inset 0 0 0 4px rgba(95, 39, 49, 0.2),
+        inset 0 0 38px rgba(72, 46, 29, 0.08);
+    }
+
+    .saved-store-map-preview:focus-visible {
+      outline: 3px solid rgba(212, 175, 55, 0.68);
+      outline-offset: 2px;
     }
 
     .table-map-zone-preview {
@@ -1438,7 +1503,7 @@
 
     @media (max-width: 900px) {
       .table-map-overview {
-        height: clamp(340px, 58vw, 430px);
+        height: auto;
       }
 
       .store-map-zone-heading {
@@ -1496,7 +1561,17 @@
       }
 
       .table-map-overview {
-        height: clamp(320px, 64vw, 390px);
+        height: auto;
+      }
+
+      .saved-map-overview-head {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .saved-map-overview-head span {
+        text-align: left;
       }
 
       .table-map-zone-preview,
@@ -5693,9 +5768,9 @@
         <div class="table-map-title-row">
           <div>
             <h3>Table Map</h3>
-            <p>See every active table at once, then tap an area to zoom in and select tables.</p>
+            <p>Live view of the floor plan saved in Supabase. Tap the map to expand and select tables.</p>
           </div>
-          <span class="table-map-mode-badge">Tablet preview</span>
+          <span class="table-map-mode-badge">Saved map</span>
         </div>
         <div class="table-map-legend" aria-label="Table state colors">
           <span><i></i>Empty</span>
@@ -6114,12 +6189,6 @@
         preferredTableCodes: ["A8", "A9", "A10"]
       }
     };
-    const TABLE_MAP_STORE_ZONE_BOUNDS = {
-      first: { x: 2.2, y: 3.5, w: 59.5, h: 93 },
-      second: { x: 70.2, y: 3.5, w: 27.6, h: 42 },
-      patio: { x: 70.2, y: 54.5, w: 27.6, h: 42 }
-    };
-
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3Iiujn95evZuFiyLNrJUo-_H6rKngdxt0EeBFVw/exec";
     const RESERVATION_REFRESH_MS = 5000;
     const DINING_REALTIME_DEBOUNCE_MS = 350;
@@ -7248,122 +7317,6 @@
       return state.tableLayouts.get(zone) || null;
     }
 
-    function getAllDiningTableCodes() {
-      const registeredTableCodes = state.partySnapshot.tables
-        .map((table) => table.table_code)
-        .filter(Boolean);
-      const preferredTableCodes = TABLE_MAP_ZONE_ORDER.flatMap((zone) => (
-        TABLE_MAP_ZONE_META[zone]?.preferredTableCodes || []
-      ));
-      const sourceTableCodes = registeredTableCodes.length
-        ? registeredTableCodes
-        : preferredTableCodes.filter((tableCode) => (
-            state.tableOptions.some((option) => (
-              String(option || "").trim().toLowerCase() === tableCode.toLowerCase()
-            ))
-          ));
-      return Array.from(new Map(
-        sourceTableCodes
-          .map((tableCode) => String(tableCode || "").trim())
-          .filter(Boolean)
-          .map((tableCode) => [tableCode.toLowerCase(), tableCode])
-      ).values()).sort((left, right) => left.localeCompare(right, undefined, {
-        numeric: true,
-        sensitivity: "base"
-      }));
-    }
-
-    function getTemporaryZoneTableCodes(zone, allTableCodes = getAllDiningTableCodes()) {
-      const preferredCodes = TABLE_MAP_ZONE_META[zone]?.preferredTableCodes || [];
-      const allCodesByKey = new Map(
-        allTableCodes.map((tableCode) => [tableCode.toLowerCase(), tableCode])
-      );
-      const reservedKeys = new Set(
-        TABLE_MAP_ZONE_ORDER.flatMap((zoneName) => (
-          TABLE_MAP_ZONE_META[zoneName]?.preferredTableCodes || []
-        )).map((tableCode) => tableCode.toLowerCase())
-      );
-      const preferred = preferredCodes
-        .map((tableCode) => allCodesByKey.get(tableCode.toLowerCase()))
-        .filter(Boolean);
-      const unreserved = allTableCodes.filter((tableCode) => (
-        !reservedKeys.has(tableCode.toLowerCase())
-        && getDiningTableMapZone(tableCode) === zone
-      ));
-      return [...preferred, ...unreserved];
-    }
-
-    function buildTemporaryTableMapLayout(zone, tableCodes) {
-      const tableCount = tableCodes.length;
-      const columns = Math.max(1, Math.min(zone === "patio" ? 3 : zone === "second" ? 2 : 3, tableCount || 1));
-      const rows = Math.max(1, Math.ceil(tableCount / columns));
-      const horizontalGap = 6;
-      const verticalGap = rows > 2 ? 5 : 9;
-      const tableWidth = Math.min(20, (80 - horizontalGap * (columns - 1)) / columns);
-      const tableHeight = Math.min(22, (62 - verticalGap * (rows - 1)) / rows);
-      const totalWidth = tableWidth * columns + horizontalGap * (columns - 1);
-      const totalHeight = tableHeight * rows + verticalGap * (rows - 1);
-      const startX = (100 - totalWidth) / 2;
-      const startY = Math.max(23, (84 - totalHeight) / 2);
-      const tableItems = tableCodes.map((tableCode, index) => {
-        const column = index % columns;
-        const row = Math.floor(index / columns);
-        const normalizedCode = tableCode.toUpperCase();
-        return {
-          id: `temporary-${zone}-${normalizedCode}`,
-          type: "table",
-          tableCode,
-          label: tableCode,
-          obstacleKind: "wall",
-          shape: zone === "patio"
-            ? "round"
-            : normalizedCode.startsWith("C")
-              ? "booth"
-              : index % 3 === 1
-                ? "round"
-                : "rectangle",
-          x: startX + column * (tableWidth + horizontalGap),
-          y: startY + row * (tableHeight + verticalGap),
-          w: tableWidth,
-          h: tableHeight,
-          rotation: 0
-        };
-      });
-      const obstacleItems = zone === "first"
-        ? [
-            { id: "temporary-first-bar", type: "obstacle", tableCode: "", label: "BAR", obstacleKind: "bar", shape: "rectangle", x: 6, y: 86, w: 54, h: 8, rotation: 0 },
-            { id: "temporary-first-stairs", type: "obstacle", tableCode: "", label: "STAIRS", obstacleKind: "stairs", shape: "rectangle", x: 76, y: 84, w: 18, h: 10, rotation: 0 }
-          ]
-        : zone === "second"
-          ? [
-              { id: "temporary-second-service", type: "obstacle", tableCode: "", label: "SERVICE", obstacleKind: "service", shape: "rectangle", x: 7, y: 84, w: 30, h: 9, rotation: 0 },
-              { id: "temporary-second-stairs", type: "obstacle", tableCode: "", label: "STAIRS", obstacleKind: "stairs", shape: "rectangle", x: 72, y: 82, w: 21, h: 11, rotation: 0 }
-            ]
-          : [
-              { id: "temporary-patio-door", type: "obstacle", tableCode: "", label: "DOOR", obstacleKind: "door", shape: "rectangle", x: 7, y: 83, w: 21, h: 10, rotation: 0 },
-              { id: "temporary-patio-planter", type: "obstacle", tableCode: "", label: "PLANTER", obstacleKind: "service", shape: "rectangle", x: 55, y: 86, w: 38, h: 7, rotation: 0 }
-            ];
-      return {
-        zone,
-        canvasWidth: 1000,
-        canvasHeight: 620,
-        items: [...obstacleItems, ...tableItems],
-        revision: 0,
-        updatedAt: ""
-      };
-    }
-
-    function getTemporaryTableMapLayouts() {
-      const allTableCodes = getAllDiningTableCodes();
-      return new Map(TABLE_MAP_ZONE_ORDER.map((zone) => [
-        zone,
-        buildTemporaryTableMapLayout(
-          zone,
-          getTemporaryZoneTableCodes(zone, allTableCodes)
-        )
-      ]));
-    }
-
     function formatDiningQrList(partyQrs) {
       if (!partyQrs.length) return "No QR";
       return partyQrs
@@ -7618,111 +7571,103 @@
       };
     }
 
-    function renderTemporaryTableMapOverview(layouts) {
-      const zoneMarkup = TABLE_MAP_ZONE_ORDER.map((zone) => {
-        const meta = TABLE_MAP_ZONE_META[zone];
-        const bounds = TABLE_MAP_STORE_ZONE_BOUNDS[zone];
-        const layout = layouts.get(zone);
-        const tableItems = layout.items.filter((item) => item.type === "table" && item.tableCode);
-        const obstacleItems = layout.items.filter((item) => item.type === "obstacle");
-        const activeCount = tableItems.filter((item) => getTableMapPreviewStatus(item.tableCode).occupied).length;
-        const obstacleMarkup = obstacleItems.map((item) => {
-          const x = Math.min(item.x, 100 - item.w);
-          const y = Math.min(item.y, 100 - item.h);
-          const style = `left:${x}%;top:${y}%;width:${item.w}%;height:${item.h}%;transform:rotate(${item.rotation}deg)`;
-          return `
-            <span
-              class="queen-map-item queen-map-obstacle"
-              data-kind="${escapeHtml(item.obstacleKind)}"
-              style="${style}"
-              aria-hidden="true"
-            >
-              <span class="queen-map-obstacle-label">${escapeHtml(item.label)}</span>
-            </span>
-          `;
-        }).join("");
-        const tableMarkup = tableItems.map((item) => {
-          const x = Math.min(item.x, 100 - item.w);
-          const y = Math.min(item.y, 100 - item.h);
-          const { activeParty, activeSession, occupied } = getTableMapPreviewStatus(item.tableCode);
-          const tableRecord = getDiningTableRecord(item.tableCode);
-          const partyQrs = getDiningTableQrs(tableRecord || item.tableCode);
-          const activeRequests = activeParty
-            ? getTableRequestHistory(item.tableCode).filter((request) => (
-              request.party_id === activeParty.id
-              && !["completed", "canceled"].includes(request.status)
-            ))
-            : activeSession
-              ? getTableRequestHistory(item.tableCode).filter((request) => (
-                request.qr_session_id === activeSession.id
-                && !["completed", "canceled"].includes(request.status)
-              ))
-              : [];
-          const partyToneClass = activeParty ? getDiningPartyToneClass(activeParty.id) : "";
-          const mappedQr = partyQrs[0]?.qr_number || activeSession?.qr_number || null;
-          const stateLabel = partyQrs.length > 1
-            ? `${partyQrs.length} QRs`
-            : mappedQr
-              ? `QR ${String(mappedQr).padStart(2, "0")}`
-              : occupied
-                ? "ACTIVE"
-                : "EMPTY";
-          const stateClasses = [
-            occupied ? "is-assigned" : "is-empty",
-            partyQrs.length ? "is-qr-active" : "",
-            partyToneClass
-          ].filter(Boolean).join(" ");
-          const style = `left:${x}%;top:${y}%;width:${item.w}%;height:${item.h}%;transform:rotate(${item.rotation}deg)`;
-          return `
-            <span
-              class="queen-map-item queen-map-table store-map-preview-table is-${escapeHtml(item.shape)} ${stateClasses}"
-              style="${style}"
-              aria-hidden="true"
-            >
-              <span class="queen-map-table-label">${escapeHtml(item.label || item.tableCode)}</span>
-              <span class="queen-map-table-state">${escapeHtml(stateLabel)}</span>
-              ${activeRequests.length ? `<span class="queen-map-open-count">${activeRequests.length}</span>` : ""}
-            </span>
-          `;
-        }).join("");
-        const zoneStyle = `left:${bounds.x}%;top:${bounds.y}%;width:${bounds.w}%;height:${bounds.h}%`;
+    function getSavedTableMapOverviewLayout() {
+      const firstFloorLayout = state.tableLayouts.get("first");
+      if (firstFloorLayout?.items.length) return firstFloorLayout;
+      return TABLE_MAP_ZONE_ORDER
+        .map((zone) => state.tableLayouts.get(zone))
+        .find((layout) => layout?.items.length) || null;
+    }
+
+    function renderSavedTableMapOverview(layout) {
+      const tableItems = layout.items.filter((item) => item.type === "table" && item.tableCode);
+      const obstacleItems = layout.items.filter((item) => item.type === "obstacle");
+      const activeCount = tableItems.filter((item) => getTableMapPreviewStatus(item.tableCode).occupied).length;
+      const obstacleMarkup = obstacleItems.map((item) => {
+        const x = Math.min(item.x, 100 - item.w);
+        const y = Math.min(item.y, 100 - item.h);
+        const style = `left:${x}%;top:${y}%;width:${item.w}%;height:${item.h}%;transform:rotate(${item.rotation}deg)`;
         return `
-          <button
-            class="table-map-zone-preview"
-            type="button"
-            data-map-preview-zone="${escapeHtml(zone)}"
-            data-zone="${escapeHtml(zone)}"
-            style="${zoneStyle}"
-            aria-label="Open ${escapeHtml(meta.label)} map, ${activeCount} active of ${tableItems.length} tables"
+          <span
+            class="queen-map-item queen-map-obstacle"
+            data-kind="${escapeHtml(item.obstacleKind)}"
+            style="${style}"
+            aria-hidden="true"
           >
-            <span class="store-map-zone-heading">
-              <span class="store-map-zone-heading-copy">
-                <strong>${escapeHtml(meta.label)}</strong>
-                <small>${escapeHtml(meta.description)} &middot; Tap to zoom</small>
-              </span>
-              <span class="table-map-zone-preview-stats">
-                <strong>${activeCount} active</strong>
-                <span>${tableItems.length} tables</span>
-              </span>
-            </span>
-            ${obstacleMarkup}
-            ${tableMarkup}
-          </button>
+            <span class="queen-map-obstacle-label">${escapeHtml(item.label)}</span>
+          </span>
         `;
       }).join("");
+      const tableMarkup = tableItems.map((item) => {
+        const x = Math.min(item.x, 100 - item.w);
+        const y = Math.min(item.y, 100 - item.h);
+        const { activeParty, activeSession, occupied } = getTableMapPreviewStatus(item.tableCode);
+        const tableRecord = getDiningTableRecord(item.tableCode);
+        const partyQrs = getDiningTableQrs(tableRecord || item.tableCode);
+        const activeRequests = activeParty
+          ? getTableRequestHistory(item.tableCode).filter((request) => (
+            request.party_id === activeParty.id
+            && !["completed", "canceled"].includes(request.status)
+          ))
+          : activeSession
+            ? getTableRequestHistory(item.tableCode).filter((request) => (
+              request.qr_session_id === activeSession.id
+              && !["completed", "canceled"].includes(request.status)
+            ))
+            : [];
+        const partyToneClass = activeParty ? getDiningPartyToneClass(activeParty.id) : "";
+        const mappedQr = partyQrs[0]?.qr_number || activeSession?.qr_number || null;
+        const stateLabel = partyQrs.length > 1
+          ? `${partyQrs.length} QRs`
+          : mappedQr
+            ? `QR ${String(mappedQr).padStart(2, "0")}`
+            : occupied
+              ? "ACTIVE"
+              : "EMPTY";
+        const stateClasses = [
+          occupied ? "is-assigned" : "is-empty",
+          partyQrs.length ? "is-qr-active" : "",
+          partyToneClass
+        ].filter(Boolean).join(" ");
+        const style = `left:${x}%;top:${y}%;width:${item.w}%;height:${item.h}%;transform:rotate(${item.rotation}deg)`;
+        return `
+          <span
+            class="queen-map-item queen-map-table store-map-preview-table is-${escapeHtml(item.shape)} ${stateClasses}"
+            style="${style}"
+            aria-hidden="true"
+          >
+            <span class="queen-map-table-label">${escapeHtml(item.label || item.tableCode)}</span>
+            <span class="queen-map-table-state">${escapeHtml(stateLabel)}</span>
+            ${activeRequests.length ? `<span class="queen-map-open-count">${activeRequests.length}</span>` : ""}
+          </span>
+        `;
+      }).join("");
+      const meta = TABLE_MAP_ZONE_META[layout.zone] || TABLE_MAP_ZONE_META.first;
       return `
-        <div class="table-map-overview">
-          <div class="store-map-plan" aria-label="Whole restaurant map">
-            ${zoneMarkup}
-            <span class="store-map-passage is-stairs" aria-hidden="true">2F<br>STAIRS &uarr;</span>
-            <span class="store-map-passage is-patio" aria-hidden="true">PATIO<br>PASSAGE &rarr;</span>
-            <span class="store-map-entrance" aria-hidden="true">MAIN ENTRANCE</span>
+        <div class="saved-map-overview-shell">
+          <div class="saved-map-overview-head">
+            <strong>Downtown saved floor plan</strong>
+            <span>${escapeHtml(meta.label)} &middot; revision ${escapeHtml(layout.revision)} &middot; ${activeCount} active &middot; ${tableItems.length} tables &middot; Tap map to expand</span>
+          </div>
+          <div
+            class="table-map-overview"
+            style="aspect-ratio:${layout.canvasWidth} / ${layout.canvasHeight}"
+          >
+            <button
+              class="saved-store-map-preview"
+              type="button"
+              data-map-preview-zone="${escapeHtml(layout.zone)}"
+              aria-label="Open the saved ${escapeHtml(meta.label)} map, ${activeCount} active of ${tableItems.length} tables"
+            >
+              ${obstacleMarkup}
+              ${tableMarkup}
+            </button>
           </div>
         </div>
       `;
     }
 
-    function renderTemporaryFocusedTableMap(zone, layout) {
+    function renderSavedFocusedTableMap(zone, layout) {
       const meta = TABLE_MAP_ZONE_META[zone];
       const tableItems = layout.items.filter((item) => item.type === "table" && item.tableCode);
       const activeCount = tableItems.filter((item) => getTableMapPreviewStatus(item.tableCode).occupied).length;
@@ -7751,38 +7696,66 @@
       if (!grid) return;
       renderPartySetupBar();
 
-      const layouts = getTemporaryTableMapLayouts();
+      const layouts = new Map(
+        TABLE_MAP_ZONE_ORDER
+          .map((zone) => [zone, state.tableLayouts.get(zone)])
+          .filter(([, layout]) => layout?.items.length)
+      );
+      if (state.activeTableMapZone !== "overview" && !layouts.has(state.activeTableMapZone)) {
+        state.activeTableMapZone = "overview";
+        state.selectedMapTableCode = null;
+      }
       const zoneCounts = Object.fromEntries(TABLE_MAP_ZONE_ORDER.map((zone) => [
         zone,
-        layouts.get(zone).items.filter((item) => item.type === "table" && item.tableCode).length
+        layouts.get(zone)?.items.filter((item) => item.type === "table" && item.tableCode).length || 0
       ]));
-      zoneCounts.overview = Object.values(zoneCounts).reduce((sum, count) => sum + count, 0);
+      const savedTableCodes = new Set(
+        [...layouts.values()].flatMap((layout) => (
+          layout.items
+            .filter((item) => item.type === "table" && item.tableCode)
+            .map((item) => item.tableCode.toLowerCase())
+        ))
+      );
+      zoneCounts.overview = savedTableCodes.size;
       document.querySelectorAll("[data-table-map-count]").forEach((count) => {
         count.textContent = String(zoneCounts[count.dataset.tableMapCount] || 0);
       });
       document.querySelectorAll("[data-table-map-zone]").forEach((button) => {
-        const isActive = button.dataset.tableMapZone === state.activeTableMapZone;
+        const zone = button.dataset.tableMapZone;
+        const unavailable = zone !== "overview" && !layouts.has(zone);
+        const isActive = zone === state.activeTableMapZone;
+        button.disabled = unavailable;
+        button.title = unavailable ? "No saved map for this area yet" : "";
         button.classList.toggle("is-active", isActive);
         button.setAttribute("aria-pressed", isActive ? "true" : "false");
       });
 
       if (state.activeTableMapZone === "overview") {
+        const overviewLayout = getSavedTableMapOverviewLayout();
         state.selectedMapTableCode = null;
         grid.classList.add("is-overview");
         grid.classList.remove("is-zone-view");
         grid.removeAttribute("data-zone");
-        grid.innerHTML = renderTemporaryTableMapOverview(layouts);
+        if (overviewLayout) {
+          grid.innerHTML = renderSavedTableMapOverview(overviewLayout);
+          return;
+        }
+        const fallbackTableCodes = Array.from(new Set([
+          ...state.tableOptions,
+          ...state.partySnapshot.tables.map((table) => table.table_code)
+        ].map((tableCode) => String(tableCode || "").trim()).filter(Boolean)));
+        const message = state.tableLayoutLoadError
+          ? '<p class="table-map-layout-note is-error">The saved Supabase map could not be loaded. The table list remains available below.</p>'
+          : '<p class="table-map-layout-note">No saved Supabase floor plan is available yet.</p>';
+        grid.innerHTML = message + renderFallbackTableCards(fallbackTableCodes);
         return;
       }
 
-      const zone = TABLE_MAP_ZONE_ORDER.includes(state.activeTableMapZone)
-        ? state.activeTableMapZone
-        : "first";
-      state.activeTableMapZone = zone;
+      const zone = state.activeTableMapZone;
       grid.classList.remove("is-overview");
       grid.classList.add("is-zone-view");
       grid.dataset.zone = zone;
-      grid.innerHTML = renderTemporaryFocusedTableMap(zone, layouts.get(zone));
+      grid.innerHTML = renderSavedFocusedTableMap(zone, layouts.get(zone));
     }
 
     function renderTableOrderHistoryEntry(request, { activePartyId = null, activeSessionId = null } = {}) {
