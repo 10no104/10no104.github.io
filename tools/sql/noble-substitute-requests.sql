@@ -22,6 +22,7 @@ create index if not exists shift_substitute_requests_requester_idx
 create or replace function schedule.touch_shift_substitute_request_updated_at()
 returns trigger
 language plpgsql
+set search_path = ''
 as $$
 begin
   new.updated_at = now();

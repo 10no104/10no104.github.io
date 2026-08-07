@@ -3790,9 +3790,6 @@ create table if not exists public.dining_table_layouts (
     unique (branch, zone)
 );
 
-create index if not exists dining_table_layouts_branch_idx
-  on public.dining_table_layouts (branch, zone);
-
 create or replace function public.set_dining_table_layout_updated_at()
 returns trigger
 language plpgsql

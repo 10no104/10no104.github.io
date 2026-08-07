@@ -916,9 +916,6 @@
     const currentResult = await supabaseClient.rpc("king_get_access_requests_v2");
     if (!currentResult.error && Array.isArray(currentResult.data)) return currentResult;
 
-    const rpcResult = await supabaseClient.rpc("king_get_access_requests");
-    if (!rpcResult.error && Array.isArray(rpcResult.data)) return rpcResult;
-
     const directResult = await supabaseClient
       .from("noble_access_requests")
       .select("id,name,branch_scope,phone_number,smart_server_number,status,note,created_at")
@@ -926,7 +923,7 @@
       .order("created_at", { ascending: false });
     if (!directResult.error && Array.isArray(directResult.data) && directResult.data.length) return directResult;
 
-    return rpcResult.error ? directResult : rpcResult;
+    return currentResult.error ? directResult : currentResult;
   }
 
   async function deleteAccessRequest(id = "") {

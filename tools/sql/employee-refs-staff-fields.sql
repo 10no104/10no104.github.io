@@ -60,6 +60,7 @@ $$;
 create or replace function staff.touch_employee_refs_updated_at()
 returns trigger
 language plpgsql
+set search_path = ''
 as $$
 begin
   new.updated_at = now();

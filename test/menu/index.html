@@ -228,6 +228,127 @@
       opacity: 0.18;
     }
 
+    .menu-preview-gallery {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 0.85fr);
+      grid-template-rows: repeat(2, minmax(0, 1fr));
+      width: 230px;
+      height: 230px;
+      padding: 0;
+      overflow: hidden;
+      border: 0;
+      border-radius: 30px;
+      background: rgba(44, 33, 22, 0.08);
+      box-shadow: 0 16px 28px rgba(39, 22, 11, 0.14);
+      cursor: pointer;
+      isolation: isolate;
+    }
+
+    .menu-preview-gallery.is-single {
+      display: block;
+    }
+
+    .menu-preview-shot {
+      position: relative;
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+      background: #eee6da;
+    }
+
+    .menu-preview-shot:first-child {
+      grid-row: 1 / 3;
+    }
+
+    .menu-preview-shot + .menu-preview-shot {
+      border-left: 3px solid rgba(255, 252, 247, 0.94);
+    }
+
+    .menu-preview-shot:nth-child(3) {
+      border-top: 3px solid rgba(255, 252, 247, 0.94);
+    }
+
+    .menu-preview-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity 0.2s ease, transform 0.35s ease;
+    }
+
+    .menu-preview-image.is-lazy {
+      opacity: 0.18;
+    }
+
+    .menu-preview-shot:nth-child(2) .menu-preview-image {
+      object-position: 60% 45%;
+    }
+
+    .menu-preview-shot:nth-child(3) .menu-preview-image {
+      object-position: 42% 62%;
+    }
+
+    .menu-preview-gallery:hover .menu-preview-image {
+      transform: scale(1.035);
+    }
+
+    .menu-preview-flavor-marker {
+      position: absolute;
+      right: 6px;
+      bottom: 6px;
+      display: grid;
+      width: 25px;
+      height: 25px;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.65);
+      border-radius: 999px;
+      background: rgba(48, 29, 18, 0.76);
+      color: #fff;
+      font-size: 0.78rem;
+      box-shadow: 0 5px 12px rgba(26, 15, 9, 0.2);
+      backdrop-filter: blur(4px);
+    }
+
+    .menu-preview-count {
+      position: absolute;
+      left: 10px;
+      bottom: 10px;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border: 1px solid rgba(255, 255, 255, 0.46);
+      border-radius: 999px;
+      background: rgba(46, 25, 16, 0.72);
+      color: #fffaf3;
+      font-size: 0.62rem;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      box-shadow: 0 6px 14px rgba(27, 16, 10, 0.2);
+      backdrop-filter: blur(5px);
+    }
+
+    .menu-preview-gallery:focus-visible {
+      outline: 3px solid rgba(212, 175, 55, 0.52);
+      outline-offset: 4px;
+    }
+
+    @media (max-width: 980px) {
+      .menu-preview-gallery {
+        width: 160px;
+        height: 160px;
+        border-radius: 20px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .menu-preview-gallery {
+        width: 100%;
+        height: 220px;
+      }
+    }
+
     .menu-page .menu-price-box {
       display: flex;
       align-items: center;
@@ -2367,6 +2488,41 @@
         box-shadow: none;
       }
 
+      .menu-page .menu-preview-gallery {
+        grid-column: 1;
+        grid-row: 1 / 3;
+        width: 86px;
+        height: 86px;
+        border-radius: 14px;
+        box-shadow: none;
+      }
+
+      .menu-preview-shot + .menu-preview-shot {
+        border-left-width: 2px;
+      }
+
+      .menu-preview-shot:nth-child(3) {
+        border-top-width: 2px;
+      }
+
+      .menu-preview-flavor-marker {
+        right: 3px;
+        bottom: 3px;
+        width: 17px;
+        height: 17px;
+        border: 0;
+        font-size: 0.52rem;
+      }
+
+      .menu-preview-count {
+        left: 5px;
+        bottom: 5px;
+        min-height: 19px;
+        padding: 0 6px;
+        font-size: 0.48rem;
+        letter-spacing: 0.03em;
+      }
+
       .menu-page .menu-content {
         grid-column: 2;
         grid-row: 1;
@@ -2498,13 +2654,134 @@
       cursor: pointer;
     }
 
-    .menu-detail-image {
-      display: block;
+    .menu-detail-visual {
+      position: relative;
+      overflow: hidden;
+      border-radius: 20px;
+      background: #eee6da;
+    }
+
+    .menu-detail-gallery {
+      display: flex;
       width: 100%;
       height: min(34vh, 230px);
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+    }
+
+    .menu-detail-gallery::-webkit-scrollbar,
+    .menu-customization-options.is-visual::-webkit-scrollbar {
+      display: none;
+    }
+
+    .menu-detail-slide {
+      position: relative;
+      flex: 0 0 100%;
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      overflow: hidden;
+      border: 0;
+      background: #eee6da;
+      scroll-snap-align: start;
+      cursor: pointer;
+    }
+
+    .menu-detail-slide img {
+      width: 100%;
+      height: 100%;
       object-fit: cover;
-      border-radius: 20px;
-      background: rgba(44, 33, 22, 0.08);
+    }
+
+    .menu-detail-slide:focus-visible {
+      outline: 3px solid #f2cf6b;
+      outline-offset: -5px;
+    }
+
+    .menu-detail-slide::after {
+      content: "";
+      position: absolute;
+      inset: 42% 0 0;
+      background: linear-gradient(180deg, transparent, rgba(31, 19, 12, 0.62));
+      pointer-events: none;
+    }
+
+    .menu-detail-slide-label {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 14px;
+      z-index: 1;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 12px;
+      color: #fff;
+      text-align: left;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.32);
+    }
+
+    .menu-detail-slide-label strong {
+      font-size: 0.88rem;
+      line-height: 1.25;
+    }
+
+    .menu-detail-slide-label span {
+      font-size: 1.2rem;
+    }
+
+    .menu-detail-gallery-nav {
+      position: absolute;
+      top: 50%;
+      z-index: 2;
+      display: grid;
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.54);
+      border-radius: 999px;
+      background: rgba(40, 25, 16, 0.62);
+      color: #fff;
+      font: inherit;
+      font-size: 1.05rem;
+      box-shadow: 0 7px 18px rgba(26, 15, 9, 0.18);
+      cursor: pointer;
+      transform: translateY(-50%);
+      backdrop-filter: blur(5px);
+    }
+
+    .menu-detail-gallery-nav:disabled {
+      opacity: 0.28;
+      cursor: default;
+    }
+
+    .menu-detail-gallery-prev { left: 10px; }
+    .menu-detail-gallery-next { right: 10px; }
+
+    .menu-detail-gallery-status {
+      position: absolute;
+      right: 12px;
+      top: 12px;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      min-height: 25px;
+      padding: 0 9px;
+      border: 1px solid rgba(255, 255, 255, 0.48);
+      border-radius: 999px;
+      background: rgba(40, 25, 16, 0.62);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 900;
+      backdrop-filter: blur(5px);
+    }
+
+    .menu-detail-gallery-status b {
+      color: #f2cf6b;
     }
 
     .menu-detail-copy {
@@ -2601,6 +2878,18 @@
       gap: 7px;
     }
 
+    .menu-customization-options.is-visual {
+      display: flex;
+      gap: 10px;
+      margin: 0 -14px;
+      padding: 2px 14px 9px;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-padding-inline: 14px;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+    }
+
     .menu-customization-option {
       display: flex;
       align-items: center;
@@ -2623,6 +2912,113 @@
     .menu-customization-option:has(input:disabled) {
       cursor: not-allowed;
       opacity: 0.5;
+    }
+
+    .menu-customization-option.is-visual {
+      position: relative;
+      display: grid;
+      flex: 0 0 min(74%, 250px);
+      min-height: 196px;
+      padding: 0;
+      overflow: hidden;
+      border-radius: 18px;
+      background: #efe7dc;
+      box-shadow: 0 8px 18px rgba(44, 27, 16, 0.08);
+      scroll-snap-align: start;
+    }
+
+    .menu-customization-option.is-visual:has(input:checked) {
+      border-color: rgba(90, 17, 34, 0.72);
+      background: #fff;
+      box-shadow: 0 0 0 2px rgba(90, 17, 34, 0.12), 0 12px 24px rgba(90, 17, 34, 0.16);
+    }
+
+    .menu-customization-option.is-visual:has(input:focus-visible) {
+      outline: 3px solid rgba(212, 175, 55, 0.58);
+      outline-offset: 3px;
+    }
+
+    .menu-customization-option.is-visual input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    .menu-customization-option-media {
+      position: relative;
+      height: 132px;
+      overflow: hidden;
+      background: #e8ddcf;
+    }
+
+    .menu-customization-option-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.28s ease;
+    }
+
+    .menu-customization-option.is-visual:hover .menu-customization-option-media img {
+      transform: scale(1.035);
+    }
+
+    .menu-customization-option-emoji {
+      position: absolute;
+      right: 10px;
+      bottom: 9px;
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.64);
+      border-radius: 999px;
+      background: rgba(51, 31, 19, 0.72);
+      font-size: 1rem;
+      box-shadow: 0 6px 14px rgba(35, 19, 10, 0.22);
+      backdrop-filter: blur(5px);
+    }
+
+    .menu-customization-option-check {
+      position: absolute;
+      top: 9px;
+      right: 9px;
+      display: grid;
+      width: 26px;
+      height: 26px;
+      place-items: center;
+      border: 2px solid rgba(255, 255, 255, 0.82);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.82);
+      color: transparent;
+      font-size: 0.7rem;
+      font-weight: 950;
+      box-shadow: 0 5px 12px rgba(37, 22, 13, 0.16);
+    }
+
+    .menu-customization-option.is-visual:has(input:checked) .menu-customization-option-check {
+      background: #5a1122;
+      color: #fff;
+    }
+
+    .menu-customization-option.is-visual .menu-customization-option-copy {
+      gap: 4px;
+      padding: 11px 12px 13px;
+      background: rgba(255, 253, 249, 0.96);
+    }
+
+    .menu-customization-option.is-visual .menu-customization-option-copy strong {
+      color: #3b2418;
+      font-size: 0.82rem;
+    }
+
+    .menu-customization-option.is-visual .menu-customization-option-copy small {
+      color: #806e60;
+      font-size: 0.65rem;
+      line-height: 1.35;
     }
 
     .menu-customization-option input {
@@ -3016,7 +3412,12 @@
   <div class="menu-detail-backdrop" id="menuDetailBackdrop" hidden>
     <section class="menu-detail-sheet" role="dialog" aria-modal="true" aria-labelledby="menuDetailNameKo">
       <button class="menu-detail-close" id="menuDetailClose" type="button" aria-label="Close menu details">×</button>
-      <img class="menu-detail-image" id="menuDetailImage" alt="" />
+      <div class="menu-detail-visual">
+        <div class="menu-detail-gallery" id="menuDetailGallery" aria-label="Menu and flavor photos" tabindex="0"></div>
+        <button class="menu-detail-gallery-nav menu-detail-gallery-prev" id="menuDetailGalleryPrev" type="button" aria-label="Previous photo">‹</button>
+        <button class="menu-detail-gallery-nav menu-detail-gallery-next" id="menuDetailGalleryNext" type="button" aria-label="Next photo">›</button>
+        <div class="menu-detail-gallery-status" id="menuDetailGalleryStatus" aria-live="polite"><b>1</b><span>/ 1</span></div>
+      </div>
       <div class="menu-detail-copy">
         <h3 id="menuDetailNameKo">Menu item</h3>
         <p class="menu-detail-name-en" id="menuDetailNameEn"></p>
@@ -3055,7 +3456,7 @@
   <script>
     /**
      * [Google Sheet 컬럼 순서]
-     * sortOrder | category | label | nameKo | nameEn | description | price | imageUrl | tags | ingredient | customizations
+     * sortOrder | category | label | nameKo | nameEn | description | price | imageUrl | tags | ingredient | customizations | galleryImages
      *
      * tags 예시:
      * 🌶️ Spicy|red, 🌱 Vegan|green, ⭐ Popular|yellow, 🐟 Seafood|blue
@@ -3143,6 +3544,7 @@
     let menuImageObserver = null;
     let requestToastHandle = null;
     let selectedMenuDetailId = null;
+    let selectedMenuGalleryIndex = 0;
     let isDiningRequestSubmitting = false;
     let currentQrNumber = null;
     let currentQrSession = null;
@@ -3277,6 +3679,39 @@
         .filter(Boolean);
     }
 
+    function normalizeMenuImages(raw = []) {
+      let source = raw;
+      if (typeof source === "string") {
+        const trimmed = source.trim();
+        if (!trimmed) return [];
+        if (trimmed.startsWith("[") || trimmed.startsWith("{")) {
+          try {
+            source = JSON.parse(trimmed);
+          } catch (error) {
+            source = trimmed.split("|");
+          }
+        } else {
+          source = trimmed.split("|");
+        }
+      }
+
+      const images = Array.isArray(source) ? source : (Array.isArray(source?.images) ? source.images : []);
+      return images.flatMap((image, index) => {
+        const imageUrl = typeof image === "string"
+          ? image.trim()
+          : String(image?.imageUrl || image?.image_url || image?.url || "").trim();
+        if (!imageUrl) return [];
+        return [{
+          imageUrl,
+          label: typeof image === "string" ? "" : String(image?.label || image?.name || "").trim(),
+          emoji: typeof image === "string" ? "" : String(image?.emoji || "").trim(),
+          optionId: typeof image === "string" ? "" : String(image?.optionId || image?.option_id || "").trim(),
+          imageAlt: typeof image === "string" ? "" : String(image?.imageAlt || image?.image_alt || "").trim(),
+          order: index
+        }];
+      });
+    }
+
     function normalizeMenuCustomizations(raw = []) {
       let source = raw;
       if (typeof source === "string") {
@@ -3301,7 +3736,14 @@
             id: slugify(option?.id || optionLabel) || `choice-${optionIndex + 1}`,
             label: optionLabel,
             priceDelta: parsePriceNumber(option?.priceDelta ?? option?.price_delta ?? option?.price ?? 0),
-            defaultSelected: Boolean(option?.defaultSelected ?? option?.default_selected ?? option?.default)
+            defaultSelected: Boolean(option?.defaultSelected ?? option?.default_selected ?? option?.default),
+            description: String(option?.description || option?.note || "").trim(),
+            imageUrl: String(option?.imageUrl || option?.image_url || option?.image || "").trim(),
+            imageAlt: String(option?.imageAlt || option?.image_alt || "").trim(),
+            emoji: String(option?.emoji || "").trim(),
+            variantMenuId: option?.variantMenuId ?? option?.variant_menu_id ?? null,
+            variantNameKo: String(option?.variantNameKo || option?.variant_name_ko || "").trim(),
+            variantNameEn: String(option?.variantNameEn || option?.variant_name_en || "").trim()
           };
         }).filter((option) => option.id && option.label);
         const minimum = Math.max(0, Number(group?.min ?? (group?.required ? 1 : 0)) || 0);
@@ -3315,6 +3757,7 @@
           type,
           min: minimum,
           max: maximum,
+          visual: Boolean(group?.visual || group?.layout === "visual" || options.some((option) => option.imageUrl)),
           options
         };
       }).filter((group) => group.id && group.options.length);
@@ -3354,7 +3797,8 @@
           tags: parseTags(cells[8] || ""),
           ingredient: cells[9] || "",
           dietaryTags: parseDietaryTagList(cells[9] || ""),
-          customizations: normalizeMenuCustomizations(cells[10] || "")
+          customizations: normalizeMenuCustomizations(cells[10] || ""),
+          galleryImages: normalizeMenuImages(cells[11] || "")
         }))
         .sort((a, b) => a.sortOrder - b.sortOrder);
     }
@@ -3381,12 +3825,151 @@
           dietaryTags: parseDietaryTagList(item.ingredient || ""),
           customizations: normalizeMenuCustomizations(
             item.customizations ?? item.customization_options ?? item.options ?? []
+          ),
+          galleryImages: normalizeMenuImages(
+            item.gallery_images ?? item.image_urls ?? item.images ?? []
           )
         }))
         .sort((a, b) => {
           if (a.allSortOrder !== b.allSortOrder) return a.allSortOrder - b.allSortOrder;
           return (a.id || 0) - (b.id || 0);
         });
+    }
+
+    function getFlavorFamilyOption(item, familyType, basePrice, index) {
+      const names = `${item?.nameKo || ""} ${item?.nameEn || ""}`.toLowerCase();
+      const itemPrice = parsePriceNumber(item?.price);
+      const common = {
+        id: `variant-${item?.id || slugify(item?.nameEn || item?.nameKo || index + 1)}`,
+        priceDelta: Number((itemPrice - basePrice).toFixed(2)),
+        defaultSelected: index === 0,
+        variantMenuId: item?.id ?? getMenuId(item),
+        variantNameKo: item?.nameKo || "",
+        variantNameEn: item?.nameEn || ""
+      };
+
+      if (familyType === "chicken") {
+        if (/양념|sweet|spicy/.test(names)) {
+          return {
+            ...common,
+            label: "양념 · Sweet & spicy",
+            description: "달콤한 고추장 소스의 매콤한 맛",
+            imageUrl: item.imageUrl || "../../img/edited/Crispy-Boneless-Sweet-Spicy-Chicken.png",
+            imageAlt: "Sweet and spicy glazed chicken",
+            emoji: "🌶️"
+          };
+        }
+        if (/간장|soy/.test(names)) {
+          return {
+            ...common,
+            label: "간장마늘 · Soy garlic",
+            description: "짭조름한 간장과 구운 마늘 풍미",
+            imageUrl: /\/ehwa\.webp(?:$|\?)/i.test(item.imageUrl || "")
+              ? "../../img/edited/Crispy-Boneless-Fried-Chicken.png"
+              : item.imageUrl,
+            imageAlt: "Soy garlic chicken",
+            emoji: "🧄"
+          };
+        }
+        return {
+          ...common,
+          label: "후라이드 · Original",
+          description: "바삭하고 담백한 기본맛",
+          imageUrl: item.imageUrl || "../../img/edited/Crispy-Boneless-Fried-Chicken.png",
+          imageAlt: "Crispy original fried chicken",
+          emoji: "✨"
+        };
+      }
+
+      const flavorData = [
+        { match: /apricot|살구/, emoji: "🍑", description: "은은한 살구 향과 산뜻한 끝맛", fallback: "../../img/edited/Sero-Apricot.png" },
+        { match: /green grape|청포도/, emoji: "🍇", description: "상큼하고 달콤한 청포도 맛", fallback: "../../img/edited/Chum-Churum.png" },
+        { match: /grapefruit|자몽/, emoji: "🍊", description: "쌉싸름하고 산뜻한 자몽 맛", fallback: "../../img/edited/Sero.png" },
+        { match: /green apple|사과/, emoji: "🍏", description: "가볍고 청량한 풋사과 맛", fallback: "../../img/edited/Sero.png" },
+        { match: /peach|복숭아/, emoji: "🍑", description: "향긋하고 부드러운 복숭아 맛", fallback: "../../img/edited/Sero-Apricot.png" },
+        { match: /plum|자두/, emoji: "🟣", description: "새콤달콤한 자두 풍미", fallback: "../../img/edited/Sero.png" },
+        { match: /cocktail|칵테일/, emoji: "🍹", description: "가볍게 즐기는 달콤한 칵테일 소주", fallback: "../../img/edited/Sero.png" },
+        { match: /hallasan|한라산/, emoji: "🏔️", description: "깔끔하고 힘 있는 제주 소주", fallback: "../../img/edited/Sero.png" },
+        { match: /jinro|진로/, emoji: "🐸", description: "부드럽고 깨끗한 클래식 소주", fallback: "../../img/edited/Jinro.png" },
+        { match: /chamisul|참이슬/, emoji: "💧", description: "깨끗하고 산뜻한 클래식 소주", fallback: "../../img/edited/Chamisul-Fresh.png" },
+        { match: /chum.?churum|처음처럼/, emoji: "🌀", description: "부드러운 목넘김의 클래식 소주", fallback: "../../img/edited/Chum-Churum.png" },
+        { match: /saero|sero|새로/, emoji: "🦊", description: "깨끗하고 드라이한 제로 슈거 소주", fallback: "../../img/edited/Sero.png" }
+      ].find((candidate) => candidate.match.test(names)) || {
+        emoji: "🥂",
+        description: "차갑게 즐기기 좋은 한국 소주",
+        fallback: "../../img/edited/Sero.png"
+      };
+      const hasPlaceholderImage = /\/ehwa\.webp(?:$|\?)/i.test(item.imageUrl || "");
+      return {
+        ...common,
+        label: [item?.nameKo, item?.nameEn].filter(Boolean).join(" · "),
+        description: flavorData.description,
+        imageUrl: hasPlaceholderImage ? flavorData.fallback : (item.imageUrl || flavorData.fallback),
+        imageAlt: `${item?.nameEn || item?.nameKo || "Soju"} bottle`,
+        emoji: flavorData.emoji
+      };
+    }
+
+    function buildFlavorFamilyItem(variants, familyType) {
+      const base = variants[0];
+      const basePrice = Math.min(...variants.map((item) => parsePriceNumber(item.price)));
+      const options = variants.map((item, index) => getFlavorFamilyOption(item, familyType, basePrice, index));
+      const isChicken = familyType === "chicken";
+      return {
+        ...base,
+        nameKo: isChicken ? "순살 치킨" : "소주",
+        nameEn: isChicken ? "Crispy Boneless Chicken" : "Soju Selection",
+        description: isChicken
+          ? "Pick your sauce after opening the menu. Each flavor keeps its original price."
+          : "Swipe through classic bottles and fruit flavors, then pick your favorite.",
+        price: basePrice,
+        imageUrl: options[0]?.imageUrl || base.imageUrl,
+        customizations: [
+          {
+            id: "flavor",
+            label: isChicken ? "맛 선택 · Choose a flavor" : "소주 선택 · Pick your bottle",
+            type: "single",
+            min: 1,
+            visual: true,
+            options
+          },
+          ...normalizeMenuCustomizations(base.customizations || []).filter((group) => !isFlavorCustomizationGroup(group))
+        ],
+        flavorFamilyType: familyType,
+        flavorVariantIds: variants.map((item) => item.id).filter((id) => id != null)
+      };
+    }
+
+    function prepareMenuFlavorFamilies(menuItems = []) {
+      const crispyChickenVariants = menuItems.filter((item) => {
+        const category = String(item.category || "").toLowerCase();
+        const names = `${item.nameKo || ""} ${item.nameEn || ""}`;
+        return category === "fried-chicken"
+          && /순살\s*(후라이드|양념|간장)\s*치킨|crispy boneless (fried|sweet\s*&?\s*spicy|soy sauce) chicken/i.test(names);
+      });
+      const sojuVariants = menuItems.filter((item) => (
+        String(item.category || "").toLowerCase() === "drink"
+        && String(item.label || "").toLowerCase() === "soju"
+      ));
+      const familyDefinitions = [
+        { type: "chicken", variants: crispyChickenVariants },
+        { type: "soju", variants: sojuVariants }
+      ].filter((family) => family.variants.length > 1);
+
+      if (!familyDefinitions.length) return menuItems;
+      const familyByVariant = new Map();
+      familyDefinitions.forEach((family) => {
+        const familyItem = buildFlavorFamilyItem(family.variants, family.type);
+        family.variants.forEach((variant, index) => {
+          familyByVariant.set(variant, { familyItem, isFirst: index === 0 });
+        });
+      });
+
+      return menuItems.flatMap((item) => {
+        const family = familyByVariant.get(item);
+        if (!family) return [item];
+        return family.isFirst ? [family.familyItem] : [];
+      });
     }
 
     async function fetchMenusFromSupabase() {
@@ -3432,6 +4015,11 @@
       if (!value) return "";
       const normalized = String(value).trim();
       return normalized.startsWith("$") ? normalized : `$${normalized}`;
+    }
+
+    function formatMenuCardPrice(item) {
+      const price = formatPrice(item?.price);
+      return item?.flavorFamilyType && price ? `From ${price}` : price;
     }
 
     function parsePriceNumber(value = "") {
@@ -3691,9 +4279,135 @@
       return Number((getCartSubtotal() + getCartTax()).toFixed(2));
     }
 
+    function getAutomaticFlavorCustomization(item) {
+      const menuName = `${item?.nameKo || ""} ${item?.nameEn || ""}`.trim();
+      if (item?.flavorFamilyType) return null;
+      if (/crispy boneless|순살.*치킨|sweet\s*&\s*spicy korean chicken/i.test(menuName)) {
+        return normalizeMenuCustomizations([{
+          id: "flavor",
+          label: "맛 선택 · Choose a flavor",
+          type: "single",
+          min: 1,
+          visual: true,
+          options: [
+            {
+              id: "original-fried",
+              label: "후라이드 · Original",
+              description: "바삭하고 담백한 기본맛",
+              imageUrl: "../../img/edited/Crispy-Boneless-Fried-Chicken.png",
+              imageAlt: "Crispy original fried chicken",
+              emoji: "✨",
+              defaultSelected: true
+            },
+            {
+              id: "sweet-spicy",
+              label: "양념 · Sweet & spicy",
+              description: "달콤한 고추장 소스의 매콤한 맛",
+              imageUrl: "../../img/edited/Crispy-Boneless-Sweet-Spicy-Chicken.png",
+              imageAlt: "Sweet and spicy glazed chicken",
+              emoji: "🌶️"
+            },
+            {
+              id: "soy-garlic",
+              label: "간장마늘 · Soy garlic",
+              description: "짭조름한 간장과 구운 마늘 풍미",
+              imageUrl: item?.imageUrl || "../../img/edited/Crispy-Boneless-Fried-Chicken.png",
+              imageAlt: "Soy garlic chicken",
+              emoji: "🧄"
+            }
+          ]
+        }])[0];
+      }
+
+      if (/소주|soju|jinro|chamisul|chum.?churum|saero|sero/i.test(menuName)) {
+        return normalizeMenuCustomizations([{
+          id: "flavor",
+          label: "맛 선택 · Pick your bottle",
+          type: "single",
+          min: 1,
+          visual: true,
+          options: [
+            {
+              id: "original",
+              label: "오리지널 · Original",
+              description: "깨끗하고 드라이한 클래식 소주",
+              imageUrl: "../../img/edited/Sero.png",
+              imageAlt: "Original clear soju bottle",
+              emoji: "💧",
+              defaultSelected: true
+            },
+            {
+              id: "apricot",
+              label: "살구 · Apricot",
+              description: "은은한 살구 향과 산뜻한 끝맛",
+              imageUrl: "../../img/edited/Sero-Apricot.png",
+              imageAlt: "Apricot flavored soju bottle",
+              emoji: "🍑"
+            },
+            {
+              id: "peach",
+              label: "복숭아 · Peach",
+              description: "향긋하고 부드러운 복숭아 맛",
+              imageUrl: "../../img/edited/Sero-Apricot.png",
+              imageAlt: "Fruit flavored soju bottle",
+              emoji: "🍑"
+            },
+            {
+              id: "green-grape",
+              label: "청포도 · Green grape",
+              description: "상큼하고 달콤한 청포도 맛",
+              imageUrl: "../../img/edited/Chum-Churum.png",
+              imageAlt: "Soju bottle with green grape flavor marker",
+              emoji: "🍇"
+            }
+          ]
+        }])[0];
+      }
+
+      return null;
+    }
+
+    function isFlavorCustomizationGroup(group) {
+      return /flavou?r|taste|sauce|맛/i.test(`${group?.id || ""} ${group?.label || ""}`);
+    }
+
+    function addFlavorVisuals(group, presetGroup, item) {
+      if (!group || !presetGroup) return group;
+      return {
+        ...group,
+        visual: true,
+        options: group.options.map((option, index) => {
+          const normalizedLabel = String(option.label || "").toLowerCase();
+          const matchingPreset = presetGroup.options.find((preset) => {
+            const presetLabel = String(preset.label || "").toLowerCase();
+            return normalizedLabel.includes(preset.id)
+              || presetLabel.split("·").some((part) => normalizedLabel.includes(part.trim()));
+          }) || presetGroup.options[index % presetGroup.options.length];
+          return {
+            ...option,
+            description: option.description || matchingPreset?.description || "",
+            imageUrl: option.imageUrl || matchingPreset?.imageUrl || item?.imageUrl || "",
+            imageAlt: option.imageAlt || matchingPreset?.imageAlt || option.label,
+            emoji: option.emoji || matchingPreset?.emoji || ""
+          };
+        })
+      };
+    }
+
     function getMenuCustomizations(item) {
       const configuredGroups = normalizeMenuCustomizations(item?.customizations || []);
-      if (configuredGroups.length) return configuredGroups;
+      const automaticFlavorGroup = getAutomaticFlavorCustomization(item);
+      const hasConfiguredFlavor = configuredGroups.some(isFlavorCustomizationGroup);
+      const enhancedGroups = configuredGroups.map((group) => (
+        isFlavorCustomizationGroup(group)
+          ? addFlavorVisuals(group, automaticFlavorGroup, item)
+          : group
+      ));
+
+      if (automaticFlavorGroup && !hasConfiguredFlavor) {
+        enhancedGroups.unshift(automaticFlavorGroup);
+      }
+      if (enhancedGroups.length) return enhancedGroups;
 
       const menuName = `${item?.nameKo || ""} ${item?.nameEn || ""}`;
       if (!/떡볶이|tteokbokki/i.test(menuName)) return [];
@@ -3721,6 +4435,36 @@
           ]
         }
       ]);
+    }
+
+    function getMenuGallery(item) {
+      const flavorGroup = getMenuCustomizations(item).find(isFlavorCustomizationGroup);
+      const flavorImages = flavorGroup
+        ? flavorGroup.options.filter((option) => option.imageUrl).map((option) => ({
+            imageUrl: option.imageUrl,
+            imageAlt: option.imageAlt || option.label,
+            label: option.label,
+            emoji: option.emoji,
+            groupId: flavorGroup.id,
+            optionId: option.id
+          }))
+        : [];
+      const extraImages = normalizeMenuImages(item?.galleryImages || []).map((image) => ({
+        ...image,
+        label: image.label || item?.nameEn || item?.nameKo || "Menu item"
+      }));
+      const primaryImage = item?.imageUrl
+        ? [{
+            imageUrl: item.imageUrl,
+            imageAlt: item.nameEn || item.nameKo || "Menu item",
+            label: item.nameEn || item.nameKo || "Menu item",
+            emoji: "",
+            groupId: "",
+            optionId: ""
+          }]
+        : [];
+      if (flavorImages.length) return flavorImages;
+      return [...extraImages, ...primaryImage].filter((image) => image.imageUrl);
     }
 
     function buildCartKey(menuId, customizations = []) {
@@ -3832,6 +4576,7 @@
       if (!menuItem) return false;
 
       const selectedCustomizations = Array.isArray(customizations) ? customizations : [];
+      const selectedVariant = selectedCustomizations.find((option) => option.variantMenuId != null);
       const cartKey = buildCartKey(menuId, selectedCustomizations);
       const optionTotal = selectedCustomizations.reduce((sum, option) => sum + Number(option.priceDelta || 0), 0);
 
@@ -3847,7 +4592,8 @@
           nameEn: menuItem.nameEn,
           quantity: 1,
           unitPrice: Number((parsePriceNumber(menuItem.price) + optionTotal).toFixed(2)),
-          imageUrl: menuItem.imageUrl,
+          imageUrl: selectedVariant?.imageUrl || menuItem.imageUrl,
+          variantMenuId: selectedVariant?.variantMenuId ?? null,
           customizations: selectedCustomizations
         });
       }
@@ -4661,6 +5407,7 @@
         total: getCartTotal(),
         items: cartItems.map((item) => ({
           menuId: item.menuId,
+          variantMenuId: item.variantMenuId ?? null,
           cartKey: item.cartKey,
           nameKo: item.nameKo,
           nameEn: item.nameEn,
@@ -4990,6 +5737,51 @@
       syncStickyHeaderMetrics();
     }
 
+    function renderMenuPreviewGallery(item) {
+      const gallery = getMenuGallery(item);
+      const featuredGallery = item?.flavorFamilyType === "soju" && gallery.length > 3
+        ? [
+            gallery[0],
+            ...gallery.filter((image) => /apricot|grape|peach|살구|포도|복숭아/i.test(image.label || "")).slice(0, 2)
+          ].filter((image, index, images) => images.indexOf(image) === index)
+        : gallery;
+      const visibleImages = (featuredGallery.length ? featuredGallery : [{
+        imageUrl: item.imageUrl || MENU_IMAGE_PLACEHOLDER,
+        imageAlt: item.nameEn || item.nameKo || "Menu item",
+        label: item.nameEn || item.nameKo || "Menu item",
+        emoji: ""
+      }]).slice(0, 3);
+      const galleryClass = visibleImages.length > 1 ? "" : " is-single";
+      const countLabel = gallery.length > 1
+        ? `<span class="menu-preview-count">${escapeHtml(gallery.length)} FLAVORS</span>`
+        : "";
+
+      return `
+        <button
+          class="menu-preview-gallery${galleryClass}"
+          data-menu-gallery-id="${escapeHtml(getMenuId(item))}"
+          type="button"
+          aria-label="View ${escapeHtml(item.nameEn || item.nameKo || "menu item")} photos and options"
+        >
+          ${visibleImages.map((image) => `
+            <span class="menu-preview-shot">
+              <img
+                class="menu-preview-image is-lazy"
+                src="${MENU_IMAGE_PLACEHOLDER}"
+                data-src="${escapeHtml(image.imageUrl || MENU_IMAGE_PLACEHOLDER)}"
+                alt="${escapeHtml(image.imageAlt || image.label || item.nameEn || item.nameKo)}"
+                loading="lazy"
+                decoding="async"
+                fetchpriority="low"
+              />
+              ${image.emoji ? `<span class="menu-preview-flavor-marker" aria-hidden="true">${escapeHtml(image.emoji)}</span>` : ""}
+            </span>
+          `).join("")}
+          ${countLabel}
+        </button>
+      `;
+    }
+
     function renderMenu() {
       const menuListEl = document.getElementById("menuList");
       const filtered = filterMenus(allMenus);
@@ -5020,7 +5812,7 @@
 
           return `
             <article class="menu-card">
-              <img class="menu-image is-lazy" src="${MENU_IMAGE_PLACEHOLDER}" data-src="${escapeHtml(item.imageUrl || MENU_IMAGE_PLACEHOLDER)}" alt="${escapeHtml(item.nameEn || item.nameKo)}" loading="lazy" decoding="async" fetchpriority="low" />
+              ${renderMenuPreviewGallery(item)}
               <div class="menu-content">
                 <p class="menu-title name-ko">${escapeHtml(item.nameKo)}</p>
                 <p class="menu-title menu-title-alt name-en">${escapeHtml(item.nameEn)}</p>
@@ -5029,7 +5821,7 @@
                 ${tagsSection}
               </div>
               <div class="menu-price-box">
-                <div class="menu-price price">${escapeHtml(formatPrice(item.price))}</div>
+                <div class="menu-price price">${escapeHtml(formatMenuCardPrice(item))}</div>
                 <div class="menu-card-actions">
                   <button class="menu-add-btn" data-menu-id="${escapeHtml(getMenuId(item))}" type="button">View &amp; add</button>
                 </div>
@@ -5045,8 +5837,85 @@
           openMenuDetail(menuId);
         });
       });
+      menuListEl.querySelectorAll(".menu-preview-gallery").forEach((button) => {
+        button.addEventListener("click", () => {
+          const menuId = button.getAttribute("data-menu-gallery-id") || "";
+          openMenuDetail(menuId);
+        });
+      });
       initLazyMenuImages(menuListEl);
       syncQrSessionUi();
+    }
+
+    function renderMenuDetailGallery(item) {
+      const gallery = document.getElementById("menuDetailGallery");
+      if (!gallery) return;
+      const images = getMenuGallery(item);
+      const slides = images.length ? images : [{
+        imageUrl: item.imageUrl || MENU_IMAGE_PLACEHOLDER,
+        imageAlt: item.nameEn || item.nameKo || "Menu item",
+        label: item.nameEn || item.nameKo || "Menu item",
+        emoji: "",
+        groupId: "",
+        optionId: ""
+      }];
+
+      selectedMenuGalleryIndex = 0;
+      gallery.scrollLeft = 0;
+      gallery.innerHTML = slides.map((image, index) => `
+        <button
+          class="menu-detail-slide"
+          type="button"
+          data-gallery-index="${index}"
+          ${image.groupId ? `data-flavor-group-id="${escapeHtml(image.groupId)}"` : ""}
+          ${image.optionId ? `data-flavor-option-id="${escapeHtml(image.optionId)}"` : ""}
+          aria-label="${escapeHtml(image.label || `Photo ${index + 1}`)}${image.optionId ? " — select this flavor" : ""}"
+        >
+          <img src="${escapeHtml(image.imageUrl || MENU_IMAGE_PLACEHOLDER)}" alt="${escapeHtml(image.imageAlt || image.label || item.nameEn || item.nameKo)}" />
+          <span class="menu-detail-slide-label">
+            <strong>${escapeHtml(image.label || item.nameEn || item.nameKo || "Menu item")}</strong>
+            ${image.emoji ? `<span aria-hidden="true">${escapeHtml(image.emoji)}</span>` : ""}
+          </span>
+        </button>
+      `).join("");
+      syncMenuDetailGalleryStatus();
+    }
+
+    function syncMenuDetailGalleryStatus() {
+      const gallery = document.getElementById("menuDetailGallery");
+      const status = document.getElementById("menuDetailGalleryStatus");
+      const prev = document.getElementById("menuDetailGalleryPrev");
+      const next = document.getElementById("menuDetailGalleryNext");
+      const slideCount = gallery?.children.length || 0;
+      if (!gallery || !status || !prev || !next || !slideCount) return;
+
+      selectedMenuGalleryIndex = Math.max(0, Math.min(selectedMenuGalleryIndex, slideCount - 1));
+      status.innerHTML = `<b>${selectedMenuGalleryIndex + 1}</b><span>/ ${slideCount}</span>`;
+      prev.disabled = selectedMenuGalleryIndex === 0;
+      next.disabled = selectedMenuGalleryIndex === slideCount - 1;
+      prev.hidden = slideCount < 2;
+      next.hidden = slideCount < 2;
+      status.hidden = slideCount < 2;
+    }
+
+    function scrollMenuDetailGallery(directionOrIndex, { absolute = false, behavior = "smooth" } = {}) {
+      const gallery = document.getElementById("menuDetailGallery");
+      const slideCount = gallery?.children.length || 0;
+      if (!gallery || !slideCount) return;
+      const nextIndex = absolute
+        ? Number(directionOrIndex)
+        : selectedMenuGalleryIndex + Number(directionOrIndex);
+      selectedMenuGalleryIndex = Math.max(0, Math.min(nextIndex, slideCount - 1));
+      gallery.scrollTo({ left: gallery.clientWidth * selectedMenuGalleryIndex, behavior });
+      syncMenuDetailGalleryStatus();
+    }
+
+    function focusMenuDetailFlavor(optionId, behavior = "smooth") {
+      if (!optionId) return;
+      const gallery = document.getElementById("menuDetailGallery");
+      const slides = [...(gallery?.querySelectorAll(".menu-detail-slide") || [])];
+      const index = slides.findIndex((slide) => slide.dataset.flavorOptionId === optionId);
+      if (index >= 0) scrollMenuDetailGallery(index, { absolute: true, behavior });
     }
 
     function openMenuDetail(menuId) {
@@ -5055,15 +5924,12 @@
       if (!item || !backdrop) return;
 
       selectedMenuDetailId = menuId;
-      const image = document.getElementById("menuDetailImage");
       const nameKo = document.getElementById("menuDetailNameKo");
       const nameEn = document.getElementById("menuDetailNameEn");
       const description = document.getElementById("menuDetailDescription");
       const tags = document.getElementById("menuDetailTags");
       const displayTags = [...item.tags.filter((tag) => tag.key !== "vegan"), ...getIngredientBadges(item)];
 
-      image.src = item.imageUrl || MENU_IMAGE_PLACEHOLDER;
-      image.alt = item.nameEn || item.nameKo || "Menu item";
       nameKo.textContent = item.nameKo || item.nameEn || "Menu item";
       nameEn.textContent = item.nameEn || "";
       description.textContent = item.description || "Ask your server if you need ingredient details.";
@@ -5071,7 +5937,10 @@
         .map((tag) => `<span class="menu-tag ${escapeHtml(tag.color)}">${escapeHtml(tag.label)}</span>`)
         .join("");
       renderMenuDetailCustomizations(item);
+      renderMenuDetailGallery(item);
       syncMenuDetailSelectionState();
+      const selectedFlavor = document.querySelector("#menuDetailCustomizations [data-custom-option]:checked");
+      focusMenuDetailFlavor(selectedFlavor?.dataset.customOption || "", "auto");
       backdrop.hidden = false;
       backdrop.classList.add("is-open");
       document.body.style.overflow = "hidden";
@@ -5101,6 +5970,7 @@
       container.innerHTML = `
         <h4 class="menu-customization-heading">Customize</h4>
         ${groups.map((group) => {
+          const isVisual = Boolean(group.visual || group.options.some((option) => option.imageUrl));
           const hint = group.min > 0
             ? (group.type === "single" ? "Choose one" : `Choose ${group.min}–${group.max}`)
             : (group.type === "single" ? "Optional · choose one" : `Optional · up to ${group.max}`);
@@ -5108,11 +5978,11 @@
             <section class="menu-customization-group" data-customization-group="${escapeHtml(group.id)}">
               <div class="menu-customization-group-head">
                 <strong>${escapeHtml(group.label)}</strong>
-                <small>${escapeHtml(hint)}</small>
+                <small>${escapeHtml(isVisual ? `${hint} · swipe →` : hint)}</small>
               </div>
-              <div class="menu-customization-options">
+              <div class="menu-customization-options${isVisual ? " is-visual" : ""}">
                 ${group.options.map((option) => `
-                  <label class="menu-customization-option">
+                  <label class="menu-customization-option${isVisual ? " is-visual" : ""}">
                     <input
                       type="${group.type === "single" ? "radio" : "checkbox"}"
                       name="menu-custom-${escapeHtml(group.id)}"
@@ -5120,8 +5990,21 @@
                       data-custom-option="${escapeHtml(option.id)}"
                       ${option.defaultSelected ? "checked" : ""}
                     />
+                    ${isVisual ? `
+                      <span class="menu-customization-option-media">
+                        <img
+                          src="${escapeHtml(option.imageUrl || item.imageUrl || MENU_IMAGE_PLACEHOLDER)}"
+                          alt="${escapeHtml(option.imageAlt || option.label)}"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                        ${option.emoji ? `<span class="menu-customization-option-emoji" aria-hidden="true">${escapeHtml(option.emoji)}</span>` : ""}
+                        <span class="menu-customization-option-check" aria-hidden="true">✓</span>
+                      </span>
+                    ` : ""}
                     <span class="menu-customization-option-copy">
                       <strong>${escapeHtml(option.label)}</strong>
+                      ${option.description ? `<small>${escapeHtml(option.description)}</small>` : ""}
                       ${option.priceDelta ? `<small>+${escapeHtml(formatCurrency(option.priceDelta))}</small>` : ""}
                     </span>
                   </label>
@@ -5148,7 +6031,11 @@
           groupLabel: group.label,
           optionId: option.id,
           label: option.label,
-          priceDelta: option.priceDelta
+          priceDelta: option.priceDelta,
+          variantMenuId: option.variantMenuId,
+          variantNameKo: option.variantNameKo,
+          variantNameEn: option.variantNameEn,
+          imageUrl: option.imageUrl
         }];
       });
     }
@@ -5168,7 +6055,7 @@
         const checkedCount = groupInputs.filter((input) => input.checked).length;
         missingRequired ||= checkedCount < group.min;
         groupInputs.forEach((input) => {
-          input.disabled = !input.checked && checkedCount >= group.max;
+          input.disabled = group.type === "multiple" && !input.checked && checkedCount >= group.max;
         });
       });
 
@@ -5189,13 +6076,48 @@
       const closeButton = document.getElementById("menuDetailClose");
       const addButton = document.getElementById("menuDetailAdd");
       const customizations = document.getElementById("menuDetailCustomizations");
-      if (!backdrop || !closeButton || !addButton || !customizations) return;
+      const gallery = document.getElementById("menuDetailGallery");
+      const galleryPrev = document.getElementById("menuDetailGalleryPrev");
+      const galleryNext = document.getElementById("menuDetailGalleryNext");
+      if (!backdrop || !closeButton || !addButton || !customizations || !gallery || !galleryPrev || !galleryNext) return;
 
       closeButton.addEventListener("click", closeMenuDetail);
       backdrop.addEventListener("click", (event) => {
         if (event.target === backdrop) closeMenuDetail();
       });
-      customizations.addEventListener("change", syncMenuDetailSelectionState);
+      customizations.addEventListener("change", (event) => {
+        syncMenuDetailSelectionState();
+        focusMenuDetailFlavor(event.target?.dataset?.customOption || "");
+      });
+      galleryPrev.addEventListener("click", () => scrollMenuDetailGallery(-1));
+      galleryNext.addEventListener("click", () => scrollMenuDetailGallery(1));
+      gallery.addEventListener("scroll", () => {
+        if (!gallery.clientWidth) return;
+        selectedMenuGalleryIndex = Math.round(gallery.scrollLeft / gallery.clientWidth);
+        syncMenuDetailGalleryStatus();
+      }, { passive: true });
+      gallery.addEventListener("click", (event) => {
+        const slide = event.target.closest("[data-flavor-option-id]");
+        if (!slide?.dataset.flavorOptionId) return;
+        const inputs = [...customizations.querySelectorAll("[data-custom-option]")];
+        const input = inputs.find((candidate) => (
+          candidate.dataset.customGroup === slide.dataset.flavorGroupId
+          && candidate.dataset.customOption === slide.dataset.flavorOptionId
+        ));
+        if (!input || input.disabled) return;
+        input.checked = true;
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+      gallery.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowLeft") {
+          event.preventDefault();
+          scrollMenuDetailGallery(-1);
+        }
+        if (event.key === "ArrowRight") {
+          event.preventDefault();
+          scrollMenuDetailGallery(1);
+        }
+      });
       addButton.addEventListener("click", () => {
         if (!selectedMenuDetailId) return;
         const added = addToCart(selectedMenuDetailId, getSelectedMenuCustomizations());
@@ -5436,7 +6358,7 @@
 
     async function bootstrap() {
       setInitialOrderFields();
-      allMenus = SAMPLE_MENU;
+      allMenus = prepareMenuFlavorFamilies(SAMPLE_MENU);
       renderTabs();
       renderSubtabs();
       renderMenu();
@@ -5450,11 +6372,11 @@
       const qrSessionPromise = refreshQrSession();
       try {
         const remoteMenus = await fetchMenusFromSupabase();
-        if (remoteMenus.length) allMenus = remoteMenus;
+        if (remoteMenus.length) allMenus = prepareMenuFlavorFamilies(remoteMenus);
       } catch (error) {
         console.error(error);
         const sheetMenus = await fetchMenusFromGoogleSheet().catch(() => SAMPLE_MENU);
-        if (sheetMenus.length) allMenus = sheetMenus;
+        if (sheetMenus.length) allMenus = prepareMenuFlavorFamilies(sheetMenus);
       }
       renderTabs();
       renderSubtabs();

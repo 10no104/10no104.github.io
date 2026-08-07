@@ -61,9 +61,6 @@ create table if not exists public.noble_schedule_shifts (
 create index if not exists noble_staff_availability_date_idx
   on public.noble_staff_availability (availability_date, branch_scope);
 
-create index if not exists noble_staff_availability_staff_idx
-  on public.noble_staff_availability (staff_key, availability_date);
-
 create index if not exists noble_schedule_shifts_week_branch_date_idx
   on public.noble_schedule_shifts (week_id, branch, shift_date, sort_order);
 
@@ -73,6 +70,7 @@ create index if not exists noble_schedule_shifts_staff_date_idx
 create or replace function public.noble_touch_updated_at()
 returns trigger
 language plpgsql
+set search_path = ''
 as $$
 begin
   new.updated_at = now();
@@ -113,7 +111,8 @@ to anon
 with check (true);
 
 drop policy if exists noble_access_requests_admin_all on public.noble_access_requests;
-create policy noble_access_requests_admin_all
+drop policy if exists noble_access_requests_authenticated_all on public.noble_access_requests;
+create policy noble_access_requests_authenticated_all
 on public.noble_access_requests
 for all
 to authenticated

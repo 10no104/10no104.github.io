@@ -18,6 +18,7 @@ create index if not exists king_schedule_calendar_events_date_idx
 create or replace function public.king_schedule_calendar_events_touch_updated_at()
 returns trigger
 language plpgsql
+set search_path = ''
 as $$
 begin
   new.updated_at = now();
