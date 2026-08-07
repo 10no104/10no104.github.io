@@ -5439,6 +5439,7 @@
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxS_ru2I7ySfJeH4kD3hd1wPiHerJW3Iiujn95evZuFiyLNrJUo-_H6rKngdxt0EeBFVw/exec";
     const RESERVATION_REFRESH_MS = 5000;
     const DINING_REALTIME_DEBOUNCE_MS = 350;
+    const DINING_SIGNAL_CONNECTED_POLL_MS = 30000;
     const DINING_SIGNAL_FALLBACK_MS = 5000;
     const DINING_SAFETY_REFRESH_MS = 5 * 60 * 1000;
     const ORDER_ALARM_REPEAT_MS = 2200;
@@ -5469,6 +5470,7 @@
       reservationRefreshHandle: null,
       diningSafetyRefreshHandle: null,
       diningSignalPollHandle: null,
+      diningSignalPollMs: null,
       diningRealtimeClient: null,
       diningRealtimeChannel: null,
       diningRealtimeStatus: "DISCONNECTED",
@@ -8230,7 +8232,10 @@
         syncStatus.textContent = "Could not reach the request queue. Existing items may be out of date.";
         syncStatus.className = "request-sync-status is-error";
       } else if (state.requestsLoadedAt) {
-        syncStatus.textContent = `Realtime updates · 5-second safety check · Updated ${formatRequestClock(state.requestsLoadedAt)}`;
+        const signalPollSeconds = Math.round(
+          (state.diningSignalPollMs || DINING_SIGNAL_FALLBACK_MS) / 1000
+        );
+        syncStatus.textContent = `Realtime updates · ${signalPollSeconds}-second safety check · Updated ${formatRequestClock(state.requestsLoadedAt)}`;
         syncStatus.className = "request-sync-status";
       }
 
@@ -8487,18 +8492,26 @@
     }
 
     function stopDiningSignalFallbackPolling() {
-      if (!state.diningSignalPollHandle) return;
-      window.clearInterval(state.diningSignalPollHandle);
+      if (state.diningSignalPollHandle) {
+        window.clearInterval(state.diningSignalPollHandle);
+      }
       state.diningSignalPollHandle = null;
+      state.diningSignalPollMs = null;
     }
 
-    function startDiningSignalFallbackPolling() {
-      if (state.diningSignalPollHandle) return;
-      checkDiningSignal();
+    function startDiningSignalFallbackPolling(intervalMs = DINING_SIGNAL_FALLBACK_MS, { immediate = true } = {}) {
+      if (
+        state.diningSignalPollHandle
+        && state.diningSignalPollMs === intervalMs
+      ) return;
+      stopDiningSignalFallbackPolling();
+      state.diningSignalPollMs = intervalMs;
+      if (immediate) checkDiningSignal();
       state.diningSignalPollHandle = window.setInterval(
         checkDiningSignal,
-        DINING_SIGNAL_FALLBACK_MS
+        intervalMs
       );
+      renderDiningRequests();
     }
 
     function handleDiningRealtimeSignal(payload) {
@@ -8546,6 +8559,10 @@
             state.diningRealtimeStatus = status;
             if (status === "SUBSCRIBED") {
               checkDiningSignal();
+              startDiningSignalFallbackPolling(
+                DINING_SIGNAL_CONNECTED_POLL_MS,
+                { immediate: false }
+              );
               return;
             }
             if (error) console.error("Dining Realtime subscription failed", error);
