@@ -2660,16 +2660,20 @@
     .menu-detail-visual {
       position: relative;
       overflow: hidden;
+      margin-inline: -4px;
       border-radius: 20px;
-      background: #eee6da;
+      background: transparent;
     }
 
     .menu-detail-gallery {
       display: flex;
+      gap: 10px;
       width: 100%;
-      height: min(34vh, 230px);
+      height: min(31vh, 220px);
+      padding-inline: 9%;
       overflow-x: auto;
       overscroll-behavior-x: contain;
+      scroll-padding-inline: 9%;
       scroll-snap-type: x mandatory;
       scrollbar-width: none;
     }
@@ -2681,15 +2685,36 @@
 
     .menu-detail-slide {
       position: relative;
-      flex: 0 0 100%;
-      width: 100%;
+      flex: 0 0 82%;
       height: 100%;
       padding: 0;
       overflow: hidden;
-      border: 0;
+      border: 2px solid transparent;
+      border-radius: 18px;
       background: #eee6da;
-      scroll-snap-align: start;
+      box-shadow: 0 10px 24px rgba(44, 27, 16, 0.12);
+      opacity: 0.68;
+      scroll-snap-align: center;
+      transform: scale(0.965);
+      transition: opacity 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
       cursor: pointer;
+    }
+
+    .menu-detail-slide.is-static,
+    .menu-detail-slide:has(input:checked) {
+      border-color: rgba(212, 175, 55, 0.76);
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .menu-detail-slide-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      clip-path: inset(50%);
+      white-space: nowrap;
     }
 
     .menu-detail-slide img {
@@ -2701,6 +2726,11 @@
     .menu-detail-slide:focus-visible {
       outline: 3px solid #f2cf6b;
       outline-offset: -5px;
+    }
+
+    .menu-detail-slide:has(input:focus-visible) {
+      outline: 3px solid #f2cf6b;
+      outline-offset: 2px;
     }
 
     .menu-detail-slide::after {
@@ -2747,6 +2777,28 @@
       font-size: 1.2rem;
     }
 
+    .menu-detail-slide-selected {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 2;
+      display: none;
+      align-items: center;
+      min-height: 27px;
+      padding: 0 9px;
+      border: 1px solid rgba(255, 255, 255, 0.62);
+      border-radius: 999px;
+      background: #5a1122;
+      color: #fff;
+      font-size: 0.62rem;
+      font-weight: 950;
+      box-shadow: 0 6px 14px rgba(35, 20, 11, 0.22);
+    }
+
+    .menu-detail-slide:has(input:checked) .menu-detail-slide-selected {
+      display: inline-flex;
+    }
+
     .menu-detail-gallery-nav {
       position: absolute;
       top: 50%;
@@ -2778,8 +2830,9 @@
 
     .menu-detail-gallery-status {
       position: absolute;
-      right: 12px;
-      top: 12px;
+      left: 50%;
+      top: 10px;
+      right: auto;
       z-index: 2;
       display: flex;
       align-items: center;
@@ -2792,6 +2845,7 @@
       color: #fff;
       font-size: 0.65rem;
       font-weight: 900;
+      transform: translateX(-50%);
       backdrop-filter: blur(5px);
     }
 
@@ -2801,12 +2855,13 @@
 
     .menu-detail-copy {
       display: grid;
-      gap: 7px;
-      padding: 16px 2px 12px;
+      gap: 5px;
+      padding: 11px 2px 8px;
     }
 
     .menu-detail-variant-kicker {
-      margin: 0 0 2px;
+      display: none;
+      margin: 0;
       color: #9a7520;
       font-size: 0.64rem;
       font-weight: 950;
@@ -2817,7 +2872,7 @@
     .menu-detail-copy h3 {
       margin: 0;
       color: #2f2119;
-      font-size: 1.5rem;
+      font-size: 1.28rem;
       letter-spacing: -0.045em;
       line-height: 1.15;
     }
@@ -2830,20 +2885,32 @@
     }
 
     .menu-detail-name-en {
-      font-size: 0.9rem;
+      font-size: 0.78rem;
       font-weight: 800;
     }
 
     .menu-detail-description {
-      font-size: 0.85rem;
+      font-size: 0.78rem;
       font-weight: 650;
     }
 
     .menu-detail-tags {
       display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-      margin-top: 4px;
+      flex-wrap: nowrap;
+      gap: 5px;
+      margin-top: 3px;
+      padding-bottom: 2px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .menu-detail-tags::-webkit-scrollbar { display: none; }
+
+    .menu-detail-tags .menu-tag {
+      flex: 0 0 auto;
+      padding: 5px 8px;
+      font-size: 0.62rem;
+      box-shadow: none;
     }
 
     .menu-detail-tags[hidden] {
@@ -2851,13 +2918,11 @@
     }
 
     .menu-detail-ingredients {
-      display: grid;
-      grid-template-columns: auto minmax(0, 1fr);
-      gap: 6px 10px;
-      margin-top: 5px;
-      padding: 10px 12px;
+      display: block;
+      margin-top: 3px;
+      padding: 0;
       border: 1px solid rgba(125, 98, 63, 0.12);
-      border-radius: 14px;
+      border-radius: 12px;
       background: rgba(255, 255, 255, 0.58);
     }
 
@@ -2865,16 +2930,43 @@
       display: none;
     }
 
-    .menu-detail-ingredients strong {
+    .menu-detail-ingredients summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      min-height: 38px;
+      padding: 0 10px;
+      list-style: none;
       color: #6f5039;
       font-size: 0.68rem;
       font-weight: 950;
       letter-spacing: 0.05em;
       text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .menu-detail-ingredients summary::-webkit-details-marker { display: none; }
+
+    .menu-detail-ingredients summary span {
+      color: #9a7520;
+      font-size: 0;
+    }
+
+    .menu-detail-ingredients summary span::after {
+      content: "View";
+      font-size: 0.6rem;
+    }
+
+    .menu-detail-ingredients[open] summary span::after { content: "Hide"; }
+
+    .menu-detail-ingredients[open] summary {
+      border-bottom: 1px solid rgba(125, 98, 63, 0.1);
     }
 
     .menu-detail-ingredients p {
       margin: 0;
+      padding: 8px 10px 10px;
       color: #756357;
       font-size: 0.72rem;
       font-weight: 720;
@@ -2882,12 +2974,12 @@
     }
 
     .menu-detail-customizations {
-      display: grid;
-      gap: 14px;
-      margin: 2px 0 10px;
-      padding: 14px;
+      display: block;
+      margin: 2px 0 6px;
+      padding: 0;
+      overflow: hidden;
       border: 1px solid rgba(125, 98, 63, 0.14);
-      border-radius: 18px;
+      border-radius: 14px;
       background: rgba(255, 252, 247, 0.78);
     }
 
@@ -2900,6 +2992,58 @@
       color: #3b2418;
       font-size: 0.95rem;
       font-weight: 950;
+    }
+
+    .menu-customization-more > summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 46px;
+      padding: 0 12px;
+      list-style: none;
+      color: #3b2418;
+      font-size: 0.78rem;
+      font-weight: 950;
+      cursor: pointer;
+    }
+
+    .menu-customization-more > summary::-webkit-details-marker { display: none; }
+
+    .menu-customization-more > summary::before {
+      content: "+";
+      display: grid;
+      flex: 0 0 auto;
+      width: 24px;
+      height: 24px;
+      margin-right: -4px;
+      place-items: center;
+      border-radius: 999px;
+      background: rgba(90, 17, 34, 0.08);
+      color: #5a1122;
+      font-size: 1rem;
+    }
+
+    .menu-customization-more[open] > summary::before { content: "−"; }
+
+    .menu-customization-more > summary span {
+      flex: 1 1 auto;
+    }
+
+    .menu-customization-more > summary small {
+      color: #8a786a;
+      font-size: 0.62rem;
+      font-weight: 850;
+    }
+
+    .menu-customization-more[open] > summary {
+      border-bottom: 1px solid rgba(125, 98, 63, 0.12);
+    }
+
+    .menu-customization-more-body {
+      display: grid;
+      gap: 12px;
+      padding: 11px;
     }
 
     .menu-customization-group {
@@ -3265,38 +3409,34 @@
       }
 
       .menu-detail-gallery {
-        height: min(35dvh, 260px);
+        height: min(28dvh, 205px);
       }
 
       .menu-detail-gallery-nav {
-        width: 38px;
-        height: 38px;
+        display: none;
       }
 
       .menu-detail-copy {
-        gap: 6px;
-        padding: 13px 2px 9px;
+        gap: 4px;
+        padding: 9px 2px 7px;
       }
 
       .menu-detail-copy h3 {
         padding-right: 4px;
-        font-size: 1.32rem;
+        font-size: 1.18rem;
       }
 
       .menu-detail-description {
-        font-size: 0.82rem;
+        font-size: 0.75rem;
       }
 
       .menu-detail-ingredients {
-        grid-template-columns: 1fr;
-        gap: 3px;
-        padding: 9px 10px;
+        padding: 0;
       }
 
       .menu-detail-customizations {
-        gap: 10px;
         margin: 0 0 6px;
-        padding: 11px;
+        padding: 0;
         border-radius: 16px;
       }
 
@@ -3661,10 +3801,10 @@
         <h3 id="menuDetailNameKo">Menu item</h3>
         <p class="menu-detail-name-en" id="menuDetailNameEn"></p>
         <p class="menu-detail-description" id="menuDetailDescription"></p>
-        <div class="menu-detail-ingredients" id="menuDetailIngredients" hidden>
-          <strong>Ingredients</strong>
+        <details class="menu-detail-ingredients" id="menuDetailIngredients" hidden>
+          <summary>Ingredients <span>View</span></summary>
           <p id="menuDetailIngredientText"></p>
-        </div>
+        </details>
         <div class="menu-detail-tags" id="menuDetailTags"></div>
       </div>
       <div class="menu-detail-customizations" id="menuDetailCustomizations" hidden></div>
@@ -6208,6 +6348,10 @@
     function renderMenuDetailGallery(item) {
       const gallery = document.getElementById("menuDetailGallery");
       if (!gallery) return;
+      const flavorGroup = getMenuCustomizations(item).find(isFlavorCustomizationGroup);
+      const defaultFlavorOptionId = flavorGroup?.options.find((option) => option.defaultSelected)?.id
+        || flavorGroup?.options[0]?.id
+        || "";
       const images = getMenuGallery(item);
       const slides = images.length ? images : [{
         imageUrl: item.imageUrl || MENU_IMAGE_PLACEHOLDER,
@@ -6224,16 +6368,29 @@
         const slidePrice = image.variantPrice != null
           ? Number(image.variantPrice)
           : Number((parsePriceNumber(item.price) + Number(image.priceDelta || 0)).toFixed(2));
+        const hasFlavorChoice = Boolean(image.groupId && image.optionId);
+        const slideTag = hasFlavorChoice ? "label" : "div";
         return `
-        <button
-          class="menu-detail-slide"
-          type="button"
+        <${slideTag}
+          class="menu-detail-slide${hasFlavorChoice ? " is-selectable" : " is-static"}"
           data-gallery-index="${index}"
           ${image.groupId ? `data-flavor-group-id="${escapeHtml(image.groupId)}"` : ""}
           ${image.optionId ? `data-flavor-option-id="${escapeHtml(image.optionId)}"` : ""}
+          ${hasFlavorChoice ? "" : "tabindex=\"0\""}
           aria-label="${escapeHtml(image.label || `Photo ${index + 1}`)}${image.optionId ? " — select this flavor" : ""}"
         >
+          ${hasFlavorChoice ? `
+            <input
+              class="menu-detail-slide-input"
+              type="radio"
+              name="menu-custom-${escapeHtml(image.groupId)}"
+              data-custom-group="${escapeHtml(image.groupId)}"
+              data-custom-option="${escapeHtml(image.optionId)}"
+              ${image.optionId === defaultFlavorOptionId ? "checked" : ""}
+            />
+          ` : ""}
           <img src="${escapeHtml(image.imageUrl || MENU_IMAGE_PLACEHOLDER)}" alt="${escapeHtml(image.imageAlt || image.label || item.nameEn || item.nameKo)}" />
+          ${hasFlavorChoice ? `<span class="menu-detail-slide-selected" aria-hidden="true">✓ Selected</span>` : ""}
           <span class="menu-detail-slide-label">
             <span class="menu-detail-slide-copy">
               <strong>${escapeHtml(image.label || item.nameEn || item.nameKo || "Menu item")}</strong>
@@ -6241,9 +6398,23 @@
             </span>
             ${image.emoji ? `<span class="menu-detail-slide-emoji" aria-hidden="true">${escapeHtml(image.emoji)}</span>` : ""}
           </span>
-        </button>
+        </${slideTag}>
       `;}).join("");
       syncMenuDetailGalleryStatus();
+    }
+
+    function getCenteredMenuDetailGalleryIndex(gallery) {
+      const slides = [...(gallery?.children || [])];
+      if (!gallery || !slides.length) return 0;
+      const viewportCenter = gallery.scrollLeft + (gallery.clientWidth / 2);
+      return slides.reduce((closestIndex, slide, index) => {
+        const slideCenter = slide.offsetLeft + (slide.offsetWidth / 2);
+        const closestSlide = slides[closestIndex];
+        const closestCenter = closestSlide.offsetLeft + (closestSlide.offsetWidth / 2);
+        return Math.abs(slideCenter - viewportCenter) < Math.abs(closestCenter - viewportCenter)
+          ? index
+          : closestIndex;
+      }, 0);
     }
 
     function syncMenuDetailGalleryStatus() {
@@ -6271,7 +6442,11 @@
         ? Number(directionOrIndex)
         : selectedMenuGalleryIndex + Number(directionOrIndex);
       selectedMenuGalleryIndex = Math.max(0, Math.min(nextIndex, slideCount - 1));
-      gallery.scrollTo({ left: gallery.clientWidth * selectedMenuGalleryIndex, behavior });
+      const slide = gallery.children[selectedMenuGalleryIndex];
+      gallery.scrollTo({
+        left: slide.offsetLeft - ((gallery.clientWidth - slide.offsetWidth) / 2),
+        behavior
+      });
       syncMenuDetailGalleryStatus();
       selectMenuDetailFlavorFromCurrentSlide();
     }
@@ -6284,10 +6459,10 @@
       if (index >= 0) scrollMenuDetailGallery(index, { absolute: true, behavior });
     }
 
-    function selectMenuDetailFlavor(optionId, groupId = "", { centerNav = true } = {}) {
+    function selectMenuDetailFlavor(optionId, groupId = "") {
       if (!optionId) return;
-      const customizations = document.getElementById("menuDetailCustomizations");
-      const inputs = [...(customizations?.querySelectorAll("[data-custom-option]") || [])];
+      const detail = document.getElementById("menuDetailBackdrop");
+      const inputs = [...(detail?.querySelectorAll("[data-custom-option]") || [])];
       const input = inputs.find((candidate) => (
         candidate.dataset.customOption === optionId
         && (!groupId || candidate.dataset.customGroup === groupId)
@@ -6295,16 +6470,6 @@
       if (!input || input.disabled) return;
       input.checked = true;
       syncMenuDetailSelectionState();
-      if (centerNav) {
-        const label = input.closest("label");
-        const track = label?.parentElement;
-        if (label && track) {
-          track.scrollTo({
-            left: label.offsetLeft - ((track.clientWidth - label.clientWidth) / 2),
-            behavior: "smooth"
-          });
-        }
-      }
     }
 
     function selectMenuDetailFlavorFromCurrentSlide() {
@@ -6323,7 +6488,7 @@
       renderMenuDetailCustomizations(item);
       renderMenuDetailGallery(item);
       syncMenuDetailSelectionState();
-      const selectedFlavor = document.querySelector("#menuDetailCustomizations [data-custom-option]:checked");
+      const selectedFlavor = document.querySelector("#menuDetailGallery [data-custom-option]:checked");
       backdrop.hidden = false;
       backdrop.classList.add("is-open");
       document.body.style.overflow = "hidden";
@@ -6347,7 +6512,11 @@
     function renderMenuDetailCustomizations(item) {
       const container = document.getElementById("menuDetailCustomizations");
       if (!container) return;
-      const groups = getMenuCustomizations(item);
+      const allGroups = getMenuCustomizations(item);
+      const galleryFlavorGroup = allGroups.find((group) => (
+        isFlavorCustomizationGroup(group) && group.options.some((option) => option.imageUrl)
+      ));
+      const groups = allGroups.filter((group) => group !== galleryFlavorGroup);
       if (!groups.length) {
         container.innerHTML = "";
         container.hidden = true;
@@ -6355,8 +6524,14 @@
       }
 
       container.hidden = false;
+      const hasRequiredOptions = groups.some((group) => group.min > 0);
       container.innerHTML = `
-        <h4 class="menu-customization-heading">Customize</h4>
+        <details class="menu-customization-more" ${hasRequiredOptions ? "open" : ""}>
+          <summary>
+            <span>Add-ons &amp; requests</span>
+            <small id="menuCustomizationMoreSummary">${hasRequiredOptions ? "Selection required" : "Optional"}</small>
+          </summary>
+          <div class="menu-customization-more-body">
         ${groups.map((group) => {
           const isFlavorNav = isFlavorCustomizationGroup(group) && group.options.some((option) => option.imageUrl);
           const isVisual = !isFlavorNav && Boolean(group.visual || group.options.some((option) => option.imageUrl));
@@ -6415,6 +6590,8 @@
             </section>
           `;
         }).join("")}
+          </div>
+        </details>
       `;
     }
 
@@ -6422,7 +6599,7 @@
       const item = allMenus.find((candidate) => getMenuId(candidate) === selectedMenuDetailId);
       if (!item) return [];
       const groups = getMenuCustomizations(item);
-      const checkedInputs = [...document.querySelectorAll("#menuDetailCustomizations [data-custom-option]:checked")];
+      const checkedInputs = [...document.querySelectorAll("#menuDetailBackdrop [data-custom-option]:checked")];
 
       return checkedInputs.flatMap((input) => {
         const group = groups.find((candidate) => candidate.id === input.dataset.customGroup);
@@ -6450,13 +6627,16 @@
       if (!item || !addButton || !price) return;
 
       const groups = getMenuCustomizations(item);
-      const inputs = [...document.querySelectorAll("#menuDetailCustomizations [data-custom-option]")];
+      const inputs = [...document.querySelectorAll("#menuDetailBackdrop [data-custom-option]")];
       let missingRequired = false;
+      let missingRequiredAddOn = false;
 
       groups.forEach((group) => {
         const groupInputs = inputs.filter((input) => input.dataset.customGroup === group.id);
         const checkedCount = groupInputs.filter((input) => input.checked).length;
-        missingRequired ||= checkedCount < group.min;
+        const isMissing = checkedCount < group.min;
+        missingRequired ||= isMissing;
+        if (isMissing && !isFlavorCustomizationGroup(group)) missingRequiredAddOn = true;
         groupInputs.forEach((input) => {
           input.disabled = group.type === "multiple" && !input.checked && checkedCount >= group.max;
         });
@@ -6476,9 +6656,18 @@
         : Number((parsePriceNumber(item.price) + Number(selectedFlavorOption?.priceDelta || 0)).toFixed(2));
       const itemTotal = Number((flavorPrice + nonFlavorOptionTotal).toFixed(2));
       const canOrder = Boolean(currentQrSession && !qrSessionLoadError && !guestPartyConflict && !isDiningRequestSubmitting);
+      const addOnInputs = [...document.querySelectorAll("#menuDetailCustomizations [data-custom-option]:checked")];
+      const addOnSummary = document.getElementById("menuCustomizationMoreSummary");
+      const addOnDetails = document.querySelector("#menuDetailCustomizations .menu-customization-more");
 
       price.textContent = formatCurrency(itemTotal);
       renderMenuDetailVariant(item, selectedFlavorOption?.id || "");
+      if (addOnSummary) {
+        addOnSummary.textContent = missingRequiredAddOn
+          ? "Selection required"
+          : (addOnInputs.length ? `${addOnInputs.length} selected` : "Optional");
+      }
+      if (missingRequiredAddOn && addOnDetails) addOnDetails.open = true;
       addButton.disabled = !canOrder || missingRequired;
       addButton.textContent = !canOrder
         ? "QR not active"
@@ -6505,9 +6694,16 @@
       });
       galleryPrev.addEventListener("click", () => scrollMenuDetailGallery(-1));
       galleryNext.addEventListener("click", () => scrollMenuDetailGallery(1));
+      gallery.addEventListener("change", (event) => {
+        if (!event.target.matches("[data-custom-option]")) return;
+        const slide = event.target.closest(".menu-detail-slide");
+        selectedMenuGalleryIndex = Number(slide?.dataset.galleryIndex || 0);
+        syncMenuDetailSelectionState();
+        syncMenuDetailGalleryStatus();
+      });
       gallery.addEventListener("scroll", () => {
         if (!gallery.clientWidth) return;
-        selectedMenuGalleryIndex = Math.round(gallery.scrollLeft / gallery.clientWidth);
+        selectedMenuGalleryIndex = getCenteredMenuDetailGalleryIndex(gallery);
         syncMenuDetailGalleryStatus();
         if (menuDetailGalleryScrollHandle) window.clearTimeout(menuDetailGalleryScrollHandle);
         menuDetailGalleryScrollHandle = window.setTimeout(() => {
@@ -6515,11 +6711,6 @@
           selectMenuDetailFlavorFromCurrentSlide();
         }, 80);
       }, { passive: true });
-      gallery.addEventListener("click", (event) => {
-        const slide = event.target.closest("[data-flavor-option-id]");
-        if (!slide?.dataset.flavorOptionId) return;
-        selectMenuDetailFlavor(slide.dataset.flavorOptionId, slide.dataset.flavorGroupId || "");
-      });
       gallery.addEventListener("keydown", (event) => {
         if (event.key === "ArrowLeft") {
           event.preventDefault();
